@@ -9,7 +9,7 @@ Modified by Florian Oswald for ScPo
 
 /* Package defaults that we slightly tweak */
 
-.remark-slide-content { font-size: 28px; }
+.remark-slide-content { font-size: 23px; }
 
 a, a > code {
   color: #d90502; /* rgb(249, 38, 114) */
@@ -22,7 +22,7 @@ a, a > code {
   position: absolute;
   bottom: 1em;
   padding-right: 4em;
-  font-size: 95%;
+  font-size: 85%;
 }
 
 /* important code slightly red */
@@ -68,12 +68,12 @@ a, a > code {
 
 .pull-left {
   float: left;
-  width: 45%;
+  width: 48%;
 }
 
 .pull-right {
   float: right;
-  width: 45%;
+  width: 48%;
 }
 
 .pull-right ~ * {
