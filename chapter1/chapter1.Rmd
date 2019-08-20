@@ -996,6 +996,10 @@ say_hello()
 * Call the function with your name!
 
 ---
+background-image: url("https://media.giphy.com/media/j3Pm7ejYTm79SpoEha/giphy.gif")
+background-size: 100%
+
+---
 class: inverse
 
 # Task 5
