@@ -11,6 +11,17 @@ Modified by Florian Oswald for ScPo
 
 .remark-slide-content { font-size: 23px; }
 
+pre {
+    display: block;
+    font-family: monospace;
+    white-space: pre;
+    margin: 1em 0px;
+    margin-top: 0em;
+    margin-right: 0px;
+    margin-bottom: 0.3em;
+    margin-left: 0px;
+}
+
 a, a > code {
   color: #d90502; /* rgb(249, 38, 114) */
   text-decoration: none;
