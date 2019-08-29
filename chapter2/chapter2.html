@@ -4,7 +4,7 @@
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald" />
-    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
     <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
@@ -14,9 +14,9 @@
 class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
-## Introduction
+## Session 2
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-08-28
+### SciencesPo Paris </br> 2019-08-29
 
 ---
 
@@ -27,6 +27,8 @@ layout: true
 
 ---
 
+
+
 # Working With Data
 
 
@@ -34,7 +36,7 @@ layout: true
 
 * In these slides we will start to look at this.
 
-* Let's first all load a dataset:
+* Let's first all load a dataset with this command:
     
     ```r
     data("mpg",package="ggplot2")
@@ -76,6 +78,8 @@ layout: true
 
 * `names` gives the column names.
 
+---
+
 # The `mpg` dataset: datatypes
 
 * It's important to know how the data is stored.
@@ -108,15 +112,25 @@ str(mpg)
 
 
 * One can learn only a limited amount from **looking** at a `data.frame`.
+
 --
+
 * Even if you *could* see all rows of the dataset, you would not know very much **about it**.
+
 --
+
 * We need to **summarize** the data for us to learn from it.
+
 --
+
 * In general, we can compute summary statistics, or visualize the data with plots.
+
 --
+
 * Let's start with some statistics first!
+
 --
+
 * Let's look at two features: *central tendency* and *spread*.
 
 ---
@@ -170,7 +184,6 @@ median(x)
 --
 
 * The *variance* is such a measure.
-
     
     ```r
     var(x)
@@ -292,7 +305,7 @@ layout: true
 hist(mpg$cty)
 ```
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -304,14 +317,14 @@ hist(mpg$cty)
 hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (City)", breaks = 12, col = "red",border = "blue")
 ```
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Looking for Outliers: Boxplots
 
 * It's good to know if a variable has *outliers*, i.e. values much more extreme than the mass of all values.
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -347,7 +360,7 @@ hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (Ci
 plot(hwy ~ displ, data = mpg)
 ```
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 class: inverse, middle
@@ -356,6 +369,8 @@ class: inverse, middle
 # It's Tutorial Time!
 
 ---
+
+# Tutorial Chapter 2
 
 Time for our first tutorial!! Type this into your `RStudio` console:
 
@@ -374,12 +389,19 @@ ScPoEconometrics::runTutorial('chapter2-script')
 
 ---
 
-# How are x and y related? Covariance
+# How are x and y related? Covariance.
 
+.pull-left[
+&lt;img src="chapter2_files/figure-html/x-y-corr-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
-&lt;img src="chapter2_files/figure-html/x-y-corr-1.png" style="display: block; margin: auto;" /&gt;
+.pull-right[
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+* This is the [relevant section in the book](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two).
 
-The [relevant section in the book](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two) is **mandatory** reading.
+* This is **mandatory** reading.
+
+]
 
 ---
 class: inverse
@@ -407,7 +429,8 @@ background-position: 9% 19%
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
 | &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
-| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides and Book |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
     </textarea>

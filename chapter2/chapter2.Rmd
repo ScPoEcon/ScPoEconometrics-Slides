@@ -23,6 +23,20 @@ layout: true
 
 ---
 
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  cache.path = ".cache/",
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+```
+
 # Working With Data
 
 
@@ -73,15 +87,25 @@ str(mpg)
 
 
 * One can learn only a limited amount from **looking** at a `data.frame`.
+
 --
+
 * Even if you *could* see all rows of the dataset, you would not know very much **about it**.
+
 --
+
 * We need to **summarize** the data for us to learn from it.
+
 --
+
 * In general, we can compute summary statistics, or visualize the data with plots.
+
 --
+
 * Let's start with some statistics first!
+
 --
+
 * Let's look at two features: *central tendency* and *spread*.
 
 ---
@@ -116,7 +140,6 @@ median(x)
 --
 
 * The *variance* is such a measure.
-
     ```{r}
     var(x)
     all.equal(var(x), sum((x - mean(x))^2) / (length(x)-1))
@@ -181,7 +204,7 @@ layout: true
 
 # Histogram
 
-```{r,fig.align='center'}
+```{r,fig.align='center',fig.height=4.5}
 hist(mpg$cty)
 ```
 
@@ -190,7 +213,7 @@ hist(mpg$cty)
 # A Nicer Histogram
 
 
-```{r,fig.align='center'}
+```{r,fig.height=4.5}
 hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (City)", breaks = 12, col = "red",border = "blue")
 ```
 
@@ -199,7 +222,7 @@ hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (Ci
 # Looking for Outliers: Boxplots
 
 * It's good to know if a variable has *outliers*, i.e. values much more extreme than the mass of all values.
-```{r,fig.align='center',echo=FALSE,fig.height=8,fig.width=10}
+```{r,fig.align='center',echo=FALSE,fig.height=5,fig.width=10}
 boxplot(hwy ~ drv, data = mpg, xlab   = "Drivetrain (f = FWD, r = RWD, 4 = 4WD)", ylab   = "Miles Per Gallon (Highway)", main   = "MPG (Highway) vs Drivetrain", pch = 20,cex = 2,col ="darkorange",border = "dodgerblue")
 ```
 
@@ -221,7 +244,7 @@ boxplot(hwy ~ drv, data = mpg, xlab   = "Drivetrain (f = FWD, r = RWD, 4 = 4WD)"
 
 # Scatter Plots
 
-```{r,fig.align='center'}
+```{r,,fig.height=5}
 plot(hwy ~ displ, data = mpg)
 ```
 
@@ -232,6 +255,8 @@ class: inverse, middle
 # It's Tutorial Time!
 
 ---
+
+# Tutorial Chapter 2
 
 Time for our first tutorial!! Type this into your `RStudio` console:
 
@@ -248,10 +273,10 @@ ScPoEconometrics::runTutorial('chapter2-script')
 
 ---
 
-# How are x and y related? Covariance
+# How are x and y related? Covariance.
 
-
-```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center'}
+.pull-left[
+```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 6,fig.width=6}
 library(mvtnorm)
 set.seed(10)
 cor = 0.9
@@ -262,8 +287,15 @@ y = ndat$X2
 par(pty="s")
 plot(x ~ y, xlab="x",ylab="y")
 ```
+]
 
-The [relevant section in the book](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two) is **mandatory** reading.
+.pull-right[
+<br><br><br>
+* This is the [relevant section in the book](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two).
+
+* This is **mandatory** reading.
+
+]
 
 ---
 class: inverse
@@ -290,7 +322,8 @@ background-position: 9% 19%
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
 | <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
-| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides and Book |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
 
