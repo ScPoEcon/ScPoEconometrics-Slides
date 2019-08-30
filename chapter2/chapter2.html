@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Session 2
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-08-29
+### SciencesPo Paris </br> 2019-08-30
 
 ---
 
@@ -44,21 +44,7 @@ layout: true
 
 --
 
-* how many observations, how many variables?
-    
-    ```r
-    dim(mpg)
-    ```
-    
-    ```
-    ## [1] 234  11
-    ```
-
----
-
-# The `mpg` dataset
-
-* And let's look at the first couple of rows:
+* Here are the first 6 rows
     
     ```r
     head(mpg)
@@ -74,9 +60,29 @@ layout: true
     ## 6         audi    a4   2.8 1999   6 manual(m5)   f  18  26  p compact
     ```
 
-* `tail` gives you the last rows.
+---
+
+# The `mpg` dataset
+
+* How many rows and columns?
+    
+    ```r
+    dim(mpg)
+    ```
+    
+    ```
+    ## [1] 234  11
+    ```
+
+* `tail` gives you the last (6) rows.
+    
+    ```r
+    tail(mpg)
+    ```
 
 * `names` gives the column names.
+
+* 🚨 this is a *tibble* - basically a data.frame with enhanced printing.
 
 ---
 
@@ -111,7 +117,7 @@ str(mpg)
 # Summarizing Data
 
 
-* One can learn only a limited amount from **looking** at a `data.frame`.
+* One can learn only a limited amount from **looking** at a `data.frame`. 🔍
 
 --
 
@@ -138,15 +144,18 @@ str(mpg)
 # Central Tendency
 
 
-
+.pull-left[
 1. `mean(x)`: the average of all values in `x`.
+    `$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$`
+
+1. `median`: the value `\(x_j\)` below and above which 50% of the values in `x` lie. `\(m\)` is the median if
+    `$$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$`
+1. The median is robust against *outliers*. 🤔? (later).
+]
 
 --
 
-1. `median`: the value `\(x_j\)` below and above which 50% of the values in `x` lie.
-
---
-
+.pull-right[
 
 ```r
 x &lt;- c(1,2,2,2,2,100)
@@ -164,6 +173,7 @@ mean(x) == sum(x) / length(x)
 ```
 ## [1] TRUE
 ```
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
 
 ```r
 median(x)
@@ -172,44 +182,35 @@ median(x)
 ```
 ## [1] 2
 ```
-
+]
 
 ---
 
 # Spread
 
+.pull-left[
+* Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
 
-* Another interesting feature is how much a variable is *spread out* about it's center (mean or median).
+* The *variance* is such a measure.
+    `$$Var(X) = E[(X-\mu)^2]$$`
+    
+* Consider two Normal Distributions with equal mean at `0`:
+    
+]
 
 --
 
-* The *variance* is such a measure.
-    
-    ```r
-    var(x)
-    ```
-    
-    ```
-    ## [1] 1607.367
-    ```
-    
-    ```r
-    all.equal(var(x), sum((x - mean(x))^2) / (length(x)-1))
-    ```
-    
-    ```
-    ## [1] TRUE
-    ```
-* Similarly, the `range` is
-    
-    ```r
-    range(x)
-    ```
-    
-    ```
-    ## [1]   1 100
-    ```
+.pull-right[
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 
+* Compute with:
+
+
+```r
+    var(x)
+    range(x)   # range
+```
+]
 ---
 
 # The `table` function
@@ -289,42 +290,69 @@ layout: true
 
 # Plotting
 
-
+.pull-left[
 * `R` base plotting is fairly good.
 
 * There is an extremely powerful alternative in package `ggplot2`. We'll see both.
 
 * First example: *histograms*. A histogram counts how many obserations fall within a certain bin.
+]
 
----
+--
 
-# Histogram
-
+.pull-right[
 
 ```r
 hist(mpg$cty)
 ```
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
 # A Nicer Histogram
 
 
+.pull-left[
+* We can give additional arguments to `hist`.
+
+* Look at `?hist` for more.
+
 
 ```r
-hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (City)", breaks = 12, col = "red",border = "blue")
+hist(mpg$cty, 
+     xlab   = "Miles Per Gallon (City)", 
+     main   = "Histogram of MPG (City)", 
+     breaks = 12, 
+     col    = "red",
+     border = "blue")
 ```
-
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
 # Looking for Outliers: Boxplots
 
-* It's good to know if a variable has *outliers*, i.e. values much more extreme than the mass of all values.
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+.pull-left[
+&lt;br&gt;
+* An *Outlier* is a datapoint far removed from the center of a distribution.
+
+* Boxplots are an effective way to check: Outliers are dots.
+
+* The thick line is the median.
+
+* The *box* typically denotes the interquartile range.
+
+* see `?boxplot`
+]
+
+.pull-right[
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
@@ -341,13 +369,15 @@ hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (Ci
     ```
     
     ```
-    ##   hwy displ
-    ## 1  29   1.8
-    ## 2  29   1.8
-    ## 3  31   2.0
-    ## 4  30   2.0
-    ## 5  26   2.8
-    ## 6  26   2.8
+    ## # A tibble: 6 x 2
+    ##     hwy displ
+    ##   &lt;int&gt; &lt;dbl&gt;
+    ## 1    29   1.8
+    ## 2    29   1.8
+    ## 3    31   2  
+    ## 4    30   2  
+    ## 5    26   2.8
+    ## 6    26   2.8
     ```
 * That's what a scatter plots shows.
 
@@ -355,12 +385,20 @@ hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (Ci
 
 # Scatter Plots
 
+.pull-left[
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
-```r
-plot(hwy ~ displ, data = mpg)
-```
+.pull-right[
+&lt;br&gt;
+* Each dot is one pair `\((x_i,y_i)\)`.
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+* We often call it one *observation*.
+
+* Corresponding to one *row* of the data.frame.
+
+* Why do some dots appear *darker* than others here?
+]
 
 ---
 class: inverse, middle
@@ -397,7 +435,9 @@ ScPoEconometrics::runTutorial('chapter2-script')
 
 .pull-right[
 &lt;br&gt;&lt;br&gt;&lt;br&gt;
-* This is the [relevant section in the book](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two).
+* How are `x` and `y` related here?
+
+* [This](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two) is the relevant section in the book about Covariance.
 
 * This is **mandatory** reading.
 

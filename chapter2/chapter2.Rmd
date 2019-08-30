@@ -30,11 +30,15 @@ knitr::opts_chunk$set(
   warning = FALSE,
   dev = "svg",
   cache = TRUE,
-  cache.path = ".cache/",
   fig.align = "center"
   #fig.width = 11,
   #fig.height = 5
 )
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],1,om[4])
+
 ```
 
 # Working With Data
@@ -51,23 +55,28 @@ knitr::opts_chunk$set(
 
 --
 
-* how many observations, how many variables?
+* Here are the first 6 rows
     ```{r}
-    dim(mpg)
+    head(mpg)
     ```
 
 ---
 
 # The `mpg` dataset
 
-* And let's look at the first couple of rows:
+* How many rows and columns?
     ```{r}
-    head(mpg)
+    dim(mpg)
     ```
 
-* `tail` gives you the last rows.
+* `tail` gives you the last (6) rows.
+    ```{r,eval = FALSE}
+    tail(mpg)
+    ```
 
 * `names` gives the column names.
+
+* `r emo::ji("rotating_light")` this is a *tibble* - basically a data.frame with enhanced printing.
 
 ---
 
@@ -86,7 +95,7 @@ str(mpg)
 # Summarizing Data
 
 
-* One can learn only a limited amount from **looking** at a `data.frame`.
+* One can learn only a limited amount from **looking** at a `data.frame`. `r emo::ji("mag")`
 
 --
 
@@ -113,42 +122,65 @@ str(mpg)
 # Central Tendency
 
 
-
+.pull-left[
 1. `mean(x)`: the average of all values in `x`.
+    $$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$
+
+1. `median`: the value $x_j$ below and above which 50% of the values in `x` lie. $m$ is the median if
+    $$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$
+1. The median is robust against *outliers*. `r emo::ji("thinking")`? (later).
+]
 
 --
 
-1. `median`: the value $x_j$ below and above which 50% of the values in `x` lie.
-
---
-
+.pull-right[
 ```{r}
 x <- c(1,2,2,2,2,100)
 mean(x)
 mean(x) == sum(x) / length(x)
+```
+```{r, fig.height=3,echo = FALSE}
+# om = par("mar")
+# par(mar = c(3,1,1,1))
+boxplot(x,horizontal = TRUE,main = "Boxplot of x (later!)")
+# par(mar = om)
+```
+```{r}
 median(x)
 ```
-
+]
 
 ---
 
 # Spread
 
+.pull-left[
+* Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
 
-* Another interesting feature is how much a variable is *spread out* about it's center (mean or median).
+* The *variance* is such a measure.
+    $$Var(X) = E[(X-\mu)^2]$$
+    
+* Consider two Normal Distributions with equal mean at `0`:
+    
+]
 
 --
 
-* The *variance* is such a measure.
-    ```{r}
-    var(x)
-    all.equal(var(x), sum((x - mean(x))^2) / (length(x)-1))
-    ```
-* Similarly, the `range` is
-    ```{r}
-    range(x)
-    ```
+.pull-right[
+```{r,echo = FALSE,fig.height=4,message = FALSE,warning = FALSE}
+library(ggplot2)
+ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1), aes(color = "1"), size = 1) + ylab("") + scale_y_continuous(breaks = NULL) + theme_bw() +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), aes(color = "4"), size = 1) + scale_color_manual("Variance:", values = c("red","blue"))
+```
 
+* Compute with:
+
+```{r,eval = FALSE}
+    var(x)
+    range(x)   # range
+    ```
+]
 ---
 
 # The `table` function
@@ -193,38 +225,75 @@ layout: true
 
 # Plotting
 
-
+.pull-left[
 * `R` base plotting is fairly good.
 
 * There is an extremely powerful alternative in package `ggplot2`. We'll see both.
 
 * First example: *histograms*. A histogram counts how many obserations fall within a certain bin.
+]
 
----
+--
 
-# Histogram
-
+.pull-right[
 ```{r,fig.align='center',fig.height=4.5}
 hist(mpg$cty)
 ```
+]
 
 ---
 
 # A Nicer Histogram
 
 
-```{r,fig.height=4.5}
-hist(mpg$cty, xlab   = "Miles Per Gallon (City)", main   = "Histogram of MPG (City)", breaks = 12, col = "red",border = "blue")
+.pull-left[
+* We can give additional arguments to `hist`.
+
+* Look at `?hist` for more.
+
+```{r,fig.height=4.5,eval=FALSE}
+hist(mpg$cty, 
+     xlab   = "Miles Per Gallon (City)", 
+     main   = "Histogram of MPG (City)", 
+     breaks = 12, 
+     col    = "red",
+     border = "blue")
 ```
+]
+.pull-right[
+```{r,fig.height=4.5,eval=TRUE,echo=FALSE}
+hist(mpg$cty, 
+     xlab   = "Miles Per Gallon (City)", 
+     main   = "Histogram of MPG (City)", 
+     breaks = 12, col = "red",
+     border = "blue")
+```
+]
 
 ---
 
 # Looking for Outliers: Boxplots
 
-* It's good to know if a variable has *outliers*, i.e. values much more extreme than the mass of all values.
-```{r,fig.align='center',echo=FALSE,fig.height=5,fig.width=10}
-boxplot(hwy ~ drv, data = mpg, xlab   = "Drivetrain (f = FWD, r = RWD, 4 = 4WD)", ylab   = "Miles Per Gallon (Highway)", main   = "MPG (Highway) vs Drivetrain", pch = 20,cex = 2,col ="darkorange",border = "dodgerblue")
+.pull-left[
+<br>
+* An *Outlier* is a datapoint far removed from the center of a distribution.
+
+* Boxplots are an effective way to check: Outliers are dots.
+
+* The thick line is the median.
+
+* The *box* typically denotes the interquartile range.
+
+* see `?boxplot`
+]
+
+.pull-right[
+```{r,fig.align='center',echo=FALSE,fig.height = 7}
+# par(mar = lowtop)
+boxplot(hwy ~ drv, data = mpg, xlab   = "Drivetrain (f = FWD, r = RWD, 4 = 4WD)", ylab   = "Miles Per Gallon (Highway)", main   = "MPG (Highway) vs Drivetrain", pch = 20,cex = 2,col ="red",border = "black")
+# par(mar = om)
 ```
+]
 
 ---
 
@@ -244,9 +313,25 @@ boxplot(hwy ~ drv, data = mpg, xlab   = "Drivetrain (f = FWD, r = RWD, 4 = 4WD)"
 
 # Scatter Plots
 
-```{r,,fig.height=5}
+.pull-left[
+```{r,,fig.height=5,echo = FALSE}
+
+par(mar = lowtop)
 plot(hwy ~ displ, data = mpg)
+par(mar = om)
 ```
+]
+
+.pull-right[
+<br>
+* Each dot is one pair $(x_i,y_i)$.
+
+* We often call it one *observation*.
+
+* Corresponding to one *row* of the data.frame.
+
+* Why do some dots appear *darker* than others here?
+]
 
 ---
 class: inverse, middle
@@ -285,13 +370,18 @@ ndat = data.frame(rmvnorm(n=300,sigma = sig))
 x = ndat$X1
 y = ndat$X2
 par(pty="s")
+par(mar = lowtop)
 plot(x ~ y, xlab="x",ylab="y")
+par(mar = om)
+
 ```
 ]
 
 .pull-right[
 <br><br><br>
-* This is the [relevant section in the book](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two).
+* How are `x` and `y` related here?
+
+* [This](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two) is the relevant section in the book about Covariance.
 
 * This is **mandatory** reading.
 

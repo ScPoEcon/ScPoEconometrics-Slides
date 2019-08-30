@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Introduction
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-08-20
+### SciencesPo Paris </br> 2019-08-30
 
 ---
 
@@ -73,8 +73,14 @@ Will increasing the minimum wage *cause* greater unemployment?
 &lt;/ru-blockquote&gt;](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)
 
 ---
+background-image: url("https://media.giphy.com/media/3o7TKMMlq8TItpr7Co/giphy.gif")
+background-position: 80% 80%
+background-size: 300pt
+
 
 # Causality
+
+.pull-left[
 
 * Notice the keyword **cause** in all of the above.
 
@@ -83,6 +89,15 @@ Will increasing the minimum wage *cause* greater unemployment?
 * Econometrics is often about spelling out conditions under which we can claim to measure causal relationships.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
+
+
+]
+
+.pull-right[
+As in the acclaimed [book of why](https://www.amazon.fr/Book-Why-Science-Cause-Effect/dp/046509760X) we often ask *why* did something happen?
+]
+
+
 
 ---
 
@@ -107,6 +122,18 @@ Will increasing the minimum wage *cause* greater unemployment?
 2. There will be two or three take home exams / case studies.
 
 3. There will be _no_ final exam. Your grade will be 40% of 1 and 60% of 2.
+
+---
+
+# Course Materials
+
+1. The [Book](https://scpoecon.github.io/ScPoEconometrics/).
+
+1. The [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides)
+
+1. The code repository for book and [R package](https://github.com/ScPoEcon/ScPoEconometrics)
+
+1. Quizzes on [Moodle](https://moodle.sciences-po.fr)
 
 ---
 layout: false
@@ -154,9 +181,7 @@ What does that mean?
 
 3\. `R` is very __flexible and powerful__—adaptable to nearly any task, _e.g._, 'metrics, spatial data analysis, machine learning, web scraping, data cleaning, website building, teaching. 
 
----
-
-## Why are we using `R`?
+--
 
 4\. _Related:_ `R` imposes __no limitations__ on your amount of observations, variables, memory, or processing power. (I'm looking at __you__, .mono[Stata].)
 
@@ -222,6 +247,7 @@ head(fl,n = 4)
 # Data Wrangling
 
 * There are always several ways to achieve a goal. (In life 😄)
+
 * Here are the two leading data packages:
 
 .pull-left[
@@ -262,7 +288,9 @@ delays_dt &lt;-
 
 # Plotting
 
-* Now we could *look* at `delays_dt`, or compute some statistics from it. 
+.pull-left[
+* Now we could *look* at the result in `delays_dt`, or compute some statistics from it. 
+
 * Nothing beats a picture, though:
 
 
@@ -272,8 +300,11 @@ ggplot(data = delays_dt,
   geom_point(aes(size = count), alpha = 1/3) +
   geom_smooth(se = FALSE)
 ```
+]
 
-&lt;img src="chapter1_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+.pull-right[
+&lt;img src="chapter1_files/figure-html/fig.h-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
@@ -302,7 +333,11 @@ ggplot(data = delays_dt,
 ```r
 library(sf)
 plot(paris_sh[,"n"],
-     main = "Number or IRIS by Arrondissement",key.pos = 3, axes = FALSE, key.width = lcm(1.3), key.length = 1.0)
+     main = "Number or IRIS by Arrondissement",
+     key.pos = 3, 
+     axes = FALSE, 
+     key.width = lcm(1.3), 
+     key.length = 1.0)
 ```
 ]
 
@@ -322,6 +357,8 @@ plot(paris_sh[,"n"],
 
 
 .pull-left[
+&lt;br&gt;
+&lt;br&gt;
 
 * ggplot can also directly plot spatial data
 
@@ -345,7 +382,7 @@ plot(paris_sh[,"n"],
 # 3D ggplots
 
 .pull-left[
-* A recent _very_ cool 🆒 package is [`rayshader`](https://cran.r-project.org/web/packages/rayshader/index.html)
+* A recent *very* cool 😎 package is [`rayshader`](https://cran.r-project.org/web/packages/rayshader/index.html)
 
 * Sometimes graphs are better to see in 3D.
 ]
@@ -377,7 +414,24 @@ layout: true
 &lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
 
 ---
+background-image: url("https://media.giphy.com/media/3oKIPqsXYcdjcBcXL2/giphy-downsized.gif")
+background-position: 90% 50%
+background-size: 300pt
 
+# Tool Time!
+
+
+.pull-left[
+
+## Getting R and Rstudio
+
+* Download `R` from [CRAN](https://cran.r-project.org) for your OS.
+
+* Download `RStudio` from [here](https://www.rstudio.com/products/rstudio/download/#download) for your OS.
+]
+
+
+---
 
 # Start your `Rstudio`!
 
@@ -1239,7 +1293,8 @@ background-position: 9% 19%
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
 | &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
-| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides and Book |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
     </textarea>

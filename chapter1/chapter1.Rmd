@@ -34,7 +34,6 @@ knitr::opts_chunk$set(
   warning = FALSE,
   dev = "svg",
   cache = TRUE,
-  cache.path = ".cache/",
   fig.align = "center"
   #fig.width = 11,
   #fig.height = 5
@@ -88,8 +87,14 @@ Will increasing the minimum wage *cause* greater unemployment?
 </ru-blockquote>](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)
 
 ---
+background-image: url("https://media.giphy.com/media/3o7TKMMlq8TItpr7Co/giphy.gif")
+background-position: 80% 80%
+background-size: 300pt
+
 
 # Causality
+
+.pull-left[
 
 * Notice the keyword **cause** in all of the above.
 
@@ -98,6 +103,15 @@ Will increasing the minimum wage *cause* greater unemployment?
 * Econometrics is often about spelling out conditions under which we can claim to measure causal relationships.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
+
+
+]
+
+.pull-right[
+As in the acclaimed [book of why](https://www.amazon.fr/Book-Why-Science-Cause-Effect/dp/046509760X) we often ask *why* did something happen?
+]
+
+
 
 ---
 
@@ -122,6 +136,18 @@ Will increasing the minimum wage *cause* greater unemployment?
 2. There will be two or three take home exams / case studies.
 
 3. There will be _no_ final exam. Your grade will be 40% of 1 and 60% of 2.
+
+---
+
+# Course Materials
+
+1. The [Book](https://scpoecon.github.io/ScPoEconometrics/).
+
+1. The [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides)
+
+1. The code repository for book and [R package](https://github.com/ScPoEcon/ScPoEconometrics)
+
+1. Quizzes on [Moodle](https://moodle.sciences-po.fr)
 
 ---
 layout: false
@@ -169,9 +195,7 @@ What does that mean?
 
 3\. `R` is very __flexible and powerful__—adaptable to nearly any task, _e.g._, 'metrics, spatial data analysis, machine learning, web scraping, data cleaning, website building, teaching. 
 
----
-
-## Why are we using `R`?
+--
 
 4\. _Related:_ `R` imposes __no limitations__ on your amount of observations, variables, memory, or processing power. (I'm looking at __you__, .mono[Stata].)
 
@@ -251,6 +275,7 @@ head(fl,n = 4)
 # Data Wrangling
 
 * There are always several ways to achieve a goal. (In life `r emo::ji("smile")`)
+
 * Here are the two leading data packages:
 
 .pull-left[
@@ -289,15 +314,27 @@ delays_dt <-
 
 # Plotting
 
-* Now we could *look* at `delays_dt`, or compute some statistics from it. 
+.pull-left[
+* Now we could *look* at the result in `delays_dt`, or compute some statistics from it. 
+
 * Nothing beats a picture, though:
 
-```{r,fig.width=10,fig.height=3.5}
+```{r,eval = FALSE}
 ggplot(data = delays_dt, 
        mapping = aes(x = dist, y = delay)) +
   geom_point(aes(size = count), alpha = 1/3) +
   geom_smooth(se = FALSE)
 ```
+]
+
+.pull-right[
+```{r,echo = FALSE, fig.h}
+ggplot(data = delays_dt, 
+       mapping = aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+```
+]
 
 ---
 
@@ -327,7 +364,11 @@ paris_sh <- readRDS("paris.RDS")
 ```{r, eval = FALSE}
 library(sf)
 plot(paris_sh[,"n"],
-     main = "Number or IRIS by Arrondissement",key.pos = 3, axes = FALSE, key.width = lcm(1.3), key.length = 1.0)
+     main = "Number or IRIS by Arrondissement",
+     key.pos = 3, 
+     axes = FALSE, 
+     key.width = lcm(1.3), 
+     key.length = 1.0)
 ```
 ]
 
@@ -350,6 +391,8 @@ plot(paris_sh[,"n"],
 
 
 .pull-left[
+<br>
+<br>
 
 * ggplot can also directly plot spatial data
 
@@ -363,7 +406,7 @@ plot(paris_sh[,"n"],
 ]
 
 .pull-right[
-```{r ggparis,fig.width = 6, fig.height = 5,echo = FALSE}
+```{r ggparis,fig.height = 6,echo = FALSE}
 gp = ggplot(paris_sh) + 
   geom_sf(aes(fill = n)) + 
   scale_fill_viridis_c("Num IRIS") + 
@@ -380,7 +423,7 @@ gp
 # 3D ggplots
 
 .pull-left[
-* A recent _very_ cool `r emo::ji("cool")` package is [`rayshader`](https://cran.r-project.org/web/packages/rayshader/index.html)
+* A recent *very* cool `r emo::ji("sunglasses")` package is [`rayshader`](https://cran.r-project.org/web/packages/rayshader/index.html)
 
 * Sometimes graphs are better to see in 3D.
 ]
@@ -419,7 +462,24 @@ layout: true
 <div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
 ---
+background-image: url("https://media.giphy.com/media/3oKIPqsXYcdjcBcXL2/giphy-downsized.gif")
+background-position: 90% 50%
+background-size: 300pt
 
+# Tool Time!
+
+
+.pull-left[
+
+## Getting R and Rstudio
+
+* Download `R` from [CRAN](https://cran.r-project.org) for your OS.
+
+* Download `RStudio` from [here](https://www.rstudio.com/products/rstudio/download/#download) for your OS.
+]
+
+
+---
 
 # Start your `Rstudio`!
 
@@ -1029,7 +1089,9 @@ background-position: 9% 19%
 | <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
 | <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
-
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
 
+```{r makepdf, echo=FALSE,eval=FALSE}
+system("decktape chapter1.html chapter1.pdf --chrome-arg=--disable-web-security")
+```
