@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Session 2
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-08-30
+### SciencesPo Paris </br> 2019-09-08
 
 ---
 
@@ -82,7 +82,6 @@ layout: true
 
 * `names` gives the column names.
 
-* 🚨 this is a *tibble* - basically a data.frame with enhanced printing.
 
 ---
 
@@ -455,6 +454,442 @@ runTutorial('correlation')
 ```
 
 
+---
+
+# Intro do `dplyr`
+
+.pull-left[
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [tidyverse](https://www.tidyverse.org) package family.
+
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is another alternative. I use it *a lot* in research.
+
+* Both have pros and cons. We'll start you off with `dplyr`. 
+]
+
+.pull-right[
+![:scale 35%](../img/logo/dplyr.svg)
+
+![:scale 35%](../img/logo/r-datatable.svg)
+]
+
+---
+
+# `dplyr` Overview
+
+.pull-left[
+&lt;br&gt;
+&lt;br&gt;
+* You *must* read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's concise.
+
+* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
+
+* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
+
+* All *verbs*: First arg is a data.frame, subsequent args describe what to do, returns another data.frame.
+
+]
+
+--
+
+.pull-right[
+
+## Verbs
+
+1. Choose observations based on a certain value (i.e. subset): `filter()`
+
+1. Reorder rows: `arrange()`
+
+1. Select variables by name: `select()`
+
+1. Create new variables out of existing ones: `mutate()`
+
+1. Summarise variables: `summarise()`
+]
+
+---
+
+# R package `nycflights13`
+
+
+```r
+library(nycflights13)
+library(dplyr)
+flights
+```
+
+```
+## # A tibble: 336,776 x 19
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515         2      830
+##  2  2013     1     1      533            529         4      850
+##  3  2013     1     1      542            540         2      923
+##  4  2013     1     1      544            545        -1     1004
+##  5  2013     1     1      554            600        -6      812
+##  6  2013     1     1      554            558        -4      740
+##  7  2013     1     1      555            600        -5      913
+##  8  2013     1     1      557            600        -3      709
+##  9  2013     1     1      557            600        -3      838
+## 10  2013     1     1      558            600        -2      753
+## # … with 336,766 more rows, and 12 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;
+```
+
+🚨 This is a `tibble` (more informative `data.frame`)
+
+---
+
+# Subset a data.frame with `filter()`
+
+* `filter` has the same purpose than `subset`
+* Which flights on 01/03/2013 departed between 5 and 6 AM with more than 10 minutes ahead of schedule?
+    
+    ```r
+    filter(flights, day == 1, month == 3, 
+           dep_time &gt;= 500 &amp; dep_time &lt;= 600, dep_delay &lt; -5)
+    ```
+--
+    
+    ```
+    ## # A tibble: 10 x 19
+    ##     year month   day dep_time sched_dep_time dep_delay arr_time
+    ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+    ##  1  2013     3     1      505            515       -10      746
+    ##  2  2013     3     1      521            530        -9      813
+    ##  3  2013     3     1      549            600       -11      639
+    ##  4  2013     3     1      550            600       -10      747
+    ##  5  2013     3     1      551            559        -8      722
+    ##  6  2013     3     1      551            600        -9      717
+    ##  7  2013     3     1      551            600        -9      845
+    ##  8  2013     3     1      552            600        -8      656
+    ##  9  2013     3     1      554            600        -6      651
+    ## 10  2013     3     1      558            605        -7      803
+    ## # … with 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
+    ## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+    ## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
+    ## #   time_hour &lt;dttm&gt;
+    ```
+   
+  
+---
+# Create a Filter: Comparisons and Logical Ops
+
+* We have standard suite of `&gt;`, `&lt;`, `&gt;=`, `&lt;=`, `!=`, `==`.
+
+* Construct more complex filters with logical operators
+    1. `x &amp; y`: `x` **and** `y`
+    1. `x | y`: `x` **or** `y`
+    1. `!y`: **not** `y`
+
+* `R` has the convenient `x %in% y` operator, `TRUE` if `x` is *a member of* `y`.
+    
+    ```r
+    3 %in% 1:3
+    ```
+    
+    ```
+    ## [1] TRUE
+    ```
+    
+    ```r
+    c(2,5) %in% 2:10  # also vectorized
+    ```
+    
+    ```
+    ## [1] TRUE TRUE
+    ```
+    
+    ```r
+    c("S","Po") %in% c("Sciences","Po")  # also strings
+    ```
+    
+    ```
+    ## [1] FALSE  TRUE
+    ```
+
+
+---
+
+# Missing Values: `NA`
+
+.pull-left[
+* Whenever a value is *missing*, we code it as `NA`.
+    
+    ```r
+    x &lt;- NA
+    ```
+* `R` propagates `NA` through operations:
+    
+    ```r
+    NA &gt; 5
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+    
+    ```r
+    NA + 10
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+* the function `is.na(x)` returns `TRUE` if `x` is an `NA`.
+    
+    ```r
+    is.na(x)
+    ```
+    
+    ```
+    ## [1] TRUE
+    ```
+
+
+]
+
+--
+
+.pull-right[
+* What is confusing is that 
+    
+    ```r
+    NA == NA
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+
+* It's easy to illustrate like that:
+    
+    ```r
+    # Let x be Mary's age. We don't know how old she is.
+    x &lt;- NA
+    
+    # Let y be John's age. We don't know how old he is.
+    y &lt;- NA
+    
+    # Are John and Mary the same age?
+    x == y
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+    
+    ```r
+    #&gt; [1] NA
+    # We don't know!
+    ```
+
+]
+
+
+   
+---
+class: inverse
+
+# Task 2.1
+
+
+* You should read through [5.2.1](https://r4ds.had.co.nz/transform.html#filter-rows-with-filter) and learn more about *comparisons* and *logical operators*.
+
+Then, find all flights that: 
+
+1. Had an arrival delay of two or more hours
+
+1. Flew to Houston (IAH or HOU)
+
+1. Were operated by United, American, or Delta
+
+1. Departed in summer (July, August, and September)
+
+1. Arrived more than two hours late, but didn’t leave late
+
+1. How many flights have a missing `dep_time`? What other variables are missing? What might these rows represent?
+
+---
+
+# `dplyr` Self Study
+
+We can also 
+1. *sort* a data.frame, 
+1. *select* some columns from it, and 
+1. add new columns.
+
+For case study 1, you have to read those short sections yourself (click on function name):
+
+1. [`arrange()`](https://r4ds.had.co.nz/transform.html#arrange-rows-with-arrange)
+
+1. [`select()`](https://r4ds.had.co.nz/transform.html#select)
+
+1. [`mutate()`](https://r4ds.had.co.nz/transform.html#add-new-variables-with-mutate)
+
+---
+
+# Split-Apply-Combine
+
+.pull-left[
+* Often we do *some* operation **by** some group in our dataset:
+    * Mean height by sex.
+    * Maximum income by age, etc
+
+* For this, we need to 
+    1. Split the data **by** `x`
+    2. Apply to each chunk `xyz`
+    3. Recombine all chunks
+    
+* in `dplyr`, that's `group_by()`.
+]
+
+--
+
+.pull-right[
+1. `group_by(x)` groups/splits `data.frame` by `x`:
+    
+    ```r
+    g = group_by(iris, Species)
+    class(g)
+    ```
+    
+    ```
+    ## [1] "grouped_df" "tbl_df"     "tbl"        "data.frame"
+    ```
+
+1. `summarise` each chunk and re-combine
+    
+    ```r
+    summarise(
+      g, mean_l = mean(Sepal.Length))
+    ```
+    
+    ```
+    ## # A tibble: 3 x 2
+    ##   Species    mean_l
+    ##   &lt;fct&gt;       &lt;dbl&gt;
+    ## 1 setosa       5.01
+    ## 2 versicolor   5.94
+    ## 3 virginica    6.59
+    ```
+]
+
+---
+background-image: url("../img/logo/magrittr.svg")
+background-position: 90% 5%
+background-size: 180px
+
+# Chaining 🔗 Commands Together: The Pipe
+
+.pull-left[
+&lt;br&gt;
+&lt;br&gt;
+* `magrittr` gives us the *pipe* `%&gt;%`.
+
+* This is like the UNIX pipe `|`: it passes arguments on.
+
+* `x %&gt;% f(y)` becomes `f(x,y)`.
+
+* With the *pipe* you construct data *pipelines*.
+
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+Our above example would become:
+
+```r
+iris %&gt;%
+  group_by(Species) %&gt;% 
+  summarise(mean_l = mean(Sepal.Length))
+```
+
+```
+## # A tibble: 3 x 2
+##   Species    mean_l
+##   &lt;fct&gt;       &lt;dbl&gt;
+## 1 setosa       5.01
+## 2 versicolor   5.94
+## 3 virginica    6.59
+```
+which is equivalent to, but nicer than:
+
+```r
+summarise(
+  group_by(iris, Species),
+  mean_l = mean( Sepal.Length))
+```
+]
+
+
+---
+background-image: url("../img/logo/ggplot2.svg")
+background-position: 90% 5%
+background-size: 180px
+
+# Quick `ggplot2` Intro
+
+.pull-left[
+&lt;br&gt;
+&lt;br&gt;
+* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
+
+* We construct a `ggplot` in layers. We `+` add layers.
+
+* In `aes` (aestethics) we say how data maps onto plot.
+
+* We choose a `geom_` function to choose the geometry.
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+
+```r
+library(ggplot2)
+ggplot(data = mpg,   # base layer
+       mapping = aes(x = displ, y = hwy)) + 
+   geom_point()   # add geom_ layer
+```
+
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# Quick `ggplot2` Intro
+
+.pull-left[
+&lt;br&gt;
+&lt;br&gt;
+* We can add more layers to this plot.
+
+* We can map another variable to another feature, like color, size, shape etc.
+
+* We could also add another `geom_` function.
+]
+
+.pull-right[
+
+```r
+ggplot(data = mpg,
+       aes(x = displ, 
+           y = hwy, 
+           color = class)) +  # map `class` to color
+   geom_point() 
+```
+
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
 ---
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)

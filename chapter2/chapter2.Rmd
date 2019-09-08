@@ -76,7 +76,6 @@ lowtop = c(om[1],om[2],1,om[4])
 
 * `names` gives the column names.
 
-* `r emo::ji("rotating_light")` this is a *tibble* - basically a data.frame with enhanced printing.
 
 ---
 
@@ -142,7 +141,7 @@ mean(x) == sum(x) / length(x)
 ```{r, fig.height=3,echo = FALSE}
 # om = par("mar")
 # par(mar = c(3,1,1,1))
-boxplot(x,horizontal = TRUE,main = "Boxplot of x (later!)")
+boxplot(x,horizontal = TRUE,main = "Boxplot of x (more on that later!)")
 # par(mar = om)
 ```
 ```{r}
@@ -170,8 +169,8 @@ median(x)
 ```{r,echo = FALSE,fig.height=4,message = FALSE,warning = FALSE}
 library(ggplot2)
 ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
-  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1), aes(color = "1"), size = 1) + ylab("") + scale_y_continuous(breaks = NULL) + theme_bw() +
-  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), aes(color = "4"), size = 1) + scale_color_manual("Variance:", values = c("red","blue"))
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1), aes(color = "1"), size = 2) + ylab("") + scale_y_continuous(breaks = NULL) + theme_bw() +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), aes(color = "4"), size = 2) + scale_color_manual("Variance:", values = c("red","blue")) + theme(text = element_text(size=20))
 ```
 
 * Compute with:
@@ -398,6 +397,322 @@ runTutorial('correlation')
 ```
 
 
+---
+
+# Intro do `dplyr`
+
+.pull-left[
+<br>
+<br>
+<br>
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [tidyverse](https://www.tidyverse.org) package family.
+
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is another alternative. I use it *a lot* in research.
+
+* Both have pros and cons. We'll start you off with `dplyr`. 
+]
+
+.pull-right[
+![:scale 35%](../img/logo/dplyr.svg)
+
+![:scale 35%](../img/logo/r-datatable.svg)
+]
+
+---
+
+# `dplyr` Overview
+
+.pull-left[
+<br>
+<br>
+* You *must* read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's concise.
+
+* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
+
+* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
+
+* All *verbs*: First arg is a data.frame, subsequent args describe what to do, returns another data.frame.
+
+]
+
+--
+
+.pull-right[
+
+## Verbs
+
+1. Choose observations based on a certain value (i.e. subset): `filter()`
+
+1. Reorder rows: `arrange()`
+
+1. Select variables by name: `select()`
+
+1. Create new variables out of existing ones: `mutate()`
+
+1. Summarise variables: `summarise()`
+]
+
+---
+
+# R package `nycflights13`
+
+```{r flights13}
+library(nycflights13)
+library(dplyr)
+flights
+```
+
+`r emo::ji("rotating_light")` This is a `tibble` (more informative `data.frame`)
+
+---
+
+# Subset a data.frame with `filter()`
+
+* `filter` has the same purpose than `subset`
+* Which flights on 01/03/2013 departed between 5 and 6 AM with more than 10 minutes ahead of schedule?
+    ```{r dplyr3,eval = FALSE}
+    filter(flights, day == 1, month == 3, 
+           dep_time >= 500 & dep_time <= 600, dep_delay < -5)
+    ```
+--
+    ```{r dplyr4, echo = FALSE}
+    filter(flights, day == 1, month == 3, 
+           dep_time >= 500 & dep_time <= 600, dep_delay < -5)
+    ```
+   
+  
+---
+# Create a Filter: Comparisons and Logical Ops
+
+* We have standard suite of `>`, `<`, `>=`, `<=`, `!=`, `==`.
+
+* Construct more complex filters with logical operators
+    1. `x & y`: `x` **and** `y`
+    1. `x | y`: `x` **or** `y`
+    1. `!y`: **not** `y`
+
+* `R` has the convenient `x %in% y` operator, `TRUE` if `x` is *a member of* `y`.
+    ```{r}
+    3 %in% 1:3
+    c(2,5) %in% 2:10  # also vectorized
+    c("S","Po") %in% c("Sciences","Po")  # also strings
+    ```
+
+
+---
+
+# Missing Values: `NA`
+
+.pull-left[
+* Whenever a value is *missing*, we code it as `NA`.
+    ```{r}
+    x <- NA
+    ```
+* `R` propagates `NA` through operations:
+    ```{r}
+    NA > 5
+    NA + 10
+    ```
+* the function `is.na(x)` returns `TRUE` if `x` is an `NA`.
+    ```{r}
+    is.na(x)
+    ```
+
+
+]
+
+--
+
+.pull-right[
+* What is confusing is that 
+    ```{r}
+    NA == NA
+    ```
+
+* It's easy to illustrate like that:
+    ```{r}
+    # Let x be Mary's age. We don't know how old she is.
+    x <- NA
+    
+    # Let y be John's age. We don't know how old he is.
+    y <- NA
+    
+    # Are John and Mary the same age?
+    x == y
+    #> [1] NA
+    # We don't know!
+    ```
+
+]
+
+
+   
+---
+class: inverse
+
+# Task 2.1
+
+
+* You should read through [5.2.1](https://r4ds.had.co.nz/transform.html#filter-rows-with-filter) and learn more about *comparisons* and *logical operators*.
+
+Then, find all flights that: 
+
+1. Had an arrival delay of two or more hours
+
+1. Flew to Houston (IAH or HOU)
+
+1. Were operated by United, American, or Delta
+
+1. Departed in summer (July, August, and September)
+
+1. Arrived more than two hours late, but didn’t leave late
+
+1. How many flights have a missing `dep_time`? What other variables are missing? What might these rows represent?
+
+---
+
+# `dplyr` Self Study
+
+We can also 
+1. *sort* a data.frame, 
+1. *select* some columns from it, and 
+1. add new columns.
+
+For case study 1, you have to read those short sections yourself (click on function name):
+
+1. [`arrange()`](https://r4ds.had.co.nz/transform.html#arrange-rows-with-arrange)
+
+1. [`select()`](https://r4ds.had.co.nz/transform.html#select)
+
+1. [`mutate()`](https://r4ds.had.co.nz/transform.html#add-new-variables-with-mutate)
+
+---
+
+# Split-Apply-Combine
+
+.pull-left[
+* Often we do *some* operation **by** some group in our dataset:
+    * Mean height by sex.
+    * Maximum income by age, etc
+
+* For this, we need to 
+    1. Split the data **by** `x`
+    2. Apply to each chunk `xyz`
+    3. Recombine all chunks
+    
+* in `dplyr`, that's `group_by()`.
+]
+
+--
+
+.pull-right[
+1. `group_by(x)` groups/splits `data.frame` by `x`:
+    ```{r dplyr1}
+    g = group_by(iris, Species)
+    class(g)
+    ```
+
+1. `summarise` each chunk and re-combine
+    ```{r dplyr2}
+    summarise(
+      g, mean_l = mean(Sepal.Length))
+    ```
+]
+
+---
+background-image: url("../img/logo/magrittr.svg")
+background-position: 90% 5%
+background-size: 180px
+
+# Chaining `r emo::ji("link")` Commands Together: The Pipe
+
+.pull-left[
+<br>
+<br>
+* `magrittr` gives us the *pipe* `%>%`.
+
+* This is like the UNIX pipe `|`: it passes arguments on.
+
+* `x %>% f(y)` becomes `f(x,y)`.
+
+* With the *pipe* you construct data *pipelines*.
+
+]
+
+.pull-right[
+<br>
+<br>
+Our above example would become:
+```{r pipe}
+iris %>%
+  group_by(Species) %>% 
+  summarise(mean_l = mean(Sepal.Length))
+```
+which is equivalent to, but nicer than:
+```{r,eval = FALSE}
+summarise(
+  group_by(iris, Species),
+  mean_l = mean( Sepal.Length))
+```
+]
+
+
+---
+background-image: url("../img/logo/ggplot2.svg")
+background-position: 90% 5%
+background-size: 180px
+
+# Quick `ggplot2` Intro
+
+.pull-left[
+<br>
+<br>
+* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
+
+* We construct a `ggplot` in layers. We `+` add layers.
+
+* In `aes` (aestethics) we say how data maps onto plot.
+
+* We choose a `geom_` function to choose the geometry.
+]
+
+.pull-right[
+<br>
+<br>
+```{r,fig.height = 4}
+library(ggplot2)
+ggplot(data = mpg,   # base layer
+       mapping = aes(x = displ, y = hwy)) + 
+   geom_point()   # add geom_ layer
+```
+
+]
+
+
+---
+
+# Quick `ggplot2` Intro
+
+.pull-left[
+<br>
+<br>
+* We can add more layers to this plot.
+
+* We can map another variable to another feature, like color, size, shape etc.
+
+* We could also add another `geom_` function.
+]
+
+.pull-right[
+```{r,fig.height = 4}
+ggplot(data = mpg,
+       aes(x = displ, 
+           y = hwy, 
+           color = class)) +  # map `class` to color
+   geom_point() 
+```
+
+]
 ---
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)

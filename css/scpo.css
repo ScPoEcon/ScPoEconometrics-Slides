@@ -15,7 +15,6 @@ pre {
     display: block;
     font-family: monospace;
     white-space: pre;
-    margin: 1em 0px;
     margin-top: 0em;
     margin-right: 0px;
     margin-bottom: 0.3em;
@@ -23,8 +22,9 @@ pre {
 }
 
 a, a > code {
-  color: #d90502; /* rgb(249, 38, 114) */
+  color: #d90502;
   text-decoration: none;
+
 }
 
 
@@ -36,14 +36,15 @@ a, a > code {
   font-size: 85%;
 }
 
-/* important code slightly red */
+/* important code slightly red 
 .remark-code-line-highlighted {
   background-color: #FFD3DE !important;
 }
+*/
 
 /* color tweak */
 .inverse {
-  background-color: #FFD3DE;
+  background-color: #ffebf0;
   color: #353632;
   text-shadow: none;
 }
