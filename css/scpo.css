@@ -78,6 +78,20 @@ a, a > code {
   padding-top: 1em;
 }
 
+/* Two-column layout (wide left col) */
+.left-wide {
+  color: #777;
+  width: 70%;
+  height: 92%;
+  float: left;
+}
+
+.right-thin {
+  width: 25%;
+  float: right;
+  padding-top: 1em;
+}
+
 .pull-left {
   float: left;
   width: 48%;
