@@ -6,7 +6,8 @@
 ## Slides
 
 1. Chapter 1 - Introduction. [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter1/chapter1.html)  [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter1/chapter1.pdf)
-1. Chapter 2 - Summarizing Data. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.html)  [PDF](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.pdf)
+1. Chapter 2 - Summarizing Data. [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.html)  [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.pdf)
+1. Chapter 3 - Regression. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html)  [PDF](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.pdf)
 
 
 ## How to build

@@ -14,7 +14,7 @@ output:
       countIncrementalSlides: false
       ratio: "16:9"
     includes:
-      in_header: "./libs/partials/header.html"
+      in_header: "../libs/partials/header.html"
 
       
 
