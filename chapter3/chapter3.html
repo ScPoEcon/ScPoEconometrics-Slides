@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Session 3
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-09-23
+### SciencesPo Paris </br> 2019-09-30
 
 ---
 
@@ -619,58 +619,12 @@ all.equal(cov(sd$error,sd$y_hat), 0)
     
 * Small `\(R^2\)` doesn't mean it's a useless model!
 
-
 ---
 
-# An Example - California Test Scores
+# An Example - Log Wage Equation
 
-* Let's look at [the worked example](https://scpoecon.github.io/ScPoEconometrics/linreg.html#lm-example1) in the book!
-
----
-
-# Rescaling Regressions
-
-* Suppose outcome `\(y\)` is *income in Euros*
-
-* `\(x\)` be years of schooling
-  $$
-  y_i = \beta_0 + \beta_1 x_i + \varepsilon_i
-  $$
-
-* Assume that `\(\beta_1 = 2000\)`, s.t. each additional year of schooling gives 2000 Euros more income.
-
-* What is `\(\beta_1\)` if we measure `\(y\)` in *thousands of euros* instead?
-
-
----
-# Rescaling Regressions
-
-
-* The result depends on whether we rescale `\(y\)`, `\(x\)` or both.
-
-* If we have rescale `\(x\)` by `\(c\)` and `\(y\)` by `\(d\)`, one can show that
-    `$$\begin{align} b_1' &amp;= \frac{Cov(dx,cy)}{Var(dx)} \\ &amp;= \frac{d}{c} b \end{align}$$`
     
-* and the intercept
-    `$$\begin{align} b_0' &amp;= \mathbb{E}[d\cdot Y] - \frac{Cov(cX, dY)}{Var(cX)} \mathbb{E}[c\cdot X] \\ &amp;= d b_0\end{align}$$`
-
----
-
-# App: Rescaling Regressors
-
-
-
-```r
-library(ScPoEconometrics)
-launchApp('Rescale')
-```
-
-
-
-```r
-library(ScPoEconometrics)
-runTutorial('rescaling')
-```
+* This set of slides continues as a fully worked example [from the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#an-example-a-log-wage-equation).
 
 
 ---

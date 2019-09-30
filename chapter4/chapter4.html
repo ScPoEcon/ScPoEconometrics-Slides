@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>ScPoEconometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Florian Oswald" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/plotly-binding/plotly.js"></script>
+    <script src="libs/typedarray/typedarray.min.js"></script>
+    <script src="libs/jquery/jquery.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <link href="libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="libs/plotly-main/plotly-latest.min.js"></script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ScPoEconometrics
+## Session 4
+### Florian Oswald
+### SciencesPo Paris </br> 2019-09-30
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+# Multiple Regression
+
+.pull-left[
+* Last session we learned how to run a simple regression.
+
+* We had one `\(x\)` on the right hand side:
+    `$$mpg_i = b_0 + b_1 hp_i + e_i$$`
+
+* We can add more!
+]
+
+--
+
+.pull-right[
+## Cars Again!
+
+* Suppose `mpg` also depends on the weight of a car.
+
+* We would write
+    `$$mpg_i = b_0 + b_1 hp_i + b_2 wt_i e_i$$`
+
+* Now we have two slope coefficients!
+]
+
+---
+
+# Cars in 3D
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+<div id="htmlwidget-79fbfe94dc04d874ad74" style="width:504px;height:504px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-79fbfe94dc04d874ad74">{"x":{"visdat":{"565e4bacf85e":["function () ","plotlyVisDat"]},"cur_data":"565e4bacf85e","attrs":{"565e4bacf85e":{"colors":"grey","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"x":{},"y":{},"z":{},"type":"scatter3d","mode":"markers","name":"data","opacity":0.8,"marker":{"color":"red","size":5,"hoverinfo":"skip"},"inherit":true},"565e4bacf85e.1":{"z":{},"type":"surface","x":[1.513,5.424],"y":[52,335],"name":"Mtcars 3D","opacity":0.75,"cauto":false,"surfacecolor":[0,0,0],"inherit":false}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"wt"},"yaxis":{"title":"hp"},"zaxis":{"title":"mpg"}},"hovermode":"closest","showlegend":true,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[2.62,2.875,2.32,3.215,3.44,3.46,3.57,3.19,3.15,3.44,3.44,4.07,3.73,3.78,5.25,5.424,5.345,2.2,1.615,1.835,2.465,3.52,3.435,3.84,3.845,1.935,2.14,1.513,3.17,2.77,3.57,2.78],"y":[110,110,93,110,175,105,245,62,95,123,123,180,180,180,205,215,230,66,52,65,97,150,150,245,175,66,91,113,264,175,335,109],"z":[21,21,22.8,21.4,18.7,18.1,14.3,24.4,22.8,19.2,17.8,16.4,17.3,15.2,10.4,10.4,14.7,32.4,30.4,33.9,21.5,15.5,15.2,13.3,19.2,27.3,26,30.4,15.8,19.7,15,21.4],"type":"scatter3d","mode":"markers","name":"data","opacity":0.8,"marker":{"color":"red","size":5,"hoverinfo":"skip","line":{"color":"rgba(31,119,180,1)"},"showscale":false},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"frame":null},{"colorbar":{"title":"mpg<br />surf","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(190,190,190,1)"],["1","rgba(190,190,190,1)"]],"showscale":false,"z":[[29.7079189601165,20.716174964165],[14.5417229265718,5.54997893062028]],"type":"surface","x":[1.513,5.424],"y":[52,335],"name":"Mtcars 3D","opacity":0.75,"cauto":false,"surfacecolor":[0,0,0],"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+&lt;p class="caption"&gt;Multiple Regression - a plane in 3D. The red lines indicate the residual for each observation.&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+# Multiple `\(x\)`
+
+.pull-left[
+* We could continue and add up to `\(K\)` variables:
+    `$$\hat{y}_i = b_0 + b_1 x_{1i} + b_2 x_{2i} + \dots + b_K x_{Ki}$$`
+
+* The mechanics of minimizing the SSR is identical to before!
+
+* Still choose `\(b\)`'s to minimize sum of `\(e_i^2 = (y_i - \hat{y_i})^2\)`
+]
+
+--
+
+.pull-right[
+
+```
+## 
+## Call:
+## lm(formula = mpg ~ wt + hp, data = mtcars)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.941 -1.600 -0.182  1.050  5.854 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.22727    1.59879  23.285  &lt; 2e-16 ***
+## wt          -3.87783    0.63273  -6.129 1.12e-06 ***
+## hp          -0.03177    0.00903  -3.519  0.00145 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.593 on 29 degrees of freedom
+## Multiple R-squared:  0.8268,	Adjusted R-squared:  0.8148 
+## F-statistic: 69.21 on 2 and 29 DF,  p-value: 9.109e-12
+```
+]
+
+---
+
+# Interpreting Coefficients in Multiple Regression
+
+.pull-left[
+* We think about each `\(b_i\)` as a *partial effect*.
+
+* What's the impact of `wt` *in isolation* of the effect that `hp` might have?
+
+* We formalize this as a *partial derivative*.
+
+* 🤔
+]
+
+--
+
+.pull-right[
+* [Partial derivative on wikipedia](https://en.wikipedia.org/wiki/Partial_derivative)
+
+* That sounds like our regression equation. 
+    `$$mpg = b_0 + b_1 hp + b_2 wt$$`
+    
+* What's the impact of varying `hp` *only*?
+
+* Well, it's `\(\frac{\partial mpg}{\partial hp} = b_1\)`.
+
+* We say: *all else equal*, the effect of `hp` is ...
+]
+
+---
+
+# Multicollinearity
+
+.pull-left[
+* It matters *which* variables we add to a regression.
+
+* A priori, we add what we *think* is important to explain the data.
+
+* However, there is also a technical restriction: An additional variable needs to add at least *some* new information.
+]
+
+--
+
+.pull-right[
+## Rank Condition: `\(N \geq K+1\)`
+
+* Let's create `wtplus = wt + 1`. No new info.
+    `$$\begin{align} y &amp;= b_0 + b_1 \text{wt} + b_2 \text{wtplus} + e \\&amp;= b_0 + b_1 \text{wt} + b_2 (\text{wt} + 1) + e \\ &amp;= (b_0 + b_2) + \text{wt} (b_1 + b_2) + e\end{align}$$`
+
+* We cannot tell `\(b1\)` and `\(b_2\)` apart! That's an *identification problem*.
+
+* We cannot solve the the minimization problem of the SSR! That's a *numerical problem*.
+
+* ➡️ variables must not be **perfectly colinear**, i.e. not perfectly linearly dependent.
+
+]
+
+---
+class: inverse
+
+# Multicolinearity App!
+
+
+```r
+library(ScPoEconometrics)
+launchApp("multicolinearity")
+```
+
+---
+# Log Wage Equation Continued
+
+
+---
+class: inverse
+
+# Tutorial
+
+
+
+```r
+library(ScPoEconometrics)
+runTutorial("lm-example")
+```
+
+---
+
+
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

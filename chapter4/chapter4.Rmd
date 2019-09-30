@@ -1,0 +1,224 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Session 4"
+author: "Florian Oswald"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+library(magrittr)
+
+```
+
+# Multiple Regression
+
+.pull-left[
+* Last session we learned how to run a simple regression.
+
+* We had one $x$ on the right hand side:
+    $$mpg_i = b_0 + b_1 hp_i + e_i$$
+
+* We can add more!
+]
+
+--
+
+.pull-right[
+## Cars Again!
+
+* Suppose `mpg` also depends on the weight of a car.
+
+* We would write
+    $$mpg_i = b_0 + b_1 hp_i + b_2 wt_i e_i$$
+
+* Now we have two slope coefficients!
+]
+
+---
+
+# Cars in 3D
+
+
+```{r plane3D-reg,echo=FALSE,fig.align='center',fig.cap='Multiple Regression - a plane in 3D. The red lines indicate the residual for each observation.',warning=FALSE,message=FALSE}
+library(plotly)
+library(reshape2)
+data(mtcars)
+ 
+# linear fit
+fit <- lm(mpg ~ wt+hp,data=mtcars)
+ 
+to_plot_x <- range(mtcars$wt)
+to_plot_y <- range(mtcars$hp)
+
+df <- data.frame(wt = rep(to_plot_x, 2),
+           hp = rep(to_plot_y, each = 2))
+df["pred"] <- predict.lm(fit, df, se.fit = F)
+
+surf <- acast(df, wt ~ hp)
+
+color <- rep(0, length(df))
+mtcars %>%
+  plot_ly(colors = "grey") %>%
+  add_markers(x = ~wt, y = ~hp, z = ~mpg,name = "data",opacity = .8, marker=list(color = 'red', size = 5, hoverinfo="skip")) %>%
+  add_surface(x = to_plot_x, y = to_plot_y, z = ~surf, inherit = F, name = "Mtcars 3D", opacity = .75, cauto = F, surfacecolor = color) %>%
+  hide_colorbar()
+```
+
+---
+
+# Multiple $x$
+
+.pull-left[
+* We could continue and add up to $K$ variables:
+    $$\hat{y}_i = b_0 + b_1 x_{1i} + b_2 x_{2i} + \dots + b_K x_{Ki}$$
+
+* The mechanics of minimizing the SSR is identical to before!
+
+* Still choose $b$'s to minimize sum of $e_i^2 = (y_i - \hat{y_i})^2$
+]
+
+--
+
+.pull-right[
+```{r,echo=FALSE}
+summary(fit)
+```
+]
+
+---
+
+# Interpreting Coefficients in Multiple Regression
+
+.pull-left[
+* We think about each $b_i$ as a *partial effect*.
+
+* What's the impact of `wt` *in isolation* of the effect that `hp` might have?
+
+* We formalize this as a *partial derivative*.
+
+* `r emo::ji("thinking")`
+]
+
+--
+
+.pull-right[
+* [Partial derivative on wikipedia](https://en.wikipedia.org/wiki/Partial_derivative)
+
+* That sounds like our regression equation. 
+    $$mpg = b_0 + b_1 hp + b_2 wt$$
+    
+* What's the impact of varying `hp` *only*?
+
+* Well, it's $\frac{\partial mpg}{\partial hp} = b_1$.
+
+* We say: *all else equal*, the effect of `hp` is ...
+]
+
+---
+
+# Multicollinearity
+
+.pull-left[
+* It matters *which* variables we add to a regression.
+
+* A priori, we add what we *think* is important to explain the data.
+
+* However, there is also a technical restriction: An additional variable needs to add at least *some* new information.
+]
+
+--
+
+.pull-right[
+## Rank Condition: $N \geq K+1$
+
+* Let's create `wtplus = wt + 1`. No new info.
+    $$\begin{align} y &= b_0 + b_1 \text{wt} + b_2 \text{wtplus} + e \\&= b_0 + b_1 \text{wt} + b_2 (\text{wt} + 1) + e \\ &= (b_0 + b_2) + \text{wt} (b_1 + b_2) + e\end{align}$$
+
+* We cannot tell $b1$ and $b_2$ apart! That's an *identification problem*.
+
+* We cannot solve the the minimization problem of the SSR! That's a *numerical problem*.
+
+* `r emo::ji("arrow_right")` variables must not be **perfectly colinear**, i.e. not perfectly linearly dependent.
+
+]
+
+---
+class: inverse
+
+# Multicolinearity App!
+
+```{r,eval=FALSE}
+library(ScPoEconometrics)
+launchApp("multicolinearity")
+```
+
+---
+# Log Wage Equation Continued
+
+
+---
+class: inverse
+
+# Tutorial
+
+
+```{r,eval=FALSE}
+library(ScPoEconometrics)
+runTutorial("lm-example")
+```
+
+---
+
+
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
