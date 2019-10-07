@@ -1,0 +1,348 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Session 5"
+author: "Florian Oswald"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+library(magrittr)
+
+```
+
+# Data On Cars
+
+# Categorical Variables
+
+* We have seen different data types in the first session.
+
+--
+
+* One of them was `factor`, representing **categorical** data:
+--
+
+
+* A person is *male* or *female*
+--
+
+
+* A plane is *passenger*, *cargo* or *military*
+--
+
+
+* Some good is produced in *Spain*, *France*, *China* or *UK*.
+
+---
+
+# Binary/Boolean/Dummy 
+
+* A *dummy* variable is either `TRUE` or `FALSE` (or `0` or `1`).
+
+* We use dummies to mark **category membership**: if member, then `TRUE`.
+
+* for example, 
+    $$\begin{aligned}\text{is.male}_i &=  \begin{cases}1 & \text{if }i\text{ is male} \\0 & \text{if }i\text{ is not male}. \\\end{cases} \\\end{aligned}$$
+  
+* Notice that whether `0` corresponds to `TRUE` or `FALSE` is up to you. Just be consistent!
+
+---
+
+# Dummy Variables
+
+.pull-left[
+* We defined `is.male`. Let's define its pendant.
+
+* That is, for females, 
+    $$\begin{aligned}\text{is.female}_i &=  \begin{cases}1 & \text{if }i\text{ is female} \\0 & \text{if }i\text{ is not female}. \\\end{cases} \\\end{aligned}$$
+    
+]
+
+--
+
+.pull-right[
+    
+* let's all create this dataset:
+
+```{r,echo=TRUE}
+df1 = data.frame(income=c(3000,5000,7500,3500),
+             sex=c("male","female","male","female"))
+```
+]
+
+---
+
+# Falling into The Dummy Variable Trap
+
+.pull-left[
+* Let's run regression $y = b_0 + b_1 is.male + b_2 is.female$
+
+* First, we create those dummy variables:
+
+```{r,echo=TRUE}
+df1$is.male = df1$sex == "male"
+df1$is.female = df1$sex == "female"
+```
+]
+
+--
+
+.pull-right[
+
+* and then let's run this:
+
+```{r,eval=FALSE}
+lm(income ~ is.male + is.female,df1)
+```
+
+* What do you see? `r emo::ji("thinking")`
+
+]
+
+---
+
+# The Trap: Multicolinearity
+
+.pull-left[
+```{r,warning=FALSE,message=FALSE}
+df1$linear_comb = df1$is.male + df1$is.female
+df1
+```
+]
+
+--
+
+.pull-right[
+
+* Oops. `is.male + is.female` is **always** equal `1`!
+
+* In other words, `is.male = 1 - is.female`. A **perfect colinearity**!
+
+* Multiple regression fails. `r emo::ji("angry")`
+
+]
+
+---
+
+# Drop One Category
+
+.pull-left[
+
+* Notice: Inclusion of both dummies doesn't add anything
+
+* If someone is `male` they are *not* `female`.
+
+* So we **drop one of the categories**. Only do $y = b_0 + b_1 is.female$
+
+]
+
+.pull-right[
+
+```{r}
+lm1 = lm(income ~ is.female,df1)
+lm1
+```
+]
+
+---
+
+# Interpretation of Dummies
+
+* We have excluded `is.male`.
+
+* So what's the effect of being `male` now?
+  * Well, *male* means `is.female = 0`. So `male` is **subsumed in the intercept**!
+  * At `is.female = 0`, i.e. $\widehat{y} = b_0 + b_1 \cdot 0=$ `r coef(lm1)[1]`
+  
+* Coefficient on `is.female` is $b_1=$ `r coef(lm1)[2]`. It measures the *difference in intercept from being female*.
+  * That means: $\widehat{y} = b_0 + b_1 \cdot 1=$ `r sum(coef(lm1)[1:2])`
+
+
+---
+# Our Dataset in a Picture
+
+```{r x-zero,echo=FALSE,fig.align='center',fig.asp=0.9,fig.width=6}
+a <- coef(lm1)[1]
+b <- coef(lm1)[2]
+x = df1$is.female
+y = df1$income
+dta = df1
+
+# plot
+expr <- function(x) a + b*x
+errors <- (a + b*x) - y
+
+plot(x,y, type = "p",pch = 21, col = "blue", bg = "royalblue",frame.plot = TRUE,cex=1.2,xlim=c(-.2, 1.7), ylim = c(min(y)-.1, max(y)+.1),xlab="is.female",ylab="income",xaxt="n")
+axis(side = 1,c(0,1))
+```
+
+---
+
+# Regression connects Conditional Means!
+
+```{r x-zero-one,echo=FALSE,fig.align='center',fig.asp=0.9,fig.width=6}
+plot(x,y, type = "p",pch = 21, col = "blue", bg = "royalblue",frame.plot = TRUE,cex=1.2,xlim=c(-.2, 1.7), ylim = c(min(y)-.1, max(y)+.1),xlab="is.female",ylab="income",xaxt="n")
+axis(side = 1,c(0,1))
+
+points(0, mean(dta[dta$is.female == 0, "income"]), col = 'orange',
+       cex = 3, pch = 15)
+text(0.35, mean(dta[dta$is.female == 0, "income"]), "E[Y | is.female = 0]", pos = 3)
+
+points(1, mean(dta[dta$is.female == 1, "income"]), col = 'orange',
+       cex = 3, pch = 15)
+text(0.95, mean(dta[dta$is.female == 1, "income"]), "E[Y | is.female = 1]", pos = 2)
+curve(expr = expr, from = min(x)-1, to = max(x)+1, add = TRUE, col = "black")
+segments(x0 = x, y0 = y, x1 = x, y1 = (y + errors), col = "green",xaxt="n",yaxt="n")
+
+```
+
+
+---
+
+# $b_1$ is *Difference* in Conditional Means
+
+```{r x-zero-two,echo=FALSE,fig.align='center',fig.asp=0.9,fig.width=6}
+plot(x,y, type = "p",pch = 21, col = "blue", bg = "royalblue",frame.plot = TRUE,cex=1.2,xlim=c(-.2, 1.7), ylim = c(min(y)-.1, max(y)+.1),xlab="is.female",ylab="income",xaxt="n")
+axis(side = 1,c(0,1))
+
+points(0, mean(dta[dta$is.female == 0, "income"]), col = 'orange',
+       cex = 3, pch = 15)
+text(0.35, mean(dta[dta$is.female == 0, "income"]), "E[Y | is.female = 0]", pos = 3)
+
+points(1, mean(dta[dta$is.female == 1, "income"]), col = 'orange',
+       cex = 3, pch = 15)
+text(0.95, mean(dta[dta$is.female == 1, "income"]), "E[Y | is.female = 1]", pos = 2)
+curve(expr = expr, from = min(x)-1, to = max(x)+1, add = TRUE, col = "black")
+segments(x0 = x, y0 = y, x1 = x, y1 = (y + errors), col = "green",xaxt="n",yaxt="n")
+
+# red arrow for effect size at xx=1.3
+xx = 1.3
+arrows(x0 =xx, y0 = mean(dta[dta$is.female == 0, "income"]), x1 = xx, y1 = mean(dta[dta$is.female == 1, "income"]),col="red",lw=3,code=3,length=0.1)
+# dashes
+segments(x0=0,y0 = mean(dta[dta$is.female == 0, "income"]),x1=xx,y1 = mean(dta[dta$is.female == 0, "income"]),col="red",lty="dashed")
+segments(x0=1,y0 = mean(dta[dta$is.female == 1, "income"]),x1=xx,y1 = mean(dta[dta$is.female == 1, "income"]),col="red",lty="dashed")
+
+text(xx, mean(y)+100, paste("b1 =",round(b,2)), pos = 4,col="red")
+abline(a=mean(dta$income),b=0,col="blue",lw=2)
+```
+
+---
+
+# Interpretation of Dummy Coefficient $b_1$
+
+* So, we have seen that 
+  $$
+  b_1 = E[Y|\text{is.female}=1] - E[Y|\text{is.female}=0]
+  $$
+  
+* This was the meaning of the red arrow.
+
+---
+class: inverse
+
+# App!
+
+* Time for you to play around with the Binary Regression!
+* Try to find the best line again!
+
+```{r,eval=FALSE}
+library(ScPoEconometrics)
+launchApp("reg_dummy")
+```
+
+---
+
+# Dummy *and* $X$
+
+* What if we added $\text{exper}_i\in \mathbb{N}$ to that regression?
+    $$
+    y_i = b_0 + b_1 \text{is.female}_i + b_2 \text{exper}_i + e_i 
+    $$
+    
+* As before, dummy acts as intercept shifter. We have
+    $$y_i =  \begin{cases}b_0 + b_1 + b_2 \text{exper}_i + e_i & \text{if is.female=1} \\b_0 + \hphantom{b_1} + b_2 \text{exper}_i + e_i & \text{if is.female=0}\end{cases}$$
+    
+* intercept is $b_0 + b_1$ for women but $b_0$ for men
+
+* Slope $b_2$ **identical** for both!
+
+---
+class: inverse
+
+# App!
+
+```{r,eval=FALSE}
+library(ScPoEconometrics)
+launchApp("reg_dummy_example")
+```
+
+
+---
+
+# More than Two Levels: `factor` 
+
+
+* Sometimes two categories are not enough.
+
+* The `R` data type `factor` can represent more than just `0` and `1` in terms of categories.
+
+* Function `factor` takes a numeric vector `x` and a vector of `labels`. Each value of `x` is associated to a `label`:
+
+```{r}
+factor(x = c(1,1,2,4,3,4),labels = c("HS","someCol","BA","MSc"))
+```
+
+* `factor` in an `lm` object automatically chooses an omitted/reference category!
+
+---
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
