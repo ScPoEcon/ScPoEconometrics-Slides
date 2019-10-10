@@ -12,7 +12,7 @@
 1. Chapter 5 - Categorical Variables
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter5/chapter5.html)  
 1. Chapter 6 - Categorical Variables
-[HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter6/chapter6.html)  
+[HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session6/chapter6/chapter6.html)  
 
 
 
