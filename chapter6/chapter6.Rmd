@@ -343,7 +343,7 @@ print(pr)  # just for slides...
 
 * Let's take 1000 samples!
 
-* Notice that this has `r nrow(virtual_samples)` rows now!
+* Notice that this has 50000 rows now!
 
 * Each `replicate` will have 50 rows, as before.
 ]
@@ -372,7 +372,8 @@ virtual_prop_red <- virtual_samples %>%
 print(virtual_prop_red)
 ```
 
-(or shorter: `virtual_prop_red <- prop_red(virtual_samples)`)
+(or shorter:
+`virtual_prop_red <- prop_red(virtual_samples)`)
 ]
 
 --
@@ -702,6 +703,14 @@ Scenario | Population parameter | Notation | Point estimate | Symbol(s)
 # Central Limit Theorem
 
 <iframe width="760" height="515" src="https://www.youtube.com/embed/jvoxEYmQHNM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
+
+class: title-slide-final, middle
+
+# THANKS
+
+To the amazing [moderndive](https://moderndive.com/) team!
 
 ---
 
