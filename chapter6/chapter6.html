@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Session 6
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-10-08
+### SciencesPo Paris </br> 2019-10-10
 
 ---
 
@@ -32,7 +32,7 @@ layout: true
 # Hands On Pasta
 
 .pull-left[
-* Today we do a hands-on activity.
+* In class we did a hands-on activity.
 
 * Consider the picture on the right:
 
@@ -43,601 +43,762 @@ layout: true
 &lt;div&gt;&lt;img src="../img/photos/pasta1.JPG"?&gt;&lt;/div&gt;
 ]
 
+---
 
-```r
-head(cars)
-```
+# Full Census is Costly
 
-```
-##   speed dist
-## 1     4    2
-## 2     4   10
-## 3     7    4
-## 4     7   22
-## 5     8   16
-## 6     9   10
-```
+.pull-left[
+* We decided counting all Fusilli is painful.
 
-* How are `speed` and `dist` related?
+* And draws worried looks of people. 🤓
 
-* What is a good summary of their relationship?
+* So what else could we do?
 ]
 
---
+.pull-right[
+&lt;div&gt;&lt;img src="../img/photos/pasta3.JPG"?&gt;&lt;/div&gt;
+]
+
+
+---
+
+# Sampling
+
+.pull-left[
+* We took a first sample of size `\(n=20\)`
+
+* We made sure it selected noodles at **random**
+
+* Here is what we found.
+
+Color | Count | Proportion
+:------:|:------:|:--------:
+Red   |  7        |  0.35
+Green   |  5     |   0.25
+White   |  8    |     0.4
+]
 
 .pull-right[
+&lt;div&gt;&lt;img src="../img/photos/pasta5.JPG"?&gt;&lt;/div&gt;
+]
+
+---
+
+# Sampling Variation
+
+
+* We asked ourselves, what would happen if we took a *new* sample? Would we also get 5 Greens as before?
+
+* Some of you said *maybe*, some said *maybe not*.
+
+* We agreed that samples would vary from draw to draw.
+
+* Key to this observation: they are *randomly* drawn samples.
+
+* We made sure it selected noodles at **random**
+
+
+
+---
+
+# Taking 11 Samples
+
+.pull-left[
+
+* Then it was **your turn**!
+
+* 11 groups of 2 students took a sample of 20.
+
+* We made a table and a histogram.
+]
+
+.pull-right[
+
+```
+##    group replicate prop_green
+## 1      1         1       0.30
+## 2      2         2       0.25
+## 3      3         3       0.25
+## 4      4         4       0.30
+## 5      5         5       0.15
+## 6      6         6       0.30
+## 7      7         7       0.25
+## 8      8         8       0.25
+## 9      9         9       0.20
+## 10    10        10       0.25
+## 11    11        11       0.20
+```
+
+]
+
+
+---
+
+# Samples Follow a Distribution
+
+.pull-left[
+## Hand Drawn
+&lt;div&gt;&lt;img src="../img/photos/pasta6.JPG"?&gt;&lt;/div&gt;
+]
+
+.pull-right[
+## `R` Drawn
+
 &lt;img src="chapter6_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
----
-
-# A Line throught the Scatterplot of Cars
-
-.left-wide[
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
---
-
-.right-thin[
-&lt;br&gt;
-&lt;br&gt;
-
-* A *line*! Great. But **which** line? This one?
-
-* That's a *flat* line. But `dist` is increasing. 
-
-* 😩
-
-]
 
 ---
 
-# A Line throught the Scatterplot of Cars
+# Handover to `Moderndive`
 
-.left-wide[
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
-]
+* The [moderndive](https://moderndive.com) project used red and white balls instead of Fusilli.
 
---
+&lt;div align="center"&gt;&lt;img src="../img/photos/transition.png"?&gt;&lt;/div&gt;
 
-.right-thin[
-&lt;br&gt;
-&lt;br&gt;
+* The rest is identical. We will continue with their example now!
 
-* **That** one?
 
-* Slightly better. Has a *slope* and an *intercept*.
-
-* 😐
-
-]
 
 
 ---
 
-# Writing Down A *Line*
+# Taking Virtual (not Real) Samples
 
 .pull-left[
-* We observe `\((y_i,x_i)\)` in the data.
+* We have all balls in the bowl in a data.frame.
 
-* This describes a line with intercept `\(b_0\)` and slope `\(b_1\)`:
-    $$
-    \widehat{y}_i = b\_0 + b\_1 x\_i
-    $$
+* Instead of with our hands and a shovel, let's write code that takes a sample form it!
 
-* We call `\(\widehat{y}_i\)` the *prediction* for `\(y_i\)`.
+* We'll use the *virtual shovel* to take a sample of 50 balls from our virtual bowl.
 
-* Most of the times, `\(\widehat{y}_i \neq y_i\)`, i.e. we make an *error*.
+* The dataset `bowl` holds the data.
 ]
 
 --
 
 .pull-right[
 
-* At point `\(x_i\)` we make error `\(e_i\)`.
-
-* Our aim will be to keep the error *as small as possible*, while at the same time giving a reasonable description of the data.
-
-* (We could be more generally trying to fit a *curve* rather than a *line*, by the way.)
-
-* The *actual data* `\((y_i,x_i)\)` can thus be written like *prediction + error*:
-    $$
-    y_i = b_0 + b_1 x_i + e_i
-    $$
-]
-
-
-
----
-
-# Making Errors
-
-
-
-
-
-.left-wide[
-&lt;img src="chapter6_files/figure-html/line-arrows-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-.right-thin[
-* Red Arrows are *errors* or *residuals* for each prediction.
-
-* Often denoted `\(u\)` or `\(e\)`.
-
-* Note that we have both `\(e&gt;0\)` and `\(e&lt;0\)`!
-]
-
----
-class: inverse
-
-# App Time!
-
-* Let's try to find the best line using only the *absolute value* of errors!
-
-
 ```r
-library(ScPoEconometrics) # load our library
-launchApp('reg_simple_arrows')
-aboutApp('reg_simple_arrows') # explainer about app
+library(dplyr)
+library(ggplot2)
+library(moderndive)  # load their package
+print(bowl)  # you dont need the print
 ```
 
+```
+## # A tibble: 2,400 x 2
+##    ball_ID color
+##      &lt;int&gt; &lt;chr&gt;
+##  1       1 white
+##  2       2 white
+##  3       3 white
+##  4       4 red  
+##  5       5 white
+##  6       6 white
+##  7       7 red  
+##  8       8 white
+##  9       9 red  
+## 10      10 white
+## # … with 2,390 more rows
+```
+]
+
 ---
 
-# Writing Down *The Best* Line
+# Using A Virtual Shovel Once
 
 .pull-left[
-* choose `\((b_0,b_1)\)` s.t. the sum `\(e_1^2 + \dots + e_N^2\)` is **as small as possible**
+* We will take a first sample of size 50 now.
 
-* `\(e_1^2 + \dots + e_N^2\)` is the *sum of squared residuals*, or SSR.
+* We will use the `moderndive` function `rep_sample_n`.
 
-* Wait a moment... Why *squared* residuals?!
+* Column `replicate` tells us the ID of the sample. Here: `1`.
 ]
 
 --
 
 .pull-right[
 
-* In previous plot, errors of different sign `\((+/-)\)` cancel out!
-
-* This makes it hard to find a good line.
-
-* Squaring each `\(e_i\)` solves that issue as `\(e_i^2 \geq 0, \forall i\)`.
-]
-
-
----
-
-# Best Line and Squared Errors
-
-.left-wide[
-&lt;img src="chapter6_files/figure-html/line-squares-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
---
-
-.right-thin[
-&lt;br&gt;
-&lt;br&gt;
-
-* **That's**  the one!
-
-* Perfect! Minimizes the sum of squares.
-
-* 😌
-
-]
-
----
-class: inverse
-
-# App Time!
-
-
-
 ```r
-launchApp('reg_simple')
-aboutApp('reg_simple')
+virtual_shovel &lt;- bowl %&gt;% 
+  rep_sample_n(size = 50)
+virtual_shovel
 ```
 
+```
+## # A tibble: 50 x 3
+## # Groups:   replicate [1]
+##    replicate ball_ID color
+##        &lt;int&gt;   &lt;int&gt; &lt;chr&gt;
+##  1         1    1420 red  
+##  2         1    1853 white
+##  3         1    1055 white
+##  4         1    1359 red  
+##  5         1    2199 white
+##  6         1     218 white
+##  7         1    1187 red  
+##  8         1     328 white
+##  9         1     454 red  
+## 10         1    1931 white
+## # … with 40 more rows
+```
+]
+
 
 ---
 
-# Ordinary Least Squares (OLS)
+# Calculating Proportions of *Red*
 
 .pull-left[
-* OLS estimates the best line for us.
 
-* In our single regressor case, there is a simple formula for the slope:
-  $$
-  b_1 = \frac{cov(x,y)}{var(x)}
-  $$
-  
-* and for the intercept
-  $$
-  b_0 = \bar{y} - b_1\bar{x}
-  $$
+```r
+sample_1 &lt;- virtual_shovel %&gt;% 
+  mutate(is_red = color == "red") %&gt;%
+  summarize(num_red = sum(is_red)) %&gt;% 
+  mutate(prop_red = num_red / 50)
+sample_1
+```
+
+```
+## # A tibble: 1 x 3
+##   replicate num_red prop_red
+##       &lt;int&gt;   &lt;int&gt;    &lt;dbl&gt;
+## 1         1      16     0.32
+```
+]
+
+.pull-right[
+1. adds a column `is_red` TRUE/FALSE
+
+2. computes sum over this (counting how many TRUE)
+
+3. computes proportion out of total (50)
+
+4. So 0.32 are red! What if we try again?
+
+5. What if we try many times, like, 33 times?
+]
+
+
+
+
+---
+
+# Using The Virtual Shovel 33 Times
+
+.pull-left[
+
+```r
+virtual_samples &lt;- bowl %&gt;% 
+  rep_sample_n(size = 50, reps = 33)
+virtual_samples
+```
+
+```
+## # A tibble: 1,650 x 3
+## # Groups:   replicate [33]
+##    replicate ball_ID color
+##        &lt;int&gt;   &lt;int&gt; &lt;chr&gt;
+##  1         1     831 white
+##  2         1    1934 white
+##  3         1    1242 red  
+##  4         1    2189 white
+##  5         1    1040 red  
+##  6         1    1319 white
+##  7         1    1107 white
+##  8         1    1369 red  
+##  9         1     467 white
+## 10         1     169 white
+## # … with 1,640 more rows
+```
 ]
 
 --
 
 .pull-right[
 
-* 🚨
+```r
+virtual_prop_red &lt;- virtual_samples %&gt;% 
+  group_by(replicate) %&gt;% 
+  summarize(red = sum(color == "red")) %&gt;% 
+  mutate(prop_red = red / 50)
+print(virtual_prop_red)
+```
 
-* You **must** know those formulae!
-
+```
+## # A tibble: 33 x 3
+##    replicate   red prop_red
+##        &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;
+##  1         1    16     0.32
+##  2         2    23     0.46
+##  3         3    15     0.3 
+##  4         4    21     0.42
+##  5         5    18     0.36
+##  6         6    16     0.32
+##  7         7    17     0.34
+##  8         8    16     0.32
+##  9         9    21     0.42
+## 10        10    20     0.4 
+## # … with 23 more rows
+```
 ]
-  
-  
----
-class: inverse
-
-# App Time!
-
-How does OLS actually perform the minimization problem?
-
-
-```r
-launchApp('SSR_cone')
-aboutApp('SSR_cone')  # after
-```
 
 
 ---
-class: inverse
 
-# App Time!
-
-
-Let's do some more OLS!
-
-
-```r
-launchApp('reg_full')
-aboutApp('reg_full')  # after
-```
-
----
-
-# OLS without any Regressor
+# (Virtual!) Sampling Variation
 
 .pull-left[
-* Our line is flat at level `\(b_0\)`:
-  `$$y = b_0$$`
-* Our optimization problem is now
-  `$$b_0 = \arg\min_{\text{int}} \sum_{i=1}^N \left[y_i - \text{int}\right]^2,$$`
-* With solution
-  `$$b_0 = \frac{1}{N} \sum_{i=1}^N y_i = \overline{y}.$$`
+* Just as when *you* did it, the virtual sampler *also* creates random samples.
+
+* The `prop_red` column in the `virtual_prop_red` data.frame differs across replicates (i.e., samples)
+
+* And again, we can visualize the **sampling distribution**:
+
+
+```r
+ggplot(virtual_prop_red, aes(x = prop_red)) +
+  geom_histogram(binwidth = 0.05, 
+                 boundary = 0.4,
+                 color = "white") +
+  labs(x = "Proportion of 50 balls that were red", 
+       title = "Distribution of 33 proportions red") 
+```
 ]
 
 --
 
 .pull-right[
-* In other words: Estimates the **mean** of `\(y\)`!
-
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter6_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 
 ---
 
-# Other OLS Restrictions
+# Designing a Function to Compute Proportions
 
-* There are other restrictions we can impose.
+.pull-left[
+* We will have to repeat the above steps quite often now.
 
-* They are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional 🤓.
+* Let's write a function.
 
-* There is an app for each of them:
-&lt;br&gt;
-&lt;br&gt;
+* Let's call it `prop_red`
 
-type | App  
--------- | --------
-No Intercept | `launchApp('reg_constrained')` 
-Centered Regression | `launchApp('demeaned_reg')` 
-Standardized Regression | `launchApp('reg_standardized')`
+* It should take a data.frame, group by `replicate`, summarize by color red and compute a proportion for each replicate.
+]
 
+.pull-right[
+
+```r
+prop_red &lt;- function(s){
+  s %&gt;%
+    group_by(replicate) %&gt;%
+    summarise(red = sum(color == "red"),n = n()) %&gt;%
+    mutate(prop_red = red / n)
+}
+# check
+pr &lt;- prop_red(virtual_samples)
+print(pr)  # just for slides...
+```
+
+```
+## # A tibble: 33 x 4
+##    replicate   red     n prop_red
+##        &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;
+##  1         1    16    50     0.32
+##  2         2    23    50     0.46
+##  3         3    15    50     0.3 
+##  4         4    21    50     0.42
+##  5         5    18    50     0.36
+##  6         6    16    50     0.32
+##  7         7    17    50     0.34
+##  8         8    16    50     0.32
+##  9         9    21    50     0.42
+## 10        10    20    50     0.4 
+## # … with 23 more rows
+```
+]
 
 ---
 
-# Predictions and Residuals
 
-
-1. The error is `\(e_i = y_i - \widehat{y}_i\)`
-
-2. The average of `\(\widehat{y}_i\)` is equal to `\(\bar{y}\)`.
-    `$$\begin{align}\frac{1}{N} \sum_{i=1}^N \widehat{y}_i &amp;= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &amp;= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$`
---
-3. Then,
-    `$$\frac{1}{N} \sum_{i=1}^N e_i = \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i = 0$$`
-    i.e. the average of errors is zero.
-
----
-
-# Properties of Residuals
+# Using The Virtual Shovel 1000 Times!
 
 .pull-left[
 
-1. The average of `\(\widehat{y}_i\)` is the same as the mean of `\(y\)`.
+* The good thing about *virtual* sampling: the computer can do it very fast.
 
-2. The average of the errors should be zero.
+* We can effortlessly increase either the sample size, or the number of replications.
 
-3. Prediction and errors should be *uncorrelated* (i.e. orthogonal).
+* Let's take 1000 samples!
 
-Let's look at the data behind our *arrows* plot above:
+* Notice that this has 1650 rows now!
+
+* Each `replicate` will have 50 rows, as before.
+]
+
+
+.pull-right[
+
+```r
+virtual_samples &lt;- bowl %&gt;% 
+  rep_sample_n(size = 50, reps = 1000)
+virtual_samples
+```
+
+```
+## # A tibble: 50,000 x 3
+## # Groups:   replicate [1,000]
+##    replicate ball_ID color
+##        &lt;int&gt;   &lt;int&gt; &lt;chr&gt;
+##  1         1     325 white
+##  2         1     155 red  
+##  3         1    1258 red  
+##  4         1     781 white
+##  5         1    2300 white
+##  6         1    1083 red  
+##  7         1     607 white
+##  8         1    1000 red  
+##  9         1    1137 white
+## 10         1    1197 white
+## # … with 49,990 more rows
+```
+]
+
+
+
+---
+
+# Computing Proportions from 1000 Samples
+
+.pull-left[
+
+```r
+virtual_prop_red &lt;- virtual_samples %&gt;% 
+  group_by(replicate) %&gt;% 
+  summarize(red = sum(color == "red")) %&gt;% 
+  mutate(prop_red = red / 50)
+print(virtual_prop_red)
+```
+
+```
+## # A tibble: 1,000 x 3
+##    replicate   red prop_red
+##        &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;
+##  1         1    22     0.44
+##  2         2    17     0.34
+##  3         3    23     0.46
+##  4         4    15     0.3 
+##  5         5    16     0.32
+##  6         6    16     0.32
+##  7         7    15     0.3 
+##  8         8    17     0.34
+##  9         9    16     0.32
+## 10        10    15     0.3 
+## # … with 990 more rows
+```
+
+(or shorter: `virtual_prop_red &lt;- prop_red(virtual_samples)`)
 ]
 
 --
 
 .pull-right[
-<table class="huxtable" style="border-collapse: collapse; margin-bottom: 2em; margin-top: 2em; width: 50%; margin-left: auto; margin-right: auto;  ">
-<col><col><col><col><col><tr>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">x</td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">y</td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">y_hat</td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">error</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.00</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.09</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.57</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.48</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">1.25</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.79</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">3.41</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.62</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.50</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">6.49</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4.25</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.24</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">3.75</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">1.71</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.10</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-3.39</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.00</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">9.89</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.94</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">3.95</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">6.25</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">7.62</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">6.78</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.83</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">7.50</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4.86</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">7.63</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-2.77</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">8.75</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">7.38</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">8.47</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-1.09</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">10.00</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">10.63</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">9.31</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 2pt 0pt; padding: 4pt 4pt 4pt 4pt;">1.32</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">Means</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.00</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.94</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.94</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-0.00</td>
-</tr>
-</table>
-
-
+&lt;img src="chapter6_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 ]
+
 
 ---
 
-# Properties of Residuals
-
+# 1000 Samples and Their Distribution
 
 .pull-left[
+* We have seen that with 1000 samples, this strongly resembles a normal distribution.
 
-1. The average of `\(\widehat{y}_i\)` is the same as the mean of `\(y\)`.
+* There are some very low values, some very high, but the mass is clearly at around 0.38 or so.
 
-2. The average of the errors should be zero.
+* The **red** line estimates a continuous density, and it looks kind of normal.
 
-3. Prediction and errors should be *uncorrelated* (i.e. orthogonal).
-
+* So: The *more* samples of a certain size we take, *more* their distribution will resemble a normal. ✅.
 ]
-
---
 
 .pull-right[
-
-
-```r
-# 1.
-all.equal(mean(sd$y_hat), mean(sd$y))
-```
-
-```
-## [1] TRUE
-```
-
-```r
-# 2.
-all.equal(mean(sd$error), 0)
-```
-
-```
-## [1] TRUE
-```
-
-```r
-# 3.
-all.equal(cov(sd$error,sd$y_hat), 0)
-```
-
-```
-## [1] TRUE
-```
-]
-
-
----
-
-# Linear Statistics
-
-* It's important to keep in mind that Var, Cov, Corr and Regression measure **linear relationships** between two variables.
-
-* Two datasets with *identical* correlations could look *vastly* different.
-
-* They would have the same regression line.
-
-* Same correlation coefficient.
-
---
-
-* Is that even possible?
-
----
-
-# Linear Statistics: Anscombe
-
-* Francis Anscombe (1973) comes up with 4 datasets with identical stats. But look!
-
-.left-wide[
-
 &lt;img src="chapter6_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
+
+---
+
+# Role of Sample Size
+
+.pull-left[
+* Let's repeat this now for different samples sizes.
+
+* Let's take 1000 samples each for `\(n=25,n=50,n=100\)`! 
+
+* Let's first generate all samples of different sizes.
+
+* using `rep_sample_n` again, and keeping `reps=1000` fixed.
+
+]
+
 --
 
-.right-thin[
-<table class="huxtable" style="border-collapse: collapse; margin-bottom: 2em; margin-top: 2em; width: 50%; margin-left: auto; margin-right: auto;  ">
-<col><col><col><col><tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">dataset</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">cov</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">var(y)</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">var(x)</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">1</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.50</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4.13</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">11.00</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.50</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4.13</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">11.00</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">3</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.50</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4.12</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">11.00</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">5.50</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4.12</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">11.00</td>
-</tr>
-</table>
+.pull-right[
 
+```r
+# 1.a) Virtually use shovel 1000 times
+virtual_samples_25 &lt;- bowl %&gt;% 
+  rep_sample_n(size = 25, reps = 1000)
+
+# 2.a) Virtually use shovel 1000 times
+virtual_samples_50 &lt;- bowl %&gt;% 
+  rep_sample_n(size = 50, reps = 1000)
+
+# 3.a) Virtually using shovel with 100 slots 1000 times
+virtual_samples_100 &lt;- bowl %&gt;% 
+  rep_sample_n(size = 100, reps = 1000)
+```
+]
+
+---
+
+# Compute Proportions and Plot Them!
+
+.pull-left[
+## Computing Proportions
+&lt;br&gt;
+
+
+```r
+# 1.b) Compute proportion red in each of 1000 samples
+virtual_prop_red_25 &lt;- prop_red(virtual_samples_25)
+
+
+# 2.b) Compute proportion red in each of 1000 samples
+virtual_prop_red_50 &lt;- prop_red(virtual_samples_50)
+
+
+# 3.b) Compute proportion red in each of 1000 samples
+virtual_prop_red_100 &lt;- prop_red(virtual_samples_100)
+```
+]
+
+.pull-right[
+## Plotting Each
+
+
+```r
+# 1.c) Plot distribution via a histogram
+ggplot(virtual_prop_red_25, aes(x = prop_red)) +
+  geom_histogram(binwidth = 0.05, boundary = 0.4, 
+                 color = "white") +
+  labs(x = "Proportion of 25 balls that were red", 
+       title = "25") 
+
+# 2.c) Plot distribution via a histogram
+ggplot(virtual_prop_red_50, aes(x = prop_red)) +
+  geom_histogram(binwidth = 0.05, boundary = 0.4, 
+                 color = "white") +
+  labs(x = "Proportion of 50 balls that were red", 
+       title = "50")  
+
+# 3.c) Plot distribution via a histogram
+ggplot(virtual_prop_red_100, aes(x = prop_red)) +
+  geom_histogram(binwidth = 0.05, boundary = 0.4, 
+                 color = "white") +
+  labs(x = "Proportion of 100 balls that were red", 
+       title = "100") 
+```
+]
+
+---
+
+# Look at That!
+
+&lt;img src="chapter6_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+# Sample Size and Sampling Distributions
+
+.pull-left[
+* The larger the sample size, the *narrower* the resulting sampling distribution.
+
+* At a constant number of replicates (i.e. 1000 in our case), bigger samples will yield normal distributions with smaller standard deviation.
+
+* Let us actually compute the standard deviation of estimated proportions from each of our three trial datasets:
+]
+
+--
+
+.pull-right[
+
+```r
+# n = 25
+sd25 = virtual_prop_red_25 %&gt;% 
+  summarize(sd = sd(prop_red))
+
+# n = 50
+sd50 = virtual_prop_red_50 %&gt;% 
+  summarize(sd = sd(prop_red))
+
+# n = 100
+sd100 = virtual_prop_red_100 %&gt;% 
+  summarize(sd = sd(prop_red))
+```
+
+]
+
+---
+
+# Sample Size and Standard Deviation
+
+.pull-left[
+
+* Let's remember what the *standard deviation* actually measures.
+
+* It's about the *spread* of a certain variable.
+
+* The Normal Distibution is *described* by it's mean and standard deviation.
+
+* We are concerned with standard deviation of *proportions red* found across replicates.
+]
+
+.pull-right[
+
+&lt;br&gt;
+
+Sample Size | Standard Deviation
+:---------:|:--------------:
+25          | 0.09
+50          | 0.07
+100          |0.05
 
 ]
 ---
 
-# Dinosaurs in your Data?
 
-* So, be wary of only looking a linear summary stats.
-* Also look at plots.
-* Dinosaurs?
-    
-    ```r
-    launchApp("datasaurus")
-    aboutApp("datasaurus")
-    ```
+# Sampling Glossary 📖
 
----
+.pull-left[
+* Population: `\(N = 2400\)` balls
 
-# Nonlinear Relationships in Data?
+* Population Parameter: Quantity we wish to learn, like: `\(p\)` = *proportion red*, or `\(\mu\)` = *mean of X*.
 
-* We can accomodate non-linear relationships in regressions.
+* Census: Counting all the Fusilli 😂
 
-* We'd just add a higher order term like this:
-    $$
-    y_i = b_0 + b_1 x_i + b_2 x_i^2 + e_i
-    $$
-    
-* This is *multiple regression* (next chapter!)
+* Sampling: Collecting samples from population of size `\(n &lt; N\)`
 
----
+* Point estimate or Sample Statistic: Quantity (summary stat) computed from sample. `\(\hat{p}\)` = *proportion red*
+]
 
-# Nonlinear Relationships in Data?
+--
 
-* For example, suppose we had this data and fit the above regression:
-    &lt;img src="chapter6_files/figure-html/non-line-cars-ols2-1.svg" style="display: block; margin: auto;" /&gt;
+.pull-right[
+* Representative Sampling: Does the sample *look like* the population?
 
----
-# Analysis of Variance
+* Biased Sampling: Did all balls have equal chance to get selected?
 
-* Remember that `\(y_i = \widehat{y}_i + e_i\)`.
+* Random Sampling: We sample in an unbiased fashion.
 
-* We have the following decomposition:
-    `$$\begin{align} Var(y) &amp;= Var(\widehat{y} + e)\\&amp;= Var(\widehat{y}) + Var(e) + 2 Cov(\widehat{y},e)\\&amp;= Var(\widehat{y}) + Var(e)\end{align}$$`
-    
-* Because: `\(Cov(\hat{y},e)=0\)`
-
-* Total variation (SST) = Model explained (SSE) + Unexplained (SSR)
-
+]
 
 ---
 
-# Assessing the Goodness of Fit
+# Statistical Definitions
 
-* The `\(R^2\)` measures how good the model fits the data.
+.pull-left[
+* So we have been estimating `\(\hat{p}\)` all along.
 
-* `\(R^2=1\)` is very good, `\(R^2=0\)` is very poorly.
-    $$
-    R^2 = \frac{\text{variance explained}}{\text{total variance}} =     \frac{SSE}{SST} = 1 - \frac{SSR}{SST}\in[0,1]
-    $$
-    
-* Small `\(R^2\)` doesn't mean it's a useless model!
+* We have illustrated the *sampling distribution* of `\(\hat{p}\)`.
+
+* We computed the standard deviation in the various collections of `\(\hat{p}\)`. It has a special name: It's the standard **error** of the *point estimate* `\(\hat{p}\)`.
+
+* Let's reproduce the table but label properly:
+]
+
+.pull-right[
+
+&lt;br&gt;
+
+Sample Size `\((n)\)` | Standard Error of `\(\hat{p}\)`
+:---------:|:--------------:
+25          | 0.09
+50          | 0.07
+100          |0.05
+
+]
 
 ---
 
-# An Example - Log Wage Equation
+# Putting It All Together
 
-    
-* This set of slides continues as a fully worked example [from the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#an-example-a-log-wage-equation).
+.pull-left[
+* Point estimtes from random samples provide a *good guess* about an underlying **population parameter**.
 
+* How good? Sometimes `\(\hat{p}\)` will be far from `\(p\)`, sometimes close. There's variation.
+
+* **On average**, our estimates will be correct. This is because of unbiasedness. We'd say: 
+&gt; `\(\hat{p}\)` is an **unbiased estimator** of `\(p\)`.
+
+* We achieved unbiasedness through random sampling.
+]
+
+--
+
+.pull-right[
+* What is the **true** proportion `\(p\)` of red balls in the population of `\(N=2400\)` balls?
+
+* There were 900 of them, or 900/2400 = 0.375 = 37.5%.
+
+* The authors did not count them (they were told).
+
+* Never forget that I *did* count (at least the green fusilli 😉)
+
+* Let's insert the **truth** `\(p=0.375\)` into our previous plots!
+]
 
 ---
 
+# Visualizing Unbiasedness and Sampling Variation
+
+&lt;img src="chapter6_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Some Sampling Scenarios
+
+
+Scenario | Population parameter | Notation | Point estimate | Symbol(s)
+:--: | :--: | :--: |:--: | :--:
+1 | Population proportion | `\(p\)` | Sample proportion | `\(\widehat{p}\)`
+2 | Population mean | `\(\mu\)` | Sample mean | `\(\overline{x}\)` or `\(\widehat{\mu}\)`
+3 | Difference in population proportions | `\(p_1 - p_2\)` | Difference in sample proportions | `\(\widehat{p}_1 - \widehat{p}_2\)`
+4 | Difference in population means | `\(\mu_1 - \mu_2\)` | Difference in sample means | `\(\overline{x}_1 - \overline{x}_2\)`
+5 | Population regression slope | `\(\beta_1\)` | Fitted regression slope | `\(b_1\)` or `\(\widehat{\beta}_1\)`
+6 | Population regression intercept | `\(\beta_0\)` | Fitted regression intercept | `\(b_0\)` or `\(\widehat{\beta}_0\)`
+
+---
+
+# The Central Limit Theorem
+
+* The fact hat our sample statistics converge to a *central limit* is well known in statistics.
+
+* It's due to a famous result know as the central limit theorem.
+
+* It states that whatever the underlying population distribution looks like, as we add statistics computed from random samples, **those** will converge to a normal distribution.
+
+* Movie?
+
+---
+
+# Central Limit Theorem
+
+&lt;iframe width="760" height="515" src="https://www.youtube.com/embed/jvoxEYmQHNM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+
+---
 
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)
