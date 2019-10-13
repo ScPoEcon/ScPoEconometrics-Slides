@@ -1,0 +1,287 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Confidence Intervals and The Bootstrap"
+author: "Florian Oswald"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+library(magrittr)
+
+```
+
+# Where Did We Stop Last Week?
+
+.pull-left[
+* Last week we learned about *sampling distributions*
+
+* We took repeated samples from a population (Fusilli or plastic balls) and computed an **estimate** of the sample proportion $\hat{p}$ over and over again
+
+* We took 1000 (!) samples and looked how the sampling distribution evolved as we increased sample sizes from $n=25$ to $n=100$. 
+
+* Our estimates became *more precise* as $n$ increased. 
+
+]
+
+--
+
+.pull-right[
+* We introduced notation: 
+    * population size $N$, 
+    * *point estimate* (like $\hat{p}$), 
+    * standard error *of* an estimate
+
+* We said *random sampling produces **unbiased** estimates*.
+
+* Our sample statistics provided **good guesses** about the true population parameters of interest.
+]
+
+
+
+---
+background-image: url(https://media.giphy.com/media/hXG93399r19vi/giphy.gif)
+background-position: 10% 50%
+background-size: 500px
+
+# Reality Check
+
+.pull-right[
+* Who could ever take **1000** samples for any study?!
+
+* Also, we **knew** the true population proportion of red balls/green Fusilli!
+
+* If we knew in real life, we wouldn't have to take samples altogether, would we?
+
+* So what on earth was all of this good for? Fun Only?! `r emo::ji("anguished")`. 
+]
+
+---
+
+# Real Life Sampling
+
+.pull-left[
+* In reality we only get to take **one** sample from the population.
+
+* Still we *know* now that there exists a *sampling distribution*. 
+
+* In other words: we *know* that there is sampling variation.
+
+* With one sample only, how can we know what it looks like?
+]
+
+--
+
+.pull-right[
+* There are two approaches:
+    1. Theory: Use mathematical formulas to derive the sampling distributions for our estimators under certain conditions.
+    1. Simulation. We can use the **Bootstrap** method to *reconstruct* the sampling distribution.
+    
+* We'll focus on the bootstrap now and come back to the maths approach later.
+
+* But first: what is a *bootstrap*?
+]
+
+---
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/9/9b/Zentralbibliothek_Solothurn_-_M%C3%BCnchhausen_zieht_sich_am_Zopf_aus_dem_Sumpf_-_a0400.tif)
+background-position: 12% 50%
+background-size: 400px
+
+# Baron von Münchhausen (not)
+
+.pull-right[
+* The ethymology of *bootstrapping* is apparently [wrongly attributed](https://en.wikipedia.org/wiki/Bootstrapping) to the Baron of Münchhausen (who pulled himself out of the swamp by his own pigtail)
+
+* The idea is to *pull oneself up by one's own bootstraps*.
+
+* It sounds as if one had super-powers.
+
+* It's a simple but powerful idea. We just *pretend* that our sample **is** the population. Then we repeatedly *resample* from it. 
+]
+
+---
+background-image: url(https://media.giphy.com/media/pPhyAv5t9V8djyRFJH/giphy.gif)
+background-position: 12% 50%
+background-size: 700px
+
+.right-thin[
+<br>
+<br>
+<br>
+
+* `r emo::ji("exploding_head")`
+
+
+]
+
+
+---
+background-image: url(https://media.giphy.com/media/pPhyAv5t9V8djyRFJH/giphy.gif)
+background-position: 12% 50%
+background-size: 700px
+
+.right-thin[
+<br>
+<br>
+<br>
+
+* `r emo::ji("exploding_head")`
+
+* Ok, let's do a little hands-on activity first.
+
+* You'll be fine. 
+
+* `r emo::ji("sunglasses")`
+]
+
+---
+
+# What's the Average Age of US Pennies?
+
+* [`Moderndive`](https://moderndive.com) went for us to the bank.
+
+* First, They got a roll of 50 pennies.
+
+
+![:scale 40%](../img/photos/md-bank.jpg)![:scale 40%](../img/photos/md-bank2.jpg)
+
+---
+
+# What's the Average Age of US Pennies?
+
+
+.left-wide[
+* Then, they recorded the year each penny was minted:
+
+
+![:scale 70%](../img/photos/md-pennies.jpg)
+]
+
+.thin-right[
+* This data is in `moderndive`
+
+```{r}
+library(moderndive)
+pennies_sample
+```
+]
+
+---
+
+# Analyzing Pennies
+
+.pull-left[
+
+* Let's assume this is a *representative, random* sample of all US pennies.
+
+* Let's look at it's distribution and compute the mean `year` in the sample.
+
+* Given randomness, that estimate should come close to the truth.
+
+]
+
+--
+
+.pull-right[
+```{r,echo = FALSE,fig.height=3,warning=FALSE,message = FALSE}
+library(ggplot2)
+library(dplyr)
+ggplot(pennies_sample, aes(x = year)) +
+  geom_histogram(binwidth = 10, color = "white")
+```
+
+```{r}
+pennies_sample %>% 
+  summarize(mean_year = mean(year))
+```
+]
+
+---
+
+# Pennies Sample Estimates
+
+.pull-left[
+* So far, this is very similar to Fusilli or Balls, where we estimated $p$ via $\hat{p}$
+
+* Here, we estimate the population average $\mu$ via the **sample mean** $\bar{x}$.
+
+* Our best guess about $\mu$ is thus about 1995.
+
+* But what about sampling variation?
+
+* If we went back to the bank for another roll of pennies, would we end up with the same number for $\bar{x}$?
+]
+
+--
+
+.pull-right[
+* Last week we drew 1000 samples from our population of (virtual) balls.
+
+* That gave rise to a *distribution* of estimates $\hat{p}$.
+
+* We could go back to the bank 1000 times, but `r emo::ji("thinking")`
+
+* We can also use our *single* sample to learn about the sampling distribution. 
+
+* It's called **resampling with replacement**.
+]
+
+---
+
+class: title-slide-final, middle
+
+# THANKS
+
+To the amazing [moderndive](https://moderndive.com/) team!
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
