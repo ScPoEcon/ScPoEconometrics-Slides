@@ -259,6 +259,233 @@ pennies_sample %>%
 
 ---
 
+# Resampling Once
+
+
+
+---
+
+# Resampling 50 Times
+
+---
+
+# Resampling 50 Times per Team
+
+* collect data via google sheet
+
+
+---
+
+# Analyse Data
+
+---
+
+# Recap
+
+.pull-left[
+* We demonstrated **bootstrapping**. We illustrated sampling distributions like in the previous chapter by *resampling* from a single sample, rather than from the population.
+
+* We obtained the **bootstrap distribution**, which approximates the true *sampling distribution*
+
+* Next up:
+
+]
+
+--
+
+.pull-right[
+* We will again re-do the exercise virtually on your computers.
+
+* We will define the concept of **confidence interval**
+
+* We will introduce the `infer` package to perform *inference* in a `dplyr` pipeline.
+
+]
+
+
+
+---
+
+# Virtual Bootstrapping
+
+
+.pull-left[
+* Let's start with a single resample.
+
+* That's like taking 50 paper slips out of our hat before.
+
+```{r}
+virtual_resample <- pennies_sample %>% 
+  rep_sample_n(size = 50, replace = TRUE)
+```
+]
+
+--
+
+.pull-right[
+* notice we set `replace = TRUE`!
+
+```{r}
+virtual_resample
+```
+]
+
+---
+
+# Resampling 35 Times
+
+```{r}
+virtual_resamples <- pennies_sample %>% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 35)
+virtual_resamples
+```
+
+```{r}
+virtual_resampled_means <- virtual_resamples %>% 
+  group_by(replicate) %>% 
+  summarize(mean_year = mean(year))
+virtual_resampled_means
+```
+
+---
+
+# Resampling 1000 times
+
+
+```{r}
+virtual_resampled_means <- pennies_sample %>% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 1000) %>% 
+  group_by(replicate) %>% 
+  summarize(mean_year = mean(year))
+virtual_resampled_means
+```
+
+---
+
+# Distribution of 1000 Resamples
+
+```{r,echo = FALSE}
+ggplot(virtual_resampled_means, aes(x = mean_year)) +
+  geom_histogram(binwidth = 1, color = "white", boundary = 1990) +
+  labs(x = "sample mean")
+```
+
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Confidence Intervals
+
+
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+---
+
+# Confidence Intervals (CIs)
+
+.pull-left[
+* A CI gives us a *range* of plausible values for any given estimate.
+
+* In order to construct a CI, we need 
+    1. an underlying *sampling distribution*, either boostrapped as here, or derived from theory.
+    2. to specify a **confidence level**, like 90% or 95% etc. Greater level implies wider CIs.
+    
+* There are two methods: the **percentile method** and the **standard error method**.
+]
+
+--
+
+.pull-right[
+
+]
+
+
+---
+
+# Percentile Method
+
+
+--- 
+
+# Constructing Confidence Intervals
+
+
+---
+
+# Using the `infer` package
+
+* different workflows
+
+---
+
+# Interpreting CIs
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Hypothesis Tests
+
+
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Is Their Gender Discrimination In Promotions?
+
+<!-- also: https://www.ncbi.nlm.nih.gov/pubmed/12083361 -->
+
+.pull-left[
+* Article published in the *Journal of Applied Psychology* in 1970 investigates whether female employees at Banks are discriminated against.
+
+* 48 supervisors were given *identical* candidate CVs - identical up to the first name, which was male or female.
+
+* Many similar experiments have been conducted with other groups. Arabic Names, *Black* names, jewish names or other groups that can be identified from typical name choice.
+]
+
+-- 
+
+.pull-right[
+
+```{r}
+library(moderndive)
+promotions
+```
+]
+
+---
+
+# Looking At Promotions
+
+.pull-left[
+```{r,echo= FALSE}
+ggplot(promotions, aes(x = gender, fill = decision)) +
+  geom_bar() +
+  labs(x = "Gender of name on resume")
+```
+]
+
+.pull-right[
+```{r}
+promotions %>% 
+  group_by(gender, decision) %>% 
+  summarize(n = n())
+```
+]
+
+
+---
+
 class: title-slide-final, middle
 
 # THANKS
