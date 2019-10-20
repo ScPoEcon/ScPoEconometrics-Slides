@@ -261,22 +261,141 @@ pennies_sample %>%
 
 # Resampling Once
 
+.pull-left[
+## Resampling Protocol
+
+1. Printed out equally-sized paper slips representing the 50 pennies in the sample.
+
+1. Put them in a hat or similar 
+
+1. Shake hat to mix the slipe, then take out a random slip.
+
+1. Record year on slip.
+
+1. **Put the slip back** into the hat!
+
+1. Repeat 3.-4. for 49 times.
+]
+
+--
+
+.pull-right[
+
+* Let's put the recorded years into a `tibble`!
+
+```{r}
+pennies_resample <- tibble(year = c(1990,2000
+  
+))
+pennies_resample <- pennies_sample
+```
+]
+
+---
+
+# Comparing Resampled Data To Original Sample
+
+.left-wide[
+```{r,echo = FALSE, fig.height = 5}
+p1 = ggplot(pennies_resample, aes(x = year)) +
+  geom_histogram(binwidth = 10, color = "white",boundary = 1990) +
+  labs(title = "Resample of 50 pennies")
+p2 = ggplot(pennies_sample, aes(x = year)) +
+  geom_histogram(binwidth = 10, color = "white",boundary = 1990) +
+  labs(title = "Original sample of 50 pennies")
+cowplot::plot_grid(p1,p2)
+```
+]
+
+--
+
+.right-thin[
+Also, comparing both means:
+
+```{r}
+pennies_sample %>% 
+  summarize(mean_year = 
+              mean(year))
+```
+
+```{r}
+pennies_resample %>% 
+  summarize(mean_year = 
+              mean(year))
+```
+]
+
 
 
 ---
 
-# Resampling 50 Times
+# Resampling 21 Times
+
+.pull-left[
+* Let's do this together now!
+
+* Everybody produce one re-sample of 50 draws from their set of paper slips.
+
+* Don't forget to **replace** the slip and mix!
+]
+
+.pull-right[
+* We'll collect data via this [shared google sheet](https://docs.google.com/spreadsheets/d/1cBefpVyP3q2SortQD3TJ_XFQ2kJ5iSxM6qjwTvqcooY/edit?usp=sharing)
+
+* I'll read this later and rebuild the slides with
+    ```{r}
+    url <- "https://docs.google.com/spreadsheets/d/1cBefpVyP3q2SortQD3TJ_XFQ2kJ5iSxM6qjwTvqcooY"
+    # pennies_our_sample <- googlesheets4::read_sheet(url)
+    ```
+
+]
 
 ---
 
-# Resampling 50 Times per Team
+# Our Resampled Data
 
-* collect data via google sheet
+.pull-left[
+* The data is collected in
+    ```{r}
+    pennies_resamples
+    ```
 
+
+]
+
+.pull-right[
+* And we want to compute the average `year` from each sample:
+    ```{r}
+    resampled_means <- pennies_resamples %>% 
+      group_by(name) %>% 
+      summarize(mean_year = mean(year))
+    resampled_means
+    ```
+
+]
 
 ---
 
-# Analyse Data
+# Visualizing Our (Manual) Bootstrap Distribution
+
+.left-wide[
+```{r,echo = FALSE,fig.height=5}
+ggplot(resampled_means, aes(x = mean_year)) +
+  geom_histogram(binwidth = 1, color = "white", boundary = 1990) +
+  labs(x = "Sampled mean year")
+```
+]
+
+.right-thin[
+## Discuss:
+
+1. Shape
+
+2. Central Location
+
+of this!
+]
+
 
 ---
 
@@ -313,32 +432,38 @@ pennies_sample %>%
 * Let's start with a single resample.
 
 * That's like taking 50 paper slips out of our hat before.
-
-```{r}
-virtual_resample <- pennies_sample %>% 
-  rep_sample_n(size = 50, replace = TRUE)
-```
+    ```{r}
+    virtual_resample <- pennies_sample %>% 
+      rep_sample_n(size = 50, replace = TRUE)
+    ```
 ]
 
 --
 
 .pull-right[
 * notice we set `replace = TRUE`!
-
-```{r}
-virtual_resample
-```
+    ```{r}
+    virtual_resample
+    ```
 ]
 
 ---
 
 # Resampling 35 Times
 
+.pull-left[
+First, compute 35 replicates:
 ```{r}
 virtual_resamples <- pennies_sample %>% 
   rep_sample_n(size = 50, replace = TRUE, reps = 35)
 virtual_resamples
 ```
+]
+
+--
+
+.pull-right[
+Then compute the mean by `replicate`!
 
 ```{r}
 virtual_resampled_means <- virtual_resamples %>% 
@@ -346,6 +471,7 @@ virtual_resampled_means <- virtual_resamples %>%
   summarize(mean_year = mean(year))
 virtual_resampled_means
 ```
+]
 
 ---
 
@@ -364,7 +490,7 @@ virtual_resampled_means
 
 # Distribution of 1000 Resamples
 
-```{r,echo = FALSE}
+```{r,echo = FALSE,fig.height = 5}
 ggplot(virtual_resampled_means, aes(x = mean_year)) +
   geom_histogram(binwidth = 1, color = "white", boundary = 1990) +
   labs(x = "sample mean")
