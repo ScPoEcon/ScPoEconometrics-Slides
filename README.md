@@ -11,8 +11,10 @@
 1. Chapter 4 - Multiple Regression. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter4/chapter4.html)  
 1. Chapter 5 - Categorical Variables
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter5/chapter5.html)  
-1. Chapter 6 - Categorical Variables
+1. Chapter 6 - Sampling
 [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session6/chapter6/chapter6.html)  
+1. Chapter 7 - Bootstrap, Confidence Intervals, and Hypothesis Tests
+[HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_bootstrap/chapter_bootstrap.html)  
 
 
 

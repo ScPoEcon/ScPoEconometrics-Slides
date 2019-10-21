@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Confidence Intervals and The Bootstrap
 ### Florian Oswald
-### SciencesPo Paris </br> 2019-10-13
+### SciencesPo Paris </br> 2019-10-21
 
 ---
 
@@ -264,6 +264,976 @@ pennies_sample %&gt;%
 
 * It's called **resampling with replacement**.
 ]
+
+---
+
+# Resampling Once
+
+.pull-left[
+## Resampling Protocol
+
+1. Printed out equally-sized paper slips representing the 50 pennies in the sample.
+
+1. Put them in a hat or similar 
+
+1. Shake hat to mix the slipe, then take out a random slip.
+
+1. Record year on slip.
+
+1. **Put the slip back** into the hat!
+
+1. Repeat 3.-4. for 49 times.
+]
+
+--
+
+.pull-right[
+
+* Let's put the recorded years into a `tibble`!
+
+
+```r
+pennies_resample &lt;- tibble(year = c(1990,2000
+  
+))
+pennies_resample &lt;- pennies_sample
+```
+]
+
+---
+
+# Comparing Resampled Data To Original Sample
+
+.left-wide[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.right-thin[
+Also, comparing both means:
+
+
+```r
+pennies_sample %&gt;% 
+  summarize(mean_year = 
+              mean(year))
+```
+
+```
+## # A tibble: 1 x 1
+##   mean_year
+##       &lt;dbl&gt;
+## 1     1995.
+```
+
+
+```r
+pennies_resample %&gt;% 
+  summarize(mean_year = 
+              mean(year))
+```
+
+```
+## # A tibble: 1 x 1
+##   mean_year
+##       &lt;dbl&gt;
+## 1     1995.
+```
+]
+
+
+
+---
+
+# Resampling 21 Times
+
+.pull-left[
+* Let's do this together now!
+
+* Everybody produce one re-sample of 50 draws from their set of paper slips.
+
+* Don't forget to **replace** the slip and mix!
+]
+
+.pull-right[
+* We'll collect data via this [shared google sheet](https://docs.google.com/spreadsheets/d/1cBefpVyP3q2SortQD3TJ_XFQ2kJ5iSxM6qjwTvqcooY/edit?usp=sharing)
+
+* I'll read this later and rebuild the slides with
+    
+    ```r
+    url &lt;- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb_D6Qczq_WLN-VmhG0-xTxh4Kb_e4A_5BPr2p9wtLN9UBB77yMDDKU3nGe34xVvadzjUQCt9jpWj_/pub?gid=0&amp;single=true&amp;output=csv"
+    # pennies_our_sample &lt;- read_csv(url)
+    ```
+
+]
+
+---
+
+# Our Resampled Data
+
+.pull-left[
+* The data is collected in
+    
+    ```r
+    pennies_resamples
+    ```
+    
+    ```
+    ## # A tibble: 1,750 x 3
+    ##    replicate name   year
+    ##        &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;
+    ##  1         1 A      1988
+    ##  2         1 A      2002
+    ##  3         1 A      2015
+    ##  4         1 A      1998
+    ##  5         1 A      1979
+    ##  6         1 A      1971
+    ##  7         1 A      1971
+    ##  8         1 A      2015
+    ##  9         1 A      1988
+    ## 10         1 A      1979
+    ## # … with 1,740 more rows
+    ```
+
+
+]
+
+.pull-right[
+* And we want to compute the average `year` from each sample:
+    
+    ```r
+    resampled_means &lt;- pennies_resamples %&gt;% 
+      group_by(name) %&gt;% 
+      summarize(mean_year = mean(year))
+    resampled_means
+    ```
+    
+    ```
+    ## # A tibble: 35 x 2
+    ##    name  mean_year
+    ##    &lt;chr&gt;     &lt;dbl&gt;
+    ##  1 A         1992.
+    ##  2 AA        1996.
+    ##  3 B         1996.
+    ##  4 BB        1992.
+    ##  5 C         1996.
+    ##  6 CC        1996.
+    ##  7 D         1997.
+    ##  8 DD        1997.
+    ##  9 E         1991.
+    ## 10 EE        1998.
+    ## # … with 25 more rows
+    ```
+
+]
+
+---
+
+# Visualizing Our (Manual) Bootstrap Distribution
+
+.left-wide[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.right-thin[
+## Discuss:
+
+1. Shape
+
+2. Central Location
+
+of this!
+]
+
+
+---
+
+# Recap
+
+.pull-left[
+* We demonstrated **bootstrapping**. We illustrated sampling distributions like in the previous chapter by *resampling* from a single sample, rather than from the population.
+
+* We obtained the **bootstrap distribution**, which approximates the true *sampling distribution*
+
+* Next up:
+
+]
+
+--
+
+.pull-right[
+* We will again re-do the exercise virtually on your computers.
+
+* We will define the concept of **confidence interval**
+
+* We will introduce the `infer` package to perform *inference* in a `dplyr` pipeline.
+
+]
+
+
+
+---
+
+# Virtual Bootstrapping
+
+
+.pull-left[
+* Let's start with a single resample.
+
+* That's like taking 50 paper slips out of our hat before.
+    
+    ```r
+    virtual_resample &lt;- pennies_sample %&gt;% 
+      rep_sample_n(size = 50, replace = TRUE)
+    ```
+]
+
+--
+
+.pull-right[
+* notice we set `replace = TRUE`!
+    
+    ```r
+    virtual_resample
+    ```
+    
+    ```
+    ## # A tibble: 50 x 3
+    ## # Groups:   replicate [1]
+    ##    replicate    ID  year
+    ##        &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+    ##  1         1    26  1979
+    ##  2         1    50  2017
+    ##  3         1    24  2017
+    ##  4         1    30  1978
+    ##  5         1    27  1993
+    ##  6         1    29  1988
+    ##  7         1    11  1994
+    ##  8         1    28  2006
+    ##  9         1    44  2015
+    ## 10         1     3  2017
+    ## # … with 40 more rows
+    ```
+]
+
+---
+
+# Resampling 35 Times
+
+.pull-left[
+First, compute 35 replicates:
+
+```r
+virtual_resamples &lt;- pennies_sample %&gt;% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 35)
+virtual_resamples
+```
+
+```
+## # A tibble: 1,750 x 3
+## # Groups:   replicate [35]
+##    replicate    ID  year
+##        &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+##  1         1    12  1995
+##  2         1     7  2008
+##  3         1    30  1978
+##  4         1    47  1982
+##  5         1    36  2015
+##  6         1    24  2017
+##  7         1    33  1979
+##  8         1    11  1994
+##  9         1    11  1994
+## 10         1     5  2008
+## # … with 1,740 more rows
+```
+]
+
+--
+
+.pull-right[
+Then compute the mean by `replicate`!
+
+
+```r
+virtual_resampled_means &lt;- virtual_resamples %&gt;% 
+  group_by(replicate) %&gt;% 
+  summarize(mean_year = mean(year))
+virtual_resampled_means
+```
+
+```
+## # A tibble: 35 x 2
+##    replicate mean_year
+##        &lt;int&gt;     &lt;dbl&gt;
+##  1         1     1992.
+##  2         2     1997.
+##  3         3     1994.
+##  4         4     1994.
+##  5         5     1994.
+##  6         6     1997 
+##  7         7     1991.
+##  8         8     1995 
+##  9         9     1996.
+## 10        10     1996.
+## # … with 25 more rows
+```
+]
+
+---
+
+# Resampling 1000 times
+
+
+
+```r
+virtual_resampled_means &lt;- pennies_sample %&gt;% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 1000) %&gt;% 
+  group_by(replicate) %&gt;% 
+  summarize(mean_year = mean(year))
+virtual_resampled_means
+```
+
+```
+## # A tibble: 1,000 x 2
+##    replicate mean_year
+##        &lt;int&gt;     &lt;dbl&gt;
+##  1         1     1990.
+##  2         2     1998.
+##  3         3     1995.
+##  4         4     1997.
+##  5         5     1995.
+##  6         6     1995.
+##  7         7     1996.
+##  8         8     1997.
+##  9         9     1997.
+## 10        10     1993.
+## # … with 990 more rows
+```
+
+---
+
+# Distribution of 1000 Resamples
+
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Confidence Intervals
+
+
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Confidence Intervals (CIs)
+
+.pull-left[
+* A CI gives us a *range* of plausible values for any given estimate.
+
+* In order to construct a CI, we need 
+    1. an underlying *sampling distribution*, either boostrapped as here, or derived from theory.
+    2. to specify a **confidence level**, like 90% or 95% etc. Greater level implies wider CIs.
+    
+* There are two methods: the **percentile method** and the **standard error method**.
+]
+
+--
+
+.pull-right[
+
+1. the **percentile method** cuts the bootstrap distribution below the 2.5% and 97.5% percentile (thus it selects the middle 95%).
+
+2. The **standard error method** assumes that the sampling distribution is approximately normal, and uses a corresponding formula for the width of the CI.
+
+]
+
+
+---
+
+# Percentile Method
+
+.left-wide[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.right-thin[
+
+* We cut the boostrap distribution at the 2.5% and 97.5% quantiles
+
+* Those values are 1990.7 and 1999.321
+
+]
+
+---
+
+# Standard Error Method
+
+.left-wide[
+* We need mean `\(\bar{x}\)` and *standard error* (SE) of the mean:
+
+* If approximately normal, 95% of observations fall within `\(\pm 1.96\)` standard deviations of the mean.
+
+* We obtain the CIs as follows:
+
+`$$\begin{align} x \pm 1.96 \cdot SE &amp;= (\bar{x} -  1.96 \cdot SE, \bar{x} +  1.96 \cdot SE)\\ &amp;= (1995.44 -  1.96 \cdot 2.13, 1995.44 +  1.96 \cdot 2.13)\\ &amp;= (1991.2652, 1999.6148) \end{align}$$`
+
+* Only valid, if sampling distribution is **approximately normal**!
+
+]
+
+.right-thin[
+
+```r
+x_bar &lt;- pennies_sample %&gt;% 
+  summarize(mean_year = 
+              mean(year))
+SE = virtual_resampled_means %&gt;% 
+  summarize(SE = 
+              sd(mean_year))
+SE
+```
+
+```
+## # A tibble: 1 x 1
+##      SE
+##   &lt;dbl&gt;
+## 1  2.13
+```
+
+* Remember that we called this the *standard error* (SE) of the mean.
+
+]
+
+
+---
+
+# Comparing Percentile and Standard Error Method
+
+.left-wide[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.right-thin[
+* The *percentile method* is based on the simulated bootstrap distribution. Shape of distribution is irrelevant.
+
+* The *standard error method* is based on *assuming* that the sampling dist. is approximately normal.
+
+]
+
+---
+
+# Constructing Confidence Intervals With `infer`
+
+.pull-left[
+
+* The `infer` package is useful for **inference**.
+
+* It relies on the bootstrap just like we introduced it above.
+
+* A typical `infer` pipeline looks like this:
+
+
+```r
+library(infer)
+pennies_sample %&gt;%
+  specify(response = year) %&gt;%
+  generate(reps = 35,type = "bootstrap") %&gt;%
+  calculate(stat = "mean") %&gt;%
+  visualize()
+```
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+![:scale 100%](../img/photos/visualize.png)
+]
+
+---
+
+# Percentile Method with `infer`
+
+.pull-left[
+* Let's start with creating a bootstrap distribution:
+    
+    ```r
+    bootstrap_distribution &lt;- pennies_sample %&gt;% 
+      specify(response = year) %&gt;% 
+      generate(reps = 1000, type = "bootstrap") %&gt;% 
+      calculate(stat = "mean")
+    bootstrap_distribution
+    ```
+    
+    ```
+    ## # A tibble: 1,000 x 2
+    ##    replicate  stat
+    ##        &lt;int&gt; &lt;dbl&gt;
+    ##  1         1 1995.
+    ##  2         2 1995.
+    ##  3         3 1992.
+    ##  4         4 1997.
+    ##  5         5 1997.
+    ##  6         6 2000.
+    ##  7         7 1996.
+    ##  8         8 1997.
+    ##  9         9 1996.
+    ## 10        10 1996.
+    ## # … with 990 more rows
+    ```
+
+]
+
+--
+
+.pull-right[
+* Then, let's visualize it!
+
+
+```r
+visualize(bootstrap_distribution)
+```
+
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Percentile Method with `infer`
+
+.pull-left[
+* We can easily get the CI like this:
+    
+    ```r
+    percentile_ci &lt;- bootstrap_distribution %&gt;% 
+      get_confidence_interval(level = 0.95, 
+                              type = "percentile")
+    percentile_ci
+    ```
+    
+    ```
+    ## # A tibble: 1 x 2
+    ##   `2.5%` `97.5%`
+    ##    &lt;dbl&gt;   &lt;dbl&gt;
+    ## 1  1991.   2000.
+    ```
+
+* Just set `type = "se"` for standard error method!
+
+* What's best is the visualization though! 🎉
+]
+
+--
+
+.pull-right[
+
+```r
+visualize(bootstrap_distribution) + 
+  shade_confidence_interval(endpoints = 
+                              percentile_ci)
+```
+
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+
+* Or shorter `shade_ci()`.
+]
+
+---
+
+# Interpreting CIs
+
+.pull-left[
+
+* Now we want to know: is the true value contained in the CI?
+
+* Let's go back to the red/white balls in `bowl`.
+
+* Given this **is** the population, we can compute the true `\(p\)`:
+
+
+```r
+bowl %&gt;% 
+  summarize(p_red = mean(color == "red"))
+```
+
+```
+## # A tibble: 1 x 1
+##   p_red
+##   &lt;dbl&gt;
+## 1 0.375
+```
+]
+
+--
+
+.pull-right[
+* In reality, again, we *don't know* `\(p\)`, and that is why we go through all this estimation trouble.
+
+* Let's take one of the samples taken from the bowl, `bowl_sample_1`
+    
+    ```r
+    prop.table(table(bowl_sample_1$color))
+    ```
+    
+    ```
+    ## 
+    ##   red white 
+    ##  0.42  0.58
+    ```
+
+* Is the true value `\(p\)` contained in a CI based on this particular `\(\hat{p}=0.42\)`?
+
+* Let's construct a boostrap sample and find out!
+]
+
+---
+
+# Constructing a CI based on `\(\bar{x}\)`
+
+.pull-left[
+
+```r
+sample_1_bootstrap &lt;- bowl_sample_1 %&gt;% 
+  # given `color` is a factor, tell what is success
+  specify(response = color, success = "red") %&gt;% 
+  # generate 1000 bootstrap samples
+  generate(reps = 1000, type = "bootstrap") %&gt;% 
+  # for each, calculate the proportion of successes
+  calculate(stat = "prop")
+
+percentile_ci_1 &lt;- sample_1_bootstrap %&gt;% 
+  get_confidence_interval(level = 0.95, type = "percentile")
+percentile_ci_1
+```
+
+```
+## # A tibble: 1 x 2
+##   `2.5%` `97.5%`
+##    &lt;dbl&gt;   &lt;dbl&gt;
+## 1   0.28    0.56
+```
+
+* Here to visualize it:
+
+```r
+sample_1_bootstrap %&gt;% 
+  visualize(bins = 15) + 
+  shade_confidence_interval(endpoints = percentile_ci_1) +
+  geom_vline(xintercept = 0.375, linetype = "dashed")
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+* Had we taken another sample, we would have obtained a different result. 
+* Take 100 samples and see how well we do!
+]
+
+---
+
+# How many CIs Contain the True Values?
+
+
+
+.left-thin[
+1. Take 100 virtual samples from `bowl`.
+
+2. Construct a 95%-CI from each.
+
+3. We plot the true `\(p = 0.375\)`.
+
+4. You see that 5 of them miss the true value.
+
+5. Hence, a 95% confidence interval.
+]
+
+--
+
+.right-wide[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Gender Discrimination
+
+## Activity
+
+
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Is There Gender Discrimination In Promotions?
+
+&lt;!-- also: https://www.ncbi.nlm.nih.gov/pubmed/12083361 --&gt;
+
+.pull-left[
+* Article published in the *Journal of Applied Psychology* in 1970 investigates whether female employees at Banks are discriminated against.
+
+* 48 supervisors were given *identical* candidate CVs - identical up to the first name, which was male or female.
+
+* Many similar experiments have been conducted with other groups. Arabic Names, Black names, Jewish names or other groups that can be identified from typical name choice.
+]
+
+--
+
+.pull-right[
+
+
+```r
+library(moderndive)
+promotions
+```
+
+```
+## # A tibble: 48 x 3
+##       id decision gender
+##    &lt;int&gt; &lt;fct&gt;    &lt;fct&gt; 
+##  1     1 promoted male  
+##  2     2 promoted male  
+##  3     3 promoted male  
+##  4     4 promoted male  
+##  5     5 promoted male  
+##  6     6 promoted male  
+##  7     7 promoted male  
+##  8     8 promoted male  
+##  9     9 promoted male  
+## 10    10 promoted male  
+## # … with 38 more rows
+```
+]
+
+---
+
+# Looking At Promotions
+
+.pull-left[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+```r
+promotions %&gt;% 
+  group_by(gender, decision) %&gt;% 
+  summarize(n = n()) %&gt;%
+  mutate(proportion = n / sum(n))
+```
+
+```
+## # A tibble: 4 x 4
+## # Groups:   gender [2]
+##   gender decision     n proportion
+##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
+## 1 male   not          3      0.125
+## 2 male   promoted    21      0.875
+## 3 female not         10      0.417
+## 4 female promoted    14      0.583
+```
+
+* 87.5% of "men" were promoted.
+* 58.3% of "women" were promoted.
+* That's a difference of 87.55 - 58.3% = 29.2%.
+* Is the 29% advantage for men in this sample **conclusive evidence**?
+* In a *hyopthetical world* **without gender discrimination**, could we have observed a 29% difference *by chance*?
+
+]
+
+
+---
+
+# Imposing A Hypothetical World: No Gender Discriminiation
+
+.pull-left[
+* Suppose we lived in a world without gender discrimination.
+
+* The label `gender` in our dataframe would be meaningless.
+
+* Let's randomly reassign `gender` to each row and see how this affects the result.
+
+* Suppose we have 48 playing cards: 24 red (female) and 24 (black)
+
+* Shuffle the cards, and lay down the cards in a row, record `f` if **red**.
+]
+
+.pull-right[
+
+```r
+bind_cols(promotions, promotions_shuffled)
+```
+
+```
+## # A tibble: 48 x 6
+##       id decision gender   id1 decision1 gender1
+##    &lt;int&gt; &lt;fct&gt;    &lt;fct&gt;  &lt;int&gt; &lt;fct&gt;     &lt;fct&gt;  
+##  1     1 promoted male       1 promoted  female 
+##  2     2 promoted male       2 promoted  female 
+##  3     3 promoted male       3 promoted  male   
+##  4     4 promoted male       4 promoted  female 
+##  5     5 promoted male       5 promoted  male   
+##  6     6 promoted male       6 promoted  male   
+##  7     7 promoted male       7 promoted  male   
+##  8     8 promoted male       8 promoted  female 
+##  9     9 promoted male       9 promoted  male   
+## 10    10 promoted male      10 promoted  female 
+## # … with 38 more rows
+```
+
+* Observe how in `promotions_shuffled` we randomly assigned `gender1`.
+
+* The `decision` column is the same!
+
+* What does this now look like?
+]
+
+---
+
+# Reshuffled Promotions
+
+.left-wide[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+.right-thin[
+
+```r
+promotions %&gt;% 
+  group_by(gender, decision) %&gt;% 
+  summarize(n = n()) %&gt;%
+  mutate(proportion = n / sum(n))
+```
+
+```
+## # A tibble: 4 x 4
+## # Groups:   gender [2]
+##   gender decision     n proportion
+##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
+## 1 male   not          3      0.125
+## 2 male   promoted    21      0.875
+## 3 female not         10      0.417
+## 4 female promoted    14      0.583
+```
+
+
+```r
+promotions_shuffled %&gt;% 
+  group_by(gender, decision) %&gt;% 
+  summarize(n = n()) %&gt;%
+  mutate(proportion = n / sum(n))
+```
+
+```
+## # A tibble: 4 x 4
+## # Groups:   gender [2]
+##   gender decision     n proportion
+##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
+## 1 male   not          6      0.25 
+## 2 male   promoted    18      0.75 
+## 3 female not          7      0.292
+## 4 female promoted    17      0.708
+```
+]
+
+
+---
+
+# Sampling Variation?
+
+.pull-left[
+* In the hypothetical world, the difference was only 4.2%.
+
+* But what's the role of *sampling variation*? How representative of that world is 4.2%?
+
+* Let's construct the sampling distribution ourselves!
+]
+
+--
+
+.pull-right[
+1. You need to flip a coin 48 times.
+
+2. You could use the function `sample` for example.
+
+3. fill in your results into [this shared spreadsheet](https://docs.google.com/spreadsheets/d/118NlPUQjd13XodX7IGri8J-oLgkObdCtDEFri65tWmo/edit?usp=sharing)!
+]
+
+---
+
+# Sampling Variation in Reshuffling
+
+.pull-left[
+&lt;img src="boostrap_files/figure-html/unnamed-chunk-39-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+* This distribution was created in our **hypothetical** scenario: no discrimination.
+
+* We see how sampling variation affects the difference in promotion rates.
+
+* The red line denotes the *observed difference* in the **real world**.
+
+* Now: How *likely* is it that the red line is part of this **hypothetical** distribution?
+]
+
+---
+
+# Recap
+
+.pull-left[
+* We just did a **permutation test**. We randomly reshuffled and checked if it makes a difference.
+
+* Again Resampling: Boostrapping is with replacment, permutation is without.
+
+* Bootstrapping: we put the paper slips **back** after recording them.
+
+* Permutation: We took card after card from our deck (*without* putting it back!)
+]
+
+--
+
+.pull-right[
+* In our exercise, we *tested* whether a hypothetical universe with no discrimination is *likely*
+
+* We used the estimates `\(\hat{p}_m - \hat{p}_f = 29\%\)`
+
+* We concluded this not very compatible with what we observed. We tended to **reject** that hypothesis.
+
+* The real question was: is 29% **really** different from zero? What is the role of sampling variation? 
+]
+
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Hypothesis Tests
+
+
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+
 
 ---
 

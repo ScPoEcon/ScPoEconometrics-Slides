@@ -81,13 +81,23 @@ a, a > code {
 /* Two-column layout (wide left col) */
 .left-wide {
   width: 70%;
-  height: 92%;
   float: left;
 }
 
 .right-thin {
   width: 25%;
   float: right;
+}
+
+/* Two-column layout (wide left col) */
+.right-wide {
+  width: 70%;
+  float: right;
+}
+
+.left-thin {
+  width: 25%;
+  float: left;
 }
 
 .pull-left {
