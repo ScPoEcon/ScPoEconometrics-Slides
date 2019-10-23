@@ -262,13 +262,12 @@ pennies_sample %>%
 # Resampling Once
 
 .pull-left[
-## Resampling Protocol
 
 1. Printed out equally-sized paper slips representing the 50 pennies in the sample.
 
-1. Put them in a hat or similar 
+1. Put them in a paper cup or similar 
 
-1. Shake hat to mix the slipe, then take out a random slip.
+1. Shake cup to mix the slips, then take out a random slip.
 
 1. Record year on slip.
 
@@ -281,15 +280,27 @@ pennies_sample %>%
 
 .pull-right[
 
+![](../img/photos/bootstrap1.JPG)
+
+]
+
+---
+
+# Collect the Bootstrapped Sample
+
 * Let's put the recorded years into a `tibble`!
 
 ```{r}
-pennies_resample <- tibble(year = c(1990,2000
-  
-))
-pennies_resample <- pennies_sample
+pennies_resample <- tibble(
+  year = c(1976, 1962, 1976, 1983, 2017, 2015, 2015, 1962, 2016, 1976, 
+           2006, 1997, 1988, 2015, 2015, 1988, 2016, 1978, 1979, 1997, 
+           1974, 2013, 1978, 2015, 2008, 1982, 1986, 1979, 1981, 2004, 
+           2000, 1995, 1999, 2006, 1979, 2015, 1979, 1998, 1981, 2015, 
+           2000, 1999, 1988, 2017, 1992, 1997, 1990, 1988, 2006, 2000)
+)
 ```
-]
+
+* And now let's look at both original and bootstrapped sample!
 
 ---
 
@@ -329,7 +340,7 @@ pennies_resample %>%
 
 ---
 
-# Resampling 21 Times
+# Resampling 11 Times
 
 .pull-left[
 * Let's do this together now!
@@ -337,24 +348,30 @@ pennies_resample %>%
 * Everybody produce one re-sample of 50 draws from their set of paper slips.
 
 * Don't forget to **replace** the slip and mix!
+
+
+
+* We'll collect data via this [shared google sheet](https://docs.google.com/spreadsheets/d/1cBefpVyP3q2SortQD3TJ_XFQ2kJ5iSxM6qjwTvqcooY/edit?usp=sharing)
+
+* In class, read this data with
+    ```{r}
+    url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb_D6Qczq_WLN-VmhG0-xTxh4Kb_e4A_5BPr2p9wtLN9UBB77yMDDKU3nGe34xVvadzjUQCt9jpWj_/pub?gid=0&single=true&output=csv"
+    # pennies_our_sample <- readr::read_csv(url)
+    ```
 ]
 
 .pull-right[
-* We'll collect data via this [shared google sheet](https://docs.google.com/spreadsheets/d/1cBefpVyP3q2SortQD3TJ_XFQ2kJ5iSxM6qjwTvqcooY/edit?usp=sharing)
-
-* I'll read this later and rebuild the slides with
-    ```{r}
-    url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb_D6Qczq_WLN-VmhG0-xTxh4Kb_e4A_5BPr2p9wtLN9UBB77yMDDKU3nGe34xVvadzjUQCt9jpWj_/pub?gid=0&single=true&output=csv"
-    # pennies_our_sample <- read_csv(url)
-    ```
+![](../img/photos/bootstrap2.JPG)
 
 ]
 
 ---
 
-# Our Resampled Data
+# `moderndive` Resampled Data
 
 .pull-left[
+* Our friends collected 35 Re-samples.
+
 * The data is collected in
     ```{r}
     pennies_resamples
@@ -757,7 +774,7 @@ bowl %>%
 
 ---
 
-# Constructing a CI based on $\bar{x}$
+# Constructing a CI based on $\hat{p}$
 
 .pull-left[
 ```{r}
@@ -874,255 +891,6 @@ ggplot(percentile_cis) +
         panel.grid.minor.x = element_blank())
 ```
 ]
-
-
----
-layout: false
-class: title-slide-section-red, middle
-
-# Gender Discrimination
-
-## Activity
-
-
-
----
-layout: true
-
-<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
-
----
-
-# Is There Gender Discrimination In Promotions?
-
-<!-- also: https://www.ncbi.nlm.nih.gov/pubmed/12083361 -->
-
-.pull-left[
-* Article published in the *Journal of Applied Psychology* in 1970 investigates whether female employees at Banks are discriminated against.
-
-* 48 supervisors were given *identical* candidate CVs - identical up to the first name, which was male or female.
-
-* Many similar experiments have been conducted with other groups. Arabic Names, Black names, Jewish names or other groups that can be identified from typical name choice.
-]
-
---
-
-.pull-right[
-
-```{r}
-library(moderndive)
-promotions
-```
-]
-
----
-
-# Looking At Promotions
-
-.pull-left[
-```{r,echo= FALSE}
-ggplot(promotions, aes(x = gender, fill = decision)) +
-  geom_bar() +
-  labs(x = "Gender of name on resume")
-```
-]
-
-.pull-right[
-```{r}
-promotions %>% 
-  group_by(gender, decision) %>% 
-  summarize(n = n()) %>%
-  mutate(proportion = n / sum(n))
-```
-
-* 87.5% of "men" were promoted.
-* 58.3% of "women" were promoted.
-* That's a difference of 87.55 - 58.3% = 29.2%.
-* Is the 29% advantage for men in this sample **conclusive evidence**?
-* In a *hyopthetical world* **without gender discrimination**, could we have observed a 29% difference *by chance*?
-
-]
-
-
----
-
-# Imposing A Hypothetical World: No Gender Discriminiation
-
-.pull-left[
-* Suppose we lived in a world without gender discrimination.
-
-* The label `gender` in our dataframe would be meaningless.
-
-* Let's randomly reassign `gender` to each row and see how this affects the result.
-
-* Suppose we have 48 playing cards: 24 red (female) and 24 (black)
-
-* Shuffle the cards, and lay down the cards in a row, record `f` if **red**.
-]
-
-.pull-right[
-```{r}
-bind_cols(promotions, promotions_shuffled)
-```
-
-* Observe how in `promotions_shuffled` we randomly assigned `gender1`.
-
-* The `decision` column is the same!
-
-* What does this now look like?
-]
-
----
-
-# Reshuffled Promotions
-
-.left-wide[
-```{r,echo=FALSE,fig.height = 5}
-p1 = ggplot(promotions, aes(x = gender, fill = decision)) +
-  geom_bar() +
-  theme(legend.position = "none") +
-  labs(x = "Gender of name on resume",title = "Original")
-p2 = ggplot(promotions_shuffled, aes(x = gender, fill = decision)) +
-  geom_bar() +
-  labs(x = "Gender of resume name",title = "Reshuffled")
-cowplot::plot_grid(p1,p2,rel_widths = c(1,1.4))
-```
-
-]
-
-.right-thin[
-```{r}
-promotions %>% 
-  group_by(gender, decision) %>% 
-  summarize(n = n()) %>%
-  mutate(proportion = n / sum(n))
-```
-
-```{r}
-promotions_shuffled %>% 
-  group_by(gender, decision) %>% 
-  summarize(n = n()) %>%
-  mutate(proportion = n / sum(n))
-```
-]
-
-
----
-
-# Sampling Variation?
-
-.pull-left[
-* In the hypothetical world, the difference was only 4.2%.
-
-* But what's the role of *sampling variation*? How representative of that world is 4.2%?
-
-* Let's construct the sampling distribution ourselves!
-]
-
---
-
-.pull-right[
-1. You need to flip a coin 48 times.
-
-2. You could use the function `sample` for example.
-
-3. fill in your results into [this shared spreadsheet](https://docs.google.com/spreadsheets/d/118NlPUQjd13XodX7IGri8J-oLgkObdCtDEFri65tWmo/edit?usp=sharing)!
-]
-
----
-
-# Sampling Variation in Reshuffling
-
-.pull-left[
-```{r,echo = FALSE}
-url <- ""
-if(!file.exists("rds/shuffled_data.rds")){
-  shuffled_data <- readr::read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vSbSC3-reAp891PVjt8qsF7C7jVzMNqPEEWfuQ2k84ekFYmNJvscQPJ54aoJsl4G-bKLHRd4C_-gbHP/pub?gid=0&single=true&output=csv")
-  shuffled_data = tibble(id = 1:48, decision = c(rep("not",13),rep("promoted",48-13)))
-  set.seed(114)
-  shuffled_data = bind_cols(shuffled_data, data.frame(replicate(33,
-                                                      sample(c(rep("f",24),
-                                                               rep("m",24)),
-                                                             replace = FALSE, 
-                                                             size = 48))))
-  readr::write_rds(shuffled_data, "../rds/shuffled_data.rds")
-} else {
-  shuffled_data <- readr::read_rds("../rds/shuffled_data.rds")
-}
-
-n_replicates <- ncol(shuffled_data) - 2
-
-shuffled_data_tidy <- shuffled_data %>% 
-  gather(team, gender, -c(id,decision)) %>% 
-  mutate(replicate = rep(1:n_replicates, each = 48))
-
-shuffled_data_tidy <- shuffled_data_tidy %>% 
-  group_by(replicate) %>% 
-  count(gender, decision) %>% 
-  filter(decision == "promoted") %>% 
-  mutate(prop = n/24) %>% 
-  select(replicate, gender, prop) %>% 
-  spread(gender, prop) %>% 
-  mutate(stat = m - f) 
-
-obs_diff_prop <- promotions %>%
-  specify(decision ~ gender, success = "promoted") %>%
-  calculate(stat = "diff in props", order = c("male", "female"))
-
-ggplot(shuffled_data_tidy,aes(x=stat)) + geom_bar(binwidth = 0.1,color = "white") + geom_vline(xintercept = obs_diff_prop[[1,1]], color = "red", size = 1.5) + labs(x = "differences in promotion rate")
-```
-]
-
-.pull-right[
-* This distribution was created in our **hypothetical** scenario: no discrimination.
-
-* We see how sampling variation affects the difference in promotion rates.
-
-* The red line denotes the *observed difference* in the **real world**.
-
-* Now: How *likely* is it that the red line is part of this **hypothetical** distribution?
-]
-
----
-
-# Recap
-
-.pull-left[
-* We just did a **permutation test**. We randomly reshuffled and checked if it makes a difference.
-
-* Again Resampling: Boostrapping is with replacment, permutation is without.
-
-* Bootstrapping: we put the paper slips **back** after recording them.
-
-* Permutation: We took card after card from our deck (*without* putting it back!)
-]
-
---
-
-.pull-right[
-* In our exercise, we *tested* whether a hypothetical universe with no discrimination is *likely*
-
-* We used the estimates $\hat{p}_m - \hat{p}_f = 29\%$
-
-* We concluded this not very compatible with what we observed. We tended to **reject** that hypothesis.
-
-* The real question was: is 29% **really** different from zero? What is the role of sampling variation? 
-]
-
-
----
-layout: false
-class: title-slide-section-red, middle
-
-# Hypothesis Tests
-
-
-
----
-layout: true
-
-<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
-
 
 
 ---

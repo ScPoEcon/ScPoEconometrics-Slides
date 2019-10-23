@@ -13,8 +13,10 @@
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter5/chapter5.html)  
 1. Chapter 6 - Sampling
 [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session6/chapter6/chapter6.html)  
-1. Chapter 7 - Bootstrap, Confidence Intervals, and Hypothesis Tests
+1. Chapter 7 - Bootstrap and Confidence Intervals
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_bootstrap/boostrap.html)  
+1. Chapter 8 - Hypothesis Tests
+[HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_hypothesis/hypothesis.html)
 
 
 
