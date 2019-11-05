@@ -61,6 +61,39 @@ library(moderndive)
 
 # Back To Wages!
 
+.pull-left[
+* We started this *looong* detour into sampling while talking about **wages**.
+
+* We were interested in the determinants of hourly wage of US workers.
+
+* We had estimated intercept $b_0$ and slope $b_1$.
+
+* Now it's time to figure out what columns 2-4 in that table mean!
+]
+
+--
+
+.pull-right[
+```{r}
+library(wooldridge)
+hourly_wage <- lm(formula = lwage ~ educ, data = wage1)
+summary(hourly_wage)
+```
+* 
+]
+
+---
+
+# Regression Table
+
+* Let's display the previous table slightly differently:
+    ```{r,echo = FALSE}
+    knitr::kable(moderndive::get_regression_table(hourly_wage), "html",align = "c")
+    ```
+    
+* We know the *meaning* of all column names in that table by now. 
+
+* Let's go through them in our regression context!
 
 
 ---
