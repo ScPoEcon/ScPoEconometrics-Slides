@@ -55,6 +55,7 @@ layout: true
 library(tidyverse)
 library(infer)
 library(moderndive)
+library(wooldridge)
 ```
 
 ---
@@ -62,45 +63,189 @@ library(moderndive)
 # Back To Wages!
 
 .pull-left[
-* We started this *looong* detour into sampling while talking about **wages**.
+```{r,echo=FALSE,fig.height=5}
+library(wooldridge)
+hourly_wage <- lm(formula = lwage ~ educ, data = wage1)
+ggplot(wage1, aes(educ, y = lwage)) + geom_point() + geom_smooth(method = "lm",se = FALSE)
+```
 
-* We were interested in the determinants of hourly wage of US workers.
-
-* We had estimated intercept $b_0$ and slope $b_1$.
-
-* Now it's time to figure out what columns 2-4 in that table mean!
 ]
 
 --
 
 .pull-right[
-```{r}
-library(wooldridge)
-hourly_wage <- lm(formula = lwage ~ educ, data = wage1)
-summary(hourly_wage)
-```
-* 
+* We started this *looong* detour into sampling while talking about **wages**.
+
+* We were interested in the determinants of hourly wage of US workers.
+
+* We used a sample of 526 US workers.
+
+* We had estimated intercept $b_0$ and slope $b_1$.
+
+* You should be asking now: Is that slope **really** different from zero? Let's look at the model output.
+
+
 ]
 
 ---
 
 # Regression Table
 
-* Let's display the previous table slightly differently:
-    ```{r,echo = FALSE}
-    knitr::kable(moderndive::get_regression_table(hourly_wage), "html",align = "c")
-    ```
+.pull-left[
+```{r}
+summary(hourly_wage)
+```
+]
+
+.pull-right[
+* We know how to get *predicted* values from this:
+    $$\hat{y} = b_0 + b_1 x$$
     
-* We know the *meaning* of all column names in that table by now. 
+* Filling in our estimates:
+    $$\hat{\text{lwage}} = 0.58 + 0.08 \text{educ}$$
+    
+* Remind yourself what both $b_0, b_1$ stand for.
+]
 
-* Let's go through them in our regression context!
+---
 
+# Sampling Scenario
+
+.pull-left[
+* We took a sample!
+
+* $b_0, b_1$ are **point estimates** much like the sample proportion $\hat{p}$ was!
+
+* In fact, we imagine that our prediction
+    $$\hat{y} = b_0 + b_1 x$$
+    is an **estimate** about an unknown, true population line
+    $$y = \beta_0 + \beta_1 x$$
+    
+* We *really* want to know $\beta$. $b$ is our gest guess.
+]
+
+--
+
+.pull-right[
+* Sampling implies sampling variation.
+
+* If we collected a *different* sample of 526 workers, would we have obtained **different** estimates $b_0, b_1$? 🤔
+
+* Let's bring what we know about Confidence Intervals, Hypothesis tests and Standard Errors to bear on those estimates!
+]
+
+---
+
+# Understanding Regression Tables
+
+
+```{r,eval = FALSE}
+# get alternative regression table:
+moderndive::get_regression_table(hourly_wage)
+```
+```{r,echo = FALSE}
+knitr::kable(moderndive::get_regression_table(hourly_wage), "html",align = "c")
+```
+--
+
+* We know the meaning of all column names in that table by now (we focus on $b_1$, case for $b_0$ is identical):
+
+
+Entry | Meaning
+----- | ----
+`std_error` |  std.deviation of sampling dist of $b_1$.
+`statistic` |  Test statistic associated to $H_0: \beta_1 = 0,H_A:\beta_1 \neq 0$
+`p value` |  p value associated to $H_0:\beta_1 = 0,H_A:\beta_1 \neq 0$
+`lower_ci, upper_ci` |  range of plausible values for $\beta_1$
+
+---
+
+# Standard Error of $b_1, SE(b_1) = 0.008$
+
+.pull-left[
+* If we took 1000 samples of workers, we'd get 1000 different estimates for $b$.
+
+* Those estimates would follow the *sampling distribution of $b$. 
+
+* Notice that we'd get 1000 different slopes $b_1$ **and** 1000 different intercept $b_0$!
+]
+
+.pull-right[
+* The standard error measures the *spread* of the associated sampling distribution.
+
+* Again, theory can tell us how to obtain this measure.
+
+* Again, we will show a quick simulation study, as an alternative.
+]
+
+
+---
+
+# Hypothesis: True $\beta = 0$?
+
+.pull-left[
+* We set up this hypothesis test:
+    $$\begin{align}H_0:& \beta_1 = 0\\H_A:& \beta \neq 0\end{align}$$
+    
+* If $H_0$ is true, the true slope is zero: There is in fact **no** relationship between `educ` and `lwage`. In that case observing $b_1 > 0$ was just chance.
+
+* If $H_0$ is false, then there is a true relationship.
+
+* We assume $H_0$ is true, derive the **null distribution** and confront with a test statistic.
+
+]
+
+
+.pull-right[
+
+* The `statistic` column is *approximately* $\frac{b}{SE(b)} = \frac{0.083}{0.008} = 10.375$.
+
+## p-value
+
+* The `pvalue` column tells us *how extreme* the estimated slope $b_1$ is in a universe where the truth is $\beta_1 = 0$
+
+* We see a value of `0` here. So, for any significance level $\alpha$, we'd reject $H_0$.
+
+* The pvalue measures the area outside of $\pm$ `statistic` under the Null distribution.
+]
+
+---
+
+# Confidence Interval around $b_1$
+
+.pull-left[
+* The values `[lower_ci,upper_ci] =` $[0.068,0.098]$ delimite the 95% confidence interval around $b_1$.
+
+* We said: If we took a large number of samples (1000), in 95% of cases would this interval contain the true value $\beta_1$.
+
+* Shorthand: We are 95% confident that $\beta_1 \in [0.068,0.098]$
+
+* Notice one thing in particular: $0 \notin [0.068,0.098]$!
+]
+
+--
+
+.pull-right[
+* That means that $\beta_1 = 0$ is *not* a highly plausible value, given our sample of data.
+
+* We are inclined to believe that there **is** a true relationship between `educ` and `lwage`!
+]
+
+---
+
+# How does `R` (and others) compute those values?
+
+* The values reported by statistical packages like R are obtained from theory under suitable assumptions.
+
+* The theory is based on *large sample approximations*, i.e. one can show that the sampling distributions converge to suitable distributions, which we can then use the conduct tests.
+
+* The set of assumptions needed defines the *Classical Regression Model* (CRM)
 
 ---
 layout: false
 class: title-slide-section-red, middle
 
-# Separator
+# The Classical Regression Model
 
 
 
@@ -111,11 +256,326 @@ layout: true
 
 ---
 
+# Notation: $b_1 \Rightarrow \beta_1$
+
+Let's talk about the small but important modifications we applied to our model:
+
+* $\beta_0$ and $\beta_1$ and intercept and slope parameters
+
+* $\varepsilon$ is the error term.
+
+We made this change to indicate that $b_0,b_1,e$ are point estimates and sample errors, respectively, while $\beta_0,\beta_1,\varepsilon$ are the true population parameters.
+
+---
+
+# Defining The CRM
+
+1. The data are **not linearly dependent**: Each variable provides new information for the outcome, and it cannot be replicated as a linear combination of other variables.
+
+2. The mean of the residuals conditional on $x$ should be zero, $E[\varepsilon|x] = 0$. Notice that this also means that $Cov(\varepsilon,x) = 0$, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
+
+3. The data are drawn from a **random sample** of size $n$: observation $(x_i,y_i)$ comes from the exact same distribution, and is independent of observation $(x_j,y_j)$, for all $i\neq j$.
+
+4. The variance of the error term $\varepsilon$ is the same for each value of $x$: $Var(\varepsilon|x) = \sigma^2$. This property is called **homoskedasticity**.
+
+5. The error is normally distributed, i.e. $\varepsilon \sim \mathcal{N}(0,\sigma^2)$
+  
+  
+Invoking assumption 5. in particular defines what is commonly called the *normal* linear regression model.
+
+---
+
+# Breaking the CRM Assumptions
+
+.pull-left[
+* No perfect collinearity. Remember `wtplus`?
+    ```{r}
+    library(dplyr)
+    mtcars %>%
+      mutate(wtplus = wt + 1) %>%
+      lm(mpg ~ wt + wtplus, data = .)
+    ```
+]
+
+.pull-right[
+Conditional mean $E[\varepsilon|x] = 0$. Consider:
+    $$\text{lwage}_i = \beta_0 + \beta_1 \text{educ}_i + \varepsilon_i$$
+* Suppose there is *unobserved* ability $a_i$. High ability means higher wage.
+* It *also* means school is easier, and so $i$ selects into more schooling.
+* Given it's *unobserved*,  $a_i$ goes into the error $\varepsilon_i$
+* We will attribute to `educ` part of the effect on wages that is actually *caused* by ability $a_i$!
+* Our *ceteris paribus* assumption (all else equal) does not hold. 
+* More examples in our book! Takeaway: if assumptions violated, theoretical inference invalid!
+]
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Simluation Based Inference
+
+
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+
+---
+
+# Simluation Based Inference
+
+.pull-left[
+* We proceed as before with `infer`
+
+* We'll generate bootstrap samples from our dataset.
+
+* We estimate many different coefficients and look at their sampling distribution.
+
+]
+
+.pull-right[
+```{r}
+bootstrap_distn_slope <- wage1 %>% 
+  specify(formula = lwage ~ educ) %>%
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "slope")
+
+bootstrap_distn_slope
+```
+]
+
+---
+
+# Bootstrap Sampling Distribution of $b_1$
+
+
+```{r,fig.height=5}
+visualize(bootstrap_distn_slope)
+```
+
+---
+
+# Confidence Intervals
+
+.pull-left[
+
+* percentile method:
+    ```{r}
+    percentile_ci <- bootstrap_distn_slope %>% 
+      get_confidence_interval(type = "percentile", level = 0.95)
+    percentile_ci
+    ```
+
+* SE-method:
+    ```{r}
+    observed_slope <- coef(hourly_wage)[2] # [1] is intercept
+    se_ci <- bootstrap_distn_slope %>% 
+      get_ci(level = 0.95, type = "se", point_estimate = observed_slope)
+    se_ci
+    ```
+]
+
+
+.pull-right[
+* The *theoretical* bounds of the CI are are given to use in the above table.
+
+* We had $[0.068,0.098]$. 
+
+* Let's put all three together and compare!
+]
+
+
+---
+
+# Simulated vs Theoretical CIs
+
+```{r,eval = FALSE}
+visualize(bootstrap_distn_slope) + 
+  shade_confidence_interval(endpoints = percentile_ci, fill = NULL, 
+                            linetype = "solid", color = "black") + 
+  shade_confidence_interval(endpoints = se_ci, fill = NULL, 
+                            linetype = "dashed", color = "black") +
+  shade_confidence_interval(endpoints = c(0.068,0.098), fill = NULL, 
+                            linetype = "dotted", color = "black")
+```
+
+
+---
+
+# Simulated vs Theoretical CIs
+
+
+```{r,echo = FALSE,fig.height=5}
+visualize(bootstrap_distn_slope) + 
+  shade_confidence_interval(endpoints = percentile_ci, fill = NULL, 
+                            linetype = "solid", color = "black") + 
+  shade_confidence_interval(endpoints = se_ci, fill = NULL, 
+                            linetype = "dashed", color = "black") +
+  shade_confidence_interval(endpoints = c(0.068,0.098), fill = NULL, 
+                            linetype = "dotted", color = "black")
+
+```
+
+---
+
+# Hypothesis Test on $\beta_1$
+
+.pull-left[
+* Let's do this hypothesis test:
+    $$\begin{align}H_0:& \beta_1 = 0\\H_A:& \beta \neq 0\end{align}$$
+    
+* If there is no relationship, then *reshuffling* or *permuting* variable `educ` should play no role. (remember the `gender` label!)
+
+* For each of the permuted samples, we'll recompute $b_1$.
+
+* Let's do that 1000 times over!
+
+]
+
+
+--
+
+
+.pull-right[
+```{r}
+null_distn_slope <- wage1 %>% 
+  specify(lwage ~ educ) %>%
+  hypothesize(null = "independence") %>% 
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "slope")
+```
+
+Finally, let's visulalize the null distribution under $H_0: \beta_1 = 0$!
+]
+
+---
+
+# Visualize $H_0: \beta_1 = 0$
+
+.pull-left[
+```{r,fig.height=5}
+visualize(null_distn_slope)
+```
+]
+
+.pull-right[
+* Notice how it's centered at 0.0! That's the most common value amongst our hyopthetical $b_1$'s in this case.
+
+* How likely is our observed estimate `observed_slope`, i.e. `r round(observed_slope,2)` in such a universe?
+
+* Let's get the associated pvalue!
+]
+
+---
+
+# Adding the pvalue
+
+.pull-left[
+```{r,fig.height=5}
+visualize(null_distn_slope) + 
+  shade_p_value(obs_stat = observed_slope, direction = "both")
+```
+]
+
+.pull-right[
+* Notice that we said `direction = "both"`: We have a two-sided alternative!
+
+* Our observed slope falls *very* far outside that distribution! There seems to be almost **no** probability mass (no red shaded area visible)
+
+* Let's confirm that and compute the p-value!
+
+]
+
+---
+
+# Computing P-value from Bootstrapped Data
+
+```{r}
+null_distn_slope %>% 
+  get_p_value(obs_stat = observed_slope, direction = "both")
+```
+
+* That **is** small! 😀
+
+* We **reject the Null** that $\beta_1 = 0$, because the p-value 0 is smaller than any significance level $\alpha>0$ we could ever require. We have *extremely convincing* evidence at hand to reject the null in this case.
+
+* We conclude that there is a **significant** relationship between `educ` and `lwage`.
+
+* We would say:
+> $\beta_1$ is *statistically significantly* different from zero at the $\alpha$ level.
+
+---
+layout: false
+class: title-slide-section-red, middle
+
+# Illustrating Regression Uncertainty
+
+
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+
+
+---
+
+# Illustrating Uncertainty
+
+.pull-left[
+* So, to answer our initial question: **yes** the slope in this picture is actually different from zero!
+
+* This is quite encouraging. 😉
+
+* We can visualize the 95% confidence interval *of the predicted line*. 
+
+* The .blue[blue] line could be anywhere in the .grey[grey] area with 95% probability!
+]
+
+.pull-right[
+```{r,echo = FALSE,fig.height=5}
+ggplot(wage1, aes(educ, y = lwage)) + geom_point() + geom_smooth(method = "lm",se = TRUE)
+```
+]
+
+
+
+---
+
+# [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` bring you: Moving Lines!
+
+.pull-left[
+![](../img/gifs/wages.gif)
+
+]
+
+
+.pull-right[
+
+* I split by gender to make it more interesting. `r emo::ji("wink")`
+
+* I take 20 bootstrap samples from the `wage1` data. You can see how different data points are included in each bootstrap sample.
+
+* Those different points imply different regression lines.
+
+* You should remember those moving lines when you go back one slide to understand what the shaded area means!
+
+]
+
+
+
+---
+
 class: title-slide-final, middle
 
 # THANKS
 
 To the amazing [moderndive](https://moderndive.com/) team!
+
+Big Thanks `r emo::ji("tada")` to [ungeviz](https://github.com/wilkelab/ungeviz) and `r emo::ji("confetti")` [gganimate](https://github.com/thomasp85/gganimate) for their awesome packages!
 
 ---
 
