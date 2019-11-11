@@ -17,6 +17,8 @@
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_bootstrap/boostrap.html)  
 1. Chapter 8 - Hypothesis Tests
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_hypothesis/hypothesis.html)
+1. Chapter 9 - Regression Inference
+[HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.html)
 
 
 
