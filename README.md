@@ -19,6 +19,8 @@
 [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_hypothesis/hypothesis.html)
 1. Chapter 9 - Regression Inference
 [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session7/chapter_reginference/reg_inference.html)
+1. Chapter 10 - Intro to Causality
+[HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.html)
 
 
 
