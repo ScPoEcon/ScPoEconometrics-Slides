@@ -1,0 +1,192 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Regression Discontinuity Design"
+author: "Florian Oswald"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+
+overwrite = FALSE
+
+```
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Packages used in this set of slides
+
+```{r}
+library(rdrobust)
+```
+
+---
+
+# Regression Discontinuity Design (RDD)
+
+.pull-left[
+* In the book, we talked about how RDD can provide an alternative to full randomization of treatment assigment.
+
+* We looked at [Clicking on Heaven's Door](https://www.aeaweb.org/articles?id=10.1257/aer.20150355), which uses the (unknown) time an immigrant quota for a certain employer group is full as a **cutoff** value.
+
+* Those who are on the immigration website just before and after $c$ are close to identical - except that the early birds got the permit.
+]
+
+--
+
+.pull-right[
+* Your take home exam will require you to perform an RDD estimation.
+
+* Let's go through some basics here which will be useful for you.
+]
+
+---
+
+# Setup
+
+1. Unit $i$ is treated if **running variable** $x_i$ crosses **threshold** $c$:
+    $$D_i = \begin{cases}\begin{array}{c}1\text{ if }x_i > c \\0\text{ if }x_i \leq c. \end{array}\end{cases}$$
+1. Writing the PO framework again in regression form (and again assuming $\delta_i=\delta$), we have
+    $$Y_i = \alpha + \beta x_i + \delta D_i + \varepsilon_i$$
+1. The RDD estimator exploits a discontinuity at $c$ in the conditional expectation function:
+    $$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$
+    where $\lim_{x\to c^+}$ means $x$ *approaches* $c$ *from above*.
+    
+
+---
+
+# Simulation
+
+* Let's whip up a quick simulation dataset.
+
+.pull-left[
+```{r}
+library(dplyr)
+library(ggplot2)
+cutoff = 50
+delta = 10.5
+nsim = 500
+d = tibble(x=runif(n=nsim,max=100)) %>%
+    mutate(D = if_else(x > cutoff,TRUE,FALSE),
+           Y = x + D*delta + rnorm(nsim,sd=3))
+```
+* and laet's plot it: 
+
+]
+
+
+
+.pull-right[
+
+```{r,echo = FALSE,fig.height = 6}
+ggplot(d,aes(x=x,y=Y)) + geom_point() + theme_bw()
+```
+]
+
+---
+
+# Illustrating the RDD Estimator
+
+.pull-left[
+* Now we fit a line to left and right of cutoff $c$.
+
+* What *kind of* line (straight, curved, polynomial etc) is quite important.
+
+]
+
+--
+
+.pull-right[
+```{r,echo = FALSE,fig.height = 6}
+d0 = d %>% filter(D==0)
+d1 = d %>% filter(D==1)
+ggplot(d,aes(x=x,y=Y)) + geom_point() + 
+    geom_smooth(data = d0, method = "lm",se = FALSE, size=1.5) +
+    geom_smooth(data = d1, method = "lm",se = FALSE, size=1.5, color = "green")+ theme_bw()
+
+```
+]
+
+---
+
+# Computing The Estimate
+
+.pull-left[
+* Finally, the estimate is the difference between red and blue line.
+
+* **At the cutoff**!
+
+* The RD estimator is the size of the **red** errorbar in that picture!
+
+]
+
+--
+
+.pull-right[
+```{r,echo = FALSE,fig.height = 6}
+d0 = d %>% filter(D==0)
+d1 = d %>% filter(D==1)
+ggplot(d,aes(x=x,y=Y)) + geom_point() + 
+    geom_smooth(data = d0, method = "lm",se = FALSE, size=1.5) +
+    geom_smooth(data = d1, method = "lm",se = FALSE, size=1.5, color = "green") +
+    geom_errorbar(data=data.frame(x=50,y1=max(d0$x),y2=min(d1$x)+delta), 
+               aes(x=x,ymin=y1,ymax=y2),inherit.aes = FALSE,size=2,colour="red", width=2)+ theme_bw()
+
+```
+]
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+

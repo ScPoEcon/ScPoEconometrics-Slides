@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>ScPoEconometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Florian Oswald" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ScPoEconometrics
+## Regression Discontinuity Design
+### Florian Oswald
+### SciencesPo Paris </br> 2019-11-25
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Packages used in this set of slides
+
+
+```r
+library(rdrobust)
+```
+
+---
+
+# Regression Discontinuity Design (RDD)
+
+.pull-left[
+* In the book, we talked about how RDD can provide an alternative to full randomization of treatment assigment.
+
+* We looked at [Clicking on Heaven's Door](https://www.aeaweb.org/articles?id=10.1257/aer.20150355), which uses the (unknown) time an immigrant quota for a certain employer group is full as a **cutoff** value.
+
+* Those who are on the immigration website just before and after `\(c\)` are close to identical - except that the early birds got the permit.
+]
+
+--
+
+.pull-right[
+* Your take home exam will require you to perform an RDD estimation.
+
+* Let's go through some basics here which will be useful for you.
+]
+
+---
+
+# Setup
+
+1. Unit `\(i\)` is treated if **running variable** `\(x_i\)` crosses **threshold** `\(c\)`:
+    `$$D_i = \begin{cases}\begin{array}{c}1\text{ if }x_i &gt; c \\0\text{ if }x_i \leq c. \end{array}\end{cases}$$`
+1. Writing the PO framework again in regression form (and again assuming `\(\delta_i=\delta\)`), we have
+    `$$Y_i = \alpha + \beta x_i + \delta D_i + \varepsilon_i$$`
+1. The RDD estimator exploits a discontinuity at `\(c\)` in the conditional expectation function:
+    `$$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$`
+    where `\(\lim_{x\to c^+}\)` means `\(x\)` *approaches* `\(c\)` *from above*.
+    
+
+---
+
+# Simulation
+
+* Let's whip up a quick simulation dataset.
+
+.pull-left[
+
+```r
+library(dplyr)
+library(ggplot2)
+cutoff = 50
+delta = 10.5
+nsim = 500
+d = tibble(x=runif(n=nsim,max=100)) %&gt;%
+    mutate(D = if_else(x &gt; cutoff,TRUE,FALSE),
+           Y = x + D*delta + rnorm(nsim,sd=3))
+```
+* and laet's plot it: 
+
+]
+
+
+
+.pull-right[
+
+&lt;img src="RDD_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Illustrating the RDD Estimator
+
+.pull-left[
+* Now we fit a line to left and right of cutoff `\(c\)`.
+
+* What *kind of* line (straight, curved, polynomial etc) is quite important.
+
+]
+
+--
+
+.pull-right[
+&lt;img src="RDD_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Computing The Estimate
+
+.pull-left[
+* Finally, the estimate is the difference between red and blue line.
+
+* **At the cutoff**!
+
+* The RD estimator is the size of the **red** errorbar in that picture!
+
+]
+
+--
+
+.pull-right[
+&lt;img src="RDD_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
