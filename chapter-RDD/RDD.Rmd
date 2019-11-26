@@ -172,6 +172,28 @@ ggplot(d,aes(x=x,y=Y)) + geom_point() +
 
 ---
 
+# `rdrobust` package
+
+.pull-left[
+* Same can be done automatically with the `rdrobust` package
+
+* You should use that in your homework!
+
+* here's how:
+
+]
+
+--
+
+.pull-right[
+```{r,echo = FALSE,fig.height = 6,fig.width=6}
+rdplot(y = d$Y, x = d$x, c = cutoff)
+
+```
+]
+
+---
+
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
