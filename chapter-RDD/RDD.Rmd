@@ -186,7 +186,7 @@ ggplot(d,aes(x=x,y=Y)) + geom_point() +
 --
 
 .pull-right[
-```{r,echo = FALSE,fig.height = 6,fig.width=6}
+```{r,echo = TRUE,fig.height = 6,fig.width=6}
 rdplot(y = d$Y, x = d$x, c = cutoff)
 
 ```
