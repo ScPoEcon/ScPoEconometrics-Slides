@@ -46,7 +46,7 @@ library(magrittr)
 
 # Categorical Variables
 
-* We have seen different data types in the first session.
+* We have seen different data types in the 1st session.
 
 --
 
