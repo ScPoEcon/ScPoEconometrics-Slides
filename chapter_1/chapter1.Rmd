@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Introduction"
-author: "Pierre Villedieu"
+author: "Florian Oswald"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
