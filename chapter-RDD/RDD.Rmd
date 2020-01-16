@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Regression Discontinuity Design"
-author: "Florian Oswald"
+author: "Gustave Kenedi"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -41,6 +41,12 @@ lowtop = c(om[1],om[2],0.1,om[4])
 
 overwrite = FALSE
 
+library(tidyverse)
+library(ggplot2)
+
+  # set seed
+set.seed(1234)
+
 ```
 
 layout: true
@@ -49,148 +55,456 @@ layout: true
 
 ---
 
+# Regression Discontinuity Design (RDD)
+
+* We seen one "program evaluation" method in the last lecture: __difference-in-differences__.
+
+--
+
+* In this lecture, we will cover another popular and rigorous program evaluation method: __regression discontinuity__.
+
+--
+
+* Starting point: subjects are not randomly allocated to treatment `r emo::ji("warning")`
+
+--
+
+* Many arbitrary rules in life:
+
+--
+
+  - You are allowed to legally drink alcohol in the US only when you turn 21 years old [(Carpenter and Dobkin, 2009)](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164);
+  
+--
+  
+  - In North Carolina, you used to have to have reached the age of five by October 16 in the relevant year to be eligible to enter kindergarten [(Cook and Kang, 2016)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.20140323);
+  
+--
+  
+  - In the US, a new born baby weighing less than 1,500 grams is considered to be of "very low birth weight" [(Almond et al., 2010)](https://academic.oup.com/qje/article/125/2/591/1882183).
+
+--
+
+* __RDD:__ allocation to treatment is ***as good as random***!
+
+---
+
+# An Example: Immigrant Legalization and Crime
+
+--
+
+* Imagine you are interested in assessing the __causal__ impact of obtaining a legal status on an illegal immigrant's criminal behavior.
+
+--
+
+* Why is this not that straightforward? Why can't you just regress criminal behavior on a legal status dummy variable?
+
+--
+
+  - There may well be __self-selection__ among illegal immigrants into asking for status.
+  
+  - Those receiving the status and the others may be different from one another
+
+--
+
+* Recent [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by Paolo Pinotti entitled "Clicking on Heaven's Door: The Effect of Immigrant Legalization on Crime"
+
+--
+
+* Estimates the effect of immigrant legalization on the crime rate of immigrants in Italy.
+
+---
+
+# Institutional Details
+
+* In Italy, immigrants often enter illegally first and then hope to obtain a residency permit through an employer
+
+* Quota system in place: established how many permits are granted by nationality and industry
+
+--
+
+```{r, echo = F, out.width = "450px"}
+knitr::include_graphics("chapter_rdd_files/figure-html/quota_table.png")
+```
+
+---
+
+# Institutional Details
+
+* In Italy, immigrants often enter illegally first and then hope to obtain a residency permit through an employer
+
+* Quota system in place: established how many permits are granted by nationality and industry
+
+## Discontinuity Feature
+
+* Applications for a permit must be sumitted online by employers, __starting at 8AM on specific click days__.
+
+--
+
+* Permits given on a first come first served basis and quotas are filled rapidly. Time at which quota fills creates a __cutoff__.
+
+--
+
+* How different are applications submitted *just before* and *just after* cutoff time? Can employers know when the quota will fill?
+
+--
+
+* `r emo::ji("point_right")` This is a regression discontinuity design!
+
+---
+
+# Graphical Results
+
+.center[**Timing of Applications and Probability of Obtaining a Residence Permit for Two Lotteries in
+Milan and Bergamo**]
+
+```{r, echo = F, out.width = "600px"}
+knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_examples.png")
+```
+
+---
+
+# Graphical Results
+
+.center[**Number of Crimes per Applicant Before and After Click Days, Conditional on the Timing of
+Application**]
+
+```{r, echo = F, out.width = "1000px"}
+knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_results.png")
+```
+
+---
+
+# RDD Setup
+
+* Research question: effect of obtaining a legal status on an illegal immigrant's criminal behavior
+
+* __Treatment variable__: $D_t$
+
+* $D_t$ = 1 if permit is obtained, $D_t$ = 0 if not.
+
+* $D_t$ is a function of the time at which immigrant's application is submitted, $t$.
+
+* The cutoff time $c$ separates those who obtain the status and those who don't:
+  $$D_t = \begin{cases}\begin{array}{c}1\text{ if }t > c \\0\text{ if }t \leq c. \end{array}\end{cases}$$
+
+* __Running variable__: variable that determines treatmen, in this case $t$.
+
+---
+
+# RDD features
+
+* Treatment status is a deterministic function of $t$.
+
+* Treatment status is discontinuous function of $t$.
+
+## Two types of RDD
+
+* __Sharp RDD__: the running variable *fully* determines assignment to treatment.
+
+* __Fuzzy RDD__: the running variable *partially* determine assignement to treatment.
+
+---
+
+# Sharp RDD
+
+1. Writing in regression form, we have
+    $$CRIME_i = \alpha + \delta D_t + \beta t + \varepsilon_i,$$
+  where $CRIME_i$ is the number of crimes committed, $D_t$ is the treatment dummy, and $t$ is the timing of the application.
+  
+  $\rightarrow$ $\beta$ captures the **jump in crime** between illegal immigrants obtaining a status and those who don't.
+    
+1. The RDD estimator exploits a discontinuity at $c$ in the conditional expectation function:
+    $$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$
+    where $\lim_{x\to c^+}$ means $x$ *approaches* $c$ *from above*.
+    
+---
+
+# Local Average Treatment Effect (LATE)
+
+* The RD estimator is a __local average treatment effect__.
+
+* It only tells you the impact of treatment $D$ on outcome $Y$ ***around*** the cutoff value of the running variable.
+
+* Limited external validity => you cannot extrapolate to bigger treatments.
+
+* e.g. using the 21 year old alcohol restriction age in the RD context will only tell you the effect of this restriction on deaths but not the general effect of alcohol consumption.
+
+---
+
+# More about RD
+
+* Unfortunately, not all cases are as straightforward as our example
+
+* Let's look at different cases.
+
+---
+
+# Simulations - Linear Relationship
+
+$$outcome_i = \alpha + \delta treatment_i + \beta running_i + error_i,$$
+--
+
+```{r, echo = FALSE, fig.height = 4.5}
+set.seed(1234)
+
+# packages
+library(viridis)
+library(dplyr)
+library(ggplot2)
+
+  # parameters
+cutoff = 0.5
+alpha = 0.2 # intercept
+delta = 0.4 # jump at cutoff
+beta = 2 # slope
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + beta * x + D*delta + u
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y)
+  
+  # plot
+rdd_lin <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE) +
+  ylim(0,3) +
+  labs(x = "Running variable (X)", y = "Outcome variable (Y)") +
+  scale_colour_viridis_d(name = "Experimental Condition",
+                        breaks=c("FALSE", "TRUE"), labels = c("Control", "Treatment")) +
+  theme_bw(base_size = 12) + theme(legend.position="top")
+rdd_lin
+```
+
+---
+
+# Simulations - Linear Relationship
+
+$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta running_i + error_i,$$
+
+```{r, echo = FALSE, fig.height = 4.5}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(0.505, 1.20, 0.505, 1.63, h = 0.2, lwd=1.5, col="black")
+
+rdd_lin +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 0.45, y = 1.45, label = "delta", colour = "#d90502", parse = T, size = 8)
+```
+
+---
+
+# Simulations - Quadratic Relationship
+
+$$outcome_i = \alpha + \delta treatment_i + \beta_1 running_i + \color{#d90502}{\beta_2 running_i^2} + error_i,$$
+
+--
+
+```{r, echo = FALSE, fig.height = 4.5}
+set.seed(1234)
+
+  # packages
+library(viridis)
+library(dplyr)
+library(ggplot2)
+
+  # parameters
+cutoff = 0.5
+alpha = 1.5 # intercept
+delta = 0.4 # jump at cutoff
+beta = -8 # slope
+beta_2 = 25
+beta_3 = -17
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + beta * x + beta_2 * x^2 + beta_3 * x^3 + D*delta + u
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y)
+
+  # plot
+rdd_quad <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point() +
+  stat_smooth(method = "lm",
+              formula = y ~ poly(x, 3),
+              se = FALSE) +
+  geom_vline(xintercept = 0.5, linetype = "longdash") +
+  ylim(0,3) +
+  labs(x = "Running variable (X)", y = "Outcome variable (Y)") +
+  scale_colour_viridis_d(name = "Experimental Condition",
+                        breaks=c("FALSE", "TRUE"), labels = c("Control", "Treatment")) +
+  theme_bw(base_size = 12) + theme(legend.position="top")
+rdd_quad
+```
+
+---
+
+# Simulations - Quadratic Relationship
+
+$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta_1 running_i + \beta_2 running_i^2 + error_i,$$
+
+```{r, echo = FALSE, fig.height = 4.5}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(0.505, 1.68, 0.505, 2.05, h = 0.2, lwd=1.5, col="black")
+
+rdd_quad +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 0.45, y = 1.865, label = "delta", colour = "#d90502", parse = T, size = 8)
+```
+
+---
+
+# Simulations - Different Slopes
+
+$$outcome_i = \alpha + \delta treatment_i + \beta (running_i - cutoff) + \\ \color{#d90502}{\gamma treatment_i * (running_i - cutoff)} + error_i,$$
+
+--
+
+```{r, echo = FALSE, fig.height = 4.5}
+set.seed(1234)
+
+  # packages
+library(viridis)
+library(dplyr)
+library(ggplot2)
+
+  # parameters
+cutoff = 0.5
+alpha = 1 # intercept
+delta = 0.4 # jump at cutoff
+beta = -1 # slope
+gamma = 4
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + beta * (x - cutoff) + D*delta + gamma * D * (x - cutoff) + u
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y)
+
+  # plot
+rdd_diffslope <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point() +
+  stat_smooth(method = "lm",
+              formula = y ~ x,
+              se = FALSE) +
+  geom_vline(xintercept = 0.5, linetype = "longdash") +
+  ylim(0,3) +
+  labs(x = "Running variable (X)", y = "Outcome variable (Y)") +
+  scale_colour_viridis_d(name = "Experimental Condition",
+                        breaks=c("FALSE", "TRUE"), labels = c("Control", "Treatment")) +
+  theme_bw(base_size = 12) + theme(legend.position="top")
+rdd_diffslope
+```
+
+---
+
+# Simulations - Different Slopes
+
+$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta (running_i - cutoff) + \\ \gamma treatment_i * (running_i - cutoff) + error_i,$$
+
+```{r, echo = FALSE, fig.height = 4.5}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(0.505, 0.99, 0.505, 1.46, h = 0.2, lwd=1.5, col="black")
+
+rdd_diffslope +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 0.45, y = 1.225, label = "delta", colour = "#d90502", parse = T, size = 8)
+```
+
+---
+
+# Which model is best?
+
+* Important to __visualise__ the data!
+
+* Coefficients across models shouldn't vary too much
+
+* Bandwidth choice: sophisticated algorithms to find optimal bandwidth
+
+---
+
+# Fuzzy RD
+
+* What happens when treatment is not fully determined by the running variable?
+
+* **Example:** Student admissions in selective high schools. Grade cutoff but self-selection. 
+
+---
+
 # Packages used in this set of slides
 
 ```{r}
 library(rdrobust)
 ```
-
----
-
-# Regression Discontinuity Design (RDD)
-
-.pull-left[
-* In the book, we talked about how RDD can provide an alternative to full randomization of treatment assigment.
-
-* We looked at [Clicking on Heaven's Door](https://www.aeaweb.org/articles?id=10.1257/aer.20150355), which uses the (unknown) time an immigrant quota for a certain employer group is full as a **cutoff** value.
-
-* Those who are on the immigration website just before and after $c$ are close to identical - except that the early birds got the permit.
-]
-
---
-
-.pull-right[
-* Your take home exam will require you to perform an RDD estimation.
-
-* Let's go through some basics here which will be useful for you.
-]
-
----
-
-# Setup
-
-1. Unit $i$ is treated if **running variable** $x_i$ crosses **threshold** $c$:
-    $$D_i = \begin{cases}\begin{array}{c}1\text{ if }x_i > c \\0\text{ if }x_i \leq c. \end{array}\end{cases}$$
-1. Writing the PO framework again in regression form (and again assuming $\delta_i=\delta$), we have
-    $$Y_i = \alpha + \beta x_i + \delta D_i + \varepsilon_i$$
-1. The RDD estimator exploits a discontinuity at $c$ in the conditional expectation function:
-    $$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$
-    where $\lim_{x\to c^+}$ means $x$ *approaches* $c$ *from above*.
-    
-
----
-
-# Simulation
-
-* Let's whip up a quick simulation dataset.
-
-.pull-left[
-```{r}
-library(dplyr)
-library(ggplot2)
-cutoff = 50
-delta = 10.5
-nsim = 500
-d = tibble(x=runif(n=nsim,max=100)) %>%
-    mutate(D = if_else(x > cutoff,TRUE,FALSE),
-           Y = x + D*delta + rnorm(nsim,sd=3))
-```
-* and laet's plot it: 
-
-]
-
-
-
-.pull-right[
-
-```{r,echo = FALSE,fig.height = 6}
-ggplot(d,aes(x=x,y=Y)) + geom_point() + theme_bw()
-```
-]
-
----
-
-# Illustrating the RDD Estimator
-
-.pull-left[
-* Now we fit a line to left and right of cutoff $c$.
-
-* What *kind of* line (straight, curved, polynomial etc) is quite important.
-
-]
-
---
-
-.pull-right[
-```{r,echo = FALSE,fig.height = 6}
-d0 = d %>% filter(D==0)
-d1 = d %>% filter(D==1)
-ggplot(d,aes(x=x,y=Y)) + geom_point() + 
-    geom_smooth(data = d0, method = "lm",se = FALSE, size=1.5) +
-    geom_smooth(data = d1, method = "lm",se = FALSE, size=1.5, color = "green")+ theme_bw()
-
-```
-]
-
----
-
-# Computing The Estimate
-
-.pull-left[
-* Finally, the estimate is the difference between red and blue line.
-
-* **At the cutoff**!
-
-* The RD estimator is the size of the **red** errorbar in that picture!
-
-]
-
---
-
-.pull-right[
-```{r,echo = FALSE,fig.height = 6}
-d0 = d %>% filter(D==0)
-d1 = d %>% filter(D==1)
-ggplot(d,aes(x=x,y=Y)) + geom_point() + 
-    geom_smooth(data = d0, method = "lm",se = FALSE, size=1.5) +
-    geom_smooth(data = d1, method = "lm",se = FALSE, size=1.5, color = "green") +
-    geom_errorbar(data=data.frame(x=50,y1=max(d0$x),y2=min(d1$x)+delta), 
-               aes(x=x,ymin=y1,ymax=y2),inherit.aes = FALSE,size=2,colour="red", width=2)+ theme_bw()
-
-```
-]
-
----
-
-# `rdrobust` package
-
-.pull-left[
-* Same can be done automatically with the `rdrobust` package
-
-* You should use that in your homework!
-
-* here's how:
-
-]
-
---
-
-.pull-right[
-```{r,echo = TRUE,fig.height = 6,fig.width=6}
-rdplot(y = d$Y, x = d$x, c = cutoff)
-
-```
-]
 
 ---
 

@@ -3,7 +3,7 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald" />
+    <meta name="author" content="Gustave Kenedi" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
@@ -15,8 +15,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Regression Discontinuity Design
-### Florian Oswald
-### SciencesPo Paris </br> 2019-11-26
+### Gustave Kenedi
+### SciencesPo Paris </br> 2020-01-13
 
 ---
 
@@ -32,6 +32,256 @@ layout: true
 layout: true
 
 &lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Regression Discontinuity Design (RDD)
+
+* We seen one "program evaluation" method in the last lecture: __difference-in-differences__.
+
+--
+
+* In this lecture, we will cover another popular and rigorous program evaluation method: __regression discontinuity__.
+
+--
+
+* Starting point: subjects are not randomly allocated to treatment ⚠️
+
+--
+
+* Many arbitrary rules in life:
+
+--
+
+  - You are allowed to legally drink alcohol in the US only when you turn 21 years old [(Carpenter and Dobkin, 2009)](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164);
+  
+--
+  
+  - In North Carolina, you used to have to have reached the age of five by October 16 in the relevant year to be eligible to enter kindergarten [(Cook and Kang, 2016)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.20140323);
+  
+--
+  
+  - In the US, a new born baby weighing less than 1,500 grams is considered to be of "very low birth weight" [(Almond et al., 2010)](https://academic.oup.com/qje/article/125/2/591/1882183).
+
+--
+
+* __RDD:__ allocation to treatment is ***as good as random***!
+
+---
+
+# An Example: Immigrant Legalization and Crime
+
+--
+
+* Imagine you are interested in assessing the __causal__ impact of obtaining a legal status on an illegal immigrant's criminal behavior.
+
+--
+
+* Why is this not that straightforward? Why can't you just regress criminal behavior on a legal status dummy variable?
+
+--
+
+  - There may well be __self-selection__ among illegal immigrants into asking for status.
+  
+  - Those receiving the status and the others may be different from one another
+
+--
+
+* Recent [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by Paolo Pinotti entitled "Clicking on Heaven's Door: The Effect of Immigrant Legalization on Crime"
+
+--
+
+* Estimates the effect of immigrant legalization on the crime rate of immigrants in Italy.
+
+---
+
+# Institutional Details
+
+* In Italy, immigrants often enter illegally first and then hope to obtain a residency permit through an employer
+
+* Quota system in place: established how many permits are granted by nationality and industry
+
+--
+
+&lt;img src="chapter_rdd_files/figure-html/quota_table.png" width="450px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Institutional Details
+
+* In Italy, immigrants often enter illegally first and then hope to obtain a residency permit through an employer
+
+* Quota system in place: established how many permits are granted by nationality and industry
+
+## Discontinuity Feature
+
+* Applications for a permit must be sumitted online by employers, __starting at 8AM on specific click days__.
+
+--
+
+* Permits given on a first come first served basis and quotas are filled rapidly. Time at which quota fills creates a __cutoff__.
+
+--
+
+* How different are applications submitted *just before* and *just after* cutoff time? Can employers know when the quota will fill?
+
+--
+
+* 👉 This is a regression discontinuity design!
+
+---
+
+# Graphical Results
+
+.center[**Timing of Applications and Probability of Obtaining a Residence Permit for Two Lotteries in
+Milan and Bergamo**]
+
+&lt;img src="chapter_rdd_files/figure-html/pinotti_examples.png" width="600px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Graphical Results
+
+.center[**Number of Crimes per Applicant Before and After Click Days, Conditional on the Timing of
+Application**]
+
+&lt;img src="chapter_rdd_files/figure-html/pinotti_results.png" width="1000px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# RDD Setup
+
+* Research question: effect of obtaining a legal status on an illegal immigrant's criminal behavior
+
+* __Treatment variable__: `\(D_t\)`
+
+* `\(D_t\)` = 1 if permit is obtained, `\(D_t\)` = 0 if not.
+
+* `\(D_t\)` is a function of the time at which immigrant's application is submitted, `\(t\)`.
+
+* The cutoff time `\(c\)` separates those who obtain the status and those who don't:
+  `$$D_t = \begin{cases}\begin{array}{c}1\text{ if }t &gt; c \\0\text{ if }t \leq c. \end{array}\end{cases}$$`
+
+* __Running variable__: variable that determines treatmen, in this case `\(t\)`.
+
+---
+
+# RDD features
+
+* Treatment status is a deterministic function of `\(t\)`.
+
+* Treatment status is discontinuous function of `\(t\)`.
+
+## Two types of RDD
+
+* __Sharp RDD__: the running variable *fully* determines assignment to treatment.
+
+* __Fuzzy RDD__: the running variable *partially* determine assignement to treatment.
+
+---
+
+# Sharp RDD
+
+1. Writing in regression form, we have
+    `$$CRIME_i = \alpha + \delta D_t + \beta t + \varepsilon_i,$$`
+  where `\(CRIME_i\)` is the number of crimes committed, `\(D_t\)` is the treatment dummy, and `\(t\)` is the timing of the application.
+  
+  `\(\rightarrow\)` `\(\beta\)` captures the **jump in crime** between illegal immigrants obtaining a status and those who don't.
+    
+1. The RDD estimator exploits a discontinuity at `\(c\)` in the conditional expectation function:
+    `$$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$`
+    where `\(\lim_{x\to c^+}\)` means `\(x\)` *approaches* `\(c\)` *from above*.
+    
+---
+
+# Local Average Treatment Effect (LATE)
+
+* The RD estimator is a __local average treatment effect__.
+
+* It only tells you the impact of treatment `\(D\)` on outcome `\(Y\)` ***around*** the cutoff value of the running variable.
+
+* Limited external validity =&gt; you cannot extrapolate to bigger treatments.
+
+* e.g. using the 21 year old alcohol restriction age in the RD context will only tell you the effect of this restriction on deaths but not the general effect of alcohol consumption.
+
+---
+
+# More about RD
+
+* Unfortunately, not all cases are as straightforward as our example
+
+* Let's look at different cases.
+
+---
+
+# Simulations - Linear Relationship
+
+`$$outcome_i = \alpha + \delta treatment_i + \beta running_i + error_i,$$`
+--
+
+&lt;img src="chapter_rdd_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simulations - Linear Relationship
+
+`$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta running_i + error_i,$$`
+
+&lt;img src="chapter_rdd_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simulations - Quadratic Relationship
+
+`$$outcome_i = \alpha + \delta treatment_i + \beta_1 running_i + \color{#d90502}{\beta_2 running_i^2} + error_i,$$`
+
+--
+
+&lt;img src="chapter_rdd_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simulations - Quadratic Relationship
+
+`$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta_1 running_i + \beta_2 running_i^2 + error_i,$$`
+
+&lt;img src="chapter_rdd_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simulations - Different Slopes
+
+`$$outcome_i = \alpha + \delta treatment_i + \beta (running_i - cutoff) + \\ \color{#d90502}{\gamma treatment_i * (running_i - cutoff)} + error_i,$$`
+
+--
+
+&lt;img src="chapter_rdd_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simulations - Different Slopes
+
+`$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta (running_i - cutoff) + \\ \gamma treatment_i * (running_i - cutoff) + error_i,$$`
+
+&lt;img src="chapter_rdd_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Which model is best?
+
+* Important to __visualise__ the data!
+
+* Coefficients across models shouldn't vary too much
+
+* Bandwidth choice: sophisticated algorithms to find optimal bandwidth
+
+---
+
+# Fuzzy RD
+
+* What happens when treatment is not fully determined by the running variable?
+
+* **Example:** Student admissions in selective high schools. Grade cutoff but self-selection. 
 
 ---
 
@@ -41,128 +291,6 @@ layout: true
 ```r
 library(rdrobust)
 ```
-
----
-
-# Regression Discontinuity Design (RDD)
-
-.pull-left[
-* In the book, we talked about how RDD can provide an alternative to full randomization of treatment assigment.
-
-* We looked at [Clicking on Heaven's Door](https://www.aeaweb.org/articles?id=10.1257/aer.20150355), which uses the (unknown) time an immigrant quota for a certain employer group is full as a **cutoff** value.
-
-* Those who are on the immigration website just before and after `\(c\)` are close to identical - except that the early birds got the permit.
-]
-
---
-
-.pull-right[
-* Your take home exam will require you to perform an RDD estimation.
-
-* Let's go through some basics here which will be useful for you.
-]
-
----
-
-# Setup
-
-1. Unit `\(i\)` is treated if **running variable** `\(x_i\)` crosses **threshold** `\(c\)`:
-    `$$D_i = \begin{cases}\begin{array}{c}1\text{ if }x_i &gt; c \\0\text{ if }x_i \leq c. \end{array}\end{cases}$$`
-1. Writing the PO framework again in regression form (and again assuming `\(\delta_i=\delta\)`), we have
-    `$$Y_i = \alpha + \beta x_i + \delta D_i + \varepsilon_i$$`
-1. The RDD estimator exploits a discontinuity at `\(c\)` in the conditional expectation function:
-    `$$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$`
-    where `\(\lim_{x\to c^+}\)` means `\(x\)` *approaches* `\(c\)` *from above*.
-    
-
----
-
-# Simulation
-
-* Let's whip up a quick simulation dataset.
-
-.pull-left[
-
-```r
-library(dplyr)
-library(ggplot2)
-cutoff = 50
-delta = 10.5
-nsim = 500
-d = tibble(x=runif(n=nsim,max=100)) %&gt;%
-    mutate(D = if_else(x &gt; cutoff,TRUE,FALSE),
-           Y = x + D*delta + rnorm(nsim,sd=3))
-```
-* and laet's plot it: 
-
-]
-
-
-
-.pull-right[
-
-&lt;img src="RDD_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-# Illustrating the RDD Estimator
-
-.pull-left[
-* Now we fit a line to left and right of cutoff `\(c\)`.
-
-* What *kind of* line (straight, curved, polynomial etc) is quite important.
-
-]
-
---
-
-.pull-right[
-&lt;img src="RDD_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-# Computing The Estimate
-
-.pull-left[
-* Finally, the estimate is the difference between red and blue line.
-
-* **At the cutoff**!
-
-* The RD estimator is the size of the **red** errorbar in that picture!
-
-]
-
---
-
-.pull-right[
-&lt;img src="RDD_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-# `rdrobust` package
-
-.pull-left[
-* Same can be done automatically with the `rdrobust` package
-
-* You should use that in your homework!
-
-* here's how:
-
-]
-
---
-
-.pull-right[
-
-```r
-rdplot(y = d$Y, x = d$x, c = cutoff)
-```
-
-&lt;img src="RDD_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
-]
 
 ---
 
@@ -231,7 +359,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {
