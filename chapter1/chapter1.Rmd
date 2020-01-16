@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Introduction"
-author: "Gustave Kenedi"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "Sciences Po Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -324,7 +324,7 @@ layout: true
 ```{r, eval = FALSE}
 library(sf)
 library(tmap)
-iris_shfl <- read_sf("chapter_intro_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %>%
+iris_shfl <- read_sf("chapter1_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %>%
   mutate(dep = substr(INSEE_COM,1,2)) %>%
   select(CODE_IRIS, dep, geometry) %>%
   filter(dep == "75")
@@ -348,10 +348,7 @@ tm_shape(iris_map) +
 ```{r, echo = FALSE}
 library(sf)
 library(tmap)
-iris_shfl <- read_sf("chapter_intro_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %>%
-  mutate(dep = substr(INSEE_COM,1,2)) %>%
-  select(CODE_IRIS, dep, geometry) %>%
-  filter(dep == "75")
+iris_shfl <- read_sf("../rds/iris_shapefile_2015.shp")
 iris_income <- readRDS("../rds/iris_inc.rds") %>%
   mutate(CODE_IRIS = IRIS) %>%
   select(CODE_IRIS, DISP_MED15)
