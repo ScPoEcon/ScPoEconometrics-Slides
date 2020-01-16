@@ -1,0 +1,315 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Differences-in-Differences"
+author: "Gustave Kenedi"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+library(emo)
+library(tidyverse)
+library(ggplot2)
+library(diffindiff)
+library(kableExtra)
+library(zoo)
+library(scales)
+library(grid)
+library(pBrackets)
+
+  # set seed
+set.seed(1234)
+```
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Difference-in-Differences (DiD)
+
+* Four main causal evaluation methods used in economics:
+
+  - ***instrumental variables (IV)***,
+  - ***propensity-score matching***,
+  - ***differences-in-differences (DiD)***, and
+  - ***regression discontinuity designs (RDD)***.
+
+--
+
+* In this lecture, we will cover a popular and rigorous program evaluation method: __differences-in-differences__.
+
+--
+
+* Starting point as usual: subjects are not randomly allocated to treatment `r emo::ji("warning")`
+
+--
+
+* In some cases though, possible existence of unobserved confounders
+
+---
+
+# An Example: Minimum Wage and Employment
+
+--
+
+* Imagine you are interested in assessing the __causal__ impact of increasing the minimum wage on (un)employment.
+
+--
+
+* Why is this not that straightforward? Why can't you just regress (un)employment rates on the level of the minimum wage?
+
+--
+
+  - The minimum wage level may be __endogenously__ determined: policymakers may want to have a low minimum wage when employment is low and increase it when conditions improve.
+
+--
+
+* Seminal [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
+
+--
+
+* Estimates the effect of an increase in the minimum wage on the employment rate in the fast-food industry. Why this industry?
+
+---
+
+# Institutional Details
+
+* In the US, there is a national minimum wage, but states can depart from it 
+
+--
+
+* April 1, 1992: New Jersey minimum wage increases from $4.25 to $5.05 per hour.
+
+--
+
+* Neighboring Pennsylvania does not change its minimum wage level. 
+--
+
+__Map of establishments?__
+
+```{r, echo = F, out.width = "450px"}
+knitr::include_graphics("chapter_rdd_files/figure-html/quota_table.png")
+```
+
+---
+
+# Institutional Details
+
+* Surveyed 410 fast-food establishments in New Jersey (NJ) and eastern Pennsylvania
+
+* Timing:
+  - Survey before NJ MW increase: Feb/March 1992
+  - Survey after NJ MW increase: Nov/Dec 1992
+
+
+__Timeline graph?__
+
+## Diff-in-Diff Feature
+
+
+```{r, echo = FALSE, eval = FALSE}
+ggplot(cardkrueger, aes(x=wage_st, fill = state)) + geom_histogram(aes(y=c(..count..[..group..== 1]/sum(..count..[..group..== 1]), ..count..[..group..== 2]/sum(..count..[..group..== 2]))), binwidth=0.1, colour="black", position="dodge") + facet_wrap(~ observation) + theme_bw() + scale_y_continuous(labels = scales::percent)
+```
+
+* What assumption is necessary for the comparison to be valid?
+
+--
+
+* `r emo::ji("point_right")` This is a difference-in-differences!
+
+---
+
+# Graphical Results
+
+.center[**Timing of Applications and Probability of Obtaining a Residence Permit for Two Lotteries in
+Milan and Bergamo**]
+
+```{r, echo = FALSE}
+ck_mw <- tibble(
+  Variable = c("FTE employment before","FTE employment after","Change in mean FTE
+employment"),
+  PA = c(23.33,21.17,-2.16),
+  NJ = c(20.44,21.03,0.59)
+)
+knitr::kable(as.data.frame(ck_mw))
+# knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_examples.png")
+```
+
+---
+
+# Graphical Results
+
+.center[**Number of Crimes per Applicant Before and After Click Days, Conditional on the Timing of
+Application**]
+
+```{r, echo = F, out.width = "1000px"}
+knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_results.png")
+```
+
+$$
+\begin{aligned}
+\gamma_{DD} & = (Y_{NJ,nov92} - Y_{NJ,feb92}) - (Y_{PA,nov92} - Y_{PA,feb92}) \\
+              & = (21.03 - 20.44) - (21.17 - 23.33) \\
+              & = 2.76
+\end{aligned}
+$$
+---
+
+# DiD Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+ck_mw <- data.frame(
+  date = as.Date(c("010292","010292","011192","011192"), format = "%d%m%y"),
+  state = c("Pennsylvania","New Jersey","Pennsylvania","New Jersey"),
+  fte_emp = c(23.33,20.44,21.17,21.03)
+)
+
+gg_did <- ggplot(ck_mw, aes(x = date, y = fte_emp, color = state)) +
+  geom_line() +
+  geom_vline(xintercept = as.Date("010492", format = "%d%m%y"), linetype = "longdash") +
+  ylim(17,24) +
+  scale_x_date(labels = date_format("%h %y"),
+               limits = c(min(ck_mw$date),as.Date("011292", format = "%d%m%y")),
+               date_breaks = "1 month",
+               minor_breaks = NULL) +
+  labs(x = NULL, y = "Average number of FTE employees per store", color = NULL) +
+  scale_colour_viridis_d() +
+  theme_bw(base_size = 12) + theme(legend.position="none") +
+  annotate("text", x = as.Date("1992-05-01"), y = 23, label = "Pennsylvania", color = viridis_pal()(2)[2]) +
+  annotate("text", x = as.Date("1992-05-01"), y = 21, label = "New Jersey", color = viridis_pal()(2)[1]) +
+  annotate("text", x = as.Date("1992-05-24"), y = 23.99, label = "New Jersey minimum wage increases", color = "black", size = 3)
+gg_did
+```
+
+---
+
+# DiD Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did2 <- gg_did +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
+               color = "#FDE725FF", linetype = "dashed") +
+  annotate("text", x = as.Date("1992-05-05"), y = 19.2, label = "New Jersey counterfactual", color = viridis_pal()(2)[2])
+gg_did2
+```
+
+---
+
+# DiD Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did2 +
+  annotate("text", x = as.Date("1992-11-23"), y = 19.7, label = "Treatment\nEffect", color = "black")
+x = 623
+ymin = 150
+ymax = ymin+120
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+```
+
+---
+
+# What if we had done a naive comparison?
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did +
+  annotate("text", x = as.Date("1992-11-23"), y = 20.75, label = "Naive\nTreatment\nEffect", color = "black") +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
+               color = viridis_pal()(2)[1], linetype = "dashed") +
+  annotate("text", x = as.Date("1992-05-05"), y = 20.25, label = "New Jersey counterfactual", color = viridis_pal()(2)[1])
+x = 623
+ymin = 150
+ymax = ymin+26
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+
+```
+
+---
+
+# What if we had done a naive comparison?
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did +
+  annotate("text", x = as.Date("1992-11-30"), y = 20.75, label = "Naive\nTreatment\nEffect", color = "black") +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
+               color = viridis_pal()(2)[1], linetype = "dashed") +
+  annotate("text", x = as.Date("1992-05-05"), y = 20.25, label = "New Jersey counterfactual", color = viridis_pal()(2)[1]) +
+  annotate("text", x = as.Date("1992-11-25"), y = 19.6, label = "Real\nTreatment\nEffect", color = "black") +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
+               color = "#FDE725FF", linetype = "dashed") +
+  annotate("text", x = as.Date("1992-05-05"), y = 19.2, label = "New Jersey counterfactual", color = viridis_pal()(2)[2])
+x = 635
+ymin = 150
+ymax = ymin+26
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+x = 623
+ymin = 150
+ymax = ymin+120
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+
+```
+
+---
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
