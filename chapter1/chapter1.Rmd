@@ -43,7 +43,6 @@ library(pander)
 library(ggthemes)
 library(maptools)
 library(knitr)
-
 ```
 
 
@@ -368,7 +367,7 @@ tm_shape(iris_map) +
 
 - Santé publique France has created a [simple web application](https://cpelat.shinyapps.io/mass/) to track the epidemiological situation in French regions per week
 
-.center[![Santé publique France](chapter_intro_files/figure-html/sante_publique_france.png)]
+.center[![Santé publique France](chapter1_files/figure-html/sante_publique_france.png)]
 
 ---
 
@@ -376,7 +375,7 @@ tm_shape(iris_map) +
 
 --
 
-* Most of the time you will be cleaning data
+* You will spend a lot of time preparing data for further analysis.
 
 * The `gapminder` dataset contains data on life expectancy, GDP per capita and population by country between 1952 and 2007.
 
@@ -389,7 +388,7 @@ tm_shape(iris_map) +
   # load gapminder package
 library(gapminder)
   # load the dataset in object gapminder
-gapminder = gapminder
+gapminder = gapminder::gapminder
   # display variables in the dataset
 names(gapminder)
   # show first 4 lines of this dataframe
@@ -402,7 +401,7 @@ head(gapminder,n = 4)
   # load gapminder package
 library(gapminder)
   # load the dataset in object gapminder
-gapminder = gapminder
+gapminder = gapminder::gapminder
   # display variables in the dataset
 names(gapminder)
   # show first 4 lines of this dataframe
@@ -500,7 +499,7 @@ library(gganimate)
 # anim_save(
 #   animation = gg,
 #   filename = "ex_gganimate.gif",
-#   path = "chapter_intro_files/figure-html",
+#   path = "chapter_in1les/figure-html",
 #   width = 9,
 #   height = 4,
 #   units = "in",
@@ -509,7 +508,7 @@ library(gganimate)
 # )
 ```
 
-.center[![Gapminder](chapter_intro_files/figure-html/ex_gganimate.gif)]
+.center[![Gapminder](chapter1_files/figure-html/ex_gganimate.gif)]
 
 .footnote[
 [1]: This animation is taken from [Ed Rubin](https://raw.githack.com/edrubin/EC421S19/master/LectureNotes/01Intro/01_intro.html#40).
@@ -565,7 +564,7 @@ background-size: 300pt
 # `RStudio` Layout
 
 ```{r, echo = F, out.width = "600px"}
-knitr::include_graphics("chapter_intro_files/figure-html/rstudio.png")
+knitr::include_graphics("chapter1_files/figure-html/rstudio.png")
 ```
 
 ---
@@ -829,7 +828,7 @@ class: inverse
 
 1. Create a total_percap variable:
     ```{r}
-    murders$total_percap = murders$total / murders$population * 10000
+    murders$total_percap = (murders$total / murders$population) * 10000
     ```
 
 Congratulations, you've created your first variable!
