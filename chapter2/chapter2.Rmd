@@ -36,8 +36,12 @@ knitr::opts_chunk$set(
 )
 
 library(knitr)
-library(learnr)
-
+library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
+# Quitting from lines 27-40 (chapter2.Rmd) 
+# Error: package or namespace load failed for 'learnr':
+#  .onAttach failed in attachNamespace() for 'learnr', details:
+#   call: NULL
+#   error: The shiny_prerendered_chunk function can only be called from within runtime: shiny_prerendered
 ```
 
 # Recap from Lecture 1
@@ -45,7 +49,7 @@ library(learnr)
 ## Add when lecture 1 is finalised
 
 ---
-
+  
 # Working With Data
 
 * Econometrics is about `data`.
