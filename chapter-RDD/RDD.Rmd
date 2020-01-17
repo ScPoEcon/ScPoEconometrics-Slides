@@ -43,6 +43,8 @@ overwrite = FALSE
 
 library(tidyverse)
 library(ggplot2)
+library(grid)
+library(pBrackets) 
 
   # set seed
 set.seed(1234)
@@ -57,7 +59,7 @@ layout: true
 
 # Regression Discontinuity Design (RDD)
 
-* We seen one "program evaluation" method in the last lecture: __difference-in-differences__.
+* We have seen one "program evaluation" method in the last lecture: __difference-in-differences__.
 
 --
 
@@ -89,7 +91,7 @@ layout: true
 
 ---
 
-# An Example: Immigrant Legalization and Crime
+# An Example: Immigrant Legalization and Crime => I wonder whether Mastering Metrics' example wouldn't be better (it's simple and it's actually a Sharp RDD)
 
 --
 
@@ -124,7 +126,7 @@ layout: true
 --
 
 ```{r, echo = F, out.width = "450px"}
-knitr::include_graphics("chapter_rdd_files/figure-html/quota_table.png")
+knitr::include_graphics("RDD_files/figure-html/quota_table.png")
 ```
 
 ---
@@ -153,13 +155,13 @@ knitr::include_graphics("chapter_rdd_files/figure-html/quota_table.png")
 
 ---
 
-# Graphical Results
+# Graphical Results => Should probably not be included since shows Fuzzy design
 
 .center[**Timing of Applications and Probability of Obtaining a Residence Permit for Two Lotteries in
 Milan and Bergamo**]
 
 ```{r, echo = F, out.width = "600px"}
-knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_examples.png")
+knitr::include_graphics("RDD_files/figure-html/pinotti_examples.png")
 ```
 
 ---
@@ -170,39 +172,41 @@ knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_examples.png")
 Application**]
 
 ```{r, echo = F, out.width = "1000px"}
-knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_results.png")
+knitr::include_graphics("RDD_files/figure-html/pinotti_results.png")
 ```
 
 ---
 
 # RDD Setup
 
-* Research question: effect of obtaining a legal status on an illegal immigrant's criminal behavior
+* *Research question:* effect of obtaining a legal status on an illegal immigrant's criminal behavior
 
 * __Treatment variable__: $D_t$
 
-* $D_t$ = 1 if permit is obtained, $D_t$ = 0 if not.
+  - $D_t$ = 1 if permit is obtained, $D_t$ = 0 if not.
 
-* $D_t$ is a function of the time at which immigrant's application is submitted, $t$.
+  - $D_t$ is a function of the time at which immigrant's application is submitted, $t$.
 
-* The cutoff time $c$ separates those who obtain the status and those who don't:
+* The __cutoff__ time $c$ separates those who obtain the status and those who don't:
   $$D_t = \begin{cases}\begin{array}{c}1\text{ if }t > c \\0\text{ if }t \leq c. \end{array}\end{cases}$$
 
-* __Running variable__: variable that determines treatmen, in this case $t$.
+* __Running variable__: variable that determines treatment, in this case $t$.
 
 ---
 
 # RDD features
 
-* Treatment status is a deterministic function of $t$.
+* Treatment status is a deterministic function of $t$ => we know the assignment rule
 
-* Treatment status is discontinuous function of $t$.
+* Treatment status is a discontinuous function of $t$ => there is some cutoff rule
 
 ## Two types of RDD
 
 * __Sharp RDD__: the running variable *fully* determines assignment to treatment.
 
 * __Fuzzy RDD__: the running variable *partially* determine assignement to treatment.
+
+We will only cover Sharp RDD in this course.
 
 ---
 
@@ -212,11 +216,11 @@ knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_results.png")
     $$CRIME_i = \alpha + \delta D_t + \beta t + \varepsilon_i,$$
   where $CRIME_i$ is the number of crimes committed, $D_t$ is the treatment dummy, and $t$ is the timing of the application.
   
-  $\rightarrow$ $\beta$ captures the **jump in crime** between illegal immigrants obtaining a status and those who don't.
+  $\rightarrow$ $\delta$ captures the **jump in crime** between illegal immigrants obtaining a status and those who don't.
     
 1. The RDD estimator exploits a discontinuity at $c$ in the conditional expectation function:
-    $$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$
-    where $\lim_{x\to c^+}$ means $x$ *approaches* $c$ *from above*.
+    $$\delta = \lim_{t \to c^+} E[CRIME_i^1|t = c] - \lim_{t \to c^-} E[CRIME_i^0|t = c]$$
+    where $\lim_{t\to c^+}$ means $t$ *approaches* $c$ *from above*.
     
 ---
 
@@ -229,14 +233,6 @@ knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_results.png")
 * Limited external validity => you cannot extrapolate to bigger treatments.
 
 * e.g. using the 21 year old alcohol restriction age in the RD context will only tell you the effect of this restriction on deaths but not the general effect of alcohol consumption.
-
----
-
-# More about RD
-
-* Unfortunately, not all cases are as straightforward as our example
-
-* Let's look at different cases.
 
 ---
 
