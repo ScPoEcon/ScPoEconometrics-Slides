@@ -345,6 +345,7 @@ hist(gapminder_2015$life_expectancy,
      border = "white")
 ```
 ]
+
 .pull-right[
 ```{r,fig.height=4.5,eval=TRUE,echo=FALSE}
 hist(gapminder_2015$life_expectancy, 
