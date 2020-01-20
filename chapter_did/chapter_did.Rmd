@@ -38,12 +38,12 @@ knitr::opts_chunk$set(
 library(emo)
 library(tidyverse)
 library(ggplot2)
-library(diffindiff)
 library(kableExtra)
 library(zoo)
 library(scales)
 library(grid)
 library(pBrackets)
+library(formattable)
 
   # set seed
 set.seed(1234)
@@ -55,7 +55,15 @@ layout: true
 
 ---
 
-# Difference-in-Differences (DiD)
+# Evaluation methods
+
+* Randomized control trials (RCTs) are the gold standard of causal identification
+
+--
+
+* In practice, RCTs are not always possible.
+
+--
 
 * Four main causal evaluation methods used in economics:
 
@@ -66,15 +74,39 @@ layout: true
 
 --
 
+* These methods are used to identify __causal relationships__ between treatments and outcomes.
+
+--
+
 * In this lecture, we will cover a popular and rigorous program evaluation method: __differences-in-differences__.
 
 --
 
-* Starting point as usual: subjects are not randomly allocated to treatment `r emo::ji("warning")`
+* Next week we will look at regression discontinuity designs.
+
+---
+
+# Difference-in-Differences (DiD)
+
+* Usual starting point: subjects are not randomly allocated to treatment `r emo::ji("warning")`
 
 --
 
-* In some cases though, possible existence of unobserved confounders
+## DiD Requirements:
+
+--
+
+* 2 time periods: before and after treatment
+
+--
+
+* 2 groups:
+  - control group: never receives treatment
+  - treatment group: initially untreated and then fully treated
+  
+--
+
+* Under certain assumptions, control group can be used as the counterfactual for treatment group  
 
 ---
 
@@ -94,7 +126,7 @@ layout: true
 
 --
 
-* Seminal [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
+* Seminal 1994 [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by prominent labor economists David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
 
 --
 
@@ -104,7 +136,7 @@ layout: true
 
 # Institutional Details
 
-* In the US, there is a national minimum wage, but states can depart from it 
+* In the US, there is a national minimum wage, but states can depart from it.
 
 --
 
@@ -112,77 +144,116 @@ layout: true
 
 --
 
-* Neighboring Pennsylvania does not change its minimum wage level. 
+* Neighboring Pennsylvania did not change its minimum wage level.
+
 --
 
-__Map of establishments?__
-
-```{r, echo = F, out.width = "450px"}
-knitr::include_graphics("chapter_did_files/figure-html/quota_table.png")
+```{r, echo = F, out.width = "600px"}
+knitr::include_graphics("chapter_did_files/figure-html/nj_penn_map.png")
 ```
 
 ---
 
-# Institutional Details
+# Card and Krueger (1994): Methodology
 
 * Surveyed 410 fast-food establishments in New Jersey (NJ) and eastern Pennsylvania
 
 * Timing:
   - Survey before NJ MW increase: Feb/March 1992
   - Survey after NJ MW increase: Nov/Dec 1992
+  
+* What comparisons do you think they did?
 
+## Card and Krueger's data: `diffindiff` package
 
-__Timeline graph?__
-
-## Diff-in-Diff Feature
-
-
-```{r, echo = FALSE, eval = FALSE}
-ggplot(cardkrueger, aes(x=wage_st, fill = state)) + geom_histogram(aes(y=c(..count..[..group..== 1]/sum(..count..[..group..== 1]), ..count..[..group..== 2]/sum(..count..[..group..== 2]))), binwidth=0.1, colour="black", position="dodge") + facet_wrap(~ observation) + theme_bw() + scale_y_continuous(labels = scales::percent)
+* Let's take a closer at their data
+```{r, echo = TRUE, eval = TRUE}
+  # install package that contains the cleaned data
+remotes::install_github("b-rodrigues/diffindiff")
+  # load package
+library(diffindiff)
+  # load data
+ck1994 <- njmin
 ```
-
-* What assumption is necessary for the comparison to be valid?
-
---
-
-* `r emo::ji("point_right")` This is a difference-in-differences!
 
 ---
 
-# Graphical Results
+class: inverse
 
-.center[**Timing of Applications and Probability of Obtaining a Residence Permit for Two Lotteries in
-Milan and Bergamo**]
+# Task 1 (10 minutes)
 
-```{r, echo = FALSE}
-ck_mw <- tibble(
+* Take a look at the dataset and list the variables.
+
+* Keep only the following variables: `state`, `region`, `observation`, `empft`, `emppt`, `wage_st`, `pctaff`.
+
+* Tabulate the number of stores by `state` and by survey wage (`observation`). Does it match what's in Table 1 of the paper?
+
+* Create a variable called `empfte` equal to `empft` + 0.5*`emppt` + `nmgrs`. `empft` and `emppt` correspond respectively to the number of full-time and part-time employees. `nmgrs` corresponds to the number of managers. This is how Card and Krueger compute full-time equivalent (FTE) employment variable (p.775 of the paper).
+
+* Create two other variables: (i) percentage of full-time (FT) employees, (ii) percentage of part-time (PT) employees.
+
+
+* Compute the average number of FTE employment, average percentage of FT employees, average PT employees and average starting wave (`wage_st`) by state and by survey wage. Compare your results with Table 2 of the paper.
+
+---
+
+# Card and Krueger DiD: Tabular Results
+
+.center[__Average Employment Per Store Before and After the Rise in NJ Minimum Wage__]
+```{r, echo = FALSE, eval = TRUE}
+# create average of FTE employment by state by survey wage
+ck1994 <- ck1994 %>%
+  mutate(empfte = empft + 0.5*emppt + nmgrs) %>%
+  group_by(state,observation) %>%
+  summarise(mean_fte = mean(empfte, na.rm = T))
+# change to data.frame format
+ck1994 <- as.data.frame(ck1994)
+
+# recode ck1994 to look nice
+ck_mw <- data.frame(
   Variable = c("FTE employment before","FTE employment after","Change in mean FTE
 employment"),
-  PA = c(23.33,21.17,-2.16),
-  NJ = c(20.44,21.03,0.59)
-)
-knitr::kable(as.data.frame(ck_mw))
-# knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_examples.png")
+  PA = c(
+    ck1994[ck1994$state == "Pennsylvania" & ck1994$observation == "February 1992", "mean_fte"],
+    ck1994[ck1994$state == "Pennsylvania" & ck1994$observation == "November 1992", "mean_fte"],
+    ck1994[ck1994$state == "Pennsylvania" & ck1994$observation == "November 1992", "mean_fte"] -
+      ck1994[ck1994$state == "Pennsylvania" & ck1994$observation == "February 1992", "mean_fte"]),
+  NJ = c(
+    ck1994[ck1994$state == "New Jersey" & ck1994$observation == "February 1992", "mean_fte"],
+    ck1994[ck1994$state == "New Jersey" & ck1994$observation == "November 1992", "mean_fte"],
+    ck1994[ck1994$state == "New Jersey" & ck1994$observation == "November 1992", "mean_fte"] -
+      ck1994[ck1994$state == "New Jersey" & ck1994$observation == "February 1992", "mean_fte"]))
+
+# present in table form
+ck_mw %>%
+  mutate(
+    PA = round(PA, 2),
+    NJ = round(NJ, 2)
+  ) %>%
+  mutate(
+    PA = ifelse(PA<0,
+                cell_spec(PA, "html", background = viridis_pal()(2)[2], color = "white", bold = T, align = "c"),
+                cell_spec(PA, "html", background = NULL, color = NULL, align = "c")),
+    NJ = ifelse(NJ<1,
+                cell_spec(NJ, "html", background = viridis_pal()(2)[1], color = "white", bold = T, align = "center"),
+                cell_spec(NJ, "html", background = NULL, color = NULL, align = "c"))
+  ) %>%
+  kable(format = "html", digits = 2, escape = F,
+        col.names = c("Variables", "Pennsylvania", "New Jersey")) %>%
+  kable_styling("striped", full_width = F)
 ```
 
----
 
-# Graphical Results
+## DiD Estimate
 
-.center[**Number of Crimes per Applicant Before and After Click Days, Conditional on the Timing of
-Application**]
+Differences-in-differences causal estimate: 0.59 - 2.17 = __2.76__!
 
-```{r, echo = F, out.width = "1000px"}
-knitr::include_graphics("chapter_rdd_files/figure-html/pinotti_results.png")
-```
+=> Interpretation: the minimum wage increase led to an __increase__ in FTE employment per store of 2.76 on average.
 
-$$
-\begin{aligned}
-\gamma_{DD} & = (Y_{NJ,nov92} - Y_{NJ,feb92}) - (Y_{PA,nov92} - Y_{PA,feb92}) \\
-              & = (21.03 - 20.44) - (21.17 - 23.33) \\
-              & = 2.76
-\end{aligned}
-$$
+Yes the essence of differences-in-differences is _that_ simple! `r emo::ji("grinning")`
+
+Let's look at these results graphically.
+
 ---
 
 # DiD Graphically
@@ -233,7 +304,7 @@ gg_did_graph
 gg_did2 <- gg_did_graph +
   geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
                color = "#FDE725FF", linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-10"), y = 19, label = "New Jersey counterfactual", color = viridis_pal()(2)[2])
+  annotate("label", x = as.Date("1992-05-10"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 6)
 gg_did2
 ```
 
@@ -243,7 +314,7 @@ gg_did2
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did2 +
-  annotate("text", x = as.Date("1992-11-23"), y = 19.7, label = "Treatment\nEffect", color = "black")
+  annotate("text", x = as.Date("1992-11-26"), y = 19.7, label = "Treatment\nEffect", color = "black", size = 6)
 x = 623
 ymin = 150
 ymax = ymin+114
@@ -260,13 +331,13 @@ grid.brackets(x,
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_graph +
-  annotate("text", x = as.Date("1992-11-23"), y = 20.75, label = "Naive\nTreatment\nEffect", color = "black") +
+  annotate("text", x = as.Date("1992-11-26"), y = 20.9, label = "Naive\nTreatment\nEffect", color = "black", size = 6) +
   geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
                color = viridis_pal()(2)[1], linetype = "dashed") +
-  annotate("text", x = as.Date("1992-05-05"), y = 20.25, label = "New Jersey counterfactual", color = viridis_pal()(2)[1])
+  annotate("label", x = as.Date("1992-06-08"), y = 20.1, label = "Naive New Jersey counterfactual", color = viridis_pal()(2)[1], size = 6)
 x = 623
 ymin = 150
-ymax = ymin+28
+ymax = ymin+24
 grid.brackets(x,
               ymin,
               x,
@@ -281,17 +352,17 @@ grid.brackets(x,
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_graph +
-  annotate("text", x = as.Date("1992-11-30"), y = 20.75, label = "Naive\nTreatment\nEffect", color = "black") +
+  annotate("text", x = as.Date("1992-11-26"), y = 21.1, label = "Naive\nTreatment\nEffect", color = "black", size = 5) +
   geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
                color = viridis_pal()(2)[1], linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-05"), y = 20.25, label = "New Jersey counterfactual", color = viridis_pal()(2)[1]) +
-  annotate("text", x = as.Date("1992-11-25"), y = 19.6, label = "Real\nTreatment\nEffect", color = "black") +
+  annotate("label", x = as.Date("1992-06-15"), y = 20.1, label = "Naive New Jersey counterfactual", color = viridis_pal()(2)[1], size = 5) +
+  annotate("text", x = as.Date("1992-11-26"), y = 19.45, label = "Real\nTreatment\nEffect", color = "black", size = 5) +
   geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
                color = "#FDE725FF", linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-05"), y = 19.2, label = "New Jersey counterfactual", color = viridis_pal()(2)[2])
+  annotate("label", x = as.Date("1992-05-20"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 5)
 x = 635
 ymin = 150
-ymax = ymin+26
+ymax = ymin+24
 grid.brackets(x,
               ymin,
               x,
@@ -299,7 +370,7 @@ grid.brackets(x,
               h = 0.05, lwd=1, col="black")
 x = 623
 ymin = 150
-ymax = ymin+120
+ymax = ymin+114
 grid.brackets(x,
               ymin,
               x,
@@ -310,17 +381,35 @@ grid.brackets(x,
 
 ---
 
-# Assumptions
+# DiD Crucial Assumption: Parallel Trends
 
-* __common or parallel trends__: Is Pennsylvania a good comparison state for New Jersey? Did employment in fast-food establishments follow a similar trend in the past?
+* __common or parallel trends__: Absent any minimum wage increase, would Pennsylvania's fast-food employment trend have been what we should have expected to see in New Jersey?
 
-* In this paper, there is only one data point before the policy change and one data point after.
+* Impossible to completely validate or invalidate this assumption.
 
-* In many other cases, it is possible to evaluate how similar the treatment and control groups are prior to the change
+* *Intuitive check:* compare trends before policy change (after change if no expected medium-term effects)
 
 ---
 
-# Parallel trends assumption
+#  Parallel Trends: Graphically
+
+```{r, echo = FALSE, eval = TRUE}
+gg_did_graph <- gg_did +
+  geom_point(size = 3) +
+  geom_line() +
+  annotate("label", x = as.Date("1992-05-15"), y = 23, label = "Pennsylvania", color = viridis_pal()(2)[2], size = 6) +
+  annotate("label", x = as.Date("1992-05-01"), y = 21, label = "New Jersey", color = viridis_pal()(2)[1], size = 6)
+gg_did_graph
+```
+
+* the parallel trend is about what happens between period 1 and 2, the pre-period evolution is a common trend assumption check!
+
+* graph with possible what would have happened absent policy changes in NJ showing the bias is ATE
+
+---
+
+# Checking the parallel trends assumption
+
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend <- ggplot(ck_mw, aes(x = date, y = fte_emp, color = state)) +
@@ -416,6 +505,79 @@ gg_did_trend_notval +
   geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"] + 1.35), color = "#440154FF", linetype = "dashed")
   
 ```
+
+---
+
+# DiD in Regression Form
+
+* In practice, DiD are usually estimated on more than 2 periods (4 observations)
+
+* There are more data points before and after the policy change
+
+3 ingredients:
+
+1. __Treatment dummy variable__: $TREAT_s$ where the $s$ subscript reminds us that the treatment is at the state level
+
+1. __Post-treatment periods dummy variables__: $POST_t$ where the $t$ subscript reminds us that this variable varies over time
+
+1. __Interaction term between the two__: $TREAT_s \times POST_t$ => the ***coefficient on this term is the DiD causal effect***!
+
+---
+
+# DiD in Regression Form
+
+__Treatment dummy variable__
+$$
+TREAT_s = \begin{cases}\begin{array}{lcl}
+0 \quad \text{if } s = \text{New Jersey} \\\
+1 \quad \text{if } s = \text{Pennsylvania}
+\end{array}\end{cases}
+$$
+
+--
+
+__Post-treatment periods dummy variables__
+$$
+POST_t = \begin{cases}\begin{array}{lcl}
+0 \quad \text{if } t < \text{April 1, 1992} \\\
+1 \quad \text{if } t \geq \text{April 1, 1992}
+\end{array}\end{cases}
+$$
+
+--
+
+__Which observations correspond to $TREAT_s \times POST_t$?__
+
+--
+
+* Let's put all these ingredients together:
+$$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta_{DiD} (TREAT_s \times POST_t) + \varepsilon_{st}$$
+
+* $\delta_{DiD}$: causal effect of the minimum wage increase on employment
+
+---
+
+# Understanding the Regression
+
+* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \alpha$
+
+* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1) = \alpha + \gamma$
+
+* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0) = \alpha + \beta$
+
+* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1) = \alpha + \beta + \gamma + \delta$
+
+$$(\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0)) - \\
+\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \delta$$
+
+
+---
+
+# Multi-period DiD: Relaxing Common Trends Assumption
+
+* When we have data on many years and many states we can relax the common trends assumption
+
+$$EMP_{st} = \alpha + \delta_{DiD} MW_st + \sum_{k=Alaska}^{Wyoming} \beta_k STATE_{kt} + \sum_{j=1985}^{1999} \gamma_j YEAR_{jt} + \varepsilon_{st}$$
 
 ---
 class: title-slide-final, middle
