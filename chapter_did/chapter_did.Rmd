@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Differences-in-Differences"
-author: "Gustave Kenedi"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -243,14 +243,21 @@ ck_mw %>%
   kable_styling("striped", full_width = F)
 ```
 
+--
 
 ## DiD Estimate
 
-Differences-in-differences causal estimate: 0.59 - 2.17 = __2.76__!
+Differences-in-differences causal estimate: 0.59 - 2.17 = __2.76__
+
+--
 
 => Interpretation: the minimum wage increase led to an __increase__ in FTE employment per store of 2.76 on average.
 
+--
+
 Yes the essence of differences-in-differences is _that_ simple! `r emo::ji("grinning")`
+
+--
 
 Let's look at these results graphically.
 
@@ -383,28 +390,25 @@ grid.brackets(x,
 
 # DiD Crucial Assumption: Parallel Trends
 
-* __common or parallel trends__: Absent any minimum wage increase, would Pennsylvania's fast-food employment trend have been what we should have expected to see in New Jersey?
+* __Common or parallel trends__: Absent any minimum wage increase, would Pennsylvania's fast-food employment trend have been what we should have expected to see in New Jersey?
+
+--
+
+* This assumption states that Pennsylvania's fast-food employment trend between February and November 1992 provides a reliable counterfactual employment trend New Jersey's fast-food industry *would have experienced* had New Jersey not increased its minimum wage.
+
+--
 
 * Impossible to completely validate or invalidate this assumption.
 
-* *Intuitive check:* compare trends before policy change (after change if no expected medium-term effects)
+* *Intuitive check:* compare trends before policy change (and after policy change if no expected medium-term effects)
 
 ---
 
 #  Parallel Trends: Graphically
 
-```{r, echo = FALSE, eval = TRUE}
-gg_did_graph <- gg_did +
-  geom_point(size = 3) +
-  geom_line() +
-  annotate("label", x = as.Date("1992-05-15"), y = 23, label = "Pennsylvania", color = viridis_pal()(2)[2], size = 6) +
-  annotate("label", x = as.Date("1992-05-01"), y = 21, label = "New Jersey", color = viridis_pal()(2)[1], size = 6)
-gg_did_graph
+```{r, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
+gg_did2
 ```
-
-* the parallel trend is about what happens between period 1 and 2, the pre-period evolution is a common trend assumption check!
-
-* graph with possible what would have happened absent policy changes in NJ showing the bias is ATE
 
 ---
 
@@ -436,7 +440,7 @@ gg_did_trend +
 
 ---
 
-# Parallel trends assumption
+# Checking the parallel trends assumption
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend +
@@ -503,16 +507,47 @@ gg_did_trend_notval +
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_notval + 
   geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"] + 1.35), color = "#440154FF", linetype = "dashed")
-  
+```
+
+---
+
+# Parallel trends assumption => Not verified `r emo::ji("x")`
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did_trend_notval + 
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"] + 1.35), color = "#440154FF", linetype = "dashed") +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
+               color = "#FDE725FF", linetype = "dashed") +
+  annotate("label", x = as.Date("1992-05-20"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 5) +
+  annotate("text", x = as.Date("1992-11-28"), y = 19.45, label = "DiD\nTreatment\nEffect", color = "black", size = 5) +
+  annotate("text", x = as.Date("1992-11-28"), y = 21.6, label = "Real\nTreatment\nEffect", color = "black", size = 5)
+x = 640
+ymin = 117
+ymax = ymin+32
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+x = 640
+ymin = 150
+ymax = ymin+114
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
 ```
 
 ---
 
 # DiD in Regression Form
 
-* In practice, DiD are usually estimated on more than 2 periods (4 observations)
+* In practice, DiD is usually estimated on more than 2 periods (4 observations)
 
 * There are more data points before and after the policy change
+
+--
 
 3 ingredients:
 
@@ -529,8 +564,8 @@ gg_did_trend_notval +
 __Treatment dummy variable__
 $$
 TREAT_s = \begin{cases}\begin{array}{lcl}
-0 \quad \text{if } s = \text{New Jersey} \\\
-1 \quad \text{if } s = \text{Pennsylvania}
+0 \quad \text{if } s = \text{Pennsylvania} \\\
+1 \quad \text{if } s = \text{New Jersey}
 \end{array}\end{cases}
 $$
 
@@ -559,25 +594,63 @@ $$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta_{DiD} (TREAT_s \tim
 
 # Understanding the Regression
 
-* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \alpha$
+$$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta_{DiD} (TREAT_s \times POST_t) + \varepsilon_{st}$$
 
-* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1) = \alpha + \gamma$
+--
 
-* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0) = \alpha + \beta$
+We have the following:
 
-* $\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1) = \alpha + \beta + \gamma + \delta$
+--
 
-$$(\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0)) - \\
-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \delta$$
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \alpha$
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1) = \alpha + \gamma$
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0) = \alpha + \beta$
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1) = \alpha + \beta + \gamma + \delta$
+
+--
+
+$$[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0)] - \\
+[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0)] = \delta$$
 
 
 ---
 
-# Multi-period DiD: Relaxing Common Trends Assumption
+class: inverse
+
+# Task 2 (10 minutes)
+
+* Create a dummy variable, `treat`, equal to 0 if `state` is Pennsylvania and 1 if New Jersey.
+
+* Create a dummy variable, `post`, equal to 0 if `observation` is February 1992 and 1 otherwise.
+
+* Estimate the following regression model using the `lm` function:
+
+$$empfte_{st} = \alpha + \beta treat_s + \gamma post_t + \delta_{DiD} (treat_s \times post_t) + \varepsilon_{st}$$
+
+* Do you obtain the same results as before?
+
+---
+
+# Multi-period DiD: Relaxing Common Trends Assumption => Too much?
 
 * When we have data on many years and many states we can relax the common trends assumption
 
 $$EMP_{st} = \alpha + \delta_{DiD} MW_st + \sum_{k=Alaska}^{Wyoming} \beta_k STATE_{kt} + \sum_{j=1985}^{1999} \gamma_j YEAR_{jt} + \varepsilon_{st}$$
+
+---
+
+# Clustered Standard Errors => Too much?
+
+
 
 ---
 class: title-slide-final, middle
