@@ -5,6 +5,7 @@ author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "Sciences Po Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
@@ -150,11 +151,11 @@ As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-E
 
 --
 
-2. There will be ***two take home exams / case studies*** => 60%
+1. There will be ***two take home exams / case studies*** => 60%
 
 --
 
-3. There will be _no_ final exam `r emo::ji("sweat_smile")`.
+1. There will be _no_ final exam `r emo::ji("sweat_smile")`.
 
 ---
 
@@ -361,7 +362,7 @@ tm_shape(iris_map) +
 
 ---
 
-# Showcase 2: Interactive web applications
+# Showcase #2: Interactive web applications
 
 --
 
@@ -376,6 +377,8 @@ tm_shape(iris_map) +
 --
 
 * You will spend a lot of time preparing data for further analysis.
+
+--
 
 * The `gapminder` dataset contains data on life expectancy, GDP per capita and population by country between 1952 and 2007.
 
@@ -449,9 +452,9 @@ ggplot(data = gapminder_dplyr,
                      color = continent,
                      size = count)) +
   geom_point(alpha = 1/3) +
-  xlab("Average life expectancy") +
-  ylab("Average GDP per capita") +
-  labs(color = "Continent",
+  labs(x = "Average life expectancy",
+       y = "Average GDP per capita",
+       color = "Continent",
        size = "Nb of countries")
 ```
 ]
@@ -464,9 +467,9 @@ ggplot(data = gapminder_dplyr,
                      color = continent,
                      size = count)) +
   geom_point(alpha = 1/3) +
-  xlab("Average life expectancy") +
-  ylab("Average GDP per capita") +
-  labs(color = "Continent",
+  labs(x = "Average life expectancy",
+       y = "Average GDP per capita",
+       color = "Continent",
        size = "Nb of countries")
 ```
 ]
@@ -553,9 +556,13 @@ background-size: 300pt
 
 * `RStudio`: an integrated development environment (IDE) to work with `R`.
 
+--
+
 * *command*: user input (text or numbers) that `R` *understands*.
 
 * *script*: a list of commands collected in a text file, each separated by a new line, to be run one after the other.
+
+--
 
 * To run a script, you need to highlight the relevant code lines and hit `Ctrl`+`Enter` (Windows) or `Cmd`+`Enter` (Mac).
 
@@ -573,7 +580,7 @@ knitr::include_graphics("chapter1_files/figure-html/rstudio.png")
 
 .pull-left[
 
-* You can use the R console like a calculator
+* You can use the `R` console like a calculator
 
 * Just type an arithmetic operation after `>` and hit `Enter`!
 
@@ -601,7 +608,7 @@ class: inverse
 
 # Task 1 (5 minutes)
 
-* Create a new R script (File -> New File -> R Script). Save it somewhere as `lecture_intro.R`.
+* Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
 
 * Write in your script and run the following code: (`Ctrl` or `Cmd` + `Enter`)
     ```{r, eval = F}
@@ -610,7 +617,7 @@ class: inverse
 
 * Write in your script and run the following code. What happens if you only run the first line of the code?
     ```{r, eval = F}
-    x = 5
+    x = 5 # equivalently x <- 5
     x
     ```
 
