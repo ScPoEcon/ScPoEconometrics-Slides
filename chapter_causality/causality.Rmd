@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Intro To Causality"
-author: "Florian Oswald"
+author: "F. Oswald, G. Kennedy and P. Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -41,6 +41,7 @@ lowtop = c(om[1],om[2],0.1,om[4])
 
 overwrite = FALSE
 
+library(emo)
 ```
 
 layout: true
@@ -48,6 +49,31 @@ layout: true
 <div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
 ---
+
+
+# Recap from from past Lectures and plan for this session
+
+Recap of past session
+
+* Simple linear model (model, interpretation of coefficients)
+
+* R knowledge : run an OLS regression
+
+
+Plan 
+
+* Causality versus correlation
+
+* The Potential Outcome Model
+
+* Randomized experiments
+
+* Follow up : the case of **class size** and **students performance** 
+
+* Back to models 
+
+---
+
 
 # Packages used in this set of slides
 
@@ -261,8 +287,6 @@ layout: true
 
 - So if we find someone, Gareth, with `X=0` and they have `Y=9`, is that because `X` increases `Y`, or is that just because Angela and Gareth would have had different `Y`s anyway?
 
-- `r emo::ji("thinking")`
-
 ---
 
 
@@ -285,8 +309,6 @@ layout: false
 class: title-slide-section-red, middle
 
 # Experiments
-
-
 
 ---
 layout: true
@@ -322,6 +344,211 @@ layout: true
 
 ---
 
+# Back to class size and students' achievements
+
+In past session we regress some average student standardized score on class size. 
+
+$$\textrm{avg_math_score}_i = b_0 + b_1 \textrm{class_size}_i + e_i$$
+Do you think $b_1$ is measuring the causal impact of class size on students' math score? If not, why ? 
+
+--
+
+* Students sorting : There is selection into schools with different sized classes. Suppose parents have a prior that smaller classes are better - they will try to get their kids into those schools.
+
+--
+
+* Teachers sorting : teachers could sort towards schools with smaller classes because it’s easier to teach a small rather than a large class, and if there is competition for those places and higher quality teachers will have an advantage.
+
+--
+
+If you were asked to think of an experiment that captures the influence of class size on student performance, what would it be? 
+
+---
+
+# The STAR Experiment (1/5)
+(Tennessee Student/Teacher Achievement Ratio Experiment)
+
+* Starting in 1985-1986 and lasting for four years, young pupils starting Kindergarden and their teachers where randomly allocated to to several possible groups : 
+
+1. Small classes with 13-17 students
+2. Regular classes with 22-25 students
+3. Regular classes with 22-25 students but with an additional full-time teaching aide.
+
+* Randomization at the school level (i.e. students and teachers of a given school are randomized across class types)
+
+* Let's take their data and replicate some of the experimental findings!
+
+---
+
+# Implementing STAR (2/5)
+
+Load the data from the `AER` package
+```{r}
+data("STAR", package = "AER")
+library(data.table)
+x = as.data.table(STAR)
+```
+
+```{r, echo = FALSE}
+x[, ID := 1:nrow(x)]  # add student ID
+
+# `melt` a data.table means to dissolve it and reassamble for some ID variables
+mx = melt.data.table(x, 
+                     id = c("ID","gender","ethnicity","birth"), 
+                     measure.vars = patterns("star*","read*","math*", "schoolid*",
+                                             "degree*","experience*","tethnicity*","lunch*"), 
+                     value.name = c("classtype","read","math","schoolid","degree",
+                                    "experience","tethniticy","lunch"),
+                     variable.name = "grade")
+
+levels(mx$grade) <- c("stark","star1","star2","star3")  # reassign levels to grade factor
+#mx[,1:8]  # show first 8 cols
+
+mx = mx[complete.cases(mx)]
+#mx[ID==2]  # here is pupil number 2
+```
+
+---
+
+# Implementing STAR (3/5)
+
+Standardizing grades
+
+.pull-left[
+
+```{r echo = FALSE,fig.height=5.5, results="hide"}
+#mx[,range(read)]
+#mx[,range(math)]
+
+setkey(mx, classtype)  # key mx by class type
+ecdfs = mx[classtype != "small",        # subset data.table to this
+    list(readcdf = list(ecdf(read)),    # create cols readcdf and mathcdf
+         mathcdf = list(ecdf(math))
+         ),
+         by = grade]    # by grade
+
+# let's look at those cdf!
+om = par("mar")
+par(mfcol=c(4,2),mar = c(2,om[2],2.5,om[4]))
+ecdfs[,.SD[,plot(mathcdf[[1]],main = paste("math ecdf grade",.BY))],by = grade]
+ecdfs[,.SD[,plot(readcdf[[1]],main = paste("read ecdf grade",.BY))],by = grade]
+
+par(mfcol=c(1,1),mar = om)
+
+# <p style="text-align: center;"> Empirical Cumulative Distribution Function of scores </p>
+
+```
+
+]
+
+--
+
+.pull-right[
+
+* Those graphs are **Empirical Cumulative Distribution Functions** : it gives the ranking - between 0 and 1 - associated to a given score. 
+
+* What is the median of the "read score" in 3rd grade?
+
+* Why don't we use the raw scores directly? 
+
+]
+
+---
+
+# Implementing STAR (4/5)
+
+Comparing the achievments between each group : **Graphical analysis**
+
+.pull-left[
+
+```{r echo = FALSE, fig.height=5, fig.width=6.5}
+setkey(ecdfs, grade)  # key ecdfs according to `grade`
+setkey(mx,grade)
+
+z = mx[ , list(ID,perc_read = ecdfs[(.BY),readcdf][[1]](read),
+               perc_math = ecdfs[(.BY),mathcdf][[1]](math)),
+        by=grade]   # stick `grade` into `ecdfs` as `.BY`
+
+z[,score := rowMeans(.SD)*100, .SDcols = c("perc_read","perc_math")]  # take average of scores
+# and multiply by 100, so it's comparable to Krueger
+
+# merge back into main data
+mxz = merge(mx,z,by = c("grade","ID"))
+
+# make a plot
+ggplot(data = mxz, mapping = aes(x = score,color=classtype)) + geom_density() + facet_wrap(~grade) + theme_bw()
+```
+]
+
+--
+
+.pull-right[
+
+* We first construct a global ranking based on both read and math score's ranking of student $i$ :
+
+$$\textrm{Final score}_i = 100*\frac{Rank^{read}_{i}+Rank^{read}_{i}}{2}$$
+
+* We compare the density function between each experimental group for the kindergarden and grade 1 to 3. 
+
+* Which group seems to be the most successful? 
+
+]
+
+---
+
+# Implementing STAR (5/5)
+
+Comparing the achievments between each group : **Regressions**
+
+The model we estimate : $Y_{i} = b_0 + b_1\textrm{SMALL}_{i} + b_2 \textrm{REG&A}_{i} + e_i$
+
+.pull-left[
+
+```{r echo = FALSE}
+# create Krueger's dummy variables
+mxz =  as_tibble(mxz) %>%
+    mutate(small = classtype == "small",
+           rega  = classtype == "regular+aide",
+           girl  = gender == "female",
+           freelunch = lunch == "free")
+
+# reproduce columns 1 in Kruger
+m1 = mxz %>% 
+    group_by(grade) %>%
+    do(model = lm(score ~ small + rega, data = .))
+
+h = list()
+
+h <- huxtable::huxreg("K" = subset(m1,grade == "stark")$model[[1]],
+                      "1" = subset(m1,grade == "star1")$model[[1]],
+                      "2" = subset(m1,grade == "star2")$model[[1]],
+                      "3" = subset(m1,grade == "star3")$model[[1]],
+                      statistics = c(N = "nobs", R2 = "r.squared"),
+                      number_format = 2, 
+                      stars = NULL, 
+                      bold_signif = 0.01
+                      ) %>% 
+  huxtable::theme_article() %>%
+  huxtable::set_caption("Estimates for each grade") %>%
+  huxtable::set_font_size(12) %>%
+  huxtable::set_top_border(8, 1:5, 2)
+h
+```
+]
+
+--
+
+.pull-right[
+
+* Based on these results, would you advise to reduce class size or provide additional teaching aide? 
+
+* What is the value of $b_1$ for grade3? Interpret this value.
+
+* What are the limits of such an experiment? 
+
+]
+---
+
 # Models
 
 - In causal inference, the *model* is our idea of what we think the process is that *generated the data*.
@@ -340,7 +567,7 @@ layout: true
 
 - Yeah, but it's impossible to skip!
 
-- We're trying to predict something that hasn't happened - a counterfactual.
+- We're trying to predict something tat hasn't happened - a counterfactual.
 
 - This is literally impossible to do if you don't have some model of how the data is generated.
 
