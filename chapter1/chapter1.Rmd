@@ -701,7 +701,7 @@ class: inverse
 
 ---
 
-# Vectors => Comment: if you think this lecture up until now lasts more than 2 hours, I would be in favor of moving the rest of this lecture to Lecture 2/3.
+# Vectors
 
 * What *is* a **vector**?
 
