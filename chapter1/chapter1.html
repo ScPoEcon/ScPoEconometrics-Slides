@@ -3,7 +3,7 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Gustave Kenedi" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
@@ -15,8 +15,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Introduction
-### Gustave Kenedi
-### Sciences Po Paris </br> 2020-01-15
+### Florian Oswald, Gustave Kenedi and Pierre Villedieu
+### Sciences Po Paris </br> 2020-01-23
 
 ---
 
@@ -134,11 +134,11 @@ As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-E
 
 --
 
-2. There will be ***two take home exams / case studies*** =&gt; 60%
+1. There will be ***two take home exams / case studies*** =&gt; 60%
 
 --
 
-3. There will be _no_ final exam 😅.
+1. There will be _no_ final exam 😅.
 
 ---
 
@@ -308,7 +308,7 @@ layout: true
 ```r
 library(sf)
 library(tmap)
-iris_shfl &lt;- read_sf("chapter_intro_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %&gt;%
+iris_shfl &lt;- read_sf("chapter1_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %&gt;%
   mutate(dep = substr(INSEE_COM,1,2)) %&gt;%
   select(CODE_IRIS, dep, geometry) %&gt;%
   filter(dep == "75")
@@ -329,18 +329,18 @@ tm_shape(iris_map) +
 
 * Can be improved but you get this with only __13 lines of code!__
 
-&lt;img src="chapter_intro_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter1_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
 
-# Showcase 2: Interactive web applications
+# Showcase #2: Interactive web applications
 
 --
 
 - Santé publique France has created a [simple web application](https://cpelat.shinyapps.io/mass/) to track the epidemiological situation in French regions per week
 
-.center[![Santé publique France](chapter_intro_files/figure-html/sante_publique_france.png)]
+.center[![Santé publique France](chapter1_files/figure-html/sante_publique_france.png)]
 
 ---
 
@@ -348,7 +348,9 @@ tm_shape(iris_map) +
 
 --
 
-* Most of the time you will be cleaning data
+* You will spend a lot of time preparing data for further analysis.
+
+--
 
 * The `gapminder` dataset contains data on life expectancy, GDP per capita and population by country between 1952 and 2007.
 
@@ -362,7 +364,7 @@ tm_shape(iris_map) +
   # load gapminder package
 library(gapminder)
   # load the dataset in object gapminder
-gapminder = gapminder
+gapminder = gapminder::gapminder
   # display variables in the dataset
 names(gapminder)
   # show first 4 lines of this dataframe
@@ -442,15 +444,15 @@ ggplot(data = gapminder_dplyr,
                      color = continent,
                      size = count)) +
   geom_point(alpha = 1/3) +
-  xlab("Average life expectancy") +
-  ylab("Average GDP per capita") +
-  labs(color = "Continent",
+  labs(x = "Average life expectancy",
+       y = "Average GDP per capita",
+       color = "Continent",
        size = "Nb of countries")
 ```
 ]
 
 .pull-right[
-&lt;img src="chapter_intro_files/figure-html/fig.h-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter1_files/figure-html/fig.h-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -459,7 +461,7 @@ ggplot(data = gapminder_dplyr,
 
 
 
-.center[![Gapminder](chapter_intro_files/figure-html/ex_gganimate.gif)]
+.center[![Gapminder](chapter1_files/figure-html/ex_gganimate.gif)]
 
 .footnote[
 [1]: This animation is taken from [Ed Rubin](https://raw.githack.com/edrubin/EC421S19/master/LectureNotes/01Intro/01_intro.html#40).
@@ -504,9 +506,13 @@ background-size: 300pt
 
 * `RStudio`: an integrated development environment (IDE) to work with `R`.
 
+--
+
 * *command*: user input (text or numbers) that `R` *understands*.
 
 * *script*: a list of commands collected in a text file, each separated by a new line, to be run one after the other.
+
+--
 
 * To run a script, you need to highlight the relevant code lines and hit `Ctrl`+`Enter` (Windows) or `Cmd`+`Enter` (Mac).
 
@@ -514,7 +520,7 @@ background-size: 300pt
 
 # `RStudio` Layout
 
-&lt;img src="chapter_intro_files/figure-html/rstudio.png" width="600px" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter1_files/figure-html/rstudio.png" width="600px" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -522,7 +528,7 @@ background-size: 300pt
 
 .pull-left[
 
-* You can use the R console like a calculator
+* You can use the `R` console like a calculator
 
 * Just type an arithmetic operation after `&gt;` and hit `Enter`!
 
@@ -570,7 +576,7 @@ class: inverse
 
 # Task 1 (5 minutes)
 
-* Create a new R script (File -&gt; New File -&gt; R Script). Save it somewhere as `lecture_intro.R`.
+* Create a new R script (File `\(\rightarrow\)` New File `\(\rightarrow\)` R Script). Save it somewhere as `lecture_intro.R`.
 
 * Write in your script and run the following code: (`Ctrl` or `Cmd` + `Enter`)
     
@@ -581,7 +587,7 @@ class: inverse
 * Write in your script and run the following code. What happens if you only run the first line of the code?
     
     ```r
-    x = 5
+    x = 5 # equivalently x &lt;- 5
     x
     ```
 
@@ -669,12 +675,12 @@ class: inverse
     ```
     
     ```
-    ## [1] '0.2.6'
+    ## [1] '0.2.5'
     ```
 
 ---
 
-# Vectors =&gt; Comment: if you think this lecture up until now lasts more than 2 hours, I would be in favor of moving the rest of this lecture to Lecture 2/3.
+# Vectors
 
 * What *is* a **vector**?
 
@@ -726,8 +732,8 @@ example_data
 ```
 ##   x       y     z
 ## 1 1   Hello  TRUE
-## 2 3   Hello  TRUE
-## 3 5   Hello FALSE
+## 2 3   Hello FALSE
+## 3 5   Hello  TRUE
 ## 4 7 Goodbye  TRUE
 ```
 
@@ -892,7 +898,7 @@ class: inverse
 1. Create a total_percap variable:
     
     ```r
-    murders$total_percap = murders$total / murders$population * 10000
+    murders$total_percap = (murders$total / murders$population) * 10000
     ```
 
 Congratulations, you've created your first variable!
@@ -918,7 +924,7 @@ background-position: 9% 19%
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
 <script src="../js/ru_xaringan.js"></script>
 <script>var slideshow = remark.create({
 "highlightStyle": "github",
@@ -964,24 +970,7 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();
-// adds .remark-code-has-line-highlighted class to <pre> parent elements
-// of code chunks containing highlighted lines with class .remark-code-line-highlighted
-(function(d) {
-  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
-  const preParents = [];
-  const findPreParent = function(line, p = 0) {
-    if (p > 1) return null; // traverse up no further than grandparent
-    const el = line.parentElement;
-    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
-  };
-
-  for (let line of hlines) {
-    let pre = findPreParent(line);
-    if (pre && !preParents.includes(pre)) preParents.push(pre);
-  }
-  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
-})(document);</script>
+})();</script>
 
 <script>
 (function() {
