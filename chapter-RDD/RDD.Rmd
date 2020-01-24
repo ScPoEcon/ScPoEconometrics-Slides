@@ -92,8 +92,6 @@ layout: true
 
 # An Example: Alcohol Consumption and Mortality
 
-## I've created a set of slides with this new example (which is a Sharp RDD and for which data is available but I've let the other slides I'd made using the Pinotti paper example at the end)
-
 --
 
 * Imagine you are in assessing the __causal__ impact of alcohol consumption on mortality.
