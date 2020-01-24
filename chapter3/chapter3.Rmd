@@ -46,47 +46,82 @@ library(ggplot2)
 
 # Recap from from past Lectures and plan for this session
 
-Plan 
+**Recap** 
+
+* R basics : first steps with R studio, importing data, data handling 
+
+* Summarising data and more advanced R (`ggplot`, `dplyr`) 
+
+--
+
+**Plan for today**
 
 * Introduction to Simple Linear Regression Model
 
-* Study the relation between **class size** and **students performance**
+* Empirical applications
+
+  - **Class size** and **students performance**
+  - **Education** and **wage**
 
 ---
 
 # Data
 
-Let's start with the relation with **student performance and class size** 
+Let's start with the relation between **student performance and class size**.
 
-.pull-left[
-* First, download the data from [here](https://www.dropbox.com/s/2g16pid3eky44bp/grades_classize.RData?dl=0). ADD SOURCE
+The data we gonna use consists of test scores in fifth grade classes at public elementary schools in Israel. These data were originally used in [Angrist and Lavy (1999)](https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
+
+ **TASK for you**
+ 
+* First, download the data from [here](https://www.dropbox.com/s/2g16pid3eky44bp/grades_classize.RData?dl=0) and open it in your R session.
+
 ```{r, echo=FALSE}
-grades = read.csv2("https://www.dropbox.com/s/jrvjrdcly0igbed/grades_classize.csv?dl=1")
+grades = read_dta("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+
+grades = grades %>% 
+  group_by(classize) %>%
+  summarise(avgmath_by_class= mean(avgmath), 
+            avgread_by_class= mean(avgverb), 
+            avggrade_by_class= (avgread_by_class+avgmath_by_class)/2)
 ```
 
-* What are the variables? What is an observation here? 
+* Describe the dataset : What are the variables? What is an observation here? 
 
-* How the average math score (`av_grade`) is related to class size (`classize`)? 
+* Create a new dataset with both the average math and verbal grade by class size (*i.e. the average over multiple class that have the same class size*).
 
-* What is a good summary of their relationship?
+* Add a new variable that summarise both grades for each class size (*simple solution : the mean*).
 
+* How do the grades seem to be related to the size of the class? 
+
+---
+
+# Data
+
+Let's plot these two variables together. 
+
+.pull-left[
+
+```{r,echo=FALSE,fig.align='left',fig.height=5,fig.width=7}
+plot(avggrade_by_class ~ classize, data = grades,
+     xlab = "Class size",
+     ylab = "Average grade",
+     main = "Average grade by class size",
+     pch  = 20,
+     cex  = 2,
+     col  = "red")
+```
 ]
 
 --
 
 .pull-right[
 
-Let's plot these two variables together. 
+<br>
+<br>
+<br>
 
-```{r,echo=FALSE,fig.align='center',fig.height=5,fig.width=8}
-plot(av_grade ~ classsize, data = grades,
-     xlab = "Class size (classsize)",
-     ylab = "Average math grade (av_grade)",
-     main = "Average math score vs class size ",
-     pch  = 20,
-     cex  = 2,
-     col  = "red")
-```
+What is a good summary of their relationship?
+
 ]
 
 ---
@@ -95,10 +130,10 @@ plot(av_grade ~ classsize, data = grades,
 
 .left-wide[
 ```{r,echo=FALSE,fig.align='center',fig.height=5,fig.width=7}
-plot(av_grade ~ classsize, data = grades,
-     xlab = "Class size (classsize)",
-     ylab = "Average math grade (av_grade)",
-     main = "Average math score vs class size ",
+plot(avggrade_by_class ~ classize, data = grades,
+     xlab = "Class size",
+     ylab = "Average grade",
+     main = "Average grade vs class size ",
      pch  = 20,
      cex  = 2,
      col  = "red")
@@ -126,10 +161,10 @@ abline(a = 66,b = 0,lw=3)
 
 .left-wide[
 ```{r,echo=FALSE,fig.align='center',fig.height=5,fig.width=7}
-plot(av_grade ~ classsize, data = grades,
-     xlab = "Class size (classsize)",
-     ylab = "Average math grade (av_grade)",
-     main = "Average math score vs class size ",
+plot(avggrade_by_class ~ classize, data = grades,
+     xlab = "Class size",
+     ylab = "Average grade",
+     main = "Average grade vs class size ",
      pch  = 20,
      cex  = 2,
      col  = "red")
@@ -140,12 +175,13 @@ abline(a = 55,b = 0.4,lw=3)
 --
 
 .right-thin[
+
 <br>
 <br>
 
 * **That** one?
 
-* Slightly better. Has a *slope* and an *intercept*.
+* Slightly better. Has a **slope** and an **intercept**.
 
 * `r emo::ji("neutral_face")`
 
@@ -154,38 +190,43 @@ abline(a = 55,b = 0.4,lw=3)
 
 ---
 
-# Writing Down A *Line*
+# Writing Down A *Line* (1/2)
 
-.pull-left[
-* We observe $(y_i,x_i)$ in the data.
+Let's formalise a bit what we are doing so far. 
 
-* This describes a line with intercept $b_0$ and slope $b_1$:
+* We are interested in the relationship between two variables for which we observe several *individual* $(x_i,y_i)$. 
+
+--
+
+* We simply and summarise this relationship with a line (for now).
+
+--
+
+* The equation for such a line with intercept $b_0$ and slope $b_1$ is:
     $$
     \widehat{y}_i = b\_0 + b\_1 x\_i
     $$
 
-* We call $\widehat{y}_i$ the *prediction* for $y_i$.
+--
 
-* Most of the times, $\widehat{y}_i \neq y_i$, i.e. we make an *error*.
-]
+* $\widehat{y}_i$ is our *prediction* for $y_i$ given our model (i.e. the line).
 
 --
 
-.pull-right[
+* Most of the times, $\widehat{y}_i \neq y_i$, i.e. we make an *error*.
+
+---
+
+# Writing Down A *Line* (2/2)
 
 * At point $x_i$ we make error $e_i$.
 
 * Our aim will be to keep the error *as small as possible*, while at the same time giving a reasonable description of the data.
 
-* (We could be more generally trying to fit a *curve* rather than a *line*, by the way.)
-
 * The *actual data* $(y_i,x_i)$ can thus be written like *prediction + error*:
     $$
     y_i = b_0 + b_1 x_i + e_i
     $$
-]
-
-
 
 ---
 
@@ -407,23 +448,25 @@ aboutApp('reg_simple')
 
 * Intercept $(b_0)$ : The predicted value of $y$ if $x$ is set to 0
 
-* Slope $(b_1)$ : The change in $y$ associated to an increase of $x$ by one unit. 
+* Slope $(b_1)$ : The change in $y$ associated to an increase of $x$ by one unit.
 
+Remember that OLS fits the best **line**!
 ]
   
 ---
 
 # OLS : class size and average math score
 
-Let's take back our grades-class size example! 
+Let's take back our grades-class size example!
 
 .pull-left[
 
-```{r echo=FALSE, fig.width=5,fig.height = 4}
+```{r echo=FALSE, fig.width=5,fig.height = 4, fig.align="left"}
 grades %>% 
-        ggplot(aes(x=classsize,y=av_grade)) + 
-        geom_point() + geom_smooth(method = "lm", se = F)
-
+  ggplot(aes(x=classize,y=avggrade_by_class)) + 
+  geom_point(col = "red") + geom_smooth(method = "lm", se = F) + 
+  labs(x = "class size",y = "Average grade") +
+  theme_classic()
 ```
 ]
 
@@ -434,7 +477,7 @@ grades %>%
 * **OLS in `R`**. You can run an OLS regression by executing this command
 
 ```{r echo=T, eval = F}
-reg = lm(av_grade~classsize,grades) # assign the result of the regression to the "reg" object 
+reg = lm(avggrade_by_class~classize,grades) # assign the result of the regression to the "reg" object 
 summary(reg) # to view the output 
 ```
 
@@ -442,7 +485,7 @@ summary(reg) # to view the output
 * We get theses values for $b_0$ and $b_1$
 
 ```{r echo=FALSE}
-coeffs = lm(av_grade~classsize,grades)$coefficients
+coeffs = lm(avggrade_by_class~classize,grades)$coefficients
 coeffs
 ```
 
