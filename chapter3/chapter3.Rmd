@@ -46,22 +46,33 @@ library(ggplot2)
 
 # Recap from from past Lectures and plan for this session
 
+Recap 
+
+* R basics : first steps with R studio, import data, data handling 
+
+* Summarising data and more advanced R (`ggplot`, `dplyr`) 
+
 Plan 
 
 * Introduction to Simple Linear Regression Model
 
-* Study the relation between **class size** and **students performance**
+* Empirical examples
+
+  - The relation between **class size** and **students performance**
+  - A **log wage example **
 
 ---
 
 # Data
 
-Let's start with the relation with **student performance and class size** 
+Let's start with the relation with **student performance and class size**.
+
+The dataset we gonna use consists of test scores in fifth grade classes at public elementary schools in Israel. These data were originally used in [Angrist and Lavy (1999)]((https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
 
 .pull-left[
-* First, download the data from [here](https://www.dropbox.com/s/2g16pid3eky44bp/grades_classize.RData?dl=0). ADD SOURCE
+* First, download the data from [here](https://www.dropbox.com/s/2g16pid3eky44bp/grades_classize.RData?dl=0) and open it in your R session.
 ```{r, echo=FALSE}
-grades = read.csv2("https://www.dropbox.com/s/jrvjrdcly0igbed/grades_classize.csv?dl=1")
+grades = read.csv2("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
 ```
 
 * What are the variables? What is an observation here? 
