@@ -171,13 +171,13 @@ As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-E
 
 ---
 
-# Syllabus
+# Syllabus `r emo::ji("crossed_fingers")`
 
 .pull-left[
 <br>
 Lecture 1: **Introduction**
 
-*Quiz 1*
+*Quiz 1 (after lecture 2)*
 
 Lecture 2/3: **Summarising Data**
 
@@ -220,6 +220,7 @@ Lecture 12: ***Recap***
 - [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
 - [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
 - [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
+- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/cunningham_mixtape.pdf)
 - [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
 
 ## Metrics and `R`
@@ -743,7 +744,7 @@ class: inverse
 
 * Find out (using `help()` or google) how to import a .csv file.
 
-* Import gun_murders.csv<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=`)
+* Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=`)
 
 ```{r,echo=F}
 library(dslabs)
