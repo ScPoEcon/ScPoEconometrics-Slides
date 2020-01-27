@@ -5,6 +5,7 @@ author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
@@ -36,6 +37,7 @@ knitr::opts_chunk$set(
 )
 
 library(knitr)
+library(flipbookr)
 library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
 # Quitting from lines 27-40 (chapter2.Rmd) 
 # Error: package or namespace load failed for 'learnr':
@@ -44,9 +46,29 @@ library(learnr) # this line needs to be run manually I have no idea why but othe
 #   error: The shiny_prerendered_chunk function can only be called from within runtime: shiny_prerendered
 ```
 
-# Recap from Lecture 1
+# Recap from last week
 
-## Add when lecture 1 is finalised
+* ***Causality*** plays a central role in modern econometrics!
+
+--
+
+* Using R is ***very*** valuable
+
+--
+
+* Basic data wrangling:
+  - `str`, `names`, `nrow`, `ncol`
+  - *subsetting:* `murders[row condition, "column name"]`
+  - *variable creation:* `murders$total_percap = (murders$total / murders$population) * 10000`
+
+--
+
+## Today
+
+* Deeper dive into data wrangling with `R`:
+  - __summarizing__ data,
+  - __visualisation__ data,
+  - __tidying__ data
 
 ---
   
@@ -68,7 +90,7 @@ knitr::include_graphics("chapter2_files/figure-html/data_science_pipeline.png")
 
 # The `gapminder` dataset: Overview
 
-* Let's first load a dataset with this command:
+* Let's first load a dataset with these commands:
     ```{r}
     library(dslabs)
     gapminder <- dslabs::gapminder
@@ -109,13 +131,28 @@ class: inverse
 
 * Create a new variable called `gdppercap` corresponding to `gdp` divided by `population`
 
-* Which country had the highest gdp per capita in 2011? 
+* Which countries had a 2011 GDP per capita greater than 30.000? 
 
 * Filter the dataset to only keep the year 2015: `gapminder_2015`
 
 * How many countries have an infant mortality in 2015 greater than 90 (per 1000)?
 
-* What is the average life_expectancy in Africa in 2015?
+* What is the average life expectancy in Africa in 2015?
+
+```{r, echo = FALSE, eval = FALSE}
+# ANSWERS
+
+* gapminder$gdppercap <- gapminder$gdp / gapminder$population
+
+* subset(gapminder, year == 2011 & gdppercap > 30000)
+
+* gapminder_2015 <- subset(gapminder, year == 2015)
+
+* nrow(subset(gapminder_2011, infant_mortality > 90))
+
+* mean(gapminder_2015[gapminder_2015$continent == "Africa", "life_expectancy"])
+  # also possible to use subset() but need to create new object
+```
 
 ---
 
@@ -172,7 +209,7 @@ mean(x)
 mean(x) == sum(x) / length(x)
 ```
 
-***Your turn:*** What's the mean of `life_expectancy` in 1960? Read the help for `mean` to remove `NA`s.
+***Your turn:*** What's the mean of `infant_mortality` in 1960? Read the help for `mean` to remove `NA`s.
 ]
 
 --
@@ -187,7 +224,7 @@ mean(x) == sum(x) / length(x)
 median(x)
 ```
 
-***Your turn:*** What's the median of `life_expectancy` in 1960?
+***Your turn:*** What's the median of `infant_mortality` in 1960?
 ]
 
 ---
@@ -281,7 +318,7 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 * Given two vectors, `table` produces a contingency table:
     ```{r}
     gapminder_2 <- subset(gapminder, year %in% 1960:1970 & region == "Northern America" & !is.na(gdp))
-    gapminder_2 <- droplevels(gapminder_2)
+    gapminder_2 <- droplevels(gapminder_2) # necessary to update factor levels
     table(gapminder_2$country,gapminder_2$year)
     ```
 
@@ -324,6 +361,13 @@ layout: true
 gapminder_2015 <- gapminder[gapminder$year == 2015,]
 hist(gapminder_2015$life_expectancy)
 ```
+
+```{r, echo = FALSE, eval = FALSE, fig.align='center', fig.height=4.5}
+gapminder_2015 <- gapminder[gapminder$year == 2015,]
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram()
+```
 ]
 
 ---
@@ -344,6 +388,7 @@ hist(gapminder_2015$life_expectancy,
      col  = "#d90502",
      border = "white")
 ```
+
 ]
 
 .pull-right[
@@ -361,8 +406,6 @@ hist(gapminder_2015$life_expectancy,
 
 # Looking for Outliers: Boxplots
 
-.pull-left[
-<br>
 * An *outlier* is a datapoint far removed from the center of a distribution.
 
 * Boxplots are an effective way to visualise the distribution of a variable.
@@ -373,7 +416,30 @@ hist(gapminder_2015$life_expectancy,
 
 * The *dots* are __outliers__ (`r emo::ji("warning")` no universally accepted definition).
 
-* see `?boxplot`
+---
+
+# Looking for Outliers: Boxplots
+
+```{r, echo = F, out.width = "1000px"}
+knitr::include_graphics("chapter2_files/figure-html/boxplot_explanation.png")
+```
+
+---
+
+# Looking for Outliers: Boxplots
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE}
+boxplot(life_expectancy ~ continent,
+    data = gapminder_2015,
+    xlab   = "Continent",
+    ylab   = "Life expectancy in 2015",
+    main   = "Life expectancy by continent in 2015",
+    pch = 20, cex = 2, # colour and size of outliers
+    col ="#d90502",border = "black")
+```
+
+* see `?boxplot` for more options
 ]
 
 .pull-right[
@@ -401,8 +467,13 @@ boxplot(life_expectancy ~ continent, data = gapminder_2015, xlab   = "Continent"
 # Scatter Plots
 
 .pull-left[
-```{r,,fig.height=5,echo = FALSE}
-plot(fertility ~ infant_mortality, data = gapminder_2015)
+```{r, echo = TRUE, fig.height=5}
+plot(fertility ~ infant_mortality,
+    data = gapminder_2015,
+    xlab   = "Infant mortality",
+    ylab   = "Fertility rate",
+    main   = "Relationship between fertility and infant mortality in 2015",
+    col = "#d90502")
 ```
 ]
 
@@ -412,10 +483,190 @@ plot(fertility ~ infant_mortality, data = gapminder_2015)
 
 * We often call it one *observation*.
 
-* Corresponding to one *row* of the data.frame.
+* Corresponding to one *row* of the `data.frame`.
 
 * Why do some dots appear *darker* than others here?
 ]
+
+---
+
+background-image: url("../img/logo/ggplot2.svg")
+background-position: 90% 5%
+background-size: 180px
+
+# Quick `ggplot2` Intro
+
+.pull-left[
+* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
+
+* Great intro to `ggplot2` [here](https://pkg.garrickadenbuie.com/gentle-ggplot2).
+
+* Based on *The __G__rammar of __G__raphics* (hence __gg__plot).
+
+* More powerful than base `R` plotting
+
+* Let's reproduce the previous graphs in ggplot
+]
+
+.pull-right[
+<br>
+<br>
+```{r, echo = F, out.width = "500px"}
+knitr::include_graphics("chapter2_files/figure-html/ggplot_grammar_graphics.png")
+```
+
+###### source: [BloggoType](http://bloggotype.blogspot.com/2016/08/holiday-notes2-grammar-of-graphics.html)
+]
+
+---
+
+# `ggplot2`: Basic Histogram
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE}
+library(ggplot2)
+
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram()
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, eval = TRUE, fig.height = 5}
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram()
+```
+]
+
+---
+
+# `ggplot2`: Fancy Histogram
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE}
+library(ggplot2)
+
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram(binwidth = 5,
+                 boundary = 45,
+                 colour = "white",
+                 fill = "#d90502") +
+  labs(x = "Life Expectancy",
+       y = "Frequency",
+       title = "Histogram of life expectancy in 2015") +
+  theme_bw(base_size = 16)
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, eval = TRUE, fig.height = 5}
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram(binwidth = 5, boundary = 45, colour = "white", fill = "#d90502") +
+  labs(x = "Life Expectancy", y = "Frequency", title = "Histogram of life expectancy in 2015") +
+  theme_bw(base_size = 16)
+```
+]
+
+---
+
+# `ggplot2`: Fancy Histogram with `facet_grid()`
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE}
+library(ggplot2)
+
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram(binwidth = 5,
+                 boundary = 45,
+                 colour = "white",
+                 fill = "#d90502") +
+  labs(x = "Life Expectancy",
+       y = "Frequency",
+       title = "Histogram of life expectancy in 2015") +
+  theme_bw(base_size = 16) +
+  facet_grid(rows = vars(continent))
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, eval = TRUE, fig.height = 7}
+ggplot(gapminder_2015,
+       aes(x = life_expectancy)) +
+  geom_histogram(binwidth = 5,
+                 boundary = 45,
+                 colour = "white",
+                 fill = "#d90502") +
+  labs(x = "Life Expectancy",
+       y = "Frequency",
+       title = "Histogram of life expectancy in 2015") +
+  theme_bw(base_size = 16) +
+  facet_grid(rows = vars(continent))
+```
+]
+
+---
+
+# `ggplot2`: Boxplots
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE}
+ggplot(gapminder_2015,
+       aes(x = continent, y = life_expectancy)) +
+  geom_boxplot(colour = "black",
+               fill = "#d90502") +
+  labs(x = "Continent",
+       y = "Life expectancy in 2015", 
+       title = "Life expectancy by continent in 2015") +
+  theme_bw(base_size = 20)
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, eval = TRUE, fig.height = 5}
+ggplot(gapminder_2015,
+       aes(x = continent, y = life_expectancy)) +
+  geom_boxplot(colour = "black", fill = "#d90502") +
+  labs(x = "Continent", y = "Life expectancy in 2015", title = "Life expectancy by continent in 2015") +
+  theme_bw(base_size = 20)
+```
+]
+
+---
+
+# `ggplot2`: Scatter Plots
+
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE}
+ggplot(gapminder_2015,
+       aes(x = fertility,
+           y = infant_mortality)) +
+  geom_point(size = 3,
+             alpha = 0.5,
+             colour = "#d90502") +
+  labs(x = "Infant mortality",
+       y = "Fertility rate",
+       title = "Relationship between fertility and infant mortality in 2015") +
+  theme_bw(base_size = 16)
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, eval = TRUE, fig.height = 5}
+ggplot(gapminder_2015,
+       aes(x = fertility, y = infant_mortality)) +
+  geom_point(size = 3, alpha = 0.5, colour = "#d90502") +
+  labs(x = "Infant mortality", y = "Fertility rate",
+       title = "Relationship between fertility and infant mortality in 2015") +
+  theme_bw(base_size = 16)
+```
+]
+
 
 ---
 
@@ -449,22 +700,25 @@ ScPoEconometrics::runTutorial('chapter2-script')
 
 .pull-left[
 ```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 6,fig.width=6}
-plot(fertility ~ infant_mortality, data = gapminder_2015)
+plot(fertility ~ infant_mortality,
+    data = gapminder_2015,
+    xlab   = "Infant mortality",
+    ylab   = "Fertility rate",
+    main   = "Relationship between fertility and infant mortality in 2015",
+    col = "#d90502")
 ```
 ]
 
 --
 
 .pull-right[
-* How are `x` and `y` related here?
-
-* The covariance is a measure of joint variability of two variables.
+* The covariance is a measure of __joint variability__ of two variables.
     $$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$
 ```{r, echo=FALSE}
 cov(gapminder_2015$fertility,gapminder_2015$infant_mortality, use = "complete.obs")
 ```
 
-* The correlation is a measure of the strenght of the __linear__ association between two variables.
+* The correlation is a measure of the strenght of the __linear association__ between two variables.
     $$Cor(x,y) = \frac{Cov(x,y)}{\sqrt(Var(x))\sqrt(Var(y))}$$
 ```{r, echo=FALSE}
 cor(gapminder_2015$fertility,gapminder_2015$infant_mortality, use = "complete.obs")
@@ -727,63 +981,6 @@ polls_us_election_2016 %>%
         state == "Iowa" &
         is.na(rawpoll_johnson)) %>%
   select(pollster)
-```
-]
-
----
-
-background-image: url("../img/logo/ggplot2.svg")
-background-position: 90% 5%
-background-size: 180px
-
-# Quick `ggplot2` Intro => as I commented earlier on I wonder if it wouldn't better to introduce ggplot straight away. What do you think?
-# This would enable them to create more advanced plots in later sessions
-
-.pull-left[
-<br>
-<br>
-* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
-
-* We construct a `ggplot` in layers. We `+` add layers.
-
-* In `aes` (aestethics) we say how data maps onto plot.
-
-* We choose a `geom_` function to choose the geometry.
-]
-
-.pull-right[
-<br>
-<br>
-```{r,fig.height = 4}
-library(ggplot2)
-ggplot(data = gapminder %>% filter(year == 2015),   # base layer
-       mapping = aes(x = life_expectancy,
-                     y = fertility)) + 
-   geom_point()   # add geom_ layer
-```
-]
-
----
-
-# Quick `ggplot2` Intro
-
-.pull-left[
-<br>
-<br>
-* We can add more layers to this plot.
-
-* We can map another variable to another feature, like color, size, shape etc.
-
-* We could also add another `geom_` function.
-]
-
-.pull-right[
-```{r,fig.height = 4}
-ggplot(data = gapminder %>% filter(year == 2015),
-       aes(x = life_expectancy, 
-           y = fertility, 
-           color = continent)) +  # map `continent` to color
-   geom_point() 
 ```
 ]
 
