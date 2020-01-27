@@ -159,7 +159,7 @@ class: inverse
 layout: false
 class: title-slide-section-red, middle
 
-# Summarizing => Should we start with plotting? It may be more engaging for students
+# Summarizing
 
 ---
 
@@ -741,7 +741,7 @@ runTutorial('correlation')
 layout: false
 class: title-slide-section-red, middle
 
-# Data Wrangling
+# Wrangling
 
 ---
 layout: true
@@ -990,7 +990,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# END
+# SEE YOU IN TWO WEEKS!
 
 
 
