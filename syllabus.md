@@ -1,7 +1,7 @@
 The material below is a complement to the lecture slides and should be used as reference. Readings in **bold** are **very highly** recommended.
 
 
-#### Lecture 1: Introduction
+### Lecture 1: Introduction
 
 [**1.1 and 1.2, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/R-intro.html)
 
@@ -9,9 +9,8 @@ The material below is a complement to the lecture slides and should be used as r
 
 [**Angrist and Pischke (2010 JEP), *The Credibility Revolution in Empirical Economics***](https://www.aeaweb.org/articles?id=10.1257/jep.24.2.3)  
 
-<br>
 
-#### Lecture 2/3: Data Visualization and Data Wrangling
+### Lecture 2/3: Data Visualization and Data Wrangling
 
 [**Chapter 2, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/sum.html)
 
@@ -19,9 +18,8 @@ The material below is a complement to the lecture slides and should be used as r
 
 Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3-wrangling.html), ModernDive
 
-<br>
 
-#### Lecture 4: Simple Linear Regression
+### Lecture 4: Simple Linear Regression
 
 [**Chapter 3, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/linreg.html)
 
@@ -29,9 +27,8 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 [Chapter 5, ModernDive](https://moderndive.com/5-regression.html)
 
-<br>
 
-#### Lecture 5: Introduction to Causality
+### Lecture 5: Introduction to Causality
 
 [**Chapter 7, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/causality.html)
 
@@ -39,9 +36,8 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 [Deaton and Cartwright (2016, VoxEU), "The limitations of randomised controlled trials"](https://voxeu.org/article/limitations-randomised-controlled-trials)
 
-<br>
 
-#### Lecture 6: Multiple Linear Regression
+### Lecture 6: Multiple Linear Regression
 
 [**Chapter 4, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/multiple-reg.html)
 
@@ -49,29 +45,25 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 [Chapter 6, ModernDive](https://moderndive.com/6-multiple-regression.html)
 
-<br>
 
-#### Lecture 7: Sampling
+### Lecture 7: Sampling
 
 [**Chapter 7, ModernDive**](https://moderndive.com/7-sampling.html)
 
-<br>
 
-#### Lecture 8/9: Statistical Inference and Hypothesis Testing
+### Lecture 8/9: Statistical Inference and Hypothesis Testing
 
 **Chapters [8](https://moderndive.com/8-confidence-intervals.html), [9](https://moderndive.com/9-hypothesis-testing.html) and [10](https://moderndive.com/10-inference-for-regression.html), ModernDive**
 
-<br>
 
-#### Lecture 10: Difference-in-Differences
+### Lecture 10: Difference-in-Differences
 
 **Chapter 5, Mastering Metrics**
 
 [**Card and Krueger (1994 AER), "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"**](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)
 
-<br>
 
-#### Lecture 11: Regression Discontinuity
+### Lecture 11: Regression Discontinuity
 
 **Chapter 4, Mastering Metrics**
 
@@ -83,7 +75,6 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 [Lee and Lemieux (2010 JEL), "Regression Discontinuity Designs in Economics"](Regression Discontinuity Designs
 in Economics)
 
-<br>
 
-#### Lecture 12: Review Session
+### Lecture 12: Review Session
 
