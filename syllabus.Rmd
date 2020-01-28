@@ -9,56 +9,92 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The material below is a supplement to the class and should be used as reference. Readings with *** in front of them are mandatory reading/viewing.
+The material below is a complement to the lecture slides and should be used as reference. Readings in **bold** are **very highly** recommended.
 
 
-### Lecture 1: Introduction
-#### *** Chapter 1 of Introduction to Econometrics with R
-#### *** Introduction, Mastering Metrics
+#### Lecture 1: Introduction
 
-### Lecture 2/3: Data Visualization and Data Wrangling
-#### *** Jonathan Schwabish, Data visualization for economists (2014 JEP)
-#### Chapter 2 of Introduction to Econometrics with R
-#### Chapter 2 and 3 of ModernDive
+[**1.1 and 1.2, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/R-intro.html)
 
-### Lecture 4: Simple Linear Regression
-#### *** Chapter 2, Mastering Metrics (pp. x-y)
-#### Chapter 5, ModernDive
-More advanced:
-Wooldridge, relevant chapter
+**Introduction, Mastering Metrics**
 
-### Lecture 5: Introduction to Causality
-#### *** Chapter 1, Mastering Metrics
-#### *** Duflo RCT (voxeu?)
-#### *** VoxEu article by Deaton: https://voxeu.org/article/limitations-randomised-controlled-trials
-More advanced:
-Wooldridge?
+[**Angrist and Pischke (2010 JEP), *The Credibility Revolution in Empirical Economics***](https://www.aeaweb.org/articles?id=10.1257/jep.24.2.3)  
 
-### Lecture 6: Multiple Linear Regression
-#### *** Chapter 2, Mastering Metrics (pp. x-y)
-#### Chapter 6, ModernDive
-More advanced:
-Wooldridge, relevant chapter
+<br>
 
-### Lecture 7: Sampling
-#### *** Chapters 7 and 8, ModernDive
+#### Lecture 2/3: Data Visualization and Data Wrangling
 
-### Lecture 8/9: Statistical Inference and Hypothesis Testing
-#### *** Chapters 9 and 10, ModernDive
+[**Chapter 2, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/sum.html)
 
-### Lecture 10: Difference-in-Differences
-#### *** Card and Krueger, Minimum wage (1994)
-#### Chapter 5, Mastering Metrics
-More advanced:
-Mostly Harmless Econometrics (pp.227-246)
+[**Schwabish (2014 JEP), An Economist's Guide to Visualizing Data**](https://www.aeaweb.org/articles?id=10.1257/jep.28.1.209)
 
-### Lecture 11: Regression Discontinuity
-#### *** STAR experiment paper with RDD?
-#### Chapter 4, Mastering Metrics
-More advanced:
-Imbens and Lemieux (2008 JMetrics)
-Lee and Lemieux (2010 JEL)
-Mostly Harmless Econometrics (pp.251-259)
+Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3-wrangling.html), ModernDive
 
-### Lecture 12: Review Session
+<br>
+
+#### Lecture 4: Simple Linear Regression
+
+[**Chapter 3, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/linreg.html)
+
+**Chapter 2, Mastering Metrics (pp. x-y)**
+
+[Chapter 5, ModernDive](https://moderndive.com/5-regression.html)
+
+<br>
+
+#### Lecture 5: Introduction to Causality
+
+[**Chapter 7, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/causality.html)
+
+**Chapter 1, Mastering Metrics**
+
+[Deaton and Cartwright (2016, VoxEU), "The limitations of randomised controlled trials"](https://voxeu.org/article/limitations-randomised-controlled-trials)
+
+<br>
+
+#### Lecture 6: Multiple Linear Regression
+
+[**Chapter 4, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/multiple-reg.html)
+
+**Chapter 2, Mastering Metrics (pp. x-y)**
+
+[Chapter 6, ModernDive](https://moderndive.com/6-multiple-regression.html)
+
+<br>
+
+#### Lecture 7: Sampling
+
+[**Chapter 7, ModernDive**](https://moderndive.com/7-sampling.html)
+
+<br>
+
+#### Lecture 8/9: Statistical Inference and Hypothesis Testing
+
+**Chapters [8](https://moderndive.com/8-confidence-intervals.html), [9](https://moderndive.com/9-hypothesis-testing.html) and [10](https://moderndive.com/10-inference-for-regression.html), ModernDive**
+
+<br>
+
+#### Lecture 10: Difference-in-Differences
+
+**Chapter 5, Mastering Metrics**
+
+[**Card and Krueger (1994 AER), "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"**](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)
+
+<br>
+
+#### Lecture 11: Regression Discontinuity
+
+**Chapter 4, Mastering Metrics**
+
+[**Carpenter and Dobkin (2009, AEJ: Applied), "The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age"**](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164)
+
+*Literature reviews:*  
+[Imbens and Lemieux (2008 JMetrics), "Regression discontinuity designs: A guide to practice"](https://faculty.smu.edu/millimet/classes/eco7377/papers/imbens%20lemieux%202008.pdf)
+
+[Lee and Lemieux (2010 JEL), "Regression Discontinuity Designs in Economics"](Regression Discontinuity Designs
+in Economics)
+
+<br>
+
+#### Lecture 12: Review Session
 
