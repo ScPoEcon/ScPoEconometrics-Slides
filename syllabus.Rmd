@@ -1,0 +1,64 @@
+---
+title: "Syllabus"
+author: "Florian Oswald, Gustave Kenedi, Pierre Villedieu"
+date: "1/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The material below is a supplement to the class and should be used as reference. Readings with *** in front of them are mandatory reading/viewing.
+
+
+### Lecture 1: Introduction
+#### *** Chapter 1 of Introduction to Econometrics with R
+#### *** Introduction, Mastering Metrics
+
+### Lecture 2/3: Data Visualization and Data Wrangling
+#### *** Jonathan Schwabish, Data visualization for economists (2014 JEP)
+#### Chapter 2 of Introduction to Econometrics with R
+#### Chapter 2 and 3 of ModernDive
+
+### Lecture 4: Simple Linear Regression
+#### *** Chapter 2, Mastering Metrics (pp. x-y)
+#### Chapter 5, ModernDive
+More advanced:
+Wooldridge, relevant chapter
+
+### Lecture 5: Introduction to Causality
+#### *** Chapter 1, Mastering Metrics
+#### *** Duflo RCT (voxeu?)
+#### *** VoxEu article by Deaton: https://voxeu.org/article/limitations-randomised-controlled-trials
+More advanced:
+Wooldridge?
+
+### Lecture 6: Multiple Linear Regression
+#### *** Chapter 2, Mastering Metrics (pp. x-y)
+#### Chapter 6, ModernDive
+More advanced:
+Wooldridge, relevant chapter
+
+### Lecture 7: Sampling
+#### *** Chapters 7 and 8, ModernDive
+
+### Lecture 8/9: Statistical Inference and Hypothesis Testing
+#### *** Chapters 9 and 10, ModernDive
+
+### Lecture 10: Difference-in-Differences
+#### *** Card and Krueger, Minimum wage (1994)
+#### Chapter 5, Mastering Metrics
+More advanced:
+Mostly Harmless Econometrics (pp.227-246)
+
+### Lecture 11: Regression Discontinuity
+#### *** STAR experiment paper with RDD?
+#### Chapter 4, Mastering Metrics
+More advanced:
+Imbens and Lemieux (2008 JMetrics)
+Lee and Lemieux (2010 JEL)
+Mostly Harmless Econometrics (pp.251-259)
+
+### Lecture 12: Review Session
+
