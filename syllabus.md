@@ -23,8 +23,6 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 [**Chapter 3, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/linreg.html)
 
-**Chapter 2, Mastering Metrics (pp. x-y)**
-
 [Chapter 5, ModernDive](https://moderndive.com/5-regression.html)
 
 
@@ -41,7 +39,7 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 [**Chapter 4, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/multiple-reg.html)
 
-**Chapter 2, Mastering Metrics (pp. x-y)**
+**Chapter 2, Mastering Metrics**
 
 [Chapter 6, ModernDive](https://moderndive.com/6-multiple-regression.html)
 
