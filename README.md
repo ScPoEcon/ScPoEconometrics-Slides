@@ -7,7 +7,7 @@
 ## Slides
 
 Lecture 1 - Introduction. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html) 
-Lectures 2/3 - Summarizing, Visualizing and Tidying Data. [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.html)
+Lectures 2/3 - Summarizing, Visualizing and Tidying Data. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.html)
 
 Lecture 4 - Simple Linear Regression (*coming soon!*)
 
