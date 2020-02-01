@@ -36,8 +36,6 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-library(knitr)
-library(flipbookr)
 library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
 # Quitting from lines 27-40 (chapter2.Rmd) 
 # Error: package or namespace load failed for 'learnr':
@@ -98,8 +96,11 @@ knitr::include_graphics("chapter2_files/figure-html/data_science_pipeline.png")
 
 * Here are the first 3 rows
     ```{r}
-    head(gapminder[,1:9], n = 3)
+    head(gapminder, n = 3)
     ```
+
+---
+# The `gapminder` dataset: Overview
 
 * What variables does this dataset contain?
     ```{r}
@@ -317,9 +318,9 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 
 * Given two vectors, `table` produces a contingency table:
     ```{r}
-    gapminder_2 <- subset(gapminder, year %in% 1960:1970 & region == "Northern America" & !is.na(gdp))
-    gapminder_2 <- droplevels(gapminder_2) # necessary to update factor levels
-    table(gapminder_2$country,gapminder_2$year)
+    gapminder_2015 <- subset(gapminder, year == 2015)
+    gapminder_2015$fertility_above_2 = (gapminder_2015$fertility > 2.1) # dummy variable for fertility rate above replacement level fertility
+    table(gapminder_2015$fertility_above_2,gapminder_2015$continent)
     ```
 
 --
@@ -335,7 +336,7 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 layout: false
 class: title-slide-section-red, middle
 
-# Plotting => I wonder whether we should use ggplot directly? discussion at link: (http://varianceexplained.org/r/teach_ggplot2_to_beginners/)
+# Plotting
 
 ---
 layout: true
@@ -698,8 +699,10 @@ ScPoEconometrics::runTutorial('chapter2-script')
 
 # How are x and y related? Covariance and Correlation
 
+* [This](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two) is the relevant section in the book about Covariance.
+
 .pull-left[
-```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 6,fig.width=6}
+```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 5,fig.width=6}
 plot(fertility ~ infant_mortality,
     data = gapminder_2015,
     xlab   = "Infant mortality",
@@ -827,7 +830,7 @@ What variables does this dataset contain?
 
 * `filter` has the same purpose as `subset`
 
-* Example: Which A graded poll with at least 2,000 people had Trump at at least 45% of the vote?
+* Example: Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
     ```{r, echo = TRUE, eval = FALSE}
     filter(polls_us_election_2016,
            grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
