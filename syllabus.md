@@ -10,7 +10,7 @@ The material below is a complement to the lecture slides and should be used as r
 [**Angrist and Pischke (2010 JEP), *The Credibility Revolution in Empirical Economics***](https://www.aeaweb.org/articles?id=10.1257/jep.24.2.3)  
 
 
-### Lecture 2/3: Data Visualization and Data Wrangling
+### Lecture 2/3: Summarizing, Visualizing and Tidying Data
 
 [**Chapter 2, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/sum.html)
 
@@ -56,7 +56,7 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 **Chapters [8](https://moderndive.com/8-confidence-intervals.html), [9](https://moderndive.com/9-hypothesis-testing.html) and [10](https://moderndive.com/10-inference-for-regression.html), ModernDive**
 
 
-### Lecture 10: Difference-in-Differences
+### Lecture 10: Differences-in-Differences
 
 **Chapter 5, Mastering Metrics**
 
