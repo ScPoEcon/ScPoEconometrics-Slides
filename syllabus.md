@@ -69,9 +69,7 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 *Literature reviews:*  
 [Imbens and Lemieux (2008 JMetrics), "Regression discontinuity designs: A guide to practice"](https://faculty.smu.edu/millimet/classes/eco7377/papers/imbens%20lemieux%202008.pdf)
-
-[Lee and Lemieux (2010 JEL), "Regression Discontinuity Designs in Economics"](Regression Discontinuity Designs
-in Economics)
+[Lee and Lemieux (2010 JEL), "Regression Discontinuity Designs in Economics"](https://www.princeton.edu/~davidlee/wp/RDDEconomics.pdf)
 
 
 ### Lecture 12: Review Session
