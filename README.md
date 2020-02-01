@@ -26,6 +26,7 @@ Lecture 11: Regression Discontinuity (*coming soon!*)
 
 Lecture 12: Recap (*coming soon!*)
 
+The suggested reading list can be found [here](https://github.com/ScPoEcon/ScPoEconometrics-Slides/blob/master/syllabus.md)
 
 ## How to build
 
