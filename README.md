@@ -6,24 +6,24 @@
 
 ## Slides
 
-1. Lecture 1 - Introduction. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html)  
-1. Lecture 2/3 - Summarizing, Visualizing and Tidying Data. [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.html)
+Lecture 1 - Introduction. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html)  
+Lectures 2/3 - Summarizing, Visualizing and Tidying Data. [HTML](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/session2_1/chapter2/chapter2.html)
 
-1. Lecture 4 - Simple Linear Regression (*coming soon!*)
+Lecture 4 - Simple Linear Regression (*coming soon!*)
 
-1. Lecture 5: Introduction to Causality (*coming soon!*)
+Lecture 5: Introduction to Causality (*coming soon!*)
 
-1. Lecture 6: Multiple Linear Regression (*coming soon!*)
+Lecture 6: Multiple Linear Regression (*coming soon!*)
 
-1. Lecture 7: Sampling (*coming soon!*)
+Lecture 7: Sampling (*coming soon!*)
 
-1. Lecture 8/9: Statistical Inference and Hypothesis Testing (*coming soon!*)
+Lectures 8/9: Statistical Inference and Hypothesis Testing (*coming soon!*)
 
-1. Lecture 10: Differences-in-Differences (*coming soon!*)
+Lecture 10: Differences-in-Differences (*coming soon!*)
 
-1. Lecture 11: Regression Discontinuity (*coming soon!*)
+Lecture 11: Regression Discontinuity (*coming soon!*)
 
-1. Lecture 12: Recap (*coming soon!*)
+Lecture 12: Recap (*coming soon!*)
 
 
 ## How to build
