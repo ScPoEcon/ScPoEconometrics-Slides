@@ -68,7 +68,7 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 [**Carpenter and Dobkin (2009, AEJ: Applied), "The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age"**](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164)
 
 *Literature reviews:*  
-[Imbens and Lemieux (2008 JMetrics), "Regression discontinuity designs: A guide to practice"](https://faculty.smu.edu/millimet/classes/eco7377/papers/imbens%20lemieux%202008.pdf)
+[Imbens and Lemieux (2008 JMetrics), "Regression discontinuity designs: A guide to practice"](https://faculty.smu.edu/millimet/classes/eco7377/papers/imbens%20lemieux%202008.pdf)  
 [Lee and Lemieux (2010 JEL), "Regression Discontinuity Designs in Economics"](https://www.princeton.edu/~davidlee/wp/RDDEconomics.pdf)
 
 
