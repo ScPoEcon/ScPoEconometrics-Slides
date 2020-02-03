@@ -6,7 +6,7 @@
 
 ## Slides
 
-Lecture 1: Introduction [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.pdf)
+Lecture 1: Introduction [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html) [PDF](https://rawcdn.githack.com/gustavek/ScPoEconometrics-Slides/pdf_links/chapter1/chapter1.pdf)
 
 Lectures 2/3: Summarizing, Visualizing and Tidying Data [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.html)
 
