@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Summarising Data
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-02-01
+### SciencesPo Paris </br> 2020-02-03
 
 ---
 
@@ -73,14 +73,36 @@ layout: true
 
 * Let's first load a dataset with these commands:
     
+    ```r
+    library(dslabs)
+    gapminder &lt;- dslabs::gapminder
+    ```
 
 * Here are the first 3 rows
     
+    ```r
+    head(gapminder, n = 3)
+    ```
+    
+    ```
+    ##   country year infant_mortality life_expectancy fertility population         gdp continent
+    ## 1 Albania 1960            115.4           62.87      6.19    1636054          NA    Europe
+    ## 2 Algeria 1960            148.2           47.50      7.65   11124892 13828152297    Africa
+    ## 3  Angola 1960            208.0           35.98      7.32    5270844          NA    Africa
+    ##            region
+    ## 1 Southern Europe
+    ## 2 Northern Africa
+    ## 3   Middle Africa
+    ```
 
 ---
 # The `gapminder` dataset: Overview
 
 * What variables does this dataset contain?
+    
+    ```r
+    names(gapminder)
+    ```
     
     ```
     ## [1] "country"          "year"             "infant_mortality" "life_expectancy" 
@@ -90,6 +112,9 @@ layout: true
 
 * `tail` gives you the last (6) rows.
     
+    ```r
+    tail(gapminder)
+    ```
 
 ---
 
@@ -99,6 +124,10 @@ layout: true
 
 * We can use `str` for that:
 
+
+```r
+str(gapminder)
+```
 
 ```
 ## 'data.frame':	10545 obs. of  9 variables:
@@ -181,8 +210,17 @@ layout: true
 `$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$`
 
 
+```r
+x &lt;- c(1,2,2,2,2,100)
+mean(x)
+```
+
 ```
 ## [1] 18.16667
+```
+
+```r
+mean(x) == sum(x) / length(x)
 ```
 
 ```
@@ -200,6 +238,10 @@ layout: true
     
 1. The median is robust against *outliers*. 🤔? (later).
 
+
+```r
+median(x)
+```
 
 ```
 ## [1] 2
@@ -303,6 +345,10 @@ layout: true
 * Compute with:
 
 
+```r
+    var(x)
+    range(x)   # range
+```
 ]
 ---
 
@@ -310,10 +356,18 @@ layout: true
 
 * `table(x)` is a useful function that counts the occurence of each unique value in `x`:
     
+    ```r
+    table(gapminder$continent)
+    ```
+    
     ```
     ## 
     ##   Africa Americas     Asia   Europe  Oceania 
     ##     2907     2052     2679     2223      684
+    ```
+    
+    ```r
+    table(gapminder$region)
     ```
     
     ```
@@ -343,6 +397,12 @@ layout: true
 
 * Given two vectors, `table` produces a contingency table:
     
+    ```r
+    gapminder_2015 &lt;- subset(gapminder, year == 2015)
+    gapminder_2015$fertility_above_2 = (gapminder_2015$fertility &gt; 2.1) # dummy variable for fertility rate above replacement level fertility
+    table(gapminder_2015$fertility_above_2,gapminder_2015$continent)
+    ```
+    
     ```
     ##        
     ##         Africa Americas Asia Europe Oceania
@@ -352,9 +412,14 @@ layout: true
 
 --
 
-* with `prop.table`, we can get proportions:
+* With `prop.table`, we can get proportions:
     
+    ```r
+    prop.table(table(gapminder_2$year,gapminder_2$country), margin = 1) # proportions by row
+    prop.table(table(gapminder_2$year,gapminder_2$country), margin = 2) # proportions by column
+    ```
 
+* ⚠️ To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
 ---
 
 layout: false
@@ -382,6 +447,12 @@ layout: true
 --
 
 .pull-right[
+
+```r
+gapminder_2015 &lt;- gapminder[gapminder$year == 2015,]
+hist(gapminder_2015$life_expectancy)
+```
+
 &lt;img src="chapter2_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 
@@ -398,6 +469,14 @@ layout: true
 * Look at `?hist` for more.
 
 
+```r
+hist(gapminder_2015$life_expectancy, 
+     xlab   = "Life Expectancy", 
+     main   = "Histogram of life expectancy in 2015", 
+     breaks = seq(from = 40, to = 90, by = 5),
+     col  = "#d90502",
+     border = "white")
+```
 
 ]
 
@@ -458,6 +537,19 @@ boxplot(life_expectancy ~ continent,
 
 * Natural to ask: How often do certain pairs of `\((x_i,y_i)\)` occur?
     
+    ```r
+    head(gapminder_2015[,c("fertility","infant_mortality")])
+    ```
+    
+    ```
+    ##       fertility infant_mortality
+    ## 10176      1.78             12.5
+    ## 10177      2.71             21.9
+    ## 10178      5.65             96.0
+    ## 10179      2.06              5.8
+    ## 10180      2.15             11.1
+    ## 10181      1.41             12.6
+    ```
 * That's what a scatter plots shows.
 
 ---
@@ -787,6 +879,18 @@ polls_us_election_2016 &lt;- as_tibble(polls_us_election_2016)
 head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
 ```
 
+```
+## # A tibble: 6 x 6
+##   state startdate  enddate    pollster                                         grade samplesize
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                            &lt;fct&gt;      &lt;int&gt;
+## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post                         A+          2220
+## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys                          B          26574
+## 3 U.S.  2016-11-02 2016-11-06 Ipsos                                            A-          2195
+## 4 U.S.  2016-11-04 2016-11-07 YouGov                                           B           3677
+## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                                 B-         16639
+## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Research/Shaw &amp; Compa… A           1295
+```
+
 🚨 This is a `tibble` (more informative than `data.frame`)
 
 What variables does this dataset contain?
@@ -805,6 +909,14 @@ What variables does this dataset contain?
     ```
 --
     
+    ```
+    ## # A tibble: 1 x 15
+    ##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton
+    ##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
+    ## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41
+    ## # … with 7 more variables: rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+    ## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+    ```
    
 ---
 
@@ -917,9 +1029,32 @@ class: inverse
 .pull-right[
 1. `group_by(polls_us_election_2016, grade)` groups/splits `polls_us_election_2016` by pollster `grade`:
     
+    ```r
+    polls_grade = group_by(polls_us_election_2016, grade)
+    ```
 
 1. `summarise` each chunk and re-combine
     
+    ```r
+    summarise(polls_grade, mean_vote_clinton = mean(rawpoll_clinton))
+    ```
+    
+    ```
+    ## # A tibble: 11 x 2
+    ##    grade mean_vote_clinton
+    ##    &lt;fct&gt;             &lt;dbl&gt;
+    ##  1 D                  46.7
+    ##  2 C-                 43.2
+    ##  3 C                  41.8
+    ##  4 C+                 44.2
+    ##  5 B-                 43.9
+    ##  6 B                  37.3
+    ##  7 B+                 44.1
+    ##  8 A-                 43.0
+    ##  9 A                  45.3
+    ## 10 A+                 45.8
+    ## 11 &lt;NA&gt;               43.2
+    ```
 ]
 
 ---
@@ -950,6 +1085,11 @@ polls_us_election_2016 %&gt;%
 ```
 which is equivalent to, but nicer than:
 
+```r
+summarise(
+  group_by(polls_us_election_2016, grade),
+  mean_vote_clinton = mean(rawpoll_clinton))
+```
 ]
 
 --
@@ -964,6 +1104,15 @@ polls_us_election_2016 %&gt;%
         state == "Iowa" &amp;
         is.na(rawpoll_johnson)) %&gt;%
   select(pollster)
+```
+
+```
+## # A tibble: 3 x 1
+##   pollster
+##   &lt;fct&gt;   
+## 1 Ipsos   
+## 2 Ipsos   
+## 3 Ipsos
 ```
 ]
 

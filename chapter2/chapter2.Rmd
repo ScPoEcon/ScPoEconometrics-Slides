@@ -325,12 +325,13 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 
 --
 
-* with `prop.table`, we can get proportions:
+* With `prop.table`, we can get proportions:
     ```{r,eval=FALSE}
     prop.table(table(gapminder_2$year,gapminder_2$country), margin = 1) # proportions by row
     prop.table(table(gapminder_2$year,gapminder_2$country), margin = 2) # proportions by column
     ```
 
+* `r emo::ji("warning")` To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
 ---
 
 layout: false
