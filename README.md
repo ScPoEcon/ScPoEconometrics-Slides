@@ -6,11 +6,11 @@
 
 ## Slides
 
-Lecture 1 - Introduction. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html)
+Lecture 1: Introduction [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter1/chapter1.pdf)
 
-Lectures 2/3 - Summarizing, Visualizing and Tidying Data. [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.html)
+Lectures 2/3: Summarizing, Visualizing and Tidying Data [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.pdf)
 
-Lecture 4 - Simple Linear Regression (*coming soon!*)
+Lecture 4: Simple Linear Regression (*coming soon!*)
 
 Lecture 5: Introduction to Causality (*coming soon!*)
 
@@ -26,7 +26,7 @@ Lecture 11: Regression Discontinuity (*coming soon!*)
 
 Lecture 12: Recap (*coming soon!*)
 
-The suggested reading list can be found [here](https://github.com/ScPoEcon/ScPoEconometrics-Slides/blob/master/syllabus.md)
+The suggested reading list can be found [here](https://github.com/ScPoEcon/ScPoEconometrics-Slides/blob/master/syllabus.md).
 
 ## How to build
 
