@@ -1,6 +1,6 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Summarising Data"
+subtitle: "Summarising, Visualizing and Tidying Data"
 author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
@@ -89,8 +89,12 @@ knitr::include_graphics("chapter2_files/figure-html/data_science_pipeline.png")
 # The `gapminder` dataset: Overview
 
 * Let's first load a dataset with these commands:
-    ```{r}
+    ```{r, echo = TRUE, eval = FALSE}
     library(dslabs)
+    gapminder <- gapminder
+    ```
+    
+    ```{r, echo = FALSE, eval = TRUE}
     gapminder <- dslabs::gapminder
     ```
 
@@ -327,8 +331,10 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 
 * With `prop.table`, we can get proportions:
     ```{r,eval=FALSE}
-    prop.table(table(gapminder_2$year,gapminder_2$country), margin = 1) # proportions by row
-    prop.table(table(gapminder_2$year,gapminder_2$country), margin = 2) # proportions by column
+    # proportions by row
+    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 1)
+    # proportions by column
+    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 2) 
     ```
 
 * `r emo::ji("warning")` To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
@@ -387,6 +393,7 @@ hist(gapminder_2015$life_expectancy,
      xlab   = "Life Expectancy", 
      main   = "Histogram of life expectancy in 2015", 
      breaks = seq(from = 40, to = 90, by = 5),
+     las = 1, # horizontal y-axis values
      col  = "#d90502",
      border = "white")
 ```
@@ -399,6 +406,7 @@ hist(gapminder_2015$life_expectancy,
      xlab   = "Life Expectancy", 
      main   = "Histogram of life expectancy in 2015", 
      breaks = seq(from = 40, to = 90, by = 5),
+     las = 1, # horizontal y-axis values
      col  = "#d90502",
      border = "white")
 ```
@@ -422,7 +430,7 @@ hist(gapminder_2015$life_expectancy,
 
 # Looking for Outliers: Boxplots
 
-```{r, echo = F, out.width = "1000px"}
+```{r, echo = F, out.width = "850px"}
 knitr::include_graphics("chapter2_files/figure-html/boxplot_explanation.png")
 ```
 
@@ -438,7 +446,7 @@ boxplot(life_expectancy ~ continent,
     ylab   = "Life expectancy in 2015",
     main   = "Life expectancy by continent in 2015",
     pch = 20, cex = 2, # colour and size of outliers
-    col ="#d90502",border = "black")
+    col ="#d90502",border = "black", las = 1)
 ```
 
 * see `?boxplot` for more options
@@ -446,7 +454,13 @@ boxplot(life_expectancy ~ continent,
 
 .pull-right[
 ```{r,fig.align='center',echo=FALSE,fig.height = 7}
-boxplot(life_expectancy ~ continent, data = gapminder_2015, xlab   = "Continent", ylab   = "Life expectancy in 2015", main   = "Life expectancy by continent in 2015", pch = 20,cex = 2,col ="#d90502",border = "black")
+boxplot(life_expectancy ~ continent,
+    data = gapminder_2015,
+    xlab   = "Continent",
+    ylab   = "Life expectancy in 2015",
+    main   = "Life expectancy by continent in 2015",
+    pch = 20, cex = 2, # colour and size of outliers
+    col ="#d90502",border = "black", las = 1)
 ```
 ]
 
@@ -475,7 +489,8 @@ plot(fertility ~ infant_mortality,
     xlab   = "Infant mortality",
     ylab   = "Fertility rate",
     main   = "Relationship between fertility and infant mortality in 2015",
-    col = "#d90502")
+    col = "#d90502",
+    las = 1)
 ```
 ]
 

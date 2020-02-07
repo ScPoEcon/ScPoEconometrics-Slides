@@ -14,9 +14,9 @@
 class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
-## Summarising Data
+## Summarising, Visualizing and Tidying Data
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-02-03
+### SciencesPo Paris </br> 2020-02-07
 
 ---
 
@@ -75,8 +75,10 @@ layout: true
     
     ```r
     library(dslabs)
-    gapminder &lt;- dslabs::gapminder
+    gapminder &lt;- gapminder
     ```
+    
+    
 
 * Here are the first 3 rows
     
@@ -105,9 +107,8 @@ layout: true
     ```
     
     ```
-    ## [1] "country"          "year"             "infant_mortality" "life_expectancy" 
-    ## [5] "fertility"        "population"       "gdp"              "continent"       
-    ## [9] "region"
+    ## [1] "country"          "year"             "infant_mortality" "life_expectancy"  "fertility"       
+    ## [6] "population"       "gdp"              "continent"        "region"
     ```
 
 * `tail` gives you the last (6) rows.
@@ -340,7 +341,7 @@ median(x)
 --
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 
 * Compute with:
 
@@ -372,22 +373,18 @@ median(x)
     
     ```
     ## 
-    ## Australia and New Zealand                 Caribbean           Central America 
-    ##                       114                       741                       456 
-    ##              Central Asia            Eastern Africa              Eastern Asia 
-    ##                       285                       912                       342 
-    ##            Eastern Europe                 Melanesia                Micronesia 
-    ##                       570                       285                       114 
-    ##             Middle Africa           Northern Africa          Northern America 
-    ##                       456                       342                       171 
-    ##           Northern Europe                 Polynesia             South America 
-    ##                       570                       171                       684 
-    ##        South-Eastern Asia           Southern Africa             Southern Asia 
-    ##                       570                       285                       456 
-    ##           Southern Europe            Western Africa              Western Asia 
-    ##                       684                       912                      1026 
-    ##            Western Europe 
-    ##                       399
+    ## Australia and New Zealand                 Caribbean           Central America              Central Asia 
+    ##                       114                       741                       456                       285 
+    ##            Eastern Africa              Eastern Asia            Eastern Europe                 Melanesia 
+    ##                       912                       342                       570                       285 
+    ##                Micronesia             Middle Africa           Northern Africa          Northern America 
+    ##                       114                       456                       342                       171 
+    ##           Northern Europe                 Polynesia             South America        South-Eastern Asia 
+    ##                       570                       171                       684                       570 
+    ##           Southern Africa             Southern Asia           Southern Europe            Western Africa 
+    ##                       285                       456                       684                       912 
+    ##              Western Asia            Western Europe 
+    ##                      1026                       399
     ```
 
 ---
@@ -415,8 +412,10 @@ median(x)
 * With `prop.table`, we can get proportions:
     
     ```r
-    prop.table(table(gapminder_2$year,gapminder_2$country), margin = 1) # proportions by row
-    prop.table(table(gapminder_2$year,gapminder_2$country), margin = 2) # proportions by column
+    # proportions by row
+    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 1)
+    # proportions by column
+    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 2) 
     ```
 
 * ⚠️ To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
@@ -453,7 +452,7 @@ gapminder_2015 &lt;- gapminder[gapminder$year == 2015,]
 hist(gapminder_2015$life_expectancy)
 ```
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ]
@@ -474,6 +473,7 @@ hist(gapminder_2015$life_expectancy,
      xlab   = "Life Expectancy", 
      main   = "Histogram of life expectancy in 2015", 
      breaks = seq(from = 40, to = 90, by = 5),
+     las = 1, # horizontal y-axis values
      col  = "#d90502",
      border = "white")
 ```
@@ -481,7 +481,7 @@ hist(gapminder_2015$life_expectancy,
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -502,7 +502,7 @@ hist(gapminder_2015$life_expectancy,
 
 # Looking for Outliers: Boxplots
 
-&lt;img src="chapter2_files/figure-html/boxplot_explanation.png" width="1000px" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/boxplot_explanation.png" width="850px" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -517,14 +517,14 @@ boxplot(life_expectancy ~ continent,
     ylab   = "Life expectancy in 2015",
     main   = "Life expectancy by continent in 2015",
     pch = 20, cex = 2, # colour and size of outliers
-    col ="#d90502",border = "black")
+    col ="#d90502",border = "black", las = 1)
 ```
 
 * see `?boxplot` for more options
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -564,10 +564,11 @@ plot(fertility ~ infant_mortality,
     xlab   = "Infant mortality",
     ylab   = "Fertility rate",
     main   = "Relationship between fertility and infant mortality in 2015",
-    col = "#d90502")
+    col = "#d90502",
+    las = 1)
 ```
 
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 .pull-right[
@@ -625,7 +626,7 @@ ggplot(gapminder_2015,
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -651,7 +652,7 @@ ggplot(gapminder_2015,
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-34-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -678,7 +679,7 @@ ggplot(gapminder_2015,
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -700,7 +701,7 @@ ggplot(gapminder_2015,
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-37-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-38-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -725,7 +726,7 @@ ggplot(gapminder_2015,
 ]
 
 .pull-right[
-&lt;img src="chapter2_files/figure-html/unnamed-chunk-39-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter2_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 
@@ -881,14 +882,14 @@ head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
 
 ```
 ## # A tibble: 6 x 6
-##   state startdate  enddate    pollster                                         grade samplesize
-##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                            &lt;fct&gt;      &lt;int&gt;
-## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post                         A+          2220
-## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys                          B          26574
-## 3 U.S.  2016-11-02 2016-11-06 Ipsos                                            A-          2195
-## 4 U.S.  2016-11-04 2016-11-07 YouGov                                           B           3677
-## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                                 B-         16639
-## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Research/Shaw &amp; Compa… A           1295
+##   state startdate  enddate    pollster                                                   grade samplesize
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                                      &lt;fct&gt;      &lt;int&gt;
+## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post                                   A+          2220
+## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys                                    B          26574
+## 3 U.S.  2016-11-02 2016-11-06 Ipsos                                                      A-          2195
+## 4 U.S.  2016-11-04 2016-11-07 YouGov                                                     B           3677
+## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                                           B-         16639
+## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Research/Shaw &amp; Company Research A           1295
 ```
 
 🚨 This is a `tibble` (more informative than `data.frame`)
@@ -911,11 +912,11 @@ What variables does this dataset contain?
     
     ```
     ## # A tibble: 1 x 15
-    ##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-    ##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-    ## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41
-    ## # … with 7 more variables: rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
-    ## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+    ##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton rawpoll_trump
+    ##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;         &lt;dbl&gt;
+    ## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41            48
+    ## # … with 6 more variables: rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
+    ## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
     ```
    
 ---
