@@ -661,11 +661,12 @@ ggplot(gapminder_2015,
 .pull-left[
 ```{r, echo = TRUE, eval = FALSE}
 ggplot(gapminder_2015,
-       aes(x = fertility,
-           y = infant_mortality)) +
+       aes(x = infant_mortality,
+           y = fertility)) +
   geom_point(size = 3,
              alpha = 0.5,
              colour = "#d90502") +
+  expand_limits(x = 0, y = 0) +
   labs(x = "Infant mortality",
        y = "Fertility rate",
        title = "Relationship between fertility and infant mortality in 2015") +
@@ -676,9 +677,14 @@ ggplot(gapminder_2015,
 .pull-right[
 ```{r, echo = FALSE, eval = TRUE, fig.height = 5}
 ggplot(gapminder_2015,
-       aes(x = fertility, y = infant_mortality)) +
-  geom_point(size = 3, alpha = 0.5, colour = "#d90502") +
-  labs(x = "Infant mortality", y = "Fertility rate",
+       aes(x = infant_mortality,
+           y = fertility)) +
+  geom_point(size = 3,
+             alpha = 0.5,
+             colour = "#d90502") +
+  expand_limits(x = 0, y = 0) +
+  labs(x = "Infant mortality",
+       y = "Fertility rate",
        title = "Relationship between fertility and infant mortality in 2015") +
   theme_bw(base_size = 16)
 ```
