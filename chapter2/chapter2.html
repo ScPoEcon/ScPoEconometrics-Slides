@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Summarising, Visualizing and Tidying Data
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-02-07
+### SciencesPo Paris </br> 2020-02-11
 
 ---
 
@@ -87,14 +87,10 @@ layout: true
     ```
     
     ```
-    ##   country year infant_mortality life_expectancy fertility population         gdp continent
-    ## 1 Albania 1960            115.4           62.87      6.19    1636054          NA    Europe
-    ## 2 Algeria 1960            148.2           47.50      7.65   11124892 13828152297    Africa
-    ## 3  Angola 1960            208.0           35.98      7.32    5270844          NA    Africa
-    ##            region
-    ## 1 Southern Europe
-    ## 2 Northern Africa
-    ## 3   Middle Africa
+    ##   country year infant_mortality life_expectancy fertility population         gdp continent          region
+    ## 1 Albania 1960            115.4           62.87      6.19    1636054          NA    Europe Southern Europe
+    ## 2 Algeria 1960            148.2           47.50      7.65   11124892 13828152297    Africa Northern Africa
+    ## 3  Angola 1960            208.0           35.98      7.32    5270844          NA    Africa   Middle Africa
     ```
 
 ---
@@ -107,8 +103,8 @@ layout: true
     ```
     
     ```
-    ## [1] "country"          "year"             "infant_mortality" "life_expectancy"  "fertility"       
-    ## [6] "population"       "gdp"              "continent"        "region"
+    ## [1] "country"          "year"             "infant_mortality" "life_expectancy"  "fertility"        "population"       "gdp"              "continent"       
+    ## [9] "region"
     ```
 
 * `tail` gives you the last (6) rows.
@@ -373,18 +369,14 @@ median(x)
     
     ```
     ## 
-    ## Australia and New Zealand                 Caribbean           Central America              Central Asia 
-    ##                       114                       741                       456                       285 
-    ##            Eastern Africa              Eastern Asia            Eastern Europe                 Melanesia 
-    ##                       912                       342                       570                       285 
-    ##                Micronesia             Middle Africa           Northern Africa          Northern America 
-    ##                       114                       456                       342                       171 
-    ##           Northern Europe                 Polynesia             South America        South-Eastern Asia 
-    ##                       570                       171                       684                       570 
-    ##           Southern Africa             Southern Asia           Southern Europe            Western Africa 
-    ##                       285                       456                       684                       912 
-    ##              Western Asia            Western Europe 
-    ##                      1026                       399
+    ## Australia and New Zealand                 Caribbean           Central America              Central Asia            Eastern Africa              Eastern Asia 
+    ##                       114                       741                       456                       285                       912                       342 
+    ##            Eastern Europe                 Melanesia                Micronesia             Middle Africa           Northern Africa          Northern America 
+    ##                       570                       285                       114                       456                       342                       171 
+    ##           Northern Europe                 Polynesia             South America        South-Eastern Asia           Southern Africa             Southern Asia 
+    ##                       570                       171                       684                       570                       285                       456 
+    ##           Southern Europe            Western Africa              Western Asia            Western Europe 
+    ##                       684                       912                      1026                       399
     ```
 
 ---
@@ -713,11 +705,12 @@ ggplot(gapminder_2015,
 
 ```r
 ggplot(gapminder_2015,
-       aes(x = fertility,
-           y = infant_mortality)) +
+       aes(x = infant_mortality,
+           y = fertility)) +
   geom_point(size = 3,
              alpha = 0.5,
              colour = "#d90502") +
+  expand_limits(x = 0, y = 0) +
   labs(x = "Infant mortality",
        y = "Fertility rate",
        title = "Relationship between fertility and infant mortality in 2015") +
@@ -912,11 +905,10 @@ What variables does this dataset contain?
     
     ```
     ## # A tibble: 1 x 15
-    ##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton rawpoll_trump
-    ##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;         &lt;dbl&gt;
-    ## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41            48
-    ## # … with 6 more variables: rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-    ## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+    ##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton rawpoll_trump rawpoll_johnson rawpoll_mcmullin adjpoll_clinton adjpoll_trump
+    ##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;           &lt;dbl&gt;         &lt;dbl&gt;
+    ## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41            48              NA               NA            37.9          51.7
+    ## # … with 2 more variables: adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
     ```
    
 ---
@@ -978,7 +970,7 @@ What variables does this dataset contain?
 ```r
 mutate(polls_us_election_2016,
        trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
-       trump_raw_adj_diff = rawpoll_trump + adjpoll_trump)
+       trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
 ```
 
 # `select()`: only keep some variables
@@ -1000,9 +992,9 @@ class: inverse
 
 1. How many polls have a missing `grade`?
 
-*For the following questions you should use `filter` and `mutate`.*
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
 
-1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on November 5th, 2016 _or_ November 5th, 2015?
+*For the following questions you should use `filter` and `mutate`.*
 
 1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000.?
 
