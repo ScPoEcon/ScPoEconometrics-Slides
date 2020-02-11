@@ -661,11 +661,12 @@ ggplot(gapminder_2015,
 .pull-left[
 ```{r, echo = TRUE, eval = FALSE}
 ggplot(gapminder_2015,
-       aes(x = fertility,
-           y = infant_mortality)) +
+       aes(x = infant_mortality,
+           y = fertility)) +
   geom_point(size = 3,
              alpha = 0.5,
              colour = "#d90502") +
+  expand_limits(x = 0, y = 0) +
   labs(x = "Infant mortality",
        y = "Fertility rate",
        title = "Relationship between fertility and infant mortality in 2015") +
@@ -676,9 +677,14 @@ ggplot(gapminder_2015,
 .pull-right[
 ```{r, echo = FALSE, eval = TRUE, fig.height = 5}
 ggplot(gapminder_2015,
-       aes(x = fertility, y = infant_mortality)) +
-  geom_point(size = 3, alpha = 0.5, colour = "#d90502") +
-  labs(x = "Infant mortality", y = "Fertility rate",
+       aes(x = infant_mortality,
+           y = fertility)) +
+  geom_point(size = 3,
+             alpha = 0.5,
+             colour = "#d90502") +
+  expand_limits(x = 0, y = 0) +
+  labs(x = "Infant mortality",
+       y = "Fertility rate",
        title = "Relationship between fertility and infant mortality in 2015") +
   theme_bw(base_size = 16)
 ```
@@ -896,7 +902,7 @@ What variables does this dataset contain?
 ```{r, echo = TRUE, eval = FALSE}
 mutate(polls_us_election_2016,
        trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
-       trump_raw_adj_diff = rawpoll_trump + adjpoll_trump)
+       trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
 ```
 
 # `select()`: only keep some variables
@@ -917,9 +923,9 @@ class: inverse
 
 1. How many polls have a missing `grade`?
 
-*For the following questions you should use `filter` and `mutate`.*
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
 
-1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on November 5th, 2016 _or_ November 5th, 2015?
+*For the following questions you should use `filter` and `mutate`.*
 
 1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000.?
 
