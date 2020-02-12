@@ -41,14 +41,17 @@ om = par("mar")
 lowtop = c(om[1],om[2],0.1,om[4])
 library(magrittr)
 library(repmis)
+library(dplyr)
 library(ggplot2)
+library(gridExtra)
+library(haven)
 ```
 
 # Recap from from past Lectures and plan for this session
 
 **Recap** 
 
-* R basics : first steps with R studio, importing data, data handling 
+* R basics : first steps with R studio, importing data, data wrangling 
 
 * Summarising data and more advanced R (`ggplot`, `dplyr`) 
 
@@ -65,50 +68,72 @@ library(ggplot2)
 
 ---
 
-# Data
+# Student performance and class size : Data
 
-Let's start with the relation between **student performance and class size**.
+Let's look at the relation between **student performance and class size** first.
 
-The data we gonna use consists of test scores in fifth grade classes at public elementary schools in Israel. These data were originally used in [Angrist and Lavy (1999)](https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
+The data we use consists of test scores in fifth grade classes at public elementary schools in Israel. These data were originally used in [Angrist and Lavy (1999)](https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
 
  **TASK for you**
  
-* First, download the data from [here](https://www.dropbox.com/s/2g16pid3eky44bp/grades_classize.RData?dl=0) and open it in your R session.
+* First, load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1). (*Hint : you will need a special function to read* ** *.dta* **  *formated data*)
 
 ```{r, echo=FALSE}
-grades = read_dta("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
-
-grades = grades %>% 
-  group_by(classize) %>%
-  summarise(avgmath_by_class= mean(avgmath), 
-            avgread_by_class= mean(avgverb), 
-            avggrade_by_class= (avgread_by_class+avgmath_by_class)/2)
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1") %>%
+  filter(classize > 10 & classize < 40) 
 ```
 
-* Describe the dataset : What are the variables? What is an observation here? 
+* Describe the dataset : What informations do we have? What is an observation here? ...
 
-* Create a new dataset with both the average math and verbal grade by class size (*i.e. the average over multiple class that have the same class size*).
-
-* Add a new variable that summarise both grades for each class size (*simple solution : the mean*).
-
-* How do the grades seem to be related to the size of the class? 
+* What would you do to get an idea of the relationship between grades and class size? 
 
 ---
 
-# Data
+# Student performance and class size : Data 
 
-Let's plot these two variables together. 
+Let's aggregate the grades by class size and compute standardized scores. 
+
+ **TASK for you**
+
+* Add new variables (`std_math` and `std_verb`) that gives both the standardized math and verbal score.
+
+* Create a new dataset (`agg_grades`) where these standardized scores are averaged by class size. (*Hint : `group_by` class size and `summarise` using the `mean` function*)
+
+* Add a new variable `std_score` that give a unique score value to each class size.
+
+```{r, echo = FALSE}
+agg_grades = grades %>%
+  mutate(std_math = (avgmath - mean(avgmath))/sd(avgmath), 
+         std_verb = (avgverb - mean(avgverb))/sd(avgverb)) %>%
+  group_by(classize) %>%
+  summarise(std_math = mean(std_math),
+            std_verb = mean(std_verb)) %>%
+  mutate(std_score = (std_math+std_verb)/2, 
+         std_score_bis = 100*(std_score - min(std_score))/(max(std_score)- min(std_score)))
+```
+
+* How do the grades seem to be related to this score? 
+
+---
+
+# Student performance and class size : Plot 
+
+Let's vizualise the relationship between class size and student achievments.
 
 .pull-left[
 
+Plots of the raw data : 
 ```{r,echo=FALSE,fig.align='left',fig.height=5,fig.width=7}
-plot(avggrade_by_class ~ classize, data = grades,
-     xlab = "Class size",
-     ylab = "Average grade",
-     main = "Average grade by class size",
-     pch  = 20,
-     cex  = 2,
-     col  = "red")
+# `r emo::ji("anguished")`
+g_math = ggplot(grades, aes(x = classize, y = avgmath)) + 
+    geom_point(size = 0.75) +
+    labs(x = "class size",y = "Average math score") +
+    theme_bw()
+g_verb = ggplot(grades, aes(x = classize, y = avgverb)) + 
+    geom_point(size = 0.75) +
+    labs(x = "class size",y = "Average verbal score") +
+    theme_bw()
+grid.arrange(g_math,g_verb, nrow = 2)
 ```
 ]
 
@@ -116,28 +141,30 @@ plot(avggrade_by_class ~ classize, data = grades,
 
 .pull-right[
 
-<br>
-<br>
-<br>
-
-What is a good summary of their relationship?
+Plot after tyding the data : 
+```{r,echo=FALSE,fig.align='right',fig.height=5,fig.width=7}
+# `r emo::ji("happy")`
+ggplot(agg_grades, aes(x = classize, y = std_score)) + 
+  geom_point() +
+  labs(x = "class size",y = "Average std. score") +
+  theme_bw()
+```
 
 ]
 
 ---
 
-# A Line throught the Scatterplot
+# Student performance and class size
+
+How to summarize the relationship : **a line throught the scatterplot** 
 
 .left-wide[
-```{r,echo=FALSE,fig.align='center',fig.height=5,fig.width=7}
-plot(avggrade_by_class ~ classize, data = grades,
-     xlab = "Class size",
-     ylab = "Average grade",
-     main = "Average grade vs class size ",
-     pch  = 20,
-     cex  = 2,
-     col  = "red")
-abline(a = 66,b = 0,lw=3)
+```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=6}
+ggplot(agg_grades, aes(x = classize, y = std_score)) + 
+  geom_hline(yintercept = -0.25, col = "red") +
+  geom_point() +
+  labs(x = "class size",y = "Average std. score") +
+  theme_bw()
 ```
 ]
 
@@ -149,7 +176,7 @@ abline(a = 66,b = 0,lw=3)
 
 * A *line*! Great. But **which** line? This one?
 
-* That's a *flat* line. But `av_grade` is increasing. 
+* That's a *flat* line. But `std_score` is increasing. 
 
 * `r emo::ji("weary")`
 
@@ -157,18 +184,17 @@ abline(a = 66,b = 0,lw=3)
 
 ---
 
-# A Line throught the Scatterplot
+# Student performance and class size
+
+How to summarize the relationship : **a line throught the scatterplot** 
 
 .left-wide[
-```{r,echo=FALSE,fig.align='center',fig.height=5,fig.width=7}
-plot(avggrade_by_class ~ classize, data = grades,
-     xlab = "Class size",
-     ylab = "Average grade",
-     main = "Average grade vs class size ",
-     pch  = 20,
-     cex  = 2,
-     col  = "red")
-abline(a = 55,b = 0.4,lw=3)
+```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=6}
+ggplot(agg_grades, aes(x = classize, y = std_score)) + 
+  geom_point() + 
+  theme_bw() +
+  labs(x = "class size",y = "Average std. score") +
+  geom_abline(intercept = -1.5,slope = 0.05, col = "red")
 ```
 ]
 
@@ -177,13 +203,12 @@ abline(a = 55,b = 0.4,lw=3)
 .right-thin[
 
 <br>
-<br>
 
 * **That** one?
 
-* Slightly better. Has a **slope** and an **intercept**.
+* Slightly better. Has a **slope** and an **intercept**. emo::ji("neutral_face")
 
-* `r emo::ji("neutral_face")`
+* We need a rule to decide! 
 
 ]
 
@@ -198,7 +223,7 @@ Let's formalise a bit what we are doing so far.
 
 --
 
-* We simply and summarise this relationship with a line (for now).
+* We summarise this relationship with a line (for now).
 
 --
 
@@ -219,14 +244,25 @@ Let's formalise a bit what we are doing so far.
 
 # Writing Down A *Line* (2/2)
 
+</br>
+
 * At point $x_i$ we make error $e_i$.
 
-* Our aim will be to keep the error *as small as possible*, while at the same time giving a reasonable description of the data.
+</br>
+
+--
 
 * The *actual data* $(y_i,x_i)$ can thus be written like *prediction + error*:
     $$
     y_i = b_0 + b_1 x_i + e_i
     $$
+    
+</br>
+
+--
+
+* Our *aim* : Find the value for $b_0$ and $b_1$ that **make the errors as small as possible**. In addition we'll check if it **gives a reasonable description of the data**
+
 
 ---
 
@@ -255,14 +291,14 @@ plot_total_dev = function(reg_data,title=NULL) {
        xlab = "x", ylab = "y", pch = 20, cex = 4, col = "black")
   rect(xleft = reg_data$x, ybottom = reg_data$y,
          xright = reg_data$x + abs(reg_data$meandev), ytop = reg_data$y - reg_data$meandev, density = -1,
-         col = rgb(red = 1, green = 0, blue = 0, alpha = 0.5), border = NA)
+         col = rgb(red = 0, green = 1, blue = 0, alpha = 0.5), border = NA)
   } else {
     plot(reg_data$x, reg_data$y,
        xlab = "x", ylab = "y", pch = 20, cex = 2, col = "grey",main=title,ylim=c(-2,10.5))
      axis(side=2,at=seq(-2,10,by=2))
   rect(xleft = reg_data$x, ybottom = reg_data$y,
          xright = reg_data$x + abs(reg_data$meandev), ytop = reg_data$y - reg_data$meandev, density = -1,
-         col = rgb(red = 1, green = 0, blue = 0, alpha = 0.5), border = NA)
+         col = rgb(red = 0, green = 1, blue = 0, alpha = 0.5), border = NA)
   }
   # arrows(reg_data$x, reg_data$y_bar,
   #        reg_data$x, reg_data$y,
@@ -349,7 +385,7 @@ class: inverse
 
 # App Time!
 
-* Let's try to find the best line using only the *absolute value* of errors!
+* Let's try to find the best line by minimizing the sum of the errors $\sum^n_{i=1}{e_i}$!
 
 ```{r,eval=FALSE}
 library(ScPoEconometrics) # load our library
@@ -362,6 +398,9 @@ aboutApp('reg_simple_arrows') # explainer about app
 # Writing Down *The Best* Line
 
 .pull-left[
+
+</br>
+
 * choose $(b_0,b_1)$ s.t. the sum $e_1^2 + \dots + e_N^2$ is **as small as possible**
 
 * $e_1^2 + \dots + e_N^2$ is the *sum of squared residuals*, or SSR.
@@ -372,6 +411,8 @@ aboutApp('reg_simple_arrows') # explainer about app
 --
 
 .pull-right[
+
+</br>
 
 * In previous plot, errors of different sign $(+/-)$ cancel out!
 
@@ -403,7 +444,7 @@ par(mar = om)
 
 * Perfect! Minimizes the sum of squares.
 
-* `r emo::ji("relieved")`
+* emo::ji("relieved")
 
 ]
 
@@ -413,6 +454,7 @@ class: inverse
 # App Time!
 
 
+Let's minimize some squared errors! 
 ```{r,eval=FALSE}
 launchApp('reg_simple')
 aboutApp('reg_simple')
@@ -424,7 +466,9 @@ aboutApp('reg_simple')
 # Ordinary Least Squares (OLS)
 
 .pull-left[
-* OLS estimates the best line for us.
+* OLS estimates is precisely doing it for us, that is minimizing the squared errors.
+
+* But what is the formulae for our *line* parameters $b_0$ and $b_1$?
 
 * In our single regressor case, there is a simple formula for the slope:
   $$
@@ -436,7 +480,7 @@ aboutApp('reg_simple')
   b_0 = \bar{y} - b_1\bar{x}
   $$
 
-* `r emo::ji("rotating_light")` You **must** know and understand those formulae!
+* emo::ji("rotating_light") You **must** know and understand those formulae!
 
 ]
 
@@ -462,10 +506,10 @@ Let's take back our grades-class size example!
 .pull-left[
 
 ```{r echo=FALSE, fig.width=5,fig.height = 4, fig.align="left"}
-grades %>% 
-  ggplot(aes(x=classize,y=avggrade_by_class)) + 
-  geom_point(col = "red") + geom_smooth(method = "lm", se = F) + 
-  labs(x = "class size",y = "Average grade") +
+ggplot(agg_grades, aes(x = classize, y = std_score)) + 
+  geom_point() + 
+  theme_bw() + geom_smooth(method = "lm", se = F, col = "green") + 
+  labs(x = "class size",y = "Average std. score") +
   theme_classic()
 ```
 ]
@@ -477,7 +521,7 @@ grades %>%
 * **OLS in `R`**. You can run an OLS regression by executing this command
 
 ```{r echo=T, eval = F}
-reg = lm(avggrade_by_class~classize,grades) # assign the result of the regression to the "reg" object 
+reg = lm(std_score~classize,agg_grades) # assign the result of the regression to the "reg" object
 summary(reg) # to view the output 
 ```
 
@@ -485,12 +529,11 @@ summary(reg) # to view the output
 * We get theses values for $b_0$ and $b_1$
 
 ```{r echo=FALSE}
-coeffs = lm(avggrade_by_class~classize,grades)$coefficients
+coeffs = lm(std_score~classize,agg_grades)$coefficients
 coeffs
 ```
 
-* Interpret these two values.
-
+* **Task**: Interpret these two values.
 
 ]
 
@@ -513,7 +556,6 @@ class: inverse
 
 # App Time!
 
-
 Let's do some more OLS!
 
 ```{r,eval=FALSE}
@@ -523,11 +565,15 @@ aboutApp('reg_full')  # after
 
 ---
 
-# OLS without any Regressor
+# OLS Restrictions #1
+
+**OLS without regressors**
+
+--
 
 .pull-left[
 * Our line is flat at level $b_0$:
-  $$y = b_0$$
+  $$y_i = b_0$$
 * Our optimization problem is now
   $$b_0 = \arg\min_{\text{int}} \sum_{i=1}^N \left[y_i - \text{int}\right]^2,$$
 * With solution
@@ -537,23 +583,41 @@ aboutApp('reg_full')  # after
 --
 
 .pull-right[
-* In other words: Estimates the **mean** of $y$!
 
-```{r,echo = FALSE, fig.height = 6}
+* In other words: OLS estimates the **mean** of $y$!
+
+```{r,echo = FALSE, fig.height = 4, fig.width=7}
 par(mar = lowtop)
 plot_total_dev(plot_data)
 par(mar = om)
 ```
+
 ]
 
 
 ---
 
-# Other OLS Restrictions
+class: inverse
 
-* There are other restrictions we can impose.
+# OLS Restrictions #2
 
-* They are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`.
+**OLS without intercept**
+
+* Rahter than imposing no regressor we can see what happens with **no intercept** in the model. 
+
+```{r,eval=FALSE}
+launchApp('reg_constrained')
+aboutApp('reg_constrained')  # after
+```
+
+
+---
+
+# Other OLS variations
+
+* 
+
+* They are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional emo::ji("nerd_face").
 
 * There is an app for each of them:
 <br>
@@ -576,6 +640,7 @@ Standardized Regression | `launchApp('reg_standardized')`
 2. The average of $\widehat{y}_i$ is equal to $\bar{y}$.
     $$\begin{align}\frac{1}{N} \sum_{i=1}^N \widehat{y}_i &= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$
 --
+
 3. Then,
     $$\frac{1}{N} \sum_{i=1}^N e_i = \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i = 0$$
     i.e. the average of errors is zero.
@@ -599,18 +664,19 @@ Let's look at the data behind our *arrows* plot above:
 --
 
 .pull-right[
-To be fixed
 ```{r,echo=FALSE}
-# sd = subset(plot_data,select=c(x,y,y_hat,error))
-# sd = rbind(sd, colMeans(sd))
-# sd = cbind(c(rep("",nrow(sd)-1),"Means"),sd)
-# names(sd)[1] = ""
-# ss = hux(sd)
-# ss %>%
-#     add_colnames() %>%
-#     set_number_format(2) %>%
-#     set_bottom_border(c(1,nrow(sd)), 2:5,2) %>%
-#     set_align(row = 1,everywhere, "center")
+sd = subset(plot_data,select=c(x,y,y_hat,error))
+sd = rbind(sd, colMeans(sd))
+sd = cbind(c(rep("",nrow(sd)-1),"Means"),sd)
+names(sd)[1] = ""
+ss = hux(sd) 
+
+ss %>%
+  add_colnames() %>%
+  set_number_format(2) %>%
+  set_bottom_border(c(1,nrow(sd)), 2:5,2) %>%
+  set_align(row = 1,everywhere, "center")
+
 ```
 
 ]
@@ -633,13 +699,13 @@ To be fixed
 .pull-right[
 ```{r}
 # 1.
-# all.equal(mean(sd$y_hat), mean(sd$y))
+all.equal(mean(sd$y_hat), mean(sd$y))
 
 # 2.
-# all.equal(mean(sd$error), 0)
+all.equal(mean(sd$error), 0)
 
 # 3.
-# all.equal(cov(sd$error,sd$y_hat), 0)
+all.equal(cov(sd$error,sd$y_hat), 0)
 ```
 ]
 
@@ -668,7 +734,7 @@ To be fixed
 
 .left-wide[
 
-```{r,echo=FALSE,fig.height = 5}
+```{r,echo=FALSE,fig.height = 4}
 ##-- now some "magic" to do the 4 regressions in a loop:
 ff <- y ~ x
 mods <- setNames(as.list(1:4), paste0("lm", 1:4))
@@ -688,7 +754,7 @@ for(i in 1:4) {
   ff[2:3] <- lapply(paste0(c("y","x"), i), as.name)
   plot(ff, data = anscombe, col = "red", pch = 21, bg = "orange", cex = 1.2,
        xlim = c(3, 19), ylim = c(3, 13),main=paste("dataset",i))
-  abline(mods[[i]], col = "blue")
+  abline(mods[[i]], col = "green")
 }
 par(op)
 ```
@@ -697,14 +763,12 @@ par(op)
 --
 
 .right-thin[
-To be fixed 
 ```{r,echo = FALSE}
-# ch = hux(covs)
-# ch %>% 
-#   set_number_format(row = everywhere, col = c(2:4), 2) %>%
-#   set_number_format(row = everywhere, col = 1, 0) %>%
-#   add_colnames()
-
+ch = hux(covs)
+ch %>%
+  set_number_format(row = everywhere, col = c(2:4), 2) %>%
+  set_number_format(row = everywhere, col = 1, 0) %>%
+  add_colnames()
 ```
 
 ]
@@ -713,7 +777,9 @@ To be fixed
 # Dinosaurs in your Data?
 
 * So, be wary of only looking a linear summary stats.
+
 * Also look at plots.
+
 * Dinosaurs?
     ```{r,eval=FALSE}
     launchApp("datasaurus")
@@ -748,6 +814,7 @@ To be fixed
     ```
 
 ---
+
 # Analysis of Variance
 
 * Remember that $y_i = \widehat{y}_i + e_i$.
@@ -909,9 +976,8 @@ background-position: 9% 19%
 
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
-| <a href="mailto:pierre.villedieu@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | pierre.villedieu@sciencespo.fr       |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
 | <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
-
