@@ -72,7 +72,7 @@ library(haven)
 
 Let's look at the relation between **student performance and class size** first.
 
-The data we use consists of test scores in fifth grade classes at public elementary schools in Israel. These data were originally used in [Angrist and Lavy (1999)](https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
+The data we use consist of test scores in fifth grade classes at public elementary schools in Israel. These data were originally used in [Angrist and Lavy (1999)](https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
 
  **TASK for you**
  
@@ -178,7 +178,7 @@ ggplot(agg_grades, aes(x = classize, y = std_score)) +
 
 * That's a *flat* line. But `std_score` is increasing. 
 
-* `r emo::ji("weary")`
+* r emo::ji("weary")
 
 ]
 
@@ -970,8 +970,6 @@ background-size: 250px
 background-position: 9% 19%
 
 # END
-
-
 
 
 |                                                                                                            |                                   |
