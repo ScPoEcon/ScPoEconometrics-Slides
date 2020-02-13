@@ -28,6 +28,12 @@ Lecture 12: Recap (*coming soon!*)
 
 The suggested reading list can be found [here](https://github.com/ScPoEcon/ScPoEconometrics-Slides/blob/master/syllabus.md).
 
+## Legal
+
+You can copy and adapt this material for your purposes, as long as you give appropriate credit and share the work yourself  under same terms. Of course you can use the slides to teach in your classrooms. *Appropriate Credit* means that somewhere in your slides there is link back to this repo, indicating that this is what you are building upon. Click on the icon for details.
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+
 ## How to build
 
 * These are simply Rmarkdown slides.
