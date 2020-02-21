@@ -138,7 +138,7 @@ class:: inverse
 
 Let's aggregate the test scores by class size. *(N.B.: each observation is relative to a specific class, so the raw scores are already averages. Here we average these averages over class size.)*
 
- **TASK**
+ **TASK 2**
 
 * Create a new dataset (`grades_avg_cs`) where math and verbal scores are averaged by class size. Let's call these new average scores `avgmath_cs` and `avgverb_cs`. 
 
@@ -572,7 +572,7 @@ ols_math_classize = lm(avgmath_cs~classize, grades_avg_cs)
 
 ---
 
-# OLS in R : nothing more simple ! 
+# OLS with R
 
 You can run the OLS regression associated to the equation : 
 $$\textrm{avgmath_cs} = b_0 + b_1 \textrm{classsize} + e_i$$
@@ -597,7 +597,9 @@ summary(ols_math_classize)
 
 class: inverse
 
-# Task : OLS
+# OLS regression with R
+
+ **TASK 3**
 
 </br>
 
@@ -629,7 +631,9 @@ $$ \widetilde z = \frac{z - \bar z}{sd(z)} $$
 
 class: inverse
 
-# Task : Standardized OLS
+# Standardized OLS
+
+ **TASK 4**
 
 * Add 
     * 2 variables (`std_math` and `std_verb`) that gives both the standardized math and verbal score.
@@ -907,7 +911,9 @@ lines(density(wage1$wage), col = "black", lw = 2)
 
 class: inverse
 
-# Task : education and wage
+# Education and wage
+
+ **TASK 5**
 
 * Run the regression of the hourly wage on education. 
 
@@ -917,7 +923,7 @@ class: inverse
 
     * Each additional year of education increase hourly wage by **??** cents.
 
-    * Compute the predicted wage associated to 15 years of education.
+    * Compute the predicted wage associated to 20 years of education.
     
 ---
 
@@ -925,7 +931,16 @@ class: inverse
 
 You may have noticed that the relationship between wages and education is not perfectly linear. 
 
-TBD 
+.pull-left[
+```{r, echo = F, fig.height=5}
+plotfun(wage1, log = T, rug = F)
+```
+]
+
+.pull-right[
+
+TBD
+]
 
 ---
 
