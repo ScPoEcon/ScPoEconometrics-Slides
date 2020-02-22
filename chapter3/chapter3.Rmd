@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Session 3 : Simple linear Regression"
-author: "F. Oswald, G. Kenedi and P. Villedieu"
+subtitle: "Simple Linear Regression"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -36,9 +36,6 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-# define vars
-om = par("mar")
-lowtop = c(om[1],om[2],0.1,om[4])
 library("magrittr")
 library("repmis")
 library("dplyr")
@@ -49,98 +46,150 @@ library("ggpubr")
 library("huxtable")
 ```
 
-# Recap from from past Lectures and plan for this session
+# Recap from past weeks
 
-**Recap** 
+* `R` basics, importing data
 
-* R basics, data importing 
+* Exploratory data analysis:
 
-* Exploratory data analysis (`ggplot2`, `dplyr`)
-
-    * Data wrangling (subsetting, filtering,...)
-    * Summary statistics
-    * Data visualization
+    * Summary statistics: *mean*, *median*, *variance*, *standard deviation*
+    * Data wrangling: `dplyr`
+    * Data visualization: base `R` and `ggplot2`
 
 --
 
-**Plan for today**
+## Today - Real metrics' finally `r emo::ji("v")`
 
-* Introduction to Simple Linear Regression Model
+* Introduction to the __Simple Linear Regression Model__ and __Ordinary Least Squares__ *estimation*.
 
-* Empirical applications
+* Empirical applications:
 
-  - **Class size** and **students performance**
-  - **Education** and **wage**
+  - *Class size* and *student performance*,
+  - **Education** and **wages** (si on ne fait pas le log cet exemple ne sert à rien je trouve + je doute qu'on ait le temps de le faire)
 
 ---
 
-# Student performance and class size
+# Class size and student performance
 
-Let's look at the relationship between **student performance and class size** first.
+* What policies lead to improved student learning?
 
-This topic has been widely discussed in both the academic and political sphere. Throughout the course we'll see several approaches that have been followed by economists.
+* Class size reduction has been at the heart of policy debates for *decades*.
 
-For now, the data we will use consist of test scores in fifth grade classes at public elementary schools in Israel. 
+--
 
-These data were originally used in [Angrist and Lavy (1999)](https://www.dropbox.com/s/le8c38jrzma656t/angrist-lavy.pdf?dl=0)
+* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273)
+
+* Consists of test scores and class/school characteristics for fifth graders (10-11 years old) in Jewish public elementary schools in Israel in 1991.
+
+* National tests measured *mathematics* and (Hebrew) *reading* skills.
 
 ---
 
 class:: inverse
 
-# Student performance and class size : Data
-
- **TASK 1**
+# Task 1: Getting to know the data (7 minutes)
  
-* First, load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1). (*Hint : you will need a special function to read* ** *.dta* **  *formated data*)
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1).  
+You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+
+1. Describe the dataset:
+
+  * What is the unit of observations, i.e. what does each row correspond to?
+  * How many obseravtions are there?
+  * What variables do we have? View the dataset to see what the variables correspond to.
+  * What do the variables `avgmath` and `avgverb` correspond to?
+
+1. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
 
 ```{r, echo=FALSE}
-grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1") #%>%
-#  filter(classize > 10 & classize < 40) 
+# import data
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
 ```
-
-* Describe the dataset : What informations do we have? What defines an observation here? NA's?...
-
-* Do you have any prior about about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight? 
 
 ---
 
-# Student performance and class size : first plot  
+# Class size and student performance: Scatter plot
 
-.left-wide[
-```{r, echo=FALSE,fig.height=4,fig.width=6}
+.pull-left[
+```{r, echo=FALSE,fig.height=6}
 g_math = ggplot(grades, aes(x = classize, y = avgmath)) + 
-    geom_point(size = 0.5) +
-    labs(x = "class size",y = "Average math score") +
-    theme_bw()
+    geom_point(size = 2, alpha = 0.5) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(
+      x = "Class size",
+      y = "Average score",
+      title = "Mathematics") +
+    theme_bw(base_size = 20)
+g_math
+```
+]
+
+.pull-right[
+```{r, echo=FALSE,fig.height=6}
 g_verb = ggplot(grades, aes(x = classize, y = avgverb)) + 
-    geom_point(size = 0.5) +
-    labs(x = "class size",y = "Average verbal score") +
-    theme_bw()
-grid.arrange(g_math,g_verb, nrow = 2)
+    geom_point(size = 2, alpha = 0.5) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(x = "Class size",
+         y = "Average score",
+         title = "Reading") +
+    theme_bw(base_size = 20)
+g_verb
 ```
 ]
 
 --
 
-.right-thin[
+* Hard to see much because all the data points are aligned vertically. Let's add a bit of `jitter` to disperse the data slightly.
 
-* Seems to be a positive association but not easy to tell.
+---
 
-* Let's compute the average score by class size! 
+# Class size and student performance: `jitter` scatter plot 
 
+.pull-left[
+```{r, echo=FALSE,fig.height=6}
+g_math = ggplot(grades, aes(x = classize, y = avgmath)) + 
+    geom_point(size = 2, alpha = 0.5, position = "jitter") +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(
+      x = "Class size",
+      y = "Average score",
+      title = "Mathematics") +
+    theme_bw(base_size = 20)
+g_math
+```
 ]
+
+.pull-right[
+```{r, echo=FALSE,fig.height=6}
+g_verb = ggplot(grades, aes(x = classize, y = avgverb)) + 
+    geom_point(size = 2, alpha = 0.5, position = "jitter") +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(x = "Class size",
+         y = "Average score",
+         title = "Reading") +
+    theme_bw(base_size = 20)
+g_verb
+```
+]
+
+--
+
+* Seems to be a positive association but not easy to tell. Let's compute the average score by class size!
+
 ---
 
 class:: inverse
 
-# Student performance and class size : tidy plot  
+# Class size and student performance: Binned scatter plot <br/> (7 minutes) 
 
-Let's aggregate the test scores by class size. *(N.B.: each observation is relative to a specific class, so the raw scores are already averages. Here we average these averages over class size.)*
+1. Create a new dataset (`grades_avg_cs`) where math and verbal scores are averaged by class size. Let's call these new average scores `avgmath_cs` and `avgverb_cs`.  
+*N.B.: the "raw" scores are already averages at the class level. Here we average these averages by class size.*
 
- **TASK 2**
-
-* Create a new dataset (`grades_avg_cs`) where math and verbal scores are averaged by class size. Let's call these new average scores `avgmath_cs` and `avgverb_cs`. 
+1. Redo the same plots as before. Is the sign of the relationship more apparent?
 
 ```{r, echo = FALSE}
 grades_avg_cs = grades %>%
@@ -149,109 +198,100 @@ grades_avg_cs = grades %>%
             avgverb_cs = mean(avgverb))
 ```
 
-
-* Redo the same plots as before. 
-
 ---
 
-# Student performance and class size : Plot 
-
-Let's vizualise the relationship between class size and student achievements.
+# Class size and student performance: Binned scatter plot 
 
 .pull-left[
-
-Plots of the raw data (with `jitter`) 
-```{r,echo=FALSE,fig.align='left',fig.height=5,fig.width=7}
-# `r emo::ji("anguished")`
-g_math = ggplot(grades, aes(x = classize, y = avgmath)) + 
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(x = "class size",y = "Average math score") +
-  theme_bw() +
-  geom_jitter(alpha = 0.5, size = 0.5)
-g_verb = ggplot(grades, aes(x = classize, y = avgverb)) + 
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(x = "class size",y = "Average verbal score") +
-  theme_bw()+
-  geom_jitter(alpha = 0.5, size = 0.5)
-grid.arrange(g_math,g_verb, nrow = 2)
+```{r, echo=FALSE,fig.height=6}
+g_math_cs = ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(
+      x = "Class size",
+      y = "Average score",
+      title = "Mathematics") +
+    theme_bw(base_size = 20)
+g_math_cs
 ```
 ]
 
---
-
 .pull-right[
-
-Plot after grouping by class size
-```{r,echo=FALSE,fig.align='right',fig.height=5,fig.width=7}
-# `r emo::ji("happy")`
-g_math_cs = ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
-    geom_point(size = 0.75) +
-    labs(x = "class size",y = "Average math score") +
-    theme_bw()
+```{r, echo=FALSE,fig.height=6}
 g_verb_cs = ggplot(grades_avg_cs, aes(x = classize, y = avgverb_cs)) + 
-    geom_point(size = 0.75) +
-    labs(x = "class size",y = "Average verbal score") +
-    theme_bw()
-grid.arrange(g_math_cs,g_verb_cs, nrow = 2)
+    geom_point(size = 2) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(x = "Class size",
+         y = "Average score",
+         title = "Reading") +
+    theme_bw(base_size = 20)
+g_verb_cs
 ```
-
 ]
 
 ---
 
-# Student performance and class size
+# Class size and student performance: Binned scatter plot
 
-How to summarize the relationship : **a line throught the scatterplot** 
+* We'll first focus on the mathematics scores and for visual simplicity we'll zoom in
+
+```{r, echo=FALSE,fig.height=4.75, fig.width = 8}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14)
+```
+
+---
+
+# Class size and student performance: Which line?
+
+How to visually summarize the relationship: **a line through the scatter plot**
 
 .left-wide[
 ```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
-ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
-  geom_hline(yintercept = 65, col = "red") +
-  geom_point() +
-  labs(x = "class size",y = "Average math score") +
-  theme_bw()
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  geom_hline(yintercept = 65, col = "red")
 ```
 ]
 
 --
 
 .right-thin[
-<br>
 <br>
 
 * A *line*! Great. But **which** line? This one?
 
-* That's a *flat* line. But `avgmath_cs` is increasing with class size. 
-
-* r emo::ji("weary")
+* That's a *flat* line. But average mathematics score is somewhat *increasing* with class size `r emo::ji("weary")`
 
 ]
 
 ---
 
-# Student performance and class size
+# Class size and student performance: Which line?
 
-How to summarize the relationship : **a line throught the scatterplot** 
+How to visually summarize the relationship: **a line through the scatter plot**
 
 .left-wide[
 ```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
-ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
-  geom_point() + 
-  theme_bw() +
-  labs(x = "class size",y = "Average math score") +
-  geom_abline(intercept = 50,slope = 0.6, col = "red")
+g_math_cs +
+  ylim(50, 80) +
+  theme_bw(base_size = 14) +
+  geom_abline(intercept = 55,slope = 0.6, col = "red")
 ```
 ]
 
 --
 
 .right-thin[
-
 <br>
 
 * **That** one?
 
-* Slightly better. Has a **slope** and an **intercept**. emo::ji("neutral_face")
+* Slightly better! Has a **slope** and an **intercept** `r emo::ji("neutral_face")`
 
 * We need a rule to decide! 
 
@@ -260,19 +300,24 @@ ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) +
 
 ---
 
-# Writing Down A *Line* #1
+# Writing Down A *Line*
 
 Let's formalise a bit what we are doing so far. 
 
-* We are interested in the relationship between two variables for which we observe several *individual* $(x_i,y_i)$. 
+* We are interested in the relationship between two variables:
+  * an __outcome variable__ (also called __dependent variable__):  
+  *average mathematics score* $(y_i)$
+  
+  * an __explanatory variable__ (also called __independent variable__ or __regressor__):  
+  *class size* $(x_i)$
+  
+--
+
+* For each class we observe both $x_i$ and $y_i$, and therefore we can plot the *joint distribution* of class size and average mathematics score.
 
 --
 
-* We summarise this relationship with a line (for now).
-
---
-
-* The equation for such a line with intercept $b_0$ and slope $b_1$ is:
+* We summarise this relationship with a line (for now). The equation for such a line with an intercept $b_0$ and a slope $b_1$ is:
     $$
     \widehat{y}_i = b\_0 + b\_1 x\_i
     $$
@@ -281,41 +326,74 @@ Let's formalise a bit what we are doing so far.
 
 * $\widehat{y}_i$ is our *prediction* for $y_i$ given our model (i.e. the line).
 
+---
+
+# Writing Down A *Line* : Error term
+
+* If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
+
 --
 
-* Most of the times, $\widehat{y}_i \neq y_i$, i.e. we make an *error*.
+```{r, echo = FALSE, fig.height = 4,fig.width=7}
+x <- runif(50, min  = 0, max = 1)
+y <- 1 * x
+
+data <- data.frame(y = y,
+                   x = x)
+
+plot_ex <- data %>% ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  labs(x = "x",
+       y = "y") +
+  theme_bw(base_size = 14)
+plot_ex
+```
 
 ---
 
-# Writing Down A *Line* #2
+# Writing Down A *Line* : Error term
 
-</br>
+* If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
-* At point $x_i$ we make error $e_i$.
+```{r, echo = FALSE, fig.height = 4,fig.width=7}
+plot_ex + geom_line(color = "red")
+```
 
-</br>
+---
 
---
+# Writing Down A *Line* : Error term
 
-* The *actual data* $(y_i,x_i)$ can thus be written like *prediction + error*:
-    $$
-    y_i = b_0 + b_1 x_i + e_i
-    $$
-    
-</br>
+* If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
---
-
-* Our **goal** : Find the values for $b_0$ and $b_1$ that **make the errors as small as possible**.
+* However, since student performance is not *only* explained by class size, $\widehat{y}_i \neq y_i$, i.e. we make an __error__. This __error__ is called the __error term__.
 
 --
 
-* In addition we'll check if it **gives a reasonable description of the data**.
+* At point $(x_i,y_i)$, we note this error $e_i$.
+
+--
+
+* The *actual data* $(y_i,x_i)$ can thus be written as *prediction + error*:
+
+  $$
+  \overbrace{y_i}^\text{actual outcome} = \underbrace{b_0 + b_1 x_i}_\text{prediction} + \underbrace{e_i}_\text{error term}
+  $$
+
+--
+
+* **Goals**
+  * Find the values for $b_0$ and $b_1$ that **make the errors as small as possible**,
+  * Check whether these values **give a reasonable description of the data**.
 
 
 ---
 
-# Making Errors
+# The Error Term: Visually
+
+Have x-axis go to 0. + make this graph nicer!
+ideally with the class size and student performance data no?
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 generate_data = function(int = 0.5,
@@ -437,8 +515,8 @@ class: inverse
 
 # App Time!
 
-At first sight, one might try to simply minimize the sum of all the errors
-$\sum^n_{i=1}{e_i}$
+Intuitively one might want to simply minimize the sum of all the errors
+$\sum^n_{i=1}{e_i}$.
 
 Let's try to find the best line by minimizing the sum of the errors.
 
@@ -450,7 +528,7 @@ aboutApp('reg_simple_arrows') # explainer about app
 
 ---
 
-# Writing Down A *Line* #3
+# Writing Down A *Line*
 
 
 .pull-left[
@@ -458,11 +536,11 @@ aboutApp('reg_simple_arrows') # explainer about app
 </br>
 
 * Errors of different sign $(+/-)$ cancel out, so let's consider **squared residuals** 
-$$\forall i, e_i^2 = (y_i - b_0 - b1x_i)^2$$
+$$\forall i \in [1,N], e_i^2 = (y_i - b_0 - b_1 x_i)^2$$
 
-* Choose $(b_0,b_1)$ s.t. the sum $e_1^2 + \dots + e_N^2$ is **as small as possible**
+* Choose $(b_0,b_1)$ such that the sum $e_1^2 + \dots + e_N^2$ is **as small as possible**.
 
-* $e_1^2 + \dots + e_N^2$ is the *sum of squared residuals*, or SSR.
+* ***Sum of Squared Residuals*** (SSR): $e_1^2 + \dots + e_N^2$
 ]
 
 --
@@ -492,23 +570,25 @@ aboutApp('reg_simple')
 
 ---
 
-# **O**rdinary **L**east **S**quares (OLS) #1
+# **O**rdinary **L**east **S**quares (OLS): Coefficient Formulas
 
-* Minimizing the sum of squared residuals is precisely what **OLS** regression does !! 
+* **OLS**: estimation technique consisting in minimizing the sum of squared residuals.
 
-* But what is the formulae for $b_0$ (intercpet) and $b_1$ (slope)?
+* So what are the formulae for $b_0$ (intercept) and $b_1$ (slope)?
 
-* In our single regressor case, there is a simple formula for the slope:
-  $$
-  b_1^{OLS} = \frac{cov(x,y)}{var(x)}
-  $$
-  
-* and for the intercept
-  $$
-  b_0^{OLS} = \bar{y} - b_1\bar{x}
-  $$
+--
 
-* N.B. OLS relies on squared residuals, one could have think of using absolute values of errors $|e_i|$ instead, it exist and it is actually another estimator.  
+* In our single independent variable case:
+
+   ### __Slope: $b_1^{OLS} = \frac{cov(x,y)}{var(x)}$ $\hspace{2cm}$ Intercept: $b_0^{OLS} = \bar{y} - b_1\bar{x}$__
+
+--
+
+* `r emo::ji("exclamation")` You should know these formulas, especially the one for $b_1^{OLS}$ `r emo::ji("exclamation")`
+   
+--
+
+* These formulas do not appear from magic. They can be found by solving the minimisation of squared errors. The maths can be found [here](https://www.youtube.com/watch?v=Hi5EJnBHFB4) for those who are interested.
 
 ---
 
@@ -524,134 +604,135 @@ aboutApp('SSR_cone')  # after
 ```
 
 ---
-# **O**rdinary **L**east **S**quares (OLS) #2
 
-</br>
+# **O**rdinary **L**east **S**quares (OLS): Interpretation
 
-**Interpreting** OLS (for now we assume x and y to be numerical). 
+For now assume both the dependent variable $(y)$ and the independent variable $(x)$ are numeric.
 
-* Intercept $(b_0)$ : The predicted value of $y$ if $x$ is set to 0
+--
 
-* Slope $(b_1)$ : The change in $y$ associated to an increase of $x$ by one unit.
+* Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if $x = 0$.**
 
-Remember that OLS in this case OLS fits the best... *line*, so the interpretation is exactly the same as the one of the intercept and slope of a line.
+--
+
+* Slope $(b_1)$: **The change in the predicted value of $y$ associated to a one-unit increase in $x$.**
+
+--
+
+## Graphical Interpretation
+
+Create graph
 
 ---
 
-# OLS : class size and student achievement
+# Application: Class size and student performance
 
-Let's take back our grades-class size example! We focus on math score here. 
+Let's go back our class size and student performance data. Let's display the OLS line.
 
-.pull-left[
+.left-wide[
 
-```{r echo=FALSE, fig.width=6,fig.height = 4}
-ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
-    geom_point(size = 0.75) +
-    geom_smooth(method = "lm", se = F, col = "green") + 
-    labs(x = "class size",y = "Average math score") +
-    stat_regline_equation(label.x = 30, label.y = 55, col = "darkgreen") +
-    theme_bw()
-
-ols_math_classize = lm(avgmath_cs~classize, grades_avg_cs)
+```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
+g_math_cs +
+  ylim(50, 80) +
+  theme_bw(base_size = 14) +
+  geom_smooth(method = "lm", se = F, col = "darkgreen")
 ```
 ]
 
 --
 
-.pull-right[
+.right-thin[
 
 </br>
 
-* You can notice that some points/observations are poorly fitted by the OLS line. 
+* Some points (observations) are poorly fitted by the OLS line. 
 
-* We call them **outliers**. 
-
-* Looking at the regression line equation, can you make sens of the two values `r round(ols_math_classize$coefficients[1])` and `r round(ols_math_classize$coefficients[2],2)`?
-
+* We call them **outliers**.
 ]
 
 ---
 
-# OLS with R
+# OLS with `R`
 
-You can run the OLS regression associated to the equation : 
-$$\textrm{avgmath_cs} = b_0 + b_1 \textrm{classsize} + e_i$$
+* In `R`, OLS regressions are estimated using the `lm` function.
 
-by using the `lm` function : 
+* This is how it works:
 
-```{r echo=T, eval = F}
-ols_math_classize = lm(formula = avgmath_cs~classize, data = grades_avg_cs) # assign the result of the regression to the "ols_math_classize" object
+  ```{r, echo = TRUE, eval = FALSE}
+  lm(dependent variable ~  independent variable, data = data.frame containing the data)
+  ```
+
+--
+
+## Class size and student performance
+
+Let's estimate the following model by OLS: $\textrm{avgmath_cs}_i = b_0 + b_1 \textrm{classsize}_i + e_i$
+
+```{r echo=T, eval = TRUE}
+# OLS regression of class size on average maths score
+lm(formula = avgmath_cs~classize, data = grades_avg_cs) 
 ```
-
-Then, to obtain a summary of this regression, call the `summary` function : 
-
-```{r echo=TRUE, eval = F}
-summary(ols_math_classize)
-```
-
-* There is a lot of information given in the summary output, we focus only on the OLS coefficients $(b_o, b_1)$
-
-* The next lectures will allow you to make sens of the whole thing.  
 
 ---
 
 class: inverse
 
-# OLS regression with R
+# Task 3: OLS Regression (7 minutes)
 
- **TASK 3**
+1. Run the same OLS regression by yourself but using average verbal score as the dependent variable.
 
-</br>
+2. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
 
-* Run the same OLS regression by yourself but for the verbal score.
+3. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
 
-* Does the slope coefficient close to the one of math score? Was it expected?
-
-* Prediction : What is the expected score when the class size is equal to 30? 
+3. What is the predicted average verbal score when the class size is equal to 30 students?
 
 
 ---
 
 # Standardized regression 
 
-* Standardizing a variable means to demean and to divide the demeaned value by its own standard deviation. 
+Standardizing a variable $z$:
 $$ \widetilde z = \frac{z - \bar z}{sd(z)} $$
+where $\bar z$ is $z$'s *mean* and $sd(z)$ is $z$'s *standard deviation*.
 
-* But why would we standardize the variables in the regression?
+Why would we standardize the variables in the regression?
 
 --
 
-* Imagine a **beauty contest** where judges take into account **weight** (measured in *kilograms*) and **height** (measure in *meters*). You are asked to combine them into a single measure. 
+* To be able to __interpret the *magnitude* of an independent variable's coefficient__. Remember that the OLS coefficient is sensitive to the independent variable's unit. Why?
 
-* Simply taking the average of the two would not be very informative because the variations in height would be completely diluted by the variations in weight. 
+--
 
-* Standardizing the two variables first would solve this problem. 
+* The dependent variable or independent variable's __units are difficult to interpret__ in themselves.  
+*Example:* Is a 1-point increase in student test scores meaningful? Depending on the spread of the scores, not clear whether that would be a big or small change...
+
+--
+
+* To __combine variables together__.  
+*Example:* if we want to combine the mathematics and verbal scores together.
 
 ---
 
 class: inverse
 
-# Standardized OLS
+# Task 4: Standardized OLS
 
- **TASK 4**
-
-* Add 
-    * 2 variables (`std_math` and `std_verb`) that gives both the standardized math and verbal score.
+1. Create 2 variables (`std_math` and `std_verb`) that contain the standardized average math and verbal scores.
  
-    * a new variable `std_score` that associate to each class size a unique score.
+2. Create a new variable `std_score` that associates to each class size a unique score.
 
-    * a new variable `std_classize` that is the standardized class size. 
+3. Create a new variable `std_classize` that is the standardized class size.
 
+4. Run the OLS regression of `std_score` on `std_classize`. 
 
-* Run the OLS regression of the `std_score` on the `std_classize`. 
-
-* Interpret the value of each coefficient. 
+5. Interpret the value of each coefficient.
 
 ---
 
 # Other OLS variations / restrictions
 
-* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional emo::ji("nerd_face").
+* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`.
 
 * There is an app for each of them:
 <br>
@@ -666,10 +747,10 @@ Standardized Regression | `launchApp('reg_standardized')`
 
 ---
 
-# Predictions and Residuals
+# Predictions and Residuals => maybe show here that prediction is uncorrelated with error
 
 
-1. The error is $e_i = y_i - \widehat{y}_i$
+1. The error term is $e_i = y_i - \widehat{y}_i$
 
 2. The average of $\widehat{y}_i$ is equal to $\bar{y}$.
     $$\begin{align}\frac{1}{N} \sum_{i=1}^N \widehat{y}_i &= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$
@@ -682,7 +763,7 @@ Standardized Regression | `launchApp('reg_standardized')`
 ---
 
 
-# Properties of Residuals
+# Properties of Residuals => je ne comprends vraiment pas l'intérêt de ce slide. les données du arrow plot ne valent rien. autant leur montrer avec la regression de class size sur average math score, non!
 
 .pull-left[
 1. The average of $\widehat{y}_i$ is the same as the mean of $y$.
@@ -716,7 +797,7 @@ ss
 
 ---
 
-# Properties of Residuals
+# Properties of Residuals => même commentaire que ci-dessus
 
 .pull-left[
 
@@ -745,25 +826,23 @@ all.equal(cov(sd$error,sd$y_hat), 0)
 ---
 
 
-# Linear Statistics
+# Linearity
 
-* It's important to keep in mind that Var, Cov, Corr and Regression measure **linear relationships** between two variables.
+* It's important to keep in mind that covariance, correlation and simple OLS regression only measure **linear relationships** between two variables.
 
-* Two datasets with *identical* correlations could look *vastly* different.
-
-* They would have the same regression line.
-
-* Same correlation coefficient.
+* Two datasets with *identical* correlations and regression lines could look *vastly* different.
 
 --
 
 * Is that even possible?
+<img src="https://media.giphy.com/media/5aLrlDiJPMPFS/giphy.gif" height = "400" align = "middle" />
+
 
 ---
 
-# Linear Statistics: Anscombe
+# Linearity: Anscombe
 
-* Francis Anscombe (1973) comes up with 4 datasets with identical stats. But look!
+* Francis Anscombe (1973) came up with 4 datasets with identical stats. But look!
 
 .left-wide[
 
@@ -812,25 +891,28 @@ ch %>%
 .pull-left[
 * We can accomodate non-linear relationships in regressions.
 
-* We'd just add a higher order term like this:
+* Just add a higher order term like this:
     $$
     y_i = b_0 + b_1 x_i + b_2 x_i^2 + e_i
     $$
     
-* This is *multiple regression* (next chapter!)
+* This is *multiple regression* (in 2 weeks!)
 ]
 
 --
 
 .pull-right[
 * For example, suppose we had this data and fit the previous regression model:
-    ```{r non-line-cars-ols2,echo=FALSE,echo=FALSE,fig.height = 5}
-    l1 = lm(mpg~hp+I(hp^2),data=mtcars)
-    newdata=data.frame(hp=seq(from=min(mtcars$hp),to=max(mtcars$hp),length.out=100))
-    newdata$y = predict(l1,newdata=newdata)
-    plot(mtcars$hp,mtcars$mpg,xlab="x",ylab="y",pch = 20, cex = 2)
-    grid()
-    lines(newdata$hp,newdata$y,lw=3,col = "red")
+    ```{r non-line-cars-ols2,echo=FALSE,echo=FALSE,fig.height = 6}
+    data(mtcars)
+    mtcars %>% ggplot(aes(x = hp, y = mpg)) +
+      geom_point() +
+      stat_smooth(method='lm', formula = y~poly(x,2), se = FALSE) +
+      labs(x = "x",
+           y = "y",
+           title = "Nonlinear relationship between x and y") +
+    theme_bw(base_size = 20)
+
     ```
 ]
 
@@ -843,23 +925,57 @@ ch %>%
 * We have the following decomposition:
     $$\begin{align} Var(y) &= Var(\widehat{y} + e)\\&= Var(\widehat{y}) + Var(e) + 2 Cov(\widehat{y},e)\\&= Var(\widehat{y}) + Var(e)\end{align}$$
     
-* Because: $Cov(\hat{y},e)=0$
+* Because:
+  * $Var(x+y) = Var(x) + Var(y) + 2Cov(x,y)$
+  * $Cov(\hat{y},e)=0$
 
-* Total variation (SST) = Model explained (SSE) + Unexplained (SSR)
+* __Total variation (SST) = Model explained (SSE) + Unexplained (SSR)__
 
 
 ---
 
-# Assessing the Goodness of Fit
+# Goodness of Fit
 
-* The $R^2$ measures how good the model fits the data.
+* The $R^2$ measures how well the model fits the data.
 
-* $R^2$ close to $1$ indicates a very high explanatory power of the model, $R^2$ close to $0$ means that the variations in the outcome $(y)$ are very poorly captured.
-    $$
-    R^2 = \frac{\text{variance explained}}{\text{total variance}} =     \frac{SSE}{SST} = 1 - \frac{SSR}{SST}\in[0,1]
-    $$
+--
+
+$$
+R^2 = \frac{\text{variance explained}}{\text{total variance}} =     \frac{SSE}{SST} = 1 - \frac{SSR}{SST}\in[0,1]
+$$
+
+--
     
-* NB: Small $R^2$ doesn't mean it's a useless model!
+* $R^2$ close to $1$ indicates a very high explanatory power of the model
+
+* $R^2$ close to $0$ means that the variations in the outcome $(y)$ are very poorly captured.
+
+--
+
+* Interpretation: an $R^2$ of 0.5, for example, means that the variation in $x$ "explains" 50% of the variation in $y$.
+
+--
+    
+* `r emo::ji("warning")` Low $R^2$ does __NOT__ mean it's a useless model! Remember that econometrics is interested in causal mechanisms, not prediction!
+
+---
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU NEXT WEEK!
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
 
 ---
 
@@ -941,22 +1057,3 @@ plotfun(wage1, log = T, rug = F)
 
 TBD
 ]
-
----
-
-
-class: title-slide-final, middle
-background-image: url(../img/logo/ScPo-econ.png)
-background-size: 250px
-background-position: 9% 19%
-
-# END
-
-
-|                                                                                                            |                                   |
-| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
-| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
-| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
-| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
-| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
-| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
