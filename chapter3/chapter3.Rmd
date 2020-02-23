@@ -36,10 +36,8 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-library("magrittr")
+library(tidyverse)
 library("repmis")
-library("dplyr")
-library("ggplot2")
 library("gridExtra")
 library("haven")
 library("ggpubr")
@@ -53,25 +51,24 @@ library("huxtable")
 * Exploratory data analysis:
 
     * Summary statistics: *mean*, *median*, *variance*, *standard deviation*
-    * Data wrangling: `dplyr`
     * Data visualization: base `R` and `ggplot2`
+    * Data wrangling: `dplyr`
 
 --
 
-## Today - Real metrics' finally `r emo::ji("v")`
+## Today - Real 'metrics finally `r emo::ji("v")`
 
 * Introduction to the __Simple Linear Regression Model__ and __Ordinary Least Squares__ *estimation*.
 
-* Empirical applications:
+* Empirical application: *class size* and *student performance*
 
-  - *Class size* and *student performance*,
-  - **Education** and **wages** (si on ne fait pas le log cet exemple ne sert à rien je trouve + je doute qu'on ait le temps de le faire)
+* Keep in mind that we are interested in uncovering **causal** relationships
 
 ---
 
 # Class size and student performance
 
-* What policies lead to improved student learning?
+* What policies *lead* to improved student learning?
 
 * Class size reduction has been at the heart of policy debates for *decades*.
 
@@ -89,17 +86,20 @@ class:: inverse
 
 # Task 1: Getting to know the data (7 minutes)
  
-1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1).  
-You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1). You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
 
 1. Describe the dataset:
 
   * What is the unit of observations, i.e. what does each row correspond to?
-  * How many obseravtions are there?
+  * How many observations are there?
   * What variables do we have? View the dataset to see what the variables correspond to.
   * What do the variables `avgmath` and `avgverb` correspond to?
+  * Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`.  
+  Hint: use `dplyr` to `select` the variables and then simply pipe (`%>%`) `skim()`.
 
 1. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
+
+1. Compute the correlation between class size and math and verbal scores. Is the relationship positive/negative, strong/weak?
 
 ```{r, echo=FALSE}
 # import data
@@ -184,12 +184,14 @@ g_verb
 
 class:: inverse
 
-# Class size and student performance: Binned scatter plot <br/> (7 minutes) 
+# Task 2: Binned scatter plot (7 minutes)
 
 1. Create a new dataset (`grades_avg_cs`) where math and verbal scores are averaged by class size. Let's call these new average scores `avgmath_cs` and `avgverb_cs`.  
 *N.B.: the "raw" scores are already averages at the class level. Here we average these averages by class size.*
 
 1. Redo the same plots as before. Is the sign of the relationship more apparent?
+
+1. Compute the correlation between class size and the new aggreagated math and verbal scores variables. Why is the (linear) association so much stronger?
 
 ```{r, echo = FALSE}
 grades_avg_cs = grades %>%
@@ -245,9 +247,11 @@ g_math_cs +
 
 ---
 
-# Class size and student performance: Which line?
+# Class size and student performance: Regression line
 
 How to visually summarize the relationship: **a line through the scatter plot**
+
+--
 
 .left-wide[
 ```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
@@ -271,7 +275,7 @@ g_math_cs +
 
 ---
 
-# Class size and student performance: Which line?
+# Class size and student performance: Regression line
 
 How to visually summarize the relationship: **a line through the scatter plot**
 
@@ -300,13 +304,18 @@ g_math_cs +
 
 ---
 
-# Writing Down A *Line*
+# Simple Linear Regression
 
 Let's formalise a bit what we are doing so far. 
 
 * We are interested in the relationship between two variables:
+
+--
+
   * an __outcome variable__ (also called __dependent variable__):  
   *average mathematics score* $(y_i)$
+  
+--
   
   * an __explanatory variable__ (also called __independent variable__ or __regressor__):  
   *class size* $(x_i)$
@@ -328,7 +337,7 @@ Let's formalise a bit what we are doing so far.
 
 ---
 
-# Writing Down A *Line* : Error term
+# Simple Linear Regression: Error term
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
@@ -353,7 +362,7 @@ plot_ex
 
 ---
 
-# Writing Down A *Line* : Error term
+# Simple Linear Regression: Error term
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
@@ -363,11 +372,12 @@ plot_ex + geom_line(color = "red")
 
 ---
 
-# Writing Down A *Line* : Error term
+# Simple Linear Regression: Error term
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
-* However, since student performance is not *only* explained by class size, $\widehat{y}_i \neq y_i$, i.e. we make an __error__. This __error__ is called the __error term__.
+* However, since in most cases the *dependent variable* $(y_i)$ is not *only* explained by the chosen *independent variable* $(x_i)$, $\widehat{y}_i \neq y_i$, i.e. we make an __error__.  
+This __error__ is called the __error term__.
 
 --
 
@@ -375,10 +385,10 @@ plot_ex + geom_line(color = "red")
 
 --
 
-* The *actual data* $(y_i,x_i)$ can thus be written as *prediction + error*:
+* The *actual data* $(x_i,y_i)$ can thus be written as *prediction + error*:
 
   $$
-  \overbrace{y_i}^\text{actual outcome} = \underbrace{b_0 + b_1 x_i}_\text{prediction} + \underbrace{e_i}_\text{error term}
+  y_i = \widehat y_i + e_i = b_0 + b_1 x_i + e_i
   $$
 
 --
@@ -390,135 +400,84 @@ plot_ex + geom_line(color = "red")
 
 ---
 
-# The Error Term: Visually
+# Simple Linear Regression: Graphically
 
-Have x-axis go to 0. + make this graph nicer!
-ideally with the class size and student performance data no?
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-generate_data = function(int = 0.5,
-                         slope = 1,
-                         sigma = 10,
-                         n_obs = 9,
-                         x_min = 0,
-                         x_max = 10) {
-  x = seq(x_min, x_max, length.out = n_obs)
-  y = int + slope * x + rnorm(n_obs, 0, sigma)
-  fit = lm(y ~ x)
-  y_hat = fitted(fit)
-  y_bar = rep(mean(y), n_obs)
-  error = resid(fit)
-  meandev = y - y_bar
-  data.frame(x, y, y_hat, y_bar, error, meandev)
-}
-
-plot_total_dev = function(reg_data,title=NULL) {
-  if (is.null(title)){
-    plot(reg_data$x, reg_data$y,
-       xlab = "x", ylab = "y", pch = 20, cex = 4, col = "black")
-  rect(xleft = reg_data$x, ybottom = reg_data$y,
-         xright = reg_data$x + abs(reg_data$meandev), ytop = reg_data$y - reg_data$meandev, density = -1,
-         col = rgb(red = 0, green = 1, blue = 0, alpha = 0.5), border = NA)
-  } else {
-    plot(reg_data$x, reg_data$y,
-       xlab = "x", ylab = "y", pch = 20, cex = 2, col = "grey",main=title,ylim=c(-2,10.5))
-     axis(side=2,at=seq(-2,10,by=2))
-  rect(xleft = reg_data$x, ybottom = reg_data$y,
-         xright = reg_data$x + abs(reg_data$meandev), ytop = reg_data$y - reg_data$meandev, density = -1,
-         col = rgb(red = 0, green = 1, blue = 0, alpha = 0.5), border = NA)
-  }
-  # arrows(reg_data$x, reg_data$y_bar,
-  #        reg_data$x, reg_data$y,
-  #        col = 'grey', lwd = 1, lty = 3, length = 0.2, angle = 20)
-  abline(h = mean(reg_data$y), lwd = 4,col = "black")
-  # abline(lm(y ~ x, data = reg_data), lwd = 2, col = "grey")
-}
-
-plot_total_dev_prop = function(reg_data) {
-  plot(reg_data$x, reg_data$y,
-       xlab = "x", ylab = "y", pch = 20, cex = 2, col = "grey")
-  arrows(reg_data$x, reg_data$y_bar,
-         reg_data$x, reg_data$y_hat,
-         col = 'darkorange', lwd = 1, length = 0.2, angle = 20)
-  arrows(reg_data$x, reg_data$y_hat,
-         reg_data$x, reg_data$y,
-         col = 'dodgerblue', lwd = 1, lty = 2, length = 0.2, angle = 20)
-  abline(h = mean(reg_data$y), lwd = 2,col = "grey")
-  abline(lm(y ~ x, data = reg_data), lwd = 2, col = "grey")
-}
-
-plot_unexp_dev = function(reg_data) {
-  plot(reg_data$x, reg_data$y,
-       xlab = "x", ylab = "y", pch = 20, cex = 3,asp=1)
-  arrows(reg_data$x, reg_data$y_hat,
-         reg_data$x, reg_data$y,
-         col = 'red', lwd = 4, lty = 1, length = 0.1, angle = 20)
-  abline(lm(y ~ x, data = reg_data), lwd = 4, col = "black")
-}
-
-plot_unexp_SSR = function(reg_data,asp=1,title=NULL) {
-  if (is.null(title)){
-      plot(reg_data$x, reg_data$y,
-       xlab = "x", ylab = "y", pch = 20, cex = 4,
-  rect(xleft = reg_data$x, ybottom = reg_data$y,
-         xright = reg_data$x + abs(reg_data$error), ytop = reg_data$y - reg_data$error, density = -1,
-         col = rgb(red = 0, green = 1, blue = 0, alpha = 0.5), border = NA),asp=asp)
-      abline(lm(y ~ x, data = reg_data), lwd = 4, col = "black")
-  } else {
-      plot(reg_data$x, reg_data$y,
-       xlab = "x", ylab = "y", pch = 20, cex = 2,
-  rect(xleft = reg_data$x, ybottom = reg_data$y,
-         xright = reg_data$x + abs(reg_data$error), ytop = reg_data$y - reg_data$error, density = -1,
-         col = rgb(red = 0, green = 1, blue = 0, alpha = 0.5), border = NA),asp=asp,main=title)
-    axis(side=2,at=seq(-2,10,by=2))
-      abline(lm(y ~ x, data = reg_data), lwd = 2, col = "black")
-  }
-}
-
-plot_exp_dev = function(reg_data) {
-  plot(reg_data$x, reg_data$y, main = "SSReg (Sum of Squares Regression)",
-  xlab = "x", ylab = "y", pch = 20, cex = 2, col = "grey")
-  arrows(reg_data$x, reg_data$y_bar,
-         reg_data$x, reg_data$y_hat,
-         col = 'darkorange', lwd = 1, length = 0.2, angle = 20)
-  abline(lm(y ~ x, data = reg_data), lwd = 2, col = "grey")
-  abline(h = mean(reg_data$y), col = "grey")
-}
+```{r, echo = F, fig.width = 10, fig.height = 5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14)
 ```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-set.seed(21)
-plot_data = generate_data(sigma = 2)
-```
-
-.left-wide[
-```{r line-arrows, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center",fig.height=5.5,fig.width=8}
-par(mar = lowtop)
-plot_unexp_dev(plot_data)
-par(mar = om)
-```
-]
-
-.right-thin[
-
-</br>
-</br>
-
-* Red Arrows are *errors* or *residuals* for each prediction.
-
-* *Errors* can be either positive (bottom to top arrows) or negative.
-
-]
 
 ---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "red") +
+  annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6)
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "red") +
+    annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6) +
+  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color='red',size = 4) +
+  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "red", size = 6)
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+math_class_reg <- lm(avgmath_cs ~ classize, data = grades_avg_cs)
+math_class_reg <- broom::augment(math_class_reg)
+
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "red") +
+    annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6) +
+  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color='red',size = 4) +
+  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "red", size = 6) +
+  geom_segment(data = math_class_reg %>% filter(classize == 17),
+               aes(xend = classize, yend = .fitted), color = "red", size = 1) +
+  annotate("text", x = 18, y = 65.5, label = "e[x = 17]", parse = TRUE, colour = "red", size = 6)
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "red") +
+    annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6) +
+  geom_segment(data = math_class_reg,
+               aes(xend = classize, yend = .fitted), color = "red", size = 0.5)
+```
+
+---
+
 class: inverse
 
-# App Time!
+# App Time! (5 minutes)
 
 Intuitively one might want to simply minimize the sum of all the errors
 $\sum^n_{i=1}{e_i}$.
 
-Let's try to find the best line by minimizing the sum of the errors.
+Let's try to find the best line by minimizing the sum of the errors. The line *won't* turn green so don't spend all day waiting for it.
 
 ```{r,eval=FALSE}
 library(ScPoEconometrics) # load our library
@@ -528,39 +487,54 @@ aboutApp('reg_simple_arrows') # explainer about app
 
 ---
 
-# Writing Down A *Line*
-
-
-.pull-left[
-
-</br>
+# **O**rdinary **L**east **S**quares (OLS) Estimation
 
 * Errors of different sign $(+/-)$ cancel out, so let's consider **squared residuals** 
-$$\forall i \in [1,N], e_i^2 = (y_i - b_0 - b_1 x_i)^2$$
+$$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$
 
-* Choose $(b_0,b_1)$ such that the sum $e_1^2 + \dots + e_N^2$ is **as small as possible**.
-
-* ***Sum of Squared Residuals*** (SSR): $e_1^2 + \dots + e_N^2$
-]
+* Choose $(b_0,b_1)$ such that $\sum_{i = 1}^N e_1^2 + \dots + e_N^2$ is **as small as possible**.
 
 --
 
-.pull-right[
-
-</br>
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE,fig.width=6,fig.height = 4.5}
-par(mar = lowtop)
-plot_unexp_SSR(plot_data)
-par(mar = om)
+```{r, echo=FALSE, message=FALSE, warning=FALSE,fig.width=7,fig.height = 3.5}
+g_math_cs +
+    ylim(50, 80) +
+    xlim(0, 50) +
+    theme_bw(base_size = 14) +
+    stat_smooth(method = "lm", se = FALSE, colour = "darkgreen")
 ```
-]
 
 ---
 
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+* Errors of different sign $(+/-)$ cancel out, so let's consider **squared residuals** 
+$$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$
+
+* Choose $(b_0,b_1)$ such that $\sum_{i = 1}^N e_1^2 + \dots + e_N^2$ is **as small as possible**.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE,fig.width=7,fig.height = 3.5}
+g_math_cs +
+    ylim(50, 80) +
+    xlim(0, 50) +
+    theme_bw(base_size = 14) +
+    stat_smooth(method = "lm", se = FALSE, colour = "darkgreen") +
+    geom_rect(data = math_class_reg,
+              aes(
+              xmin = classize,
+              xmax = classize + abs(.resid),
+              ymin = avgmath_cs,
+              ymax = avgmath_cs - .resid),
+              fill = "darkgreen",
+              alpha = 0.3)
+```
+
+---
+
+
 class: inverse
 
-# App Time!
+# App Time! #2 (5 minutes)
 
 Let's minimize some squared errors! 
 ```{r,eval=FALSE}
@@ -580,7 +554,7 @@ aboutApp('reg_simple')
 
 * In our single independent variable case:
 
-   ### __Slope: $b_1^{OLS} = \frac{cov(x,y)}{var(x)}$ $\hspace{2cm}$ Intercept: $b_0^{OLS} = \bar{y} - b_1\bar{x}$__
+>   ### __Slope: $b_1^{OLS} = \frac{cov(x,y)}{var(x)}$ $\hspace{2cm}$ Intercept: $b_0^{OLS} = \bar{y} - b_1\bar{x}$__
 
 --
 
@@ -594,9 +568,9 @@ aboutApp('reg_simple')
 
 class: inverse
 
-# App Time!
+# App Time! #3 (3 minutes)
 
-How does OLS actually perform the minimization problem?
+How does OLS actually perform the minimization problem? Some intuition without maths.
 
 ```{r,eval=FALSE}
 launchApp('SSR_cone')
@@ -611,45 +585,15 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
 
 --
 
-* Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if $x = 0$.**
+> Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if $x = 0$.**
 
 --
 
-* Slope $(b_1)$: **The change in the predicted value of $y$ associated to a one-unit increase in $x$.**
+> Slope $(b_1)$: **The change in the predicted value of $y$ associated to a one-unit increase in $x$.**
 
 --
 
-## Graphical Interpretation
-
-Create graph
-
----
-
-# Application: Class size and student performance
-
-Let's go back our class size and student performance data. Let's display the OLS line.
-
-.left-wide[
-
-```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
-g_math_cs +
-  ylim(50, 80) +
-  theme_bw(base_size = 14) +
-  geom_smooth(method = "lm", se = F, col = "darkgreen")
-```
-]
-
---
-
-.right-thin[
-
-</br>
-
-* Some points (observations) are poorly fitted by the OLS line. 
-
-* We call them **outliers**.
-]
-
+Note that the units of $x$ will matter for the interpretation (and magnitude!) of $b_1$.
 ---
 
 # OLS with `R`
@@ -672,6 +616,39 @@ Let's estimate the following model by OLS: $\textrm{avgmath_cs}_i = b_0 + b_1 \t
 # OLS regression of class size on average maths score
 lm(formula = avgmath_cs~classize, data = grades_avg_cs) 
 ```
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Prediction
+
+```{r echo=F, eval = TRUE}
+# OLS regression of class size on average maths score
+lm(formula = avgmath_cs~classize, data = grades_avg_cs)
+```
+
+--
+
+This implies:
+
+
+$$
+\begin{aligned}
+\widehat y_i &= b_0 + b_1 x_i \\
+\widehat {\text{avgmath_cs}} &= b_0 + b_1 \cdot \text{classize} \\
+\widehat {\text{avgmath_cs}} &= 61.11 + 0.19 \cdot \text{classize}
+\end{aligned}
+$$
+
+--
+
+What's the predicted average score for a class of 26 students? (Using the *exact* coefficients.)
+
+$$
+\begin{aligned}
+\widehat {\text{avgmath_cs}} &= 61.11 + 0.19 \cdot 26 \\
+\widehat {\text{avgmath_cs}} &= 66.08
+\end{aligned}
+$$
 
 ---
 
@@ -716,11 +693,11 @@ Why would we standardize the variables in the regression?
 
 class: inverse
 
-# Task 4: Standardized OLS
+# Task 4: Standardized OLS (7 minutes)
 
-1. Create 2 variables (`std_math` and `std_verb`) that contain the standardized average math and verbal scores.
+1. Create 2 variables (`std_math` and `std_verb`) that contain the standardized average math and verbal scores. You can use the `scale()` function in a `mutate` command.
  
-2. Create a new variable `std_score` that associates to each class size a unique score.
+2. Create a new variable `std_score` that associates to each class size a unique score equal to the average of the standardized math and verbal scores.
 
 3. Create a new variable `std_classize` that is the standardized class size.
 
@@ -747,86 +724,28 @@ Standardized Regression | `launchApp('reg_standardized')`
 
 ---
 
-# Predictions and Residuals => maybe show here that prediction is uncorrelated with error
-
-
-1. The error term is $e_i = y_i - \widehat{y}_i$
-
-2. The average of $\widehat{y}_i$ is equal to $\bar{y}$.
-    $$\begin{align}\frac{1}{N} \sum_{i=1}^N \widehat{y}_i &= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$
---
-
-3. Then,
-    $$\frac{1}{N} \sum_{i=1}^N e_i = \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i = 0$$
-    i.e. the average of errors is zero.
-
----
-
-
-# Properties of Residuals => je ne comprends vraiment pas l'intérêt de ce slide. les données du arrow plot ne valent rien. autant leur montrer avec la regression de class size sur average math score, non!
+# Predictions and Residuals: Properties
 
 .pull-left[
-1. The average of $\widehat{y}_i$ is the same as the mean of $y$.
+* __The average of $\widehat{y}_i$ is equal to $\bar{y}$.__  
+    $$\begin{align} \frac{1}{N} \sum_{i=1}^N \widehat{y}_i &= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$
 
-2. The average of the errors should be zero.
-
-3. Prediction and errors should be *uncorrelated* (i.e. orthogonal).
-
-Let's look at the data behind our *arrows* plot above:
-
+* __The average (or sum) of errors is 0.__
+  $$\begin{align} \frac{1}{N} \sum_{i=1}^N e_i &= \frac{1}{N} \sum_{i=1}^N (y_i - \widehat y_i) \\ &= \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i \\\ &= 0 \end{align}$$
 ]
 
 --
 
 .pull-right[
+* __Prediction and errors are uncorrelated.__
 
-```{r,echo=FALSE, results="asis"}
-sd = subset(plot_data,select=c(x,y,y_hat,error))
-sd = rbind(sd, colMeans(sd))
-sd = cbind(c(rep("",nrow(sd)-1),"Means"),sd)
-names(sd)[1] = ""
-
-ss = hux(sd,add_colnames = T) %>%
-  set_number_format(2) %>%
-  set_bottom_border(c(1,nrow(sd)), 1:5,2) %>%
-  set_align(row = 1,everywhere, "center")
-ss
-```
+  $$\begin{align} Cov(\widehat y_i, e_i) &= \frac{1}{N} \sum_{i=1}^{N}(\widehat y_i - \bar{y})(e_i - \bar{e}) \\ &= \frac{1}{N} \sum_{i=1}^{N}(\widehat y_i - \bar{y})(e_i) \\ &= \frac{1}{N} \sum_{i=1}^{N}\widehat y_i e_i - \bar{y} \frac{1}{N} \sum_{i=1}^{N}e_i \\ &= 0 \end{align}$$
 
 ]
 
 ---
 
-# Properties of Residuals => même commentaire que ci-dessus
-
-.pull-left[
-
-1. The average of $\widehat{y}_i$ is the same as the mean of $y$.
-
-2. The average of the errors should be zero.
-
-3. Prediction and errors should be *uncorrelated* (i.e. orthogonal).
-]
-
---
-
-.pull-right[
-```{r}
-# 1.
-all.equal(mean(sd$y_hat), mean(sd$y))
-
-# 2.
-all.equal(mean(sd$error), 0)
-
-# 3.
-all.equal(cov(sd$error,sd$y_hat), 0)
-```
-]
-
----
-
-
-# Linearity
+# Linearity Assumption: Visualize your Data!
 
 * It's important to keep in mind that covariance, correlation and simple OLS regression only measure **linear relationships** between two variables.
 
@@ -837,10 +756,9 @@ all.equal(cov(sd$error,sd$y_hat), 0)
 * Is that even possible?
 <img src="https://media.giphy.com/media/5aLrlDiJPMPFS/giphy.gif" height = "400" align = "middle" />
 
-
 ---
 
-# Linearity: Anscombe
+# Linearity Assumption: Anscombe
 
 * Francis Anscombe (1973) came up with 4 datasets with identical stats. But look!
 
@@ -931,12 +849,11 @@ ch %>%
 
 * __Total variation (SST) = Model explained (SSE) + Unexplained (SSR)__
 
-
 ---
 
 # Goodness of Fit
 
-* The $R^2$ measures how well the model fits the data.
+* The __ $R^2$ __ measures how well the __model fits the data__.
 
 --
 
@@ -946,17 +863,32 @@ $$
 
 --
     
-* $R^2$ close to $1$ indicates a very high explanatory power of the model
+* $R^2$ close to $1$ indicates a __very ***high*** explanatory power__ of the model.
 
-* $R^2$ close to $0$ means that the variations in the outcome $(y)$ are very poorly captured.
+* $R^2$ close to $0$ indicates a __very ***low*** explanatory power__ of the model.
 
 --
 
-* Interpretation: an $R^2$ of 0.5, for example, means that the variation in $x$ "explains" 50% of the variation in $y$.
+* *Interpretation:* an $R^2$ of 0.5, for example, means that the variation in $x$ "explains" 50% of the variation in $y$.
 
 --
     
 * `r emo::ji("warning")` Low $R^2$ does __NOT__ mean it's a useless model! Remember that econometrics is interested in causal mechanisms, not prediction!
+
+---
+
+class: inverse
+
+# Task 5: $R^2$ and nonlinear OLS (7 minutes)
+
+1. Regress `classize` on `avgmath_cs`. Assign to an object `math_reg`.
+
+1. Pass `math_reg` in the `summary()` function. What is the (multiple) $R^2$ for this regression? How can you interpret it?
+
+1. Repeat steps 1 1 and 2 for `avgverb_cs`. For which exam does class size explain more of the variance in students' scores?
+
+1. Regress `classize` and `classize` squared on `avgmath_cs`. How is the coefficient on `classize` changed?  
+Hint: you can use `classize + classize^2` or `poly(classize, 2)` as the regressors in `lm`.
 
 ---
 
@@ -976,84 +908,3 @@ background-position: 9% 19%
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
-
----
-
-# Education and wage
-
-* Let's now consider the relationship between between education (years of schooling) and (hourly) wage.
-
-* The following data were collected in the [1976 Current Population Survey](https://www.census.gov/programs-surveys/cps/library.1976.html) in the US. 
-
-
-* Load it from the `wooldridge` package with the `data()` function.
-
-```{r echo = FALSE}
-data("wage1", package = "wooldridge")   # load data
-
-# a function that returns a plot
-plotfun <- function(wage1,log=FALSE,rug = TRUE){
-    y = wage1$wage
-    if (log){
-        y = log(wage1$wage)
-    }
-    plot(y = y,
-       x = wage1$educ, 
-       col = "red", pch = 21, bg = "grey",     
-       cex=1.25, xaxt="n", frame = FALSE,      # set default x-axis to none
-       main = ifelse(log,"log(Wages) vs. Education, 1976","Wages vs. Education, 1976"),
-       xlab = "years of education", 
-       ylab = ifelse(log,"Log Hourly wages","Hourly wages"))
-    axis(side = 1, at = c(0,6,12,18))         # add custom ticks to x axis
-    if (rug) rug(wage1$wage, side=2, col="red")        # add `rug` to y axis
-}
-```
-
-* Briefly describe the data and produce a plot to vizualize the link between `wage` and `education`.
-
---
-
-```{r echo = FALSE, fig.height = 3, fig.width=10}
-par(mfcol = c(1,2))  # set up a plot with 2 panels
-# plot 1: standard scatter plot
-plotfun(wage1)
-
-# plot 2: add a panel with histogram+density
-hist(wage1$wage,prob = TRUE, col = "grey", border = "red", 
-     main = "Histogram of wages and Density",xlab = "hourly wage")
-lines(density(wage1$wage), col = "black", lw = 2)
-```
----
-
-class: inverse
-
-# Education and wage
-
- **TASK 5**
-
-* Run the regression of the hourly wage on education. 
-
-* Interpretation
-
-    * With zero year of education, the hourly wage is about **??** dollars per hour.
-
-    * Each additional year of education increase hourly wage by **??** cents.
-
-    * Compute the predicted wage associated to 20 years of education.
-    
----
-
-# Education and wage : log transformation
-
-You may have noticed that the relationship between wages and education is not perfectly linear. 
-
-.pull-left[
-```{r, echo = F, fig.height=5}
-plotfun(wage1, log = T, rug = F)
-```
-]
-
-.pull-right[
-
-TBD
-]
