@@ -36,7 +36,8 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-library(tidyverse)
+library("tidyverse")
+library("kableExtra")
 library("repmis")
 library("gridExtra")
 library("haven")
@@ -74,7 +75,7 @@ library("huxtable")
 
 --
 
-* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273)
+* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273) downloaded from [here](https://opportunityinsights.org/course/?__cf_chl_captcha_tk__=b541f569de7b823d372f1c6d9d25117969b14eed-1582541243-0-AYDqlRfXiRndjCpcqUWi1Sx3ulmTikpOgY-BXJbr2bOIDzVjJhnWaj7ZtpTDhnmsqpYvN27_OO-uNf0YGsKQiXX2eyPdcGERJp_EvfSmD3gcYxkPi8yvFebK11G8HmfcWHjUWVlYB8aizG2swwo3nAPzPrJMxP86TxbWeM4nCLMBkTUXrGeMrXicDmAr7ysEjIslxkT_j-L6W6PEXlPL9rnp0Xk-E39Ov7-3SHW5J0QiGSRMyUz1gWOK9Q3BJ9K_xM9L792c320Trhv4pkaSxXeHYDv_05z-EClD2N9qSiUlRcxCs0vaqFJ-5o_HgDQxptbx9kMHGjn0VnC00dm-z2YI-Op4mpQzLmfFqgVu7VpKjhJa6u9UlK89KJOKEyPuPQ)
 
 * Consists of test scores and class/school characteristics for fifth graders (10-11 years old) in Jewish public elementary schools in Israel in 1991.
 
@@ -429,7 +430,7 @@ g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
   stat_smooth(method = "lm", se = FALSE, colour = "red") +
-    annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6) +
+    annotate("text", x = 6.5, y = 64, label = "hat(italic(y))", parse = TRUE, colour = "red", size = 6) +
   geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color='red',size = 4) +
   annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "red", size = 6)
 ```
@@ -446,7 +447,7 @@ g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
   stat_smooth(method = "lm", se = FALSE, colour = "red") +
-    annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6) +
+    annotate("text", x = 6.5, y = 64, label = "hat(italic(y))", parse = TRUE, colour = "red", size = 6) +
   geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color='red',size = 4) +
   annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "red", size = 6) +
   geom_segment(data = math_class_reg %>% filter(classize == 17),
@@ -463,7 +464,7 @@ g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
   stat_smooth(method = "lm", se = FALSE, colour = "red") +
-    annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6) +
+    annotate("text", x = 6.5, y = 64, label = "hat(italic(y))", parse = TRUE, colour = "red", size = 6) +
   geom_segment(data = math_class_reg,
                aes(xend = classize, yend = .fitted), color = "red", size = 0.5)
 ```
@@ -589,11 +590,16 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
 
 --
 
-> Slope $(b_1)$: **The change in the predicted value of $y$ associated to a one-unit increase in $x$.**
+> Slope $(b_1)$: **The predicted change, on average, in the value of $y$ *associated* to a one-unit increase in $x$.**
 
 --
 
-Note that the units of $x$ will matter for the interpretation (and magnitude!) of $b_1$.
+* `r emo::ji("warning")` Note that we use the term *associated*, **clearly avoiding interpreting $b_1$ as the causal impact of $x$ on $y$**. To make such a claim, we need some specific conditions to be met. (Next week!)
+
+--
+ 
+* Also notice that the units of $x$ will matter for the interpretation (and magnitude!) of $b_1$.
+
 ---
 
 # OLS with `R`
@@ -667,47 +673,7 @@ class: inverse
 
 ---
 
-# Standardized regression 
-
-Standardizing a variable $z$:
-$$ \widetilde z = \frac{z - \bar z}{sd(z)} $$
-where $\bar z$ is $z$'s *mean* and $sd(z)$ is $z$'s *standard deviation*.
-
-Why would we standardize the variables in the regression?
-
---
-
-* To be able to __interpret the *magnitude* of an independent variable's coefficient__. Remember that the OLS coefficient is sensitive to the independent variable's unit. Why?
-
---
-
-* The dependent variable or independent variable's __units are difficult to interpret__ in themselves.  
-*Example:* Is a 1-point increase in student test scores meaningful? Depending on the spread of the scores, not clear whether that would be a big or small change...
-
---
-
-* To __combine variables together__.  
-*Example:* if we want to combine the mathematics and verbal scores together.
-
----
-
-class: inverse
-
-# Task 4: Standardized OLS (7 minutes)
-
-1. Create 2 variables (`std_math` and `std_verb`) that contain the standardized average math and verbal scores. You can use the `scale()` function in a `mutate` command.
- 
-2. Create a new variable `std_score` that associates to each class size a unique score equal to the average of the standardized math and verbal scores.
-
-3. Create a new variable `std_classize` that is the standardized class size.
-
-4. Run the OLS regression of `std_score` on `std_classize`. 
-
-5. Interpret the value of each coefficient.
-
----
-
-# Other OLS variations / restrictions
+# OLS variations / restrictions
 
 * All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`.
 
@@ -793,12 +759,13 @@ par(op)
 --
 
 .right-thin[
+</br>
+</br>
+
 ```{r,echo = FALSE}
-ch = hux(covs)
+ch = kable(round(covs,3))
 ch %>%
-  set_number_format(row = everywhere, col = c(2:4), 2) %>%
-  set_number_format(row = everywhere, col = 1, 0) %>%
-  add_colnames()
+   kable_styling(bootstrap_options = "striped", font_size = 17)
 ```
 
 ]
@@ -825,7 +792,7 @@ ch %>%
     data(mtcars)
     mtcars %>% ggplot(aes(x = hp, y = mpg)) +
       geom_point() +
-      stat_smooth(method='lm', formula = y~poly(x,2), se = FALSE) +
+      stat_smooth(method='lm', formula = y~poly(x,2), se = FALSE, col = "darkgreen") +
       labs(x = "x",
            y = "y",
            title = "Nonlinear relationship between x and y") +
