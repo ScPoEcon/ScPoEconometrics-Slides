@@ -75,11 +75,11 @@ library("huxtable")
 
 --
 
-* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273) downloaded from [here](https://opportunityinsights.org/course/?__cf_chl_captcha_tk__=b541f569de7b823d372f1c6d9d25117969b14eed-1582541243-0-AYDqlRfXiRndjCpcqUWi1Sx3ulmTikpOgY-BXJbr2bOIDzVjJhnWaj7ZtpTDhnmsqpYvN27_OO-uNf0YGsKQiXX2eyPdcGERJp_EvfSmD3gcYxkPi8yvFebK11G8HmfcWHjUWVlYB8aizG2swwo3nAPzPrJMxP86TxbWeM4nCLMBkTUXrGeMrXicDmAr7ysEjIslxkT_j-L6W6PEXlPL9rnp0Xk-E39Ov7-3SHW5J0QiGSRMyUz1gWOK9Q3BJ9K_xM9L792c320Trhv4pkaSxXeHYDv_05z-EClD2N9qSiUlRcxCs0vaqFJ-5o_HgDQxptbx9kMHGjn0VnC00dm-z2YI-Op4mpQzLmfFqgVu7VpKjhJa6u9UlK89KJOKEyPuPQ)
+* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273), obtained from [Raj Chetty and Greg Bruich's course](https://opportunityinsights.org/course/).
 
 * Consists of test scores and class/school characteristics for fifth graders (10-11 years old) in Jewish public elementary schools in Israel in 1991.
 
-* National tests measured *mathematics* and (Hebrew) *reading* skills.
+* National tests measured *mathematics* and (Hebrew) *reading* skills. The raw scores were scaled from 1-100.
 
 ---
 
@@ -179,7 +179,7 @@ g_verb
 
 --
 
-* Seems to be a positive association but not easy to tell. Let's compute the average score by class size!
+* Somewhat positive association as suggested by correlations. Let's compute the average score by class size to see things more clearly!
 
 ---
 
@@ -259,7 +259,7 @@ How to visually summarize the relationship: **a line through the scatter plot**
 g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
-  geom_hline(yintercept = 65, col = "red")
+  geom_hline(yintercept = 65, col = "#d90502")
 ```
 ]
 
@@ -285,7 +285,7 @@ How to visually summarize the relationship: **a line through the scatter plot**
 g_math_cs +
   ylim(50, 80) +
   theme_bw(base_size = 14) +
-  geom_abline(intercept = 55,slope = 0.6, col = "red")
+  geom_abline(intercept = 55,slope = 0.6, col = "#d90502")
 ```
 ]
 
@@ -314,16 +314,16 @@ Let's formalise a bit what we are doing so far.
 --
 
   * an __outcome variable__ (also called __dependent variable__):  
-  *average mathematics score* $(y_i)$
+  *average mathematics score* $(y)$
   
 --
   
   * an __explanatory variable__ (also called __independent variable__ or __regressor__):  
-  *class size* $(x_i)$
+  *class size* $(x)$
   
 --
 
-* For each class we observe both $x_i$ and $y_i$, and therefore we can plot the *joint distribution* of class size and average mathematics score.
+* For each class $i$ we observe both $x_i$ and $y_i$, and therefore we can plot the *joint distribution* of class size and average mathematics score.
 
 --
 
@@ -334,7 +334,7 @@ Let's formalise a bit what we are doing so far.
 
 --
 
-* $\widehat{y}_i$ is our *prediction* for $y_i$ given our model (i.e. the line).
+* $\widehat{y}_i$ is our *prediction* for $y$ at observation $i$ $(y_i)$ given our model (i.e. the line).
 
 ---
 
@@ -368,7 +368,7 @@ plot_ex
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
 ```{r, echo = FALSE, fig.height = 4,fig.width=7}
-plot_ex + geom_line(color = "red")
+plot_ex + geom_line(color = "#d90502")
 ```
 
 ---
@@ -377,7 +377,7 @@ plot_ex + geom_line(color = "red")
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
-* However, since in most cases the *dependent variable* $(y_i)$ is not *only* explained by the chosen *independent variable* $(x_i)$, $\widehat{y}_i \neq y_i$, i.e. we make an __error__.  
+* However, since in most cases the *dependent variable* $(y)$ is not *only* explained by the chosen *independent variable* $(x)$, $\widehat{y}_i \neq y_i$, i.e. we make an __error__.  
 This __error__ is called the __error term__.
 
 --
@@ -417,8 +417,8 @@ g_math_cs +
 g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
-  stat_smooth(method = "lm", se = FALSE, colour = "red") +
-  annotate("text", x = 6.5, y = 64, label = "hat(italic(y[i]))", parse = TRUE, colour = "red", size = 6)
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6)
 ```
 
 ---
@@ -429,10 +429,10 @@ g_math_cs +
 g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
-  stat_smooth(method = "lm", se = FALSE, colour = "red") +
-    annotate("text", x = 6.5, y = 64, label = "hat(italic(y))", parse = TRUE, colour = "red", size = 6) +
-  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color='red',size = 4) +
-  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "red", size = 6)
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color = "#d90502", size = 4) +
+  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "#d90502", size = 6)
 ```
 
 ---
@@ -446,13 +446,13 @@ math_class_reg <- broom::augment(math_class_reg)
 g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
-  stat_smooth(method = "lm", se = FALSE, colour = "red") +
-    annotate("text", x = 6.5, y = 64, label = "hat(italic(y))", parse = TRUE, colour = "red", size = 6) +
-  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color='red',size = 4) +
-  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "red", size = 6) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color = "#d90502", size = 4) +
+  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "#d90502", size = 6) +
   geom_segment(data = math_class_reg %>% filter(classize == 17),
-               aes(xend = classize, yend = .fitted), color = "red", size = 1) +
-  annotate("text", x = 18, y = 65.5, label = "e[x = 17]", parse = TRUE, colour = "red", size = 6)
+               aes(xend = classize, yend = .fitted), color = "#d90502", size = 1) +
+  annotate("text", x = 18, y = 65.55, label = "e[x = 17]", parse = TRUE, colour = "#d90502", size = 6)
 ```
 
 ---
@@ -463,10 +463,10 @@ g_math_cs +
 g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14) +
-  stat_smooth(method = "lm", se = FALSE, colour = "red") +
-    annotate("text", x = 6.5, y = 64, label = "hat(italic(y))", parse = TRUE, colour = "red", size = 6) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
   geom_segment(data = math_class_reg,
-               aes(xend = classize, yend = .fitted), color = "red", size = 0.5)
+               aes(xend = classize, yend = .fitted), color = "#d90502", size = 0.5)
 ```
 
 ---
@@ -475,10 +475,10 @@ class: inverse
 
 # App Time! (5 minutes)
 
-Intuitively one might want to simply minimize the sum of all the errors
-$\sum^n_{i=1}{e_i}$.
+Intuitively one might want to simply minimize the absolute value of the sum of all the errors
+$\mid \sum^n_{i=1}{e_i} \mid$, that is one might want the sum of errors as close to 0 as possible.
 
-Let's try to find the best line by minimizing the sum of the errors. The line *won't* turn green so don't spend all day waiting for it.
+Let's try to find the best line by minimizing the absolute value of the sum of errors. The line *won't* turn green so don't spend all day waiting for it.
 
 ```{r,eval=FALSE}
 library(ScPoEconometrics) # load our library
@@ -486,6 +486,57 @@ launchApp('reg_simple_arrows')
 aboutApp('reg_simple_arrows') # explainer about app
 ```
 
+---
+
+# Minimizing the Absolute Value of the Sum of Errors
+
+```{r, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
+data = data.frame(y = c(3,2,4,6,8,7),
+                  x = c(1,2,3,7,8,9))
+
+data_plot = ggplot(data,
+       aes(x = x, y = y)) +
+  geom_point() +
+  xlim(0,10) +
+  ylim(0,10) +
+  labs(x = "x",
+       y = "y",
+       title = "Extreme case") +
+  theme_bw(base_size = 16)
+data_plot
+```
+
+---
+
+# Minimizing the Absolute Value of the Sum of Errors
+
+```{r, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
+data_plot +
+  geom_hline(yintercept = 5, col = "#d90502")
+```
+
+---
+
+# Minimizing the Absolute Value of the Sum of Errors
+
+.pull-left[
+```{r, echo = FALSE, eval = TRUE, fig.height = 7}
+data_plot +
+  geom_hline(yintercept = 5, col = "#d90502") +
+  theme_bw(base_size = 20)
+```
+]
+
+.pull-right[
+<br>
+<br>
+
+* This line minimizes the absolute value of the sum of errors since the data points are symmetric around $y = 5$.
+
+* Yet it clearly does not fit the data well!
+
+* Note also that many other lines would also yield a sum of errors of 0 since the data are symmetric. A unique solution is not guaranteed!
+]
 ---
 
 # **O**rdinary **L**east **S**quares (OLS) Estimation
@@ -535,7 +586,7 @@ g_math_cs +
 
 class: inverse
 
-# App Time! #2 (5 minutes)
+# App Time! #2 (3 minutes)
 
 Let's minimize some squared errors! 
 ```{r,eval=FALSE}
@@ -547,9 +598,11 @@ aboutApp('reg_simple')
 
 # **O**rdinary **L**east **S**quares (OLS): Coefficient Formulas
 
-* **OLS**: estimation technique consisting in minimizing the sum of squared residuals.
+* **OLS**: *estimation* method consisting in minimizing the sum of squared residuals.
 
-* So what are the formulae for $b_0$ (intercept) and $b_1$ (slope)?
+* Yields __unique__ solutions to this minization problem.
+
+* So what are the formulas for $b_0$ (intercept) and $b_1$ (slope)?
 
 --
 
@@ -634,12 +687,12 @@ lm(formula = avgmath_cs~classize, data = grades_avg_cs)
 
 --
 
-This implies:
+This implies (abstracting the $_i$ subscript for simplicity):
 
 
 $$
 \begin{aligned}
-\widehat y_i &= b_0 + b_1 x_i \\
+\widehat y &= b_0 + b_1 x \\
 \widehat {\text{avgmath_cs}} &= b_0 + b_1 \cdot \text{classize} \\
 \widehat {\text{avgmath_cs}} &= 61.11 + 0.19 \cdot \text{classize}
 \end{aligned}
@@ -703,9 +756,16 @@ Standardized Regression | `launchApp('reg_standardized')`
 --
 
 .pull-right[
+* __ Regressor and errors are uncorelated (by definition).__
+
+  $$Cov(x_i, e_i) = 0$$
+
+
 * __Prediction and errors are uncorrelated.__
 
-  $$\begin{align} Cov(\widehat y_i, e_i) &= \frac{1}{N} \sum_{i=1}^{N}(\widehat y_i - \bar{y})(e_i - \bar{e}) \\ &= \frac{1}{N} \sum_{i=1}^{N}(\widehat y_i - \bar{y})(e_i) \\ &= \frac{1}{N} \sum_{i=1}^{N}\widehat y_i e_i - \bar{y} \frac{1}{N} \sum_{i=1}^{N}e_i \\ &= 0 \end{align}$$
+  $$\begin{align} Cov(\widehat y_i, e_i) &= Cov(b_0 + b_1x_i, e_i) \\ &= b_1Cov(x_i,e_i) \\ &= 0 \end{align}$$
+  
+  Since $Cov(a + bx, y) = bCov(x,y)$.
 
 ]
 
@@ -765,7 +825,7 @@ par(op)
 ```{r,echo = FALSE}
 ch = kable(round(covs,3))
 ch %>%
-   kable_styling(bootstrap_options = "striped", font_size = 17)
+   kable_styling(bootstrap_options = "striped", font_size = 20)
 ```
 
 ]
@@ -776,12 +836,12 @@ ch %>%
 .pull-left[
 * We can accomodate non-linear relationships in regressions.
 
-* Just add a higher order term like this:
+* Just add a *higher order* term like this:
     $$
     y_i = b_0 + b_1 x_i + b_2 x_i^2 + e_i
     $$
     
-* This is *multiple regression* (in 2 weeks!)
+* This is __multiple regression__ (in 2 weeks!)
 ]
 
 --
@@ -789,14 +849,18 @@ ch %>%
 .pull-right[
 * For example, suppose we had this data and fit the previous regression model:
     ```{r non-line-cars-ols2,echo=FALSE,echo=FALSE,fig.height = 6}
-    data(mtcars)
-    mtcars %>% ggplot(aes(x = hp, y = mpg)) +
-      geom_point() +
-      stat_smooth(method='lm', formula = y~poly(x,2), se = FALSE, col = "darkgreen") +
-      labs(x = "x",
-           y = "y",
-           title = "Nonlinear relationship between x and y") +
-    theme_bw(base_size = 20)
+data(mtcars)
+mtcars %>% ggplot(aes(x = hp, y = mpg)) +
+    geom_point() +
+    stat_smooth(method='lm', formula = y~poly(x,2), se = FALSE, aes(colour="Nonlinear")) +
+    stat_smooth(method='lm', se = FALSE, aes(colour="Linear")) +
+    scale_colour_manual(name="legend", values=c("darkgreen", "#d90502")) +
+    labs(x = "x",
+         y = "y",
+         title = "Nonlinear relationship between x and y") +
+    theme_bw(base_size = 20) +
+    theme(legend.position="top") +
+    theme(legend.title = element_blank())
 
     ```
 ]
@@ -852,10 +916,10 @@ class: inverse
 
 1. Pass `math_reg` in the `summary()` function. What is the (multiple) $R^2$ for this regression? How can you interpret it?
 
-1. Repeat steps 1 1 and 2 for `avgverb_cs`. For which exam does class size explain more of the variance in students' scores?
+1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
 
 1. Regress `classize` and `classize` squared on `avgmath_cs`. How is the coefficient on `classize` changed?  
-Hint: you can use `classize + classize^2` or `poly(classize, 2)` as the regressors in `lm`.
+Hint: you can use `classize + I(classize^2)` or `poly(classize, 2, raw = TRUE)` as the regressors in `lm`.
 
 ---
 
