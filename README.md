@@ -10,7 +10,9 @@ Lecture 1: Introduction [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics
 
 Lectures 2/3: Summarizing, Visualizing and Tidying Data [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.pdf)
 
-Lecture 4: Simple Linear Regression (*coming soon!*)
+
+Lecture 4: Simple Linear Regression [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.pdf)
+
 
 Lecture 5: Introduction to Causality (*coming soon!*)
 
@@ -39,5 +41,5 @@ You can copy and adapt this material for your purposes, as long as you give appr
 * These are simply Rmarkdown slides.
 * So, in Rstudio, just click *knit*.
 * To print slides as PDF, do 
-    ```decktape chapter1.html chapter1.pdf --chrome-arg=--disable-web-security```
-    using the awesome [decktape](https://github.com/astefanutti/decktape)
+```decktape chapter1.html chapter1.pdf --chrome-arg=--disable-web-security```
+using the awesome [decktape](https://github.com/astefanutti/decktape)
