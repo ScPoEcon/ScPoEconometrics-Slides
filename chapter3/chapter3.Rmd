@@ -553,7 +553,8 @@ g_math_cs +
     ylim(50, 80) +
     xlim(0, 50) +
     theme_bw(base_size = 14) +
-    stat_smooth(method = "lm", se = FALSE, colour = "darkgreen")
+    stat_smooth(method = "lm", se = FALSE, colour = "darkgreen") +
+  coord_fixed(ratio = 0.65)
 ```
 
 ---
@@ -574,11 +575,12 @@ g_math_cs +
     geom_rect(data = math_class_reg,
               aes(
               xmin = classize,
-              xmax = classize + abs(.resid),
+              xmax = classize + abs(.resid)*0.65,
               ymin = avgmath_cs,
               ymax = avgmath_cs - .resid),
               fill = "darkgreen",
-              alpha = 0.3)
+              alpha = 0.3) +
+  coord_fixed(ratio = 0.65)
 ```
 
 ---
@@ -662,7 +664,7 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
 * This is how it works:
 
   ```{r, echo = TRUE, eval = FALSE}
-  lm(dependent variable ~  independent variable, data = data.frame containing the data)
+  lm(formula = dependent variable ~  independent variable, data = data.frame containing the data)
   ```
 
 --
@@ -673,7 +675,7 @@ Let's estimate the following model by OLS: $\textrm{avgmath_cs}_i = b_0 + b_1 \t
 
 ```{r echo=T, eval = TRUE}
 # OLS regression of class size on average maths score
-lm(formula = avgmath_cs~classize, data = grades_avg_cs) 
+lm(avgmath_cs ~ classize, grades_avg_cs) 
 ```
 
 ---
@@ -715,7 +717,9 @@ class: inverse
 
 # Task 3: OLS Regression (7 minutes)
 
-1. Run the same OLS regression by yourself but using average verbal score as the dependent variable.
+1. Compute the OLS coefficients using the formulas on slide 28.
+
+1. Regress class size (independant variable) on average verbal score (dependent variable).
 
 2. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
 
@@ -910,16 +914,17 @@ $$
 
 class: inverse
 
-# Task 4: $R^2$ and nonlinear OLS (7 minutes)
+# Task 4: $R^2$ and goodness of fit (10 minutes)
 
 1. Regress `classize` on `avgmath_cs`. Assign to an object `math_reg`.
 
 1. Pass `math_reg` in the `summary()` function. What is the (multiple) $R^2$ for this regression? How can you interpret it?
 
-1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
+1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you of the relationship between $R^2$ and the correlation in a regression with only one regressor?
 
-1. Regress `classize` and `classize` squared on `avgmath_cs`. How is the coefficient on `classize` changed?  
-Hint: you can use `classize + I(classize^2)` or `poly(classize, 2, raw = TRUE)` as the regressors in `lm`.
+1. Install and load the `broom` package. Pass `math_reg` in the `broom::augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula in the previous slide.
+
+1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
 
 ---
 
