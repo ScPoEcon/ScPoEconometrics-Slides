@@ -3,11 +3,11 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald" />
+    <meta name="author" content="F. Oswald, G. Kennedy and P. Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
-    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="..\css\scpo.css" type="text/css" />
+    <link rel="stylesheet" href="..\css\scpo-fonts.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -15,8 +15,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Intro To Causality
-### Florian Oswald
-### SciencesPo Paris </br> 2019-11-18
+### F. Oswald, G. Kennedy and P. Villedieu
+### SciencesPo Paris </br> 2020-03-01
 
 ---
 
@@ -35,73 +35,91 @@ layout: true
 
 ---
 
-# Packages used in this set of slides
+
+# Recap from from past Lectures and plan for this session
+
+**Recap of past session**
+
+* Simple Linear Regression model 
+
+* R knowledge : run an OLS regression and interpret the output
 
 
-```r
-library(tidyverse)
-```
+**Plan for today** : *Introduction to causal inference*
+
+* Causality versus correlation
+
+* The Potential Outcome Model
+
+* Randomized experiments
+
+* Follow up : the case of **class size** and **students performance** 
 
 ---
 
-# Why Causality?
+# Why do we care about causality?
 
-- Many of the interesting questions we might want to answer with data are causal&lt;sup&gt;1&lt;/sup&gt;
+Many of the interesting questions we might want to answer with data are causal&lt;sup&gt;1&lt;/sup&gt;
 
-- Some are non-causal, too - for example, "how can we predict whether this photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat
+--
 
-- Nearly every *why* question is causal
+- Understanding the world
+    - Social sciences : Why people behave in the way they do? 
+    - Health sciences : XXX
 
-- *Why* is a first order question for any policy maker thinking about a new policy.
+--
 
+- Public policy perspective
+    - How to reduce unemployment?
+    - XXX 
+
+--
+
+Note that some questions we might want to answer are non causal 
+  - Most *Artificial Intelligence* tasks, for example : "how can we predict whether a photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
+    
 .footnote[
 [1]: This set of slides follows closely the great material by [Nick Huntington Klein](https://nickch-k.github.io/introcausality/)
 ]
 
 ---
 
-# Also
+# Why causality 
 
-- This is economists' comparative advantage!
+- This is (kind of) economists' comparative advantage!
 
-- Plenty of fields do statistics. But very few make it standard training for their students to understand causality
+- Plenty of fields do statistics. But very few make it standard training for their students to understand causality.
 
 - This understanding of causality makes economists very useful! *This* is one big reason why tech companies have whole economics departments in them
 
 ---
 
-# So what is causality?
+# Causality : Definition
 
 - We say that `X` *causes* `Y` if...
 
-- were we to intervene and *change* the value of `X` without changing anything else...
+--
 
-- then `Y` would also change as a result
+  - we were to intervene and *change* the value of `X` without changing anything else...
+    
+--
 
----
-
-# Some examples of causal relationships
-
-.pull-left[
-## Some Obvious:
-
-- A light switch being set to on causes the light to be on
-
-- Setting off fireworks raises the noise level
-
-]
+  - then `Y` would also change as a result
 
 --
 
-.pull-right[
+This is the so-called **ceteris paribus assumption**
 
-## Some less obvious:
+- But it does **NOT** mean that...
 
-- Getting a college degree increases your earnings
+  - `X` is the only cause of `Y`, other factors could *cause* `Y`
+    
+  - XXX
+    
+---
 
-- Tariffs reduce the amount of trade
+# DAG 
 
-]
 
 ---
 
@@ -111,61 +129,111 @@ library(tidyverse)
 
 * Well, we're here to figure out conditions when it **is**!
 
-## Examples of non-zero *correlations* that are not *causal* (or may be causal in the wrong direction!)
+* Econometrics is about stating the conditions under which we can claim that a relationship is causal.
 
-.pull-left[
+---
 
-### Some obvious:
+# Correlation vs. causality : some obvious cases
 
-- People tend to wear shorts on days when ice cream trucks are out
+Check the [Spurious correlation website](https://www.tylervigen.com/spurious-correlations)
 
-- Rooster crowing sounds are followed closely by sunrise
+![:scale 70%](../img/photos/spurious.png)
 
-] 
+- Who would believe that sociologist can help into space lauching? 😄
+
+- Some case are more difficult to tell
+---
+
+# Correlation vs. causality : a more debated case #1
+
+**Does smoking cause lung cancer?** 
+
+- Today, we know the answer and it is YES! 
+
+- But let's go back in the 1950's
+
+  - We are at the start of a big increase in deaths from lung cancer...
+  
+  - ... which is happening after a fast growth of cigarette consumption
+
+--
 
 .pull-right[
+![:scale 60%](../img/photos/Smoking_lung_cancer.png)
+]
 
-### Some less obvious:
+---
 
-- Colds tend to clear up a few days after you take Emergen-C
+# Correlation vs. causality : a more debated case #1
 
-- The performance of the economy tends to be lower or higher depending on the president's political party
+.pull-left[
+![:scale 80%](../img/photos/Smoking_lung_cancer.png)
+]
+
+.right-large[
+
+Skepticism about the causal impact of smoking :
+
+- Other macro factors have also changed between 1900 and 1950
+  - Tarring of roads
+  - Inhalation of motor exhausts (leaded gasoline fumes)
+  - General greater air pollution.
+
+- Smokers and non smokers are not the same 
+  - Selection on observables (age, education, income, ...)
+  - Selection on unobservables : the hypothetical confounding genome theory of Fisher. 
 
 ]
 
 ---
 
-# [Spurious](https://www.tylervigen.com/spurious-correlations) Correlation?
+# Correlation vs. causality : Lung cancer and smoking #2
 
-![](../img/photos/spurious.png)
+- Let's focus on death rates among smokers and non smokers in 3 countries [(Cochran 1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents)
+
+Death rates per 1,000 person-years
+
+![:scale 40%](../img/photos/raw_death_rates.png)
+
+--
+
+- What seems to be the most dangerous? 
+
+--
+
+- In the same time we observe smokers to be older on average
+
+![:scale 40%](../img/photos/age_by_smoking_status.png)
+
 
 ---
 
-# Good and Bad Correlation?
+class:inverse
 
-* *Correlation* is a well-defined concept of statistical **association**
+# **Task**
 
-* It's clearly true that space launches and Sociology doctorates have a correlation coefficient of 78%.
+Let's consider this table.
 
-* However, what relationship lies **behind** this association is a more difficult question. 
+![:scale 40%](../img/photos/ex_cigar_subclassif.png)
 
-* In other words, what does it **mean** to measure a correlation between two variables?
+
+
+- What is the average death rate for pipe smokers?
+
+- What would the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
 
 ---
 
 
-# Important Note
+# Correlation vs. causality : Lung cancer and smoking #3
 
-- "X causes Y" *doesn't* mean that X is necessarily the *only* thing that causes Y
+Here is the adjusted death rates using 3 age groups
 
-- And it *doesn't* mean that all Y must be X
+![:scale 40%](../img/photos/adjusted_death_rates.png)
 
-- For example, using a light switch causes the light to go on
+- Cigars and pipes do not seem to be as dangerous as in the first table.
 
-- But not if the bulb is burned out (no Y, despite X), or if the light was already on (Y without X)
-
-- But still we'd say that using the switch causes the light! The important thing is that X *changes the probability* that Y happens, not that it necessarily makes it happen for certain
-
+- It does not mean that cigars are not dangerous, but it shows that the first table provide no evidence about the causal impact of smoking on lung cancer 
 
 ---
 
@@ -182,8 +250,6 @@ layout: false
 class: title-slide-section-red, middle
 
 # Causal Inference
-
-
 
 ---
 layout: true
@@ -248,8 +314,6 @@ layout: true
 
 - So if we find someone, Gareth, with `X=0` and they have `Y=9`, is that because `X` increases `Y`, or is that just because Angela and Gareth would have had different `Y`s anyway?
 
-- 🤔
-
 ---
 
 
@@ -263,17 +327,33 @@ layout: true
 
 - If we could, we'd pick someone *identical* to Angela, the only difference being that they had `X=0` and not `X=1`.
 
+---
+
+# The Potential Outcomes Model
+
+also called Rubin Causal Model 
+
+Definition 1
 
 
+---
 
+
+# The Potential Outcomes Model
+
+Definition 2
+
+---
+
+# The Potential Outcomes Model
+
+ATE
 
 ---
 layout: false
 class: title-slide-section-red, middle
 
 # Experiments
-
-
 
 ---
 layout: true
@@ -309,7 +389,196 @@ layout: true
 
 ---
 
+# Back to class size and students' achievements
+
+In past session we regress some average student standardized score on class size. 
+
+`$$\textrm{avg_math_score}_i = b_0 + b_1 \textrm{class_size}_i + e_i$$`
+Do you think `\(b_1\)` is measuring the causal impact of class size on students' math score? If not, why ? 
+
+--
+
+* Students sorting : There is selection into schools with different sized classes. Suppose parents have a prior that smaller classes are better - they will try to get their kids into those schools.
+
+--
+
+* Teachers sorting : teachers could sort towards schools with smaller classes because it’s easier to teach a small rather than a large class, and if there is competition for those places and higher quality teachers will have an advantage.
+
+--
+
+If you were asked to think of an experiment that captures the influence of class size on student performance, what would it be? 
+
+---
+
+# The STAR Experiment (1/5)
+(Tennessee Student/Teacher Achievement Ratio Experiment)
+
+* Starting in 1985-1986 and lasting for four years, young pupils starting Kindergarden and their teachers where randomly allocated to to several possible groups : 
+
+1. Small classes with 13-17 students
+2. Regular classes with 22-25 students
+3. Regular classes with 22-25 students but with an additional full-time teaching aide.
+
+* Randomization at the school level (i.e. students and teachers of a given school are randomized across class types)
+
+* Let's take their data and replicate some of the experimental findings!
+
+---
+
+# Implementing STAR (2/5)
+
+Load the data from the `AER` package
+
+```r
+data("STAR", package = "AER")
+library(data.table)
+x = as.data.table(STAR)
+```
+
+
+
+---
+
+# Implementing STAR (3/5)
+
+Standardizing grades
+
+.pull-left[
+
+&lt;img src="causality_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+--
+
+.pull-right[
+
+* Those graphs are **Empirical Cumulative Distribution Functions** : it gives the ranking - between 0 and 1 - associated to a given score. 
+
+* What is the median of the "read score" in 3rd grade?
+
+* Why don't we use the raw scores directly? 
+
+]
+
+---
+
+# Implementing STAR (4/5)
+
+Comparing the achievments between each group : **Graphical analysis**
+
+.pull-left[
+
+&lt;img src="causality_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+
+* We first construct a global ranking based on both read and math score's ranking of student `\(i\)` :
+
+`$$\textrm{Final score}_i = 100*\frac{Rank^{read}_{i}+Rank^{read}_{i}}{2}$$`
+
+* We compare the density function between each experimental group for the kindergarden and grade 1 to 3. 
+
+* Which group seems to be the most successful? 
+
+]
+
+---
+
+# Implementing STAR (5/5)
+
+Comparing the achievments between each group : **Regressions**
+
+The model we estimate : `\(Y_{i} = b_0 + b_1\textrm{SMALL}_{i} + b_2 \textrm{REG&amp;A}_{i} + e_i\)`
+
+.pull-left[
+
+&lt;!able class="huxtable" style="border-collapse: collapse; margin-bottom: 2em; margin-top: 2em; width: 50%; margin-left: auto; margin-right: auto;  ">
+<caption style="caption-side: top; text-align: center;">Estimates for each grade</caption><col><col><col><col><col><tr>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 1pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;"></td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 1pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">K</td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 1pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">1</td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 1pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">2</td>
+<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 1pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">3</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(Intercept)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">51.44&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">49.43&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">49.75&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">50.87&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;"></td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.61)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.56)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.61)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.66)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">smallTRUE</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">4.84&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">8.37&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">6.19&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">4.96&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;"></td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.89)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.85)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.89)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.91)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">regaTRUE</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">-0.19&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">3.38&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">2.22&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">-0.08&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;"></td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">(0.86)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.82)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">(0.85)</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">(0.88)</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">N</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">5723&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">6225&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">5704&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">5715&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold; font-size: 12pt;">R2</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">0.01&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">0.02&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">0.01&nbsp;</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 1pt 0pt; padding: 4pt 4pt 4pt 4pt; font-size: 12pt;">0.01&nbsp;</td>
+</tr>
+</table>
+<!
+
+--
+
+.pull-right[
+
+* Based on these results, would you advise to reduce class size or provide additional teaching aide? 
+
+* What is the value of `\(b_1\)` for grade3? Interpret this value.
+
+* What are the limits of such an experiment? 
+
+]
+---
+
 # Models
+
+* We cannot always run RCTs 
 
 - In causal inference, the *model* is our idea of what we think the process is that *generated the data*.
 
@@ -327,7 +596,7 @@ layout: true
 
 - Yeah, but it's impossible to skip!
 
-- We're trying to predict something that hasn't happened - a counterfactual.
+- We're trying to predict something tat hasn't happened - a counterfactual.
 
 - This is literally impossible to do if you don't have some model of how the data is generated.
 
@@ -359,10 +628,10 @@ head(df,4)
 ## # A tibble: 4 x 4
 ##   Y.without.X     X Y.with.X Observed.Y
 ##         &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
-## 1      0.930      0    101.      0.930 
-## 2     -0.0645     0     99.9    -0.0645
-## 3     -0.461      1     99.5    99.5   
-## 4      0.594      1    101.    101.
+## 1       3.03      0    103.       3.03 
+## 2       1.17      1    101.     101.   
+## 3       0.191     0    100.       0.191
+## 4      -1.07      1     98.9     98.9
 ```
 ]
 
@@ -377,7 +646,7 @@ df %&gt;% group_by(X) %&gt;%
 ```
 
 ```
-## [1] 99.95001
+## [1] 100.0577
 ```
 ]
 
@@ -405,14 +674,14 @@ head(df)
 
 ```
 ## # A tibble: 6 x 5
-##       Z Y.without.X Y.with.X X     Observed.Y
-##   &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;lgl&gt;      &lt;dbl&gt;
-## 1 0.263        27.2     127. FALSE       27.2
-## 2 0.113        10.7     111. FALSE       10.7
-## 3 0.325        32.6     133. FALSE       32.6
-## 4 0.186        18.0     118. FALSE       18.0
-## 5 0.836        83.5     183. FALSE       83.5
-## 6 0.833        82.9     183. FALSE       82.9
+##        Z Y.without.X Y.with.X X     Observed.Y
+##    &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;lgl&gt;      &lt;dbl&gt;
+## 1 0.0989        9.93     110. FALSE       9.93
+## 2 0.725        73.0      173. FALSE      73.0 
+## 3 0.514        51.2      151. FALSE      51.2 
+## 4 0.339        36.1      136. FALSE      36.1 
+## 5 0.159        14.7      115. FALSE      14.7 
+## 6 0.0927       10.3      110. FALSE      10.3
 ```
 ]
 
@@ -428,7 +697,7 @@ df %&gt;% group_by(X) %&gt;%
 ```
 
 ```
-## [1] 149.3084
+## [1] 150.2028
 ```
 
 * That's not the correct effect size!
@@ -444,7 +713,7 @@ df %&gt;% filter(abs(Z-.9)&lt;.01) %&gt;%
 ```
 
 ```
-## [1] 100.9533
+## [1] 100.8847
 ```
 ]
 
@@ -469,7 +738,7 @@ class: title-slide-final, middle
 
 # THANKS
 
-To [Nick Huntington Klein](http://www.nickchk.com/index.html) for making his lecture material available online!
+To XXX
 
 ---
 
@@ -492,7 +761,7 @@ background-position: 9% 19%
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
 <script src="../js/ru_xaringan.js"></script>
 <script>var slideshow = remark.create({
 "highlightStyle": "github",
@@ -538,7 +807,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {

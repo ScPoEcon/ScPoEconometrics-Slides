@@ -42,7 +42,12 @@ lowtop = c(om[1],om[2],0.1,om[4])
 
 overwrite = FALSE
 
+library(ggplot2)
 library(emo)
+library(dplyr)
+library(png)
+library(grid)
+library(pander)
 ```
 
 layout: true
@@ -54,14 +59,14 @@ layout: true
 
 # Recap from from past Lectures and plan for this session
 
-Recap of past session
+**Recap of past session**
 
-* Simple linear model (model, interpretation of coefficients)
+* Simple Linear Regression model 
 
-* R knowledge : run an OLS regression
+* R knowledge : run an OLS regression and interpret the output
 
 
-Plan 
+**Plan for today** : *Introduction to causal inference*
 
 * Causality versus correlation
 
@@ -71,77 +76,71 @@ Plan
 
 * Follow up : the case of **class size** and **students performance** 
 
-* Back to models 
-
 ---
 
+# Why do we care about causality?
 
-# Packages used in this set of slides
+Many of the interesting questions we might want to answer with data are causal<sup>1</sup>
 
-```{r}
-library(tidyverse)
-```
+--
 
----
+- Understanding the world
+    - Social sciences : Why people behave in the way they do? 
+    - Health sciences : XXX
 
-# Why Causality?
+--
 
-- Many of the interesting questions we might want to answer with data are causal<sup>1</sup>
+- Public policy perspective
+    - How to reduce unemployment?
+    - XXX 
 
-- Some are non-causal, too - for example, "how can we predict whether this photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat
+--
 
-- Nearly every *why* question is causal
-
-- *Why* is a first order question for any policy maker thinking about a new policy.
-
+Note that some questions we might want to answer are non causal 
+  - Most *Artificial Intelligence* tasks, for example : "how can we predict whether a photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
+    
 .footnote[
 [1]: This set of slides follows closely the great material by [Nick Huntington Klein](https://nickch-k.github.io/introcausality/)
 ]
 
 ---
 
-# Also
+# Why causality 
 
-- This is economists' comparative advantage!
+- This is (kind of) economists' comparative advantage!
 
-- Plenty of fields do statistics. But very few make it standard training for their students to understand causality
+- Plenty of fields do statistics. But very few make it standard training for their students to understand causality.
 
 - This understanding of causality makes economists very useful! *This* is one big reason why tech companies have whole economics departments in them
 
 ---
 
-# So what is causality?
+# Causality : Definition
 
 - We say that `X` *causes* `Y` if...
 
-- were we to intervene and *change* the value of `X` without changing anything else...
+--
 
-- then `Y` would also change as a result
+  - we were to intervene and *change* the value of `X` without changing anything else...
+    
+--
 
----
-
-# Some examples of causal relationships
-
-.pull-left[
-## Some Obvious:
-
-- A light switch being set to on causes the light to be on
-
-- Setting off fireworks raises the noise level
-
-]
+  - then `Y` would also change as a result
 
 --
 
-.pull-right[
+This is the so-called **ceteris paribus assumption**
 
-## Some less obvious:
+- But it does **NOT** mean that...
 
-- Getting a college degree increases your earnings
+  - `X` is the only cause of `Y`, other factors could *cause* `Y`
+    
+  - XXX
+    
+---
 
-- Tariffs reduce the amount of trade
+# DAG 
 
-]
 
 ---
 
@@ -151,61 +150,111 @@ library(tidyverse)
 
 * Well, we're here to figure out conditions when it **is**!
 
-## Examples of non-zero *correlations* that are not *causal* (or may be causal in the wrong direction!)
+* Econometrics is about stating the conditions under which we can claim that a relationship is causal.
 
-.pull-left[
+---
 
-### Some obvious:
+# Correlation vs. causality : some obvious cases
 
-- People tend to wear shorts on days when ice cream trucks are out
+Check the [Spurious correlation website](https://www.tylervigen.com/spurious-correlations)
 
-- Rooster crowing sounds are followed closely by sunrise
+![:scale 70%](../img/photos/spurious.png)
 
-] 
+- Who would believe that sociologist can help into space lauching? `r emo::ji("smile")`
+
+- Some case are more difficult to tell
+---
+
+# Correlation vs. causality : a more debated case #1
+
+**Does smoking cause lung cancer?** 
+
+- Today, we know the answer and it is YES! 
+
+- But let's go back in the 1950's
+
+  - We are at the start of a big increase in deaths from lung cancer...
+  
+  - ... which is happening after a fast growth of cigarette consumption
+
+--
 
 .pull-right[
+![:scale 60%](../img/photos/Smoking_lung_cancer.png)
+]
 
-### Some less obvious:
+---
 
-- Colds tend to clear up a few days after you take Emergen-C
+# Correlation vs. causality : a more debated case #1
 
-- The performance of the economy tends to be lower or higher depending on the president's political party
+.pull-left[
+![:scale 80%](../img/photos/Smoking_lung_cancer.png)
+]
+
+.right-large[
+
+Skepticism about the causal impact of smoking :
+
+- Other macro factors have also changed between 1900 and 1950
+  - Tarring of roads
+  - Inhalation of motor exhausts (leaded gasoline fumes)
+  - General greater air pollution.
+
+- Smokers and non smokers are not the same 
+  - Selection on observables (age, education, income, ...)
+  - Selection on unobservables : the hypothetical confounding genome theory of Fisher. 
 
 ]
 
 ---
 
-# [Spurious](https://www.tylervigen.com/spurious-correlations) Correlation?
+# Correlation vs. causality : Lung cancer and smoking #2
 
-![](../img/photos/spurious.png)
+- Let's focus on death rates among smokers and non smokers in 3 countries [(Cochran 1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents)
+
+Death rates per 1,000 person-years
+
+![:scale 40%](../img/photos/raw_death_rates.png)
+
+--
+
+- What seems to be the most dangerous? 
+
+--
+
+- In the same time we observe smokers to be older on average
+
+![:scale 40%](../img/photos/age_by_smoking_status.png)
+
 
 ---
 
-# Good and Bad Correlation?
+class:inverse
 
-* *Correlation* is a well-defined concept of statistical **association**
+# **Task**
 
-* It's clearly true that space launches and Sociology doctorates have a correlation coefficient of 78%.
+Let's consider this table.
 
-* However, what relationship lies **behind** this association is a more difficult question. 
+![:scale 40%](../img/photos/ex_cigar_subclassif.png)
 
-* In other words, what does it **mean** to measure a correlation between two variables?
+
+
+- What is the average death rate for pipe smokers?
+
+- What would the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
 
 ---
 
 
-# Important Note
+# Correlation vs. causality : Lung cancer and smoking #3
 
-- "X causes Y" *doesn't* mean that X is necessarily the *only* thing that causes Y
+Here is the adjusted death rates using 3 age groups
 
-- And it *doesn't* mean that all Y must be X
+![:scale 40%](../img/photos/adjusted_death_rates.png)
 
-- For example, using a light switch causes the light to go on
+- Cigars and pipes do not seem to be as dangerous as in the first table.
 
-- But not if the bulb is burned out (no Y, despite X), or if the light was already on (Y without X)
-
-- But still we'd say that using the switch causes the light! The important thing is that X *changes the probability* that Y happens, not that it necessarily makes it happen for certain
-
+- It does not mean that cigars are not dangerous, but it shows that the first table provide no evidence about the causal impact of smoking on lung cancer 
 
 ---
 
@@ -222,8 +271,6 @@ layout: false
 class: title-slide-section-red, middle
 
 # Causal Inference
-
-
 
 ---
 layout: true
@@ -301,9 +348,27 @@ layout: true
 
 - If we could, we'd pick someone *identical* to Angela, the only difference being that they had `X=0` and not `X=1`.
 
+---
+
+# The Potential Outcomes Model
+
+also called Rubin Causal Model 
+
+Definition 1
 
 
+---
 
+
+# The Potential Outcomes Model
+
+Definition 2
+
+---
+
+# The Potential Outcomes Model
+
+ATE
 
 ---
 layout: false
@@ -552,6 +617,8 @@ h
 
 # Models
 
+* We cannot always run RCTs 
+
 - In causal inference, the *model* is our idea of what we think the process is that *generated the data*.
 
 - We have to make some assumptions about what this is!
@@ -671,7 +738,7 @@ class: title-slide-final, middle
 
 # THANKS
 
-To [Nick Huntington Klein](http://www.nickchk.com/index.html) for making his lecture material available online!
+To XXX
 
 ---
 
