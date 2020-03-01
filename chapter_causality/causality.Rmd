@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Intro To Causality"
-author: "F. Oswald, G. Kennedy and P. Villedieu"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -56,25 +56,24 @@ layout: true
 
 ---
 
+# Recap from last week
 
-# Recap from from past Lectures and plan for this session
+* Simple Linear Regression model: $\widehat y_i = b_0 + b_1 x_i$
 
-**Recap of past session**
+* Ordinary Least Squares (OLS) estimation: minimize the sum of squared errors
 
-* Simple Linear Regression model 
-
-* R knowledge : run an OLS regression and interpret the output
+* R command to estimate a linear model: `lm(dependent variable ~ independent variable, data)`
 
 
-**Plan for today** : *Introduction to causal inference*
+## Today - Introduction to causal inference
 
 * Causality versus correlation
 
-* The Potential Outcome Model
+* The Potential Outcome Framework a.k.a. Rubin's Causal Model
 
-* Randomized experiments
+* Randomized controlled trials (RCTs)
 
-* Follow up : the case of **class size** and **students performance** 
+* Follow up on the empirical application of *class size* and *student performance*
 
 ---
 
@@ -369,6 +368,10 @@ Definition 2
 # The Potential Outcomes Model
 
 ATE
+
+ATT
+
+ATU
 
 ---
 layout: false
