@@ -466,7 +466,7 @@ $$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$
 
 # Facing the problem of causal inference #2
 
-Let's decompose the Simple Difference in mean Ouctomes (SDO). 
+Let's decompose the **Simple Difference in mean Ouctomes** (SDO). 
 
 \begin{align}
   \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
@@ -491,11 +491,9 @@ And because $ATE = \mathop{\mathbb{E}}(\delta_i) \underbrace{=}_\text{constant t
 
 class:inverse
 
-# Facing the problem of causal inference #3
+# Task 2 (10 min)
 
-###**Task**
-
-Let's compute the selection bias with some toy data 
+Let's compute these various quantities and bias with some toy data (i.e. data we generated ourselves).
 
 ```{r, echo = FALSE, eval = FALSE}
 
@@ -517,11 +515,15 @@ fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_dat
 # toy_data = read.csv("https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1")
 ```
 
-1) Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). 
+1) Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). Notice that `Di_random` is a treatment status we would have under a given random assignment.
 
-2) Add the variables $Y_i$ and $\delta_i$. 
+2) Compute and add $Y_i$ and $\delta_i$ as new variables. 
 
-3) 
+3) Compute the **ATE** and the **SDO**. Is there is any bias? Is it large in magnitude? 
+
+4) Using `D_i_random`, compute the **SDO under randomization**. If you got it right, the bias should be almost 0 (about 0.017 actually). 
+
+5) Bonus :  Compute the value of the **selection bias** and the **heterogenous trt effect bias** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heter. trt. effect bias}$$ 
 
 
 ---
@@ -567,11 +569,6 @@ layout: true
 # Randomized experiments
 
 - Often called **R**andom **C**ontrolled **T**rial (RCT).
-
-- If you can *randomly assign* `D`, then you know that the people with `D=0` are, on average, exactly the same as the people with `D=1`.
-
-- So simple comparisons will allow you to make causal inference!
-
 
 ---
 
@@ -661,7 +658,7 @@ Compute the average percentage of girls, african americans, and free lunch quali
 #         names_to = c(".value", "grade"),
 #         names_pattern = "(.+)(k|1|2|3)$")
 # write.csv2(star, file = "star_data.csv", row.names = F)
-star_df = read.csv(file = "https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_long = read.csv(file = "https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
 ```
 
 ---
@@ -721,9 +718,10 @@ k | read | `r round(diff_table[2,3], 2)` | `r round(diff_table[2,4], 2)` | `r ro
 Recall: $Y_i = D_i Y_i^1 + (1 - D_i) Y_i^0$
 
 We get:
-$$\begin{align} 
 
-## Dummy variable trap
+---
+
+# Dummy variable trap
 
 ---
 
@@ -810,164 +808,44 @@ The model we estimate is : $Y_{i} = b_0 + b_1\textrm{SMALL}_{i} + b_2 \textrm{RE
 ]
 ---
 
-# Pros and cons of RCT's 
+# RCTs Shortcomings 
 
-RCTs are often seen as the **gold standard of causal inference**
+Although randomized experiments make causal inference much more convincing it also has several shortcomings 
 
-* The Nobel price in economics has recently (2019) been awarded to three exponents of the RCT literature, [Duflo, Banerje and Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty).
+* RCT are often **infeasible**
 
-* The main strenght of RCTs is their **internal validity** : we are very confident that the estimates we get are capturing causal effects 
+  * RCTs are **costly**
+  * RCTs may face some **ethical issues** : some *treatment* just cannot be given to people
+  * RCTs take time and we may be **time constrained** 
 
 --
 
-But it has also several shortcomings 
+* **Interpretating** the results
 
-* **External validity issue**: How much can we generalize from given RCT's results? 
-* RCTs are **costly** both in time and money
-* RCTs may face some **ethical issues** : there is some treatment that cannot be assigned to people 
-
-* ...
+  * **External validity issue**: How much the results from a given RCT's can be generalized to other context (countries, populations,...?
+  
+  * Identifying the mechanisms that are at stake may be difficult
 
 ---
 
 
-# Back to model 
+# What comes next? 
 
-* If we cannot run an RCT (most of the time) we have to find way to make causal inference from **observational data**
+* So if we cannot rely on RCTs to make our life easy, it means we have to find a way to make causal inference from **observational data** (as opposed to experimental data) 
 
 * It brings us back to models 
 
-- In causal inference, the *model* is our idea of what we think the process is that *generated the data*.
+  - In causal inference, the *model* is our idea of what the process that *generated the data* is.
 
-- We have to make some assumptions about what this is!
+  - We have to make some assumptions about what this is!
 
-- We put together what we know about the world with assumptions and end up with our model.
-
-- The model can then tell us what kinds of things could give us wrong results so we can fix them and get the right counterfactual.
-
----
-
-# Models
-
-- Wouldn't it be nice to not have to make assumptions?
-
-- Yeah, but it's impossible to skip!
-
-- We're trying to predict something tat hasn't happened - a counterfactual.
-
-- This is literally impossible to do if you don't have some model of how the data is generated.
-
-- You can't even predict the sun will rise tomorrow without a model!
-
-- If you think you can, you're just don't realize the model you're using - that's dangerous!
-
----
-
-# Teaser of next sessions 
-
-The approach taken to make causal inference will depend on the 
-
----
+* If we are confident that **selection occurs on the observables**, i.e. variables that we have in our data : we will use **Multiple Regression**
+  * That's next course !
+  
+* If we think that some confounding factors are unobserved : we will have to rely on more *fancy* techniques, such as **RDD** or **Diff-in-Diff**
+  * That's session 10 and 11 ! 
 
 
-# An Example: Randomization
-
-- Let's generate some data.
-- Let's say that getting `X` causes `Y` to increase by 100.
-- And let's run a randomized experiment of who actually gets X and estimate the size of the effect (should be close to `100`!)
-
-.pull-left[
-```{r, echo=TRUE, eval=TRUE}
-true_effect <- 100
-df <- tibble(Y.without.X = rnorm(1000),
-             X=sample(c(0,1),1000,replace=T)) %>%
-  mutate(Y.with.X = Y.without.X + true_effect) %>%
-  #Now assign who actually gets X
-  mutate(Observed.Y = ifelse(X==1,Y.with.X,Y.without.X))
-head(df,4)
-```
-]
-
-.pull-right[
-* Now, estimate the group means and simply difference them:
-```{r}
-#And see what effect our experiment suggests X has on Y
-df %>% group_by(X) %>% 
-  summarize(Y = mean(Observed.Y)) %>%
-  pull(Y) %>% diff
-```
-]
-
-* That's pretty close to the true effect there!
-
----
-
-# An Example: No Randomization
-
-- Suppose now we can *not* randomize the `X`.
-
-- Instead there is some kind of rule that decides about `X`.
-
-.pull-left[
-```{r, echo=TRUE, eval=TRUE}
-df <- tibble(Z = runif(10000)) %>% 
-  mutate(Y.without.X = rnorm(10000)+100*Z, 
-         Y.with.X = Y.without.X + 100) %>%
-  #Now assign who actually gets X
-  mutate(X = Z > .9,
-         Observed.Y = ifelse(X==1,Y.with.X,Y.without.X))
-head(df)
-```
-]
-
---
-
-.pull-right[
-
-```{r}
-df %>% group_by(X) %>% 
-  summarize(Y = mean(Observed.Y)) %>%
-  pull(Y) %>% diff
-```
-
-* That's not the correct effect size!
-
-* But if we properly model the assignment process and compare apples to apples?
-
-```{r}
-df %>% filter(abs(Z-.9)<.01) %>% 
-  group_by(X) %>% 
-  summarize(Y = mean(Observed.Y)) %>%
-  pull(Y) %>% diff
-```
-]
-
----
-
-# Building the Counterfactual
-
-* In that last example our first attempt failed because we had not taken selection into account.
-
-* It turns out that `Z` influences `Y.without.X`, which at the same time will be part of our estimator for the true effect size.
-
-* But `Z` also determines who gets treatment! All the ones with `Z > 0.9`!
-
-* So, people with `Z > 0.9` get treated, but **also** have a relatively high `Y.without.X`. 
-
-* You can see that there is a depenence between the assignment and the effect size.
-
-
----
-
-class: title-slide-final, middle
-
-# Materials used to make these set of slides 
-
-* Applied Econometrics: Causal Inference and Research Design, S. Cunningham, 2017
-
-* Counterfactuals and Causal Inference, Methods and Principles for Social Research, S. L. Morgan, C. Winship, 2015
-
-Thanks to the authors for making it available! 
 ---
 
 class: title-slide-final, middle
