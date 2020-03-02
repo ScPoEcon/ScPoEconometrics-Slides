@@ -661,7 +661,7 @@ Compute the average percentage of girls, african americans, and free lunch quali
 #         names_to = c(".value", "grade"),
 #         names_pattern = "(.+)(k|1|2|3)$")
 # write.csv2(star, file = "star_data.csv", row.names = F)
-star_df = read.csv2(file = "https://www.dropbox.com/s/u2ozlbs1d2qy0bz/star_data.csv?dl=1")
+star_df = read.csv(file = "https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
 ```
 
 ---
@@ -670,7 +670,7 @@ star_df = read.csv2(file = "https://www.dropbox.com/s/u2ozlbs1d2qy0bz/star_data.
 
 We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the control and treatment groups.
 
-Let's only focus on only one treatment grou: small classes.
+Let's only focus on one treatment group: small classes.
 
 ```{r, echo = FALSE}
 diff_table = data.frame(
@@ -701,16 +701,27 @@ diff_table = data.frame(
         diff_regular_aide_regular = round(mean_regular_aide - mean_regular, 3)
     ) %>%
     arrange(factor(grade, levels = c("k","1","2","3")))
-diff_table
 ```
 
 grade | test | mean regular | mean small | ATE
 --------|---------|---------|---------|---------
 k | math | `r round(diff_table[1,3], 2)` | `r round(diff_table[1,4], 2)` | `r round(diff_table[1,4] - diff_table[1,3], 2)`
 k | read | `r round(diff_table[2,3], 2)` | `r round(diff_table[2,4], 2)` | `r round(diff_table[2,4] - diff_table[2,3], 2)`
+1 | math | `r round(diff_table[3,3], 2)` | `r round(diff_table[3,4], 2)` | `r round(diff_table[3,4] - diff_table[3,3], 2)`
+1 | read | `r round(diff_table[4,3], 2)` | `r round(diff_table[4,4], 2)` | `r round(diff_table[4,4] - diff_table[4,3], 2)`
+2 | math | `r round(diff_table[5,3], 2)` | `r round(diff_table[5,4], 2)` | `r round(diff_table[5,4] - diff_table[5,3], 2)`
+2 | read | `r round(diff_table[6,3], 2)` | `r round(diff_table[6,4], 2)` | `r round(diff_table[6,4] - diff_table[6,3], 2)`
+3 | math | `r round(diff_table[7,3], 2)` | `r round(diff_table[7,4], 2)` | `r round(diff_table[7,4] - diff_table[7,3], 2)`
+3 | read | `r round(diff_table[8,3], 2)` | `r round(diff_table[8,4], 2)` | `r round(diff_table[8,4] - diff_table[8,3], 2)`
 
 ---
-# RCT in regression
+
+# RCT in Regression Form
+
+Recall: $Y_i = D_i Y_i^1 + (1 - D_i) Y_i^0$
+
+We get:
+$$\begin{align} 
 
 ## Dummy variable trap
 
