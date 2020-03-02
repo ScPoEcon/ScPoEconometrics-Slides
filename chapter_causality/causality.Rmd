@@ -227,35 +227,29 @@ Smokers and non-smokers may be different in the first place:
 
 - Let's focus on one of these potential confounding characteristics : **age**.
 
+
 - Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates from lung cancer in Canada, U.K. and U.S.
 
 - Add simple details about sample size and years!
 
-.pull-left[
 Death rates per 1,000 person-years
 
-![:scale 80%](../img/photos/raw_death_rates.png)
+![:scale 50%](../img/photos/raw_death_rates.png)
 
-]
-
---
-
-.pull-right[
-</br>
 
 - We are 30% (U.S.) to 75% (Canada) more likely to find death from lung cancer among cigar/pipe smokers than non-smokers.
 
-]
+---
 
---
+# Correlation vs. causality : smoking and lung cancer #2
 
-.pull-left[
-* But, the age distribution vary a lot accross groups
-]
+* But the age distribution is also very different according to smoking status
 
-.pull-right[
-![:scale 60%](../img/photos/age_by_smoking_status.png)
-]
+Mean age by smoking status
+
+![:scale 50%](../img/photos/age_by_smoking_status.png)
+
+* Because health is likely to deteriorate with age the previous table could be far from causal estimates. 
 
 ---
 
@@ -263,18 +257,18 @@ class:inverse
 
 # Correlation vs. causality : smoking and lung cancer #3
 
-Let's adjust our statistics taking into account the age distribution of pipe-smokers.
+Let's consider adjust our statistics taking into account the age distribution of pipe-smokers.
 
 ![:scale 40%](../img/photos/ex_cigar_subclassif.png)
 
 
-This table gives a 3 age group distribution of 40 pipe-smokers and 40 non-smokers, as well as the death rate of pipe-smokers for each age group.
+This table replicates the 3 age group distribution of pipe-smokers and non-smokers, as well as the death rate of pipe-smokers for each age group in Canada.
 
 **Questions** 
 
-- What is the average death rate for pipe smokers?
+- Compute the average death rate for pipe smokers in Canada from age grouped death rates?
 
-- What would the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
+- What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
 
 ---
 
@@ -326,7 +320,7 @@ Often called the **Rubin Causal Model** in memory of the statistician **Donald R
 
 --
 
-* **Key idea/assumption** : Each individual can be exposed to **multiple alternative states of a cause**, i.e. two treatment state.
+* **Key idea/assumption** : Each individual can be exposed to **multiple alternative treatment states**.
 For example :
   - smoking or non-smoking 
   - growing up in a poor vs a rich neighborhood
@@ -337,11 +331,10 @@ For example :
 .pull-left[
 * Let this treatment be a binary variable
 
-For example : 
 $$
 D_i = \begin{cases} 
-                    1 \textrm{ if i in a small class} \\\\ 
-                    0 \textrm{ if i in a big class} 
+                    1 \textrm{ if i is treated} \\\\ 
+                    0 \textrm{ if i is not} 
       \end{cases}
 $$
 ]
@@ -350,9 +343,9 @@ $$
 
 .pull-right[
 
-* For each $i$, we **observe** the value of $D_i$. 
+**Treatment group** $\equiv$ all the individuals such that $D_i = 1$   
 
-* In real life, $D_i$ is either equal to 0 or 1. 
+**Control group** $\equiv$ all the individuals such that $D_i = 0$   
 ]
 
 .footnote[
@@ -376,13 +369,23 @@ $$
 
 $$ \delta_i = Y_i^1 - Y_i^0$$
 * N.b. : $\delta_i$ measures the **causal effect of $D$** for the individual $i$ on the outcome $Y$
-* Problem : We only observe one of both potential outcomes, so we cannot compute $\delta_i$ for any $i$. This is know as the **fundamental problem of causal inference**. 
+
+
+* In real life we observe $Y_i$ such that 
+
+$$Y_i = D_i * Y_i^1 + (1- D_i)*Y_i^0$$
+
+* That is the **fundamental problem of causal inference**. We only observe one of both potential outcomes, so we cannot compute $\delta_i$ for any $i$. 
+
+
+---
+
+# The Potential Outcomes Model of causal inference
 
 * The potential outcome that is not observed exists in principle, it is called the **counterfactual outcome**.
 
   * What your test score would have been if you have been in a big class, knowing that you were in a small one.
-
-
+  
 ---
 
 # The Potential Outcomes Model
@@ -400,7 +403,8 @@ ATE &= \mathop{\mathbb{E}}(\delta_i) \\
   
 * The ATE simply measures the **average of individual treatment effects over the whole population**. 
   
-  * The $\mathop{\mathbb{E}}(.)$ symbol stands for *expectation* or *population mean*
+  * The $\mathop{\mathbb{E}}(.)$ operator stands for *expectation* or *population mean*. 
+  * N.B. : the $\mathop{\mathbb{E}}(.)$ operator is linear $\equiv$ $\mathop{\mathbb{E}}(A+B) = \mathop{\mathbb{E}}(A) + \mathop{\mathbb{E}}(B)$. $A$ and $B$ being two random variables
 
 ---
 
@@ -416,15 +420,26 @@ We may also (mostly) be interested in average effect in the population, in parti
      &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 1)
 \end{align}
 
-* The ATT measures the **average treatment effect conditional on being a treatment group member**, all $i$ such that $D_i = 1$
+* The ATT measures the **average treatment effect conditional on being in the treatment group**.
 
-  * The $\mathop{\mathbb{E}}(Y_i|D_i=1)$ symbol stands for *conditional expectation*. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition $D_i = 1$.
+    * The $\mathop{\mathbb{E}}(.|C)$ operator stands for *conditional expectation*. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition $C$.
+  * The $\mathop{\mathbb{E}}(.|C)$ is also linear.
 
-* In the same way we can define the **A**verage **T**reatment Effect on the **U**treated as : 
+---
+
+# The Potential Outcomes Model
+
+We may also (mostly) be interested in average effect in the population, in particular :
+
+* The **A**verage **T**reatment Effect on the **U**treated
 
 \begin{align}
- ATU &= \mathop{\mathbb{E}}(\delta_i | D_i = 0)
+ ATT &= \mathop{\mathbb{E}}(\delta_i | D_i = 0) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 0) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 0) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
 \end{align}
+
+* The ATU measures the **average treatment effect conditional on being in the control group**.
 
 ---
 
@@ -451,7 +466,7 @@ $$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$
 
 # Facing the problem of causal inference #2
 
-Let's decompose the simple difference in mean ouctomes. 
+Let's decompose the Simple Difference in mean Ouctomes (SDO). 
 
 \begin{align}
   \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
@@ -482,13 +497,65 @@ class:inverse
 
 Let's compute the selection bias with some toy data 
 
+```{r, echo = FALSE, eval = FALSE}
+
+set.seed(1)
+D_i = sample(c(0,1), replace = T, size = 1000)
+Y0_i = sample(c(1:10), replace = T, size = 1000) + D_i
+delta_i = sample(c(1:3), replace = T, size = 1000) + 0.2*D_i
+cor(Y0_i, D_i)
+cor(delta_i, D_i)
+Y1_i = Y0_i + delta_i
+
+set.seed(3)
+D_i_random = sample(c(0,1), replace = T, size = 1000)
+cor(Y0_i, D_i_random)
+cor(delta_i, D_i_random)
+
+toy_data = data.frame(D_i, Y0_i, Y1_i, D_i_random)
+fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_data.csv")
+# toy_data = read.csv("https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1")
+```
+
+1) Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). 
+
+2) Add the variables $Y_i$ and $\delta_i$. 
+
+3) 
+
+
+---
+
+# Randomization solves the pb of causal inference ! 
+
+* Let's imagine you can **randomly** assign people to each treatment group. That is what **randomized experiments** are. 
+
+* Then the treatment status would be **independant** of the potential outcomes.
+
+* In particular, there is no reason for $\mathop{\mathbb{E}}(Y_i^0 | D_i = 1)$ to be different from $\mathop{\mathbb{E}}(Y_i^0 | D_i = 0)$
+
+  * So the **selection bias is equal to O** 
+  
+* In the same way, so there is no reason for $\delta_i$ to be different among treated than among controls. 
+
+  * So ATT will equal ATU, implying the **Heterogenous treatment effect bias to be 0** 
+
+---
+
+# Randomization solves the pb of causal inference ! 
+
+Thanks to randomization we then have : 
+
+$$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) = ATE$$ 
+
+It means we can directly estimate the ATE from the data! 
 
 ---
 
 layout: false
 class: title-slide-section-red, middle
 
-# Experiments
+# Randomized Experiments
 
 ---
 layout: true
@@ -497,9 +564,9 @@ layout: true
 
 ---
 
-# Experiments
+# Randomized experiments
 
-- A common way to do this in many fields is an *experiment*, Often called **R**andom **C**ontrolled **T**rial (RCT).
+- Often called **R**andom **C**ontrolled **T**rial (RCT).
 
 - If you can *randomly assign* `D`, then you know that the people with `D=0` are, on average, exactly the same as the people with `D=1`.
 
