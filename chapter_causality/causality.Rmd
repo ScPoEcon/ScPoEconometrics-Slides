@@ -59,9 +59,9 @@ layout: true
 
 # Recap from last week
 
-* Simple Linear Regression model: $\widehat y_i = b_0 + b_1 x_i$
+* *Simple Linear Regression Model*: $\widehat y_i = b_0 + b_1 x_i$
 
-* Ordinary Least Squares (OLS) estimation: minimize the sum of squared errors
+* *Ordinary Least Squares* (OLS) estimation: minimize the sum of squared errors
 
 * R command to estimate a linear model: `lm(dependent variable ~ independent variable, data)`
 
@@ -84,99 +84,92 @@ Many of the *interesting questions* we might want to answer with data are causal
 
 --
 
-- **Understanding** the world
+- ***Understanding*** the world
 
-  - Social sciences : Why people behave in the way they do? 
-  - Health sciences : Why people get sick? How to cure them?
-
---
-
-- Causal understanding is also of first interest for **public planers**
-
-  - How to reduce unemployment? You need to know what cause unemployment... 
-  - Should governments care about the level of public debt? 
+  - *Social sciences*: Why do people behave in the way they do?
+  - *Health sciences*: Why do people get sick? Which medicine can cure them?
 
 --
 
-- Note that some questions we might want to answer are non causal 
+- Causal understanding is also of first interest for **policymakers**
+
+  - How to lower unemployment?
+  - How to improve student learning?
+  - Whether governments should care about the level of public debt?
+
+--
+
+- Note that some questions we might want to answer are not causal 
   - Most *Artificial Intelligence* tasks only care about **prediction**
-  - Ex : "how can we predict whether a photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
+  - *Example*: "predicting whether a photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
 
 ---
 
 # Causality and Economics
 
-- Making causal inference from data can be seen as the economists' comparative advantage among social sciences!
+- Making causal inference from data can be seen as economists' comparative advantage among the social sciences!
 
 - Plenty of fields do statistics. But very few make it standard training for their students to understand causality.
 
-- The care of economists for making consistent causal inference is also what makes them useful both in private (tech companies for example) or public sector (policy advisors) 
+- Economists' endeavour to establish causal relationships is also what makes them useful both in the private (e.g. tech companies) and public sector (e.g. policy advisors) 
 
 --
 
-- Ok, that's enough lobbying... `r emo::ji("sweat_smile")`
+- Ok, that's enough lobbying `r emo::ji("sweat_smile")`
 
 
 ---
 
 # The Concept of Causality
 
-Causality : what are we talking about? 
+__Causality__: what are we talking about? 
 
-- We say that `X` *causes* `Y`...
+- We say that `X` *causes* `Y`
 
 --
 
-  - if we were to intervene and *change* the value of `X` without changing anything else...
+  - if we were to intervene and *change* the value of `X` ***without changing anything else***...
     
 --
 
-  - then `Y` would also change as a result
+  - then `Y` would also change ***as a result***.
+  
+--
 
-- The key point here is the *without changing anything else*, often refered as the **Ceteris Paribus assumption**
+- The key point here is the ***without changing anything else***, often refered as the **ceteris paribus assumption**   
+(*latin* makes things seem more complicated `r emo::ji("nerd_face")`)
 
 --
 
-- `r emo::ji("warning")` It does **NOT** mean that `X` is the only factor only that causes `Y`
+- `r emo::ji("warning")` It does **NOT** mean that `X` is the only factor that causes `Y`.
 
 ---
 
 # Correlation vs Causation
 
-* That's becomes almost a trueism: *Correlation is not equal Causation*.
+*Correlation does not equal causation* has become a ubiquitous mantra, but can you tell why it is true?
 
-* Well, we're here to figure out conditions when it **is**!
+--
 
-* Econometrics is about stating the conditions under which we can claim that a relationship is causal.
+Some correlations obviously don't imply causation ([Spurious correlation website](https://www.tylervigen.com/spurious-correlations))
+
+--
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../img/photos/spurious.png")
+```
 
 ---
 
-# Some funny correlations...
-
-... that are obviously not causation 
-
-You can have a look to the [Spurious correlation website](https://www.tylervigen.com/spurious-correlations)
-
-.pull-left[
-![:scale 90%](../img/photos/spurious.png)
-]
-
-.pull-right[
-- Who would believe that sociologist can help into space lauching? `r emo::ji("smile")`
-]
-
+# Correlation vs Causation: Smoking and Lung Cancer
 
 But not all correlations are so easy to rule out
 
----
-
-# Correlation vs. causality : smoking and lung cancer #1
-
-**Does smoking cause lung cancer?** 
-
-- Today, we know the answer and it is YES! 
+***Does smoking cause lung cancer?***
 
 .pull-left[
+- Today, we know the answer is *YES*! 
+
 - But let's go back in the 1950's
 
   - We are at the start of a big increase in deaths from lung cancer...
@@ -187,61 +180,56 @@ But not all correlations are so easy to rule out
 --
 
 .pull-right[
-![:scale 75%](../img/photos/Smoking_lung_cancer.png)
+```{r, echo = FALSE, out.width = "400px"}
+knitr::include_graphics("../img/photos/Smoking_lung_cancer.png")
+```
 ]
 
 --
-- Again, it is very temptative to claim that smoking does cause lung cancer based on this graph.
+
+- It's very tempting to claim that smoking causes lung cancer based on this graph.
 
 ---
 
-# Correlation vs. causality : smoking and lung cancer #1
+# Correlation vs Causation: Smoking and Lung Cancer
+
+At the time many people were still skeptical, including some famous statisticians:
+
+--
 
 .pull-left[
-![:scale 90%](../img/photos/Smoking_lung_cancer.png)
-]
+***Macro confouding factors***:  
 
-.pull-right[
+Other macro factors which can cause cancers also changed between 1900 and 1950:
 
-At the time many people were still skeptical, including some famous statisticians :
-
-1) Other macro factors have also changed between 1900 and 1950
-
-  - Tarring of roads
-
-  - Inhalation of motor exhausts (leaded gasoline fumes)
-
+  - Tarring of roads,
+  
+  - Inhalation of motor exhausts (leaded gasoline fumes),
+  
   - General greater air pollution.
-
 ]
 
----
-
-# Correlation vs. causality : smoking and lung cancer #1
-
-.pull-left[
-![:scale 90%](../img/photos/Smoking_lung_cancer.png)
-]
+--
 
 .pull-right[
+***Self selection***: 
 
-At the time many people were still skeptical, including some famous statisticians :
-
-2) **Self selection problem** : Smokers and non smokers may be different in the first place 
+Smokers and non-smokers may be different in the first place: 
   
-  - Selection on observables characteristics : age, education, income, ...
+  - __Selection on observable characteristics__: age, education, income, etc.
   
-  - Selection on unobservables : the hypothetical confounding genome theory of Fisher. 
-
+  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of Fisher [ADD LINK]). 
 ]
 
 ---
 
-# Correlation vs. causality : smoking and lung cancer #2
+# Correlation vs Causation: Smoking and Lung Cancer
 
 - Let's focus on one of these potential confounding characteristics : **age**.
 
-- Based on [(Cochran 1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates from lung cancer in Canada, U.K. and U.S.. 
+- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates from lung cancer in Canada, U.K. and U.S.
+
+- Add simple details about sample size and years!
 
 .pull-left[
 Death rates per 1,000 person-years
@@ -522,46 +510,82 @@ layout: true
 
 # Back to class size and students' achievements
 
-In past session we regress some average student standardized score on class size. 
+Last week we regressed class size on average student math and reading scores.
 
-$$\textrm{test_score}_i = b_0 + b_1 \textrm{class_size}_i + e_i$$
-We briefly discuss why $b_1^{OLS}$ may not be measuring the causal effect of class size on students' test scores? 
-
---
-
-* **Students sorting** : There is selection into schools with different sized classes. Suppose parents have a prior that smaller classes are better - they will try to get their kids into those schools.
+$$\textrm{math_score}_i = b_0 + b_1 \textrm{class_size}_i + e_i$$
+We briefly discuss why $b_1^{OLS}$ could only establish an ***association*** and not a ***causal relationship***.
 
 --
 
-* **Teachers sorting** : teachers could sort towards schools with smaller classes because it’s easier to teach a small rather than a large class, and if there is competition for those places and higher quality teachers will have an advantage.
+* **Student sorting**: There is selection into schools with different sized classes. Suppose parents have a prior that smaller classes are better, they will try to get their kids into those schools.
+
+--
+
+* **Teacher sorting**: Teachers may sort in schools with smaller classes because it’s easier to teach a small rather than a large class, and if there is competition for those places then higher quality teachers will have an advantage.
+
+--
+
+* **Location effect**: Large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.
+
+--
+
+An RCT would take care of all these biases!
 
 ---
 
-# The STAR Experiment #1
-Tennessee **S**tudent/**T**eacher **A**chievement **R**atio Experiment
+# The Project STAR Experiment
 
-* The experiment started in 1985-1986 and lasting for four years
+Tennessee **S**tudent/**T**eacher **A**chievement **R**atio Experiment (see [Krueger (1999)](http://piketty.pse.ens.fr/files/Krueger1999.pdf))
 
-* 11,600 students and their teachers where **randomly assigned** to to one of the following three groups:
+* Funded by Tennesse legislature for a total cost of approx. $12 million.
 
-  1. **Small class** of 13-17 students
-  2. **Regular class** of 22-25 students
-  3. **Regular class** of 22-25 students with a full-time teacher's **aide**
+* The experiment started in the 1985-1986 school year and lasted four years.
 
-* Students to remain in the same class type for four years
+--
+
+* 11,600 students and their teachers where **randomly assigned** to one of the following 3 groups from kindergarten through third grade:
+
+  1. ***Small class***: 13-17 students per teacher,
+  
+  2. ***Regular class***: 22-25 students,
+  
+  3. ***Regular/aide class***: 22-25 students with a full-time teacher's *aide*.
+
+--
 
 * Randomization occurred within schools.
+
+* Students' math and reading skills were tested around March each year.
+
+--
+
+* There was a problem of ***non-random attrition*** but we will ignore it.
 
 ---
 
 class:inverse
 
+# Task 2 (10 minutes)
 
-# The STAR Experiment #2
+1. Load the *STAR* data from [here]() and assign it to an object called `star_df`.
 
-**Task 2** 
+1. Read the help for `AER::STAR` to understand what the variables correspond to. (Note: the data has been *reshaped* so don't mind the "k", "1", etc. in the variable names in the help.)
 
-1) Load the *STAR* data from this [link]() and assign it to an object called `star_df`. 
+1. What's the unit of observation? Which variable contains: (i) the (random) class assignment, (ii) the student's class grade, (iii) the outcomes of interest?
+
+1. How many observations are there? Why so many?
+
+1. Why are there so many `NA`s? What do they correspond to?
+
+1. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_long),]`
+
+1. Let's check how well the randomization was done by doing ***balancing checks***.  
+Compute the average percentage of girls, african americans, and free lunch qualifiers by grade *and* treatment class.  
+*Hint*: The following computes the percentage of girls (without the relevant `dplyr` verbs)
+`share_female = mean(gender == "female") * 100`.
+
+
 ```{r, echo = FALSE}
 # data("STAR", package = "AER")
 # star <- STAR %>%
@@ -571,11 +595,52 @@ class:inverse
 #         names_pattern = "(.+)(k|1|2|3)$")
 # write.csv2(star, file = "star_data.csv", row.names = F)
 star_df = read.csv2(file = "https://www.dropbox.com/s/u2ozlbs1d2qy0bz/star_data.csv?dl=1")
-head(star_df)
 ```
-2) What's the unit of observation? What's the meaning of NA's here? Meaning of variables
 
-3) Balancing checks 
+---
+
+# The Project STAR Experiment
+
+We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the control and treatment groups.
+
+Let's only focus on only one treatment grou: small classes.
+
+```{r, echo = FALSE}
+diff_table = data.frame(
+    grade = rep(c("1","2","3","k"), each = 2),
+    test = rep(c("math","read"), times = 4),
+    star_long  %>%
+        pivot_longer(cols = c("math","read"), names_to = "test", values_to = "score") %>%
+        filter(star == "regular") %>%
+        group_by(grade, test) %>%
+        summarise(mean_regular = round(mean(score), 3)) %>%
+        ungroup() %>%
+        select(mean_regular),
+    star_long %>%
+        pivot_longer(cols = c("math","read"), names_to = "test", values_to = "score") %>%
+        filter(star == "small") %>% group_by(grade, test) %>%
+        summarise(mean_small = round(mean(score), 3)) %>%
+        ungroup() %>%
+        select(mean_small),
+    star_long %>%
+        pivot_longer(cols = c("math","read"), names_to = "test", values_to = "score") %>%
+        filter(star == "regular+aide") %>%
+        group_by(grade, test) %>%
+        summarise(mean_regular_aide = round(mean(score), 3)) %>%
+        ungroup() %>%
+        select(mean_regular_aide)) %>%
+    mutate(
+        diff_small_regular = round(mean_small - mean_regular, 3),
+        diff_regular_aide_regular = round(mean_regular_aide - mean_regular, 3)
+    ) %>%
+    arrange(factor(grade, levels = c("k","1","2","3")))
+diff_table
+```
+
+grade | test | mean regular | mean small | ATE
+--------|---------|---------|---------|---------
+k | math | `r round(diff_table[1,3], 2)` | `r round(diff_table[1,4], 2)` | `r round(diff_table[1,4] - diff_table[1,3], 2)`
+k | read | `r round(diff_table[2,3], 2)` | `r round(diff_table[2,4], 2)` | `r round(diff_table[2,4] - diff_table[2,3], 2)`
 
 ---
 
