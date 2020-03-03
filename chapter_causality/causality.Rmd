@@ -325,7 +325,7 @@ layout: true
 
 # The Potential Outcomes Framework
 
-Often called the **Rubin Causal Model** in memory of the statistician **Donald Rubin** who generalised and formalized this model in the 1970's.<sup>1<sup/>
+Often called the **Rubin Causal Model** in memory of the statistician **Donald Rubin** who generalised and formalized this model in the 1970's.
 
 --
 
@@ -351,13 +351,9 @@ $$
 
 .pull-right[
 
-**Treatment group**: all the individuals such that $D_i = 1$.
+***Treatment group***: all the individuals such that $D_i = 1$.
 
-**Control group**: all the individuals such that $D_i = 0$.
-]
-
-.footnote[
-[1]: The potential outcomes framework was first proposed by Jerzy Neyman in his 1923 Master's thesis.
+***Control group***: all the individuals such that $D_i = 0$.
 ]
 
 ---
@@ -639,7 +635,7 @@ layout: true
 
 # Randomized experiments
 
-- Often called **R**andom **C**ontrolled **T**rial (RCT).
+- Often called **R**andomized **C**ontrolled **T**rials (RCT).
 
 - The first RCTs were conducted, long time ago (18th and 19th century), mainly in **Medecine**. 
 
@@ -857,9 +853,15 @@ From the estimation output we get the following:
 
 $\begin{align} \mathbb{E}[\textrm{math score} | D_i = \textrm{regular class}]&= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = \textrm{regular class}] \\ &= b_0 + \delta \mathbb{E}[D_i| D_i = \textrm{regular class}] \\ &= b_0 \end{align}$
 
+--
+
 $\begin{align} \mathbb{E}[\textrm{math score} | D_i = \textrm{small class}]&= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = \textrm{small class}] \\ &= b_0 + \delta \mathbb{E}[D_i| D_i = \textrm{small class}] \\ &= b_0 + \delta \end{align}$
 
+--
+
 $\begin{align} ATE &= \mathbb{E}[\textrm{math score} | D_i = \textrm{small class}] - \mathbb{E}[\textrm{math score} | D_i = \textrm{regular class}] \\ &= b_0 + \delta - b_0 \\ &= \delta \end{align}$
+
+--
 
 We knew this already but we now understand why this is true `r emo::ji("v")`
 
