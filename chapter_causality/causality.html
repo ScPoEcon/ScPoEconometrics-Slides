@@ -6,8 +6,8 @@
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
-    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="..\css\scpo.css" type="text/css" />
+    <link rel="stylesheet" href="..\css\scpo-fonts.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -37,7 +37,7 @@ layout: true
 
 # Recap from last week
 
-* *Simple Linear Regression Model*: `\(\widehat y_i = b_0 + b_1 x_i\)`
+* *Simple Linear Regression Model*: `\(y_i = b_0 + b_1 x_i + e_i\)`
 
 * *Ordinary Least Squares* (OLS) estimation: minimize the sum of squared errors
 
@@ -79,21 +79,21 @@ Many of the *interesting questions* we might want to answer with data are causal
 
 - Note that some questions we might want to answer are not causal 
   - Most *Artificial Intelligence* tasks only care about **prediction**
-  - *Example*: "predicting whether a photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
+  - *Example*: predicting whether a photo is of a dog or a cat is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
 
 ---
 
 # Causality and Economics
 
-- Making causal inference from data can be seen as economists' comparative advantage among the social sciences!
+- Making causal inference from data can be seen as economists' *comparative advantage* among the social sciences!
 
 - Plenty of fields do statistics. But very few make it standard training for their students to understand causality.
 
-- Economists' endeavour to establish causal relationships is also what makes them useful both in the private (e.g. tech companies) and public sector (e.g. policy advisors) 
+- Economists' endeavour to establish causal relationships is also what makes them useful both in the private (e.g. tech companies) and public sector (e.g. policy advisors). 
 
 --
 
-- Ok, that's enough lobbying 😅
+- Ok, that's enough preaching 😅
 
 
 ---
@@ -114,7 +114,7 @@ __Causality__: what are we talking about?
   
 --
 
-- The key point here is the ***without changing anything else***, often referred as the **ceteris paribus assumption**   
+- The key point here is the ***without changing anything else***, often referred as the **ceteris paribus (*all else equal*) assumption**.   
 (*latin* makes things seem more complicated 🤓)
 
 --
@@ -129,7 +129,7 @@ __Causality__: what are we talking about?
 
 --
 
-Some correlations obviously don't imply causation ([Spurious correlation website](https://www.tylervigen.com/spurious-correlations))
+Some correlations obviously don't imply causation ([e.g. spurious correlation website](https://www.tylervigen.com/spurious-correlations)).
 
 --
 
@@ -141,7 +141,11 @@ Some correlations obviously don't imply causation ([Spurious correlation website
 
 But not all correlations are so easy to rule out
 
+--
+
 ***Does smoking cause lung cancer?***
+
+--
 
 .pull-left[
 - Today, we know the answer is *YES*! 
@@ -192,7 +196,7 @@ Smokers and non-smokers may be different in the first place:
   
   - __Selection on observable characteristics__: age, education, income, etc.
   
-  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of Fisher [ADD LINK]). 
+  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of [Fisher](https://fr.wikipedia.org/wiki/Ronald_Aylmer_Fisher)). 
 ]
 
 ---
@@ -202,16 +206,15 @@ Smokers and non-smokers may be different in the first place:
 - Let's focus on one of these potential confounding characteristics: **age**.
 
 
-- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents), we will use death rates from lung cancer in Canada, the U.K. and the U.S.
+- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
 
-- Add simple details about sample size and years!
+- In each study 3 groups of men have been followed from 20 months (U.S.) to 5 five years (U.K.)
 
-Death rates per 1,000 person-years
+- The following table gives the death rates per 1000 persons-years among these people. 
 
-![:scale 50%](../img/photos/raw_death_rates.png)
+&lt;img src="../img/photos/raw_death_rates.png" width="500px" style="display: block; margin: auto;" /&gt;
 
-
-- We are 30% (U.S.) to 75% (Canada) more likely to find death from lung cancer among cigar/pipe smokers than non-smokers.
+- Cigar/pipe smokers are 30% (U.S.) to 75% (Canada) more likely to die from lung cancer than non-smokers.
 
 ---
 
@@ -219,39 +222,43 @@ Death rates per 1,000 person-years
 
 * But the age distribution is also very different according to smoking status
 
-Mean age by smoking status
+* The following table gives the mean age by smoking status
 
-![:scale 50%](../img/photos/age_by_smoking_status.png)
+&lt;img src="../img/photos/age_by_smoking_status.png" width="600px" style="display: block; margin: auto;" /&gt;
 
-* Because health is likely to deteriorate with age the previous table could be far from causal estimates. 
+* Because health is likely to deteriorate with age the previous table could be far from giving causal estimates. 
 
 ---
 
 class:inverse
 
-# Correlation vs. causality : smoking and lung cancer #3
+# Task 1 (5 min)
 
-Let's consider adjust our statistics taking into account the age distribution of pipe-smokers.
-
-![:scale 40%](../img/photos/ex_cigar_subclassif.png)
+Let's adjust our statistics **taking into account the age distribution** of pipe-smokers.
 
 
-This table replicates the 3 age group distribution of pipe-smokers and non-smokers, as well as the death rate of pipe-smokers for each age group in Canada.
+|           | Death rates of &lt;br&gt; Pipe-smokers| Nb. of &lt;br&gt; pipe smokers | Nb. of &lt;br&gt; non-smokers |
+|-----------|:----:|:----:|:----:|
+| Age 20-50 | 15 | 11 | 29 |
+| Age 50-70 | 35 | 13 | 9  |
+| Age +70   | 50 | 16 | 2  |
+| Total     |    | 40 | 40 |
 
-**Questions** 
+This table replicates, for Canada, the 3 age group distribution of pipe-smokers and non-smokers, and death rate of pipe-smokers.
 
-- Compute the average death rate for pipe smokers in Canada from age grouped death rates?
+1) Compute the average death rate for pipe smokers in Canada from age grouped death rates?
 
-- What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
+2) What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
 
 ---
 
 
-# Correlation vs. causality : smoking and lung cancer #4
+# Correlation vs. causality : smoking and lung cancer #3
+
 
 Here is the adjusted death rates table found by [(Cochran 1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents) using 3 age groups
 
-![:scale 40%](../img/photos/adjusted_death_rates.png)
+&lt;img src="../img/photos/adjusted_death_rates.png" width="600px" style="display: block; margin: auto;" /&gt;
 
 - Cigars/pipes seem much less dangerous than in the previous table...
 
@@ -263,7 +270,7 @@ Here is the adjusted death rates table found by [(Cochran 1968)](https://www.jst
 
 # How Can We Tell?
 
-- Sometimes correlations are just pure artefacts: there is no causal relationship between the variables of interest
+- Sometimes correlations are just pure *artefacts*: there is no causal relationship between the variables of interest.
 
 - In some other cases, there are both correlation and causality but not of the same **magnitude**, or even the same **direction**.
 
@@ -290,7 +297,7 @@ layout: true
 
 # The Potential Outcomes Framework
 
-Often called the **Rubin Causal Model** in memory of the statistician **Donald Rubin** who generalised and formalized this model in the 1970's.&lt;sup&gt;1&lt;sup/&gt;
+Often called the **Rubin Causal Model** in memory of the statistician **Donald Rubin** who generalised and formalized this model in the 1970's.
 
 --
 
@@ -316,13 +323,9 @@ $$
 
 .pull-right[
 
-**Treatment group**: all the individuals such that `\(D_i = 1\)`.
+***Treatment group***: all the individuals such that `\(D_i = 1\)`.
 
-**Control group**: all the individuals such that `\(D_i = 0\)`.
-]
-
-.footnote[
-[1]: The potential outcomes framework was first proposed by Jerzy Neyman in his 1923 Master's thesis.
+***Control group***: all the individuals such that `\(D_i = 0\)`.
 ]
 
 ---
@@ -338,7 +341,7 @@ $$
 
 --
 
-* From these we can compute the ***individual treatment effect***:
+* From these we can define the ***individual treatment effect***:
 
 $$ \delta_i = Y_i^1 - Y_i^0$$
 
@@ -370,7 +373,7 @@ $$ \delta_i = Y_i^1 - Y_i^0$$
 * Since the treatment effect *cannot* be observed at the individual level, we estimate treatment effects at the population level.
 
 .footnote[
-This image is from Morgan and Winship (2015, p.46).
+This table is from Morgan and Winship (2015, p.46).
 ]
 ---
 
@@ -406,8 +409,8 @@ Other ***conditional*** average treatment effects may be of interest:
 
 * The ATT measures the ***average treatment effect conditional on being in the treatment group***.
 
-    * The `\(\mathop{\mathbb{E}}(.|C)\)` operator stands for **conditional expectation**. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition `\(C\)`.
-  * The `\(\mathop{\mathbb{E}}(.|C)\)` operator is also linear.
+    * The `\(\mathop{\mathbb{E}}(.|D = x)\)` operator stands for **conditional expectation**. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition `\(D = x\)`.
+  * The `\(\mathop{\mathbb{E}}(.|D = x)\)` operator is also linear.
 
 ---
 
@@ -439,28 +442,28 @@ Other ***conditional*** average treatment effects may be of interest:
 
 * From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
 
-$$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
+$$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
 
 * For example, it would consist in taking the difference between:
-  * Death rates for smokers and non-smokers ,
+  * Death rates for smokers and non-smokers,
   * GDP growth rates for democratic and non democratic countries,
   * Unemployment rates for countries with and without a minimum wage.
 
-* Most of the time, such an estimate **will fail to the capture causal effect** of the treatment.
+* Most of the time, such a difference **will fail to capture the causal effect** of the treatment.
 
-* Notice that this kind raw comparison is often done by journalists, politicians, badly trained scientists.
+* Notice that this kind raw comparison is often done by journalists, politicians, badly trained scientists (but not you now! 😉).
 
 ---
 
 # The Problem of Causal Inference
 
-Let's rewrite the SDO, to make the ATE `\((\delta_i)\)`appear in the equation. 
+Let's rewrite the SDO to make the individual treatment effect `\((\delta_i)\)` appear in the equation. 
 
 `\begin{align}
   \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &amp;= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
 \end{align}`
 
-For simplicity, suppose **treatment effect is constant** across people: `\(\forall i, \delta_i = \delta\)`.
+For now, suppose **treatment effect is constant** across people: `\(\forall i, \delta_i = \delta\)`.
 
 Then,
 
@@ -468,7 +471,7 @@ Then,
   \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &amp;= \delta + \mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
 \end{align}`
 
-And because `\(ATE = \mathop{\mathbb{E}}(\delta_i) \underbrace{=}_\text{constant treatment effect} \mathop{\mathbb{E}}(\delta) = \delta\)`, we get: 
+And because `\(ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) = \delta\)` (by assumption), we get: 
 
 
 `\begin{align}
@@ -478,23 +481,45 @@ And because `\(ATE = \mathop{\mathbb{E}}(\delta_i) \underbrace{=}_\text{constant
 
 ---
 
+# The Problem of Causal Inference
+
+Let's now relax the assumption that the treatment effect is constant among all individuals.
+
+After tedious calculations that we skip, we can get that the SDO is now decomposed as : 
+
+`\begin{align}
+  SDO &amp;= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
+  &amp; \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
+\end{align}`
+
+where `\(1 - \pi\)` denotes the share of people in the control group. 
+
+* So there is a novel source of bias that comes from the potential **heterogeneity in the individual treatment effect** `\(\delta_i\)`.
+
+--
+
+* **Intuition** : Suppose that *education* is our treatment and this is people who will most benefit from school (higer `\(\delta_i\)`) who stay in school longer. Then, simply comparing outcomes between highly educated and low educated would ovestimate the effect of schooling among the whole population. 
+
+---
+
 class:inverse
 
-# Task 2 (10 min)
+# Task 2 (10 minutes)
 
-Let's compute these various quantities and bias with some toy data (i.e. data we generated ourselves).
+Let's compute these various quantities and biases with some toy data (i.e. data we generated ourselves).
 
 
 
-1) Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). Notice that `Di_random` is a treatment status we would have under a given random assignment.
+1. Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). Notice that `Di_random` is a treatment status we would have under random assignment.
 
-2) Compute and add `\(Y_i\)` and `\(\delta_i\)` as new variables. 
+1. Create the following variables: `\(Y_i\)` and `\(\delta_i\)`. Recall that `\(Y_i = D_i * Y_i^1 + (1 - D_i) Y_i^0\)` and `\(\delta_i = Y_i^1 - Y_i^0\)`. 
 
-3) Compute the **ATE** and the **SDO**. Is there is any bias? Is it large in magnitude? 
+1. Compute the ***ATE*** and the ***SDO***. (Use base `R`.)  Is there is any *bias*? Is it large in magnitude?
 
-4) Using `D_i_random`, compute the **SDO under randomization**. If you got it right, the bias should be almost 0 (about 0.017 actually). 
+1. Using `D_i_random`, compute the ***SDO under randomization***. Remember that you need to recompute `\(Y_i\)` because the assignment is not the same anymore.   
+If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
 
-5) Bonus :  Compute the value of the **selection bias** and the **heterogenous trt effect bias** and check that we have `$$SDO = ATE + \textrm{selection bias} + \textrm{heter. trt. effect bias}$$` 
+1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treat effect bias*** and check that we have `$$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$`
 
 
 ---
@@ -539,7 +564,15 @@ layout: true
 
 # Randomized experiments
 
-- Often called **R**andom **C**ontrolled **T**rial (RCT).
+- Often called **R**andomized **C**ontrolled **T**rials (RCT).
+
+- The first RCTs were conducted, long time ago (18th and 19th century), mainly in **Medecine**. 
+
+- In the beginning of the 20th century they have popularized by famous statisticians like **J. Neyman** or **R.A. Fisher**. 
+
+- Since then they have been a growing influence and progressively accepted as a [tool for public policy](https://www.povertyactionlab.org/fr). 
+
+- As for Economics, the **Nobel Price in Economics 2019** has been awarded to three exponents of the RCT literature, [Duflo, Banerje and Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty).
 
 ---
 
@@ -600,7 +633,7 @@ Tennessee **S**tudent/**T**eacher **A**chievement **R**atio Experiment (see [Kru
 
 class:inverse
 
-# Task 2 (10 minutes)
+# Task 3 (10 minutes)
 
 1. Load the *STAR* data from [here]() and assign it to an object called `star_df`.
 
@@ -627,9 +660,17 @@ Compute the average percentage of girls, african americans, and free lunch quali
 
 # The Project STAR Experiment
 
-We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the control and treatment groups.
+We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the treatment and control groups.
 
-Let's only focus on one treatment group: **small classes**; and on one grade: **kindergarten** (k).
+Let's only focus on:
+
+- One treatment group: **small classes**,
+
+- One control group: **regular classes**,
+
+- One grade: **kindergarten** (k).
+
+--
 
 
 
@@ -677,35 +718,67 @@ The last equation looks exactly like the simple regression model we saw last wee
 
 Let's therefore estimate the ATE of small class size on math scores using a regression.
 
+--
+
+.pull-left[
 We want to estimate the following model: `\(mathscore_i = b_0 + \delta D_i + e_i\)`, with
 
 $$
 D_i = \begin{cases} 
-                    1 \textrm{  if small class}  \\\\ 
-                    0 \textrm{  if regular class} 
+                    1 \textrm{  if small class = 1}  \\\\ 
+                    0 \textrm{  if small class = 0} 
       \end{cases}
 $$
 
 
+```r
+star_df_k_small &lt;- star_df %&gt;%
+  filter(
+    star %in% c("regular", "small") &amp;
+      grade == "k") %&gt;% 
+  mutate(small = (star == "small"))
+```
+]
 
+--
+
+.pull-right[
 
 ```r
-lm(math ~ star, star_df_k_small)
+lm(math ~ small, star_df_k_small)
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = math ~ star, data = star_df_k_small)
+## lm(formula = math ~ small, data = star_df_k_small)
 ## 
 ## Coefficients:
-## (Intercept)    starsmall  
+## (Intercept)    smallTRUE  
 ##     484.446        8.895
 ```
 
---
 
-Compare with results from the table a few slides back!
+```r
+mean(star_df_k_small[
+    star_df_k_small$small == 1, "math"]) - 
+  mean(star_df_k_small[
+    star_df_k_small$small == 0, "math"])
+```
+
+```
+## [1] 8.895193
+```
+
+```r
+mean(star_df_k_small[
+    star_df_k_small$small == 0, "math"])
+```
+
+```
+## [1] 484.4464
+```
+]
 
 ---
 
@@ -713,52 +786,35 @@ Compare with results from the table a few slides back!
 
 From the estimation output we get the following:
 
-`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = \textrm{regular class}]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = \textrm{regular class}] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = \textrm{regular class}] \\ &amp;= b_0 \end{align}\)`
+`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = 0]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 0] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = 0] \\ &amp;= b_0 \end{align}\)`
 
-`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = \textrm{small class}]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = \textrm{small class}] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = \textrm{small class}] \\ &amp;= b_0 + \delta \end{align}\)`
+--
 
-`\(\begin{align} ATE &amp;= \mathbb{E}[\textrm{math score} | D_i = \textrm{small class}] - \mathbb{E}[\textrm{math score} | D_i = \textrm{regular class}] \\ &amp;= b_0 + \delta - b_0 \\ &amp;= \delta \end{align}\)`
+`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = 1]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 1] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = 1] \\ &amp;= b_0 + \delta \end{align}\)`
+
+--
+
+`\(\begin{align} ATE &amp;= \mathbb{E}[\textrm{math score} | D_i = 1] - \mathbb{E}[\textrm{math score} | D_i = 0] \\ &amp;= b_0 + \delta - b_0 \\ &amp;= \delta \end{align}\)`
+
+--
 
 We knew this already but we now understand why this is true ✌️
 
 ---
 
-# Dummy Variable Trap
-
-Notice from the regression output that only one of the outcomes is included in the regression!
-
-
-```
-## 
-## Call:
-## lm(formula = math ~ star, data = star_df_k_small)
-## 
-## Coefficients:
-## (Intercept)    starsmall  
-##     484.446        8.895
-```
-
-This is because `\(D_i\)`, the treatment variable, is either small class size or regular class. The coefficient for regular class is "captured" by the intercept.
-
----
-
 class:inverse
 
-# Task 3
+# Task 4 (10 minutes)
 
 1. Filter the dataset to only keep first graders and the small class and regular class groups.
 
-1. Compute the average math score for both groups.
+1. Compute the average math score for both groups, and the difference between the two. (Use base `R`.)
+
+1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
 
 1. Regress the treatment dummy variable on math score. Are the results in line with the previous question?
 
-1. Go back to the original data and this time keep first graders but don't get rid of the regular+aide treatment group.
-
-1. Compute the average math score for the regular+aide treatment group.
-
-1. Regress the treatment dummy variable on math score. What do you observe? How do you interpret the coefficients? What's the ATE of small class size compared to regular+aide?
-
-
+1. How do you interpret these coefficients?
 
 ---
 
@@ -774,11 +830,13 @@ Although randomized experiments make causal inference much more convincing it al
 
 --
 
-* **Interpretating** the results
+* **Interpretation** of the results
 
   * **External validity issue**: How much the results from a given RCT's can be generalized to other context (countries, populations,...?
   
-  * Identifying the mechanisms that are at stake may be difficult
+  * Uncovering the mechanisms that are at stake may be difficult
+  
+  * Imperfect randomization issues, attrition,...
 
 ---
 
