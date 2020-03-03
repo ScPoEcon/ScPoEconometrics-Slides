@@ -218,7 +218,7 @@ Smokers and non-smokers may be different in the first place:
   
   - __Selection on observable characteristics__: age, education, income, etc.
   
-  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of Fisher [ADD LINK]). 
+  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of [Fisher](https://fr.wikipedia.org/wiki/Ronald_Aylmer_Fisher)). 
 ]
 
 ---
@@ -228,16 +228,17 @@ Smokers and non-smokers may be different in the first place:
 - Let's focus on one of these potential confounding characteristics: **age**.
 
 
-- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates from lung cancer in Canada, the U.K. and the U.S.
+- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
 
-- Add simple details about sample size and years!
+- In each study 3 groups of men have been followed from 20 months (U.S.) to 5 five years (U.K.)
 
-Death rates per 1,000 person-years
+- The following table gives the death rates per 1000 persons-years among these people. 
 
-![:scale 50%](../img/photos/raw_death_rates.png)
+```{r, echo = FALSE, out.width = "500px"}
+knitr::include_graphics("../img/photos/raw_death_rates.png")
+```
 
-
-- We are 30% (U.S.) to 75% (Canada) more likely to find death from lung cancer among cigar/pipe smokers than non-smokers.
+- Death rates are 30% (U.S.) to 75% (Canada) higher among cigar/pipe smokers than among non-smokers.
 
 ---
 
@@ -245,39 +246,47 @@ Death rates per 1,000 person-years
 
 * But the age distribution is also very different according to smoking status
 
-Mean age by smoking status
+* The following table gives the mean age by smoking status
 
-![:scale 50%](../img/photos/age_by_smoking_status.png)
+```{r, echo = FALSE, out.width = "600px"}
+knitr::include_graphics("../img/photos/age_by_smoking_status.png")
+```
 
-* Because health is likely to deteriorate with age the previous table could be far from causal estimates. 
+* Because health is likely to deteriorate with age the previous table could be far from giving causal estimates. 
 
 ---
 
 class:inverse
 
-# Correlation vs. causality : smoking and lung cancer #3
+# Task 1 (5 min)
 
-Let's consider adjust our statistics taking into account the age distribution of pipe-smokers.
-
-![:scale 40%](../img/photos/ex_cigar_subclassif.png)
+Let's adjust our statistics **taking into account the age distribution** of pipe-smokers.
 
 
-This table replicates the 3 age group distribution of pipe-smokers and non-smokers, as well as the death rate of pipe-smokers for each age group in Canada.
+|           | Death rates of <br> Pipe-smokers| Nb. of <br> pipe smokers | Nb. of <br> non-smokers |
+|-----------|:----:|:----:|:----:|
+| Age 20-50 | 15 | 11 | 29 |
+| Age 50-70 | 35 | 13 | 9  |
+| Age +70   | 50 | 16 | 2  |
+| Total     |    | 40 | 40 |
 
-**Questions** 
+This table replicates, for Canada, the 3 age group distribution of pipe-smokers and non-smokers, and death rate of pipe-smokers.
 
-- Compute the average death rate for pipe smokers in Canada from age grouped death rates?
+1) Compute the average death rate for pipe smokers in Canada from age grouped death rates?
 
-- What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
+2) What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
 
 ---
 
 
-# Correlation vs. causality : smoking and lung cancer #4
+# Correlation vs. causality : smoking and lung cancer #3
+
 
 Here is the adjusted death rates table found by [(Cochran 1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents) using 3 age groups
 
-![:scale 40%](../img/photos/adjusted_death_rates.png)
+```{r, echo = FALSE, out.width = "600px"}
+knitr::include_graphics("../img/photos/adjusted_death_rates.png")
+```
 
 - Cigars/pipes seem much less dangerous than in the previous table...
 
@@ -467,7 +476,7 @@ Other ***conditional*** average treatment effects may be of interest:
 
 * From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
 
-$$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
+$$ SDO =  \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
 
 * For example, it would consist in taking the difference between:
   * Death rates for smokers and non-smokers ,
@@ -482,13 +491,13 @@ $$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$
 
 # The Problem of Causal Inference
 
-Let's rewrite the SDO, to make the ATE $(\delta_i)$appear in the equation. 
+Let's rewrite the SDO, to make the ATE $(\delta_i)$ appear in the equation. 
 
 \begin{align}
   \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
 \end{align}
 
-For simplicity, suppose **treatment effect is constant** across people: $\forall i, \delta_i = \delta$.
+For now, suppose **treatment effect is constant** across people: $\forall i, \delta_i = \delta$.
 
 Then,
 
@@ -496,13 +505,34 @@ Then,
   \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \delta + \mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
 \end{align}
 
-And because $ATE = \mathop{\mathbb{E}}(\delta_i) \underbrace{=}_\text{constant treatment effect} \mathop{\mathbb{E}}(\delta) = \delta$, we get: 
+And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) = \delta$ (by assumption), we get: 
 
 
 \begin{align}
   SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
   &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias}
 \end{align}
+
+---
+
+# The Problem of Causal Inference
+
+Let's now relax the assumption that the treatment effect is constant among all individuals.
+
+After tedious calculations that we skip, we can get that the SDO is now decomposed as : 
+
+\begin{align}
+  SDO &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
+  & \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
+\end{align}
+
+where $1 - \pi$ denotes the share of people in the control group. 
+
+* So there is a novel source of bias that comes from the potential **heterogeneity in the individual treatment effect** $\delta_i$.
+
+--
+
+* **Intuition** : Suppose that *education* is our treatment and this is people who will most benefit from school (higer $\delta_i$) who stay in school longer. Then, simply comparing outcomes between highly educated and low educated would ovestimate the effect of schooling among the whole population. 
 
 ---
 
@@ -513,23 +543,47 @@ class:inverse
 Let's compute these various quantities and bias with some toy data (i.e. data we generated ourselves).
 
 ```{r, echo = FALSE, eval = FALSE}
-
-set.seed(1)
-D_i = sample(c(0,1), replace = T, size = 1000)
-Y0_i = sample(c(1:10), replace = T, size = 1000) + D_i
-delta_i = sample(c(1:3), replace = T, size = 1000) + 0.2*D_i
-cor(Y0_i, D_i)
-cor(delta_i, D_i)
-Y1_i = Y0_i + delta_i
-
-set.seed(3)
-D_i_random = sample(c(0,1), replace = T, size = 1000)
-cor(Y0_i, D_i_random)
-cor(delta_i, D_i_random)
-
-toy_data = data.frame(D_i, Y0_i, Y1_i, D_i_random)
-fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_data.csv")
+# set.seed(1)
+# 
+# D_i = sample(c(0,1), replace = T, size = 10000)
+# Y0_i = sample(c(1:10), replace = T, size = 10000) + D_i
+# delta_i = sample(c(1:3), replace = T, size = 10000) + 0.2*D_i
+# 
+# cor(Y0_i, D_i)
+# cor(delta_i, D_i)
+# 
+# Y1_i = Y0_i + delta_i
+# 
+# set.seed(3)
+# D_i_random = sample(c(0,1), replace = T, size = 10000)
+# cor(Y0_i, D_i_random)
+# cor(delta_i, D_i_random)
+# 
+# toy_data = data.frame(D_i, Y0_i, Y1_i, D_i_random)
+# 
+# 
+# fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_data.csv")
 # toy_data = read.csv("https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1")
+# 
+# 
+# toy_data$Y_i = toy_data$D_i*toy_data$Y1_i + (1-toy_data$D_i)*toy_data$Y0_i
+# toy_data$Y_i_random = toy_data$D_i_random*toy_data$Y1_i + (1-toy_data$D_i_random)*toy_data$Y0_i
+# toy_data$delta_i = toy_data$Y1_i - toy_data$Y0_i
+# 
+# 
+# ATE = mean(toy_data$delta_i)
+# 
+# SDO = mean(toy_data$Y_i[toy_data$D_i==1]) - mean(toy_data$Y_i[toy_data$D_i==0]) 
+# SDO_random = mean(toy_data$Y_i_random[toy_data$D_i_random==1]) - mean(toy_data$Y_i_random[toy_data$D_i_random==0]) 
+# 
+# (SDO - ATE)
+# (SDO_random - ATE)
+# 
+# 
+# selection_bias = mean(toy_data$Y0_i[toy_data$D_i==1]) - mean(toy_data$Y0_i[toy_data$D_i==0]) 
+# het_trt_effect_bias = (1 - sum(toy_data$D_i==1)/nrow(toy_data))*(mean(toy_data$delta_i[toy_data$D_i==1]) - mean(toy_data$delta_i[toy_data$D_i==0]))
+# 
+# (SDO == ATE + selection_bias + het_trt_effect_bias)
 ```
 
 1) Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). Notice that `Di_random` is a treatment status we would have under a given random assignment.
@@ -540,7 +594,7 @@ fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_dat
 
 4) Using `D_i_random`, compute the **SDO under randomization**. If you got it right, the bias should be almost 0 (about 0.017 actually). 
 
-5) Bonus :  Compute the value of the **selection bias** and the **heterogenous trt effect bias** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heter. trt. effect bias}$$ 
+5) Bonus :  Compute the value of the **selection bias** and the **heterogenous treatment effect bias** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$ 
 
 
 ---
@@ -586,6 +640,14 @@ layout: true
 # Randomized experiments
 
 - Often called **R**andom **C**ontrolled **T**rial (RCT).
+
+- The first RCTs were conducted, long time ago (18th and 19th century), mainly in **Medecine**. 
+
+- In the beginning of the 20th century they have popularized by famous statisticians like **J. Neyman** or **R.A. Fisher**. 
+
+- Since then they have been a growing influence and progressively accepted as a [tool for public policy](https://www.povertyactionlab.org/fr). 
+
+- As for Economics, the **Nobel Price in Economics 2019** has been awarded to three exponents of the RCT literature, [Duflo, Banerje and Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty).
 
 ---
 
@@ -857,11 +919,13 @@ Although randomized experiments make causal inference much more convincing it al
 
 --
 
-* **Interpretating** the results
+* **Interpretation** of the results
 
   * **External validity issue**: How much the results from a given RCT's can be generalized to other context (countries, populations,...?
   
-  * Identifying the mechanisms that are at stake may be difficult
+  * Uncovering the mechanisms that are at stake may be difficult
+  
+  * Imperfect randomization issues, attrition,...
 
 ---
 
