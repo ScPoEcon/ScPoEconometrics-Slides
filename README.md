@@ -14,7 +14,8 @@ Lectures 2/3: Summarizing, Visualizing and Tidying Data [HTML](https://raw.githa
 Lecture 4: Simple Linear Regression [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.pdf)
 
 
-Lecture 5: Introduction to Causality (*coming soon!*)
+Lecture 5: Introduction to Causality [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.pdf)
+
 
 Lecture 6: Multiple Linear Regression (*coming soon!*)
 

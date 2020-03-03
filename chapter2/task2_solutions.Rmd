@@ -1,0 +1,133 @@
+---
+title: "Lectures 2/3 - Task 2 - Solutions"
+author: "Gustave"
+date: "2/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Let's first load the data we were working on.
+
+```{r, echo = TRUE, eval = TRUE}
+library(dslabs)
+polls_us_election_2016 <- polls_us_election_2016
+```
+
+Let's also load the `tidyverse` package which will give us `dplyr` and `magrittr`.
+```{r, echo = TRUE, eval = TRUE}
+library(tidyverse)
+```
+
+## Question 1
+
+Which polls had more vote intentions for Trump than for Clinton?
+
+```{r, echo = TRUE, eval = FALSE}
+q1 <- polls_us_election_2016 %>%
+    filter(rawpoll_trump > rawpoll_clinton)
+q1
+```
+
+```{r, echo = FALSE, layout="l-body-outset"}
+library(rmarkdown)
+q1 <- polls_us_election_2016 %>%
+    filter(rawpoll_trump > rawpoll_clinton)
+paged_table(q1, options = list(rows.print = 10))
+```
+
+## Question 2
+
+How many polls have a missing `grade`?
+
+```{r, echo = TRUE, eval = TRUE}
+# base R solution
+q2_base <- sum(is.na(polls_us_election_2016$grade))
+q2_base
+
+# dplyr solution
+q2_dplyr <- nrow(polls_us_election_2016 %>%
+    filter(is.na(grade)))
+q2_dplyr
+```
+
+## Question 3
+
+Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
+
+```{r, echo = TRUE, eval = FALSE}
+q3 <- polls_us_election_2016 %>%
+    filter(
+        pollster %in% c("American Strategies","GfK Group","Merrill Poll") &
+        samplesize > 1000 &
+        startdate == "2016-10-20"
+        )
+q3
+```
+
+```{r, echo = FALSE, layout="l-body-outset"}
+q3 <- polls_us_election_2016 %>%
+    filter(
+        pollster %in% c("American Strategies","GfK Group","Merrill Poll") &
+        samplesize > 1000 &
+        startdate == "2016-10-20"
+        )
+paged_table(q3, options = list(rows.print = 10))
+```
+
+
+*For the following questions you should use `filter` and `mutate`.*
+
+## Question 4
+
+Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000?
+
+```{r, echo = TRUE, eval = FALSE}
+q4 <- polls_us_election_2016 %>%
+    mutate(rawpoll_clintontrump = rawpoll_clinton + rawpoll_trump) %>%
+    filter(
+        !is.na(rawpoll_johnson) &
+        rawpoll_clintontrump > 95 &
+        samplesize > 1000
+        )
+q4
+```
+
+```{r, echo = FALSE, layout="l-body-outset"}
+q4 <- polls_us_election_2016 %>%
+    mutate(rawpoll_clintontrump = rawpoll_clinton + rawpoll_trump) %>%
+    filter(
+        !is.na(rawpoll_johnson) &
+        rawpoll_clintontrump > 95 &
+        samplesize > 1000
+        )
+paged_table(q4, options = list(rows.print = 10))
+```
+
+## Question 5
+
+Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
+
+```{r, echo = TRUE, eval = FALSE}
+q5 <- polls_us_election_2016 %>%
+    mutate(diff_clintontrump = rawpoll_trump - rawpoll_clinton) %>%
+    filter(
+        is.na(rawpoll_johnson) &
+        diff_clintontrump > 5 &
+        state == "Iowa"
+        )
+q5
+```
+
+```{r, echo = FALSE, layout="l-body-outset"}
+q5 <- polls_us_election_2016 %>%
+    mutate(diff_clintontrump = rawpoll_trump - rawpoll_clinton) %>%
+    filter(
+        is.na(rawpoll_johnson) &
+        diff_clintontrump > 5 &
+        state == "Iowa"
+        )
+paged_table(q5, options = list(rows.print = 10))
+```
