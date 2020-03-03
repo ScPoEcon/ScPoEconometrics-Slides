@@ -231,10 +231,13 @@ Smokers and non-smokers may be different in the first place:
 
 - Let's focus on one of these potential confounding characteristics: **age**.
 
+--
 
 - Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
 
-- In each study 3 groups of men have been followed from 20 months (U.S.) to 5 five years (U.K.)
+- For each country 3 groups of men were studied for 20 months (U.S.) to 5 five years (U.K.).
+
+--
 
 - The following table gives the death rates per 1000 persons-years among these people. 
 
@@ -246,9 +249,9 @@ knitr::include_graphics("../img/photos/raw_death_rates.png")
 
 ---
 
-# Correlation vs. causality : smoking and lung cancer #2
+# Correlation vs Causation: Smoking and Lung Cancer
 
-* But the age distribution is also very different according to smoking status
+* But the age *distribution* is also very different depending on smoking status.
 
 * The following table gives the mean age by smoking status
 
@@ -262,9 +265,9 @@ knitr::include_graphics("../img/photos/age_by_smoking_status.png")
 
 class:inverse
 
-# Task 1 (5 min)
+# Task 1 (5 minutes)
 
-Let's adjust our statistics **taking into account the age distribution** of pipe-smokers.
+Let's adjust our Canadian statistics **taking the age distribution into account **.
 
 
 |           | Death rates of <br> Pipe-smokers| Nb. of <br> pipe smokers | Nb. of <br> non-smokers |
@@ -274,19 +277,17 @@ Let's adjust our statistics **taking into account the age distribution** of pipe
 | Age +70   | 50 | 16 | 2  |
 | Total     |    | 40 | 40 |
 
-This table replicates, for Canada, the 3 age group distribution of pipe-smokers and non-smokers, and death rate of pipe-smokers.
+1. Compute the average death rate for pipe smokers in Canada.
 
-1) Compute the average death rate for pipe smokers in Canada from age grouped death rates?
-
-2) What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
+1. What would the average mortality rate be for pipe smokers if they had the same age distribution as non-smokers?
 
 ---
 
 
-# Correlation vs. causality : smoking and lung cancer #3
+# Correlation vs Causation: Smoking and Lung Cancer
 
 
-Here is the adjusted death rates table found by [(Cochran 1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents) using 3 age groups
+Here is the age-adjusted death rates table found by [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents).
 
 ```{r, echo = FALSE, out.width = "600px"}
 knitr::include_graphics("../img/photos/adjusted_death_rates.png")
@@ -294,9 +295,13 @@ knitr::include_graphics("../img/photos/adjusted_death_rates.png")
 
 - Cigars/pipes seem much less dangerous than in the previous table...
 
-- ... but this table still does not allow us to tell about the causal effect of smoking. 
+--
 
-- There are still a lot of **confounding factors** that we are not controling for. 
+- ... but this table still does not allow us to tell about the causal effect of smoking.
+
+--
+
+- There are still a lot of ***confounding factors*** that are not accounted for. 
 
 ---
 
@@ -310,7 +315,7 @@ knitr::include_graphics("../img/photos/adjusted_death_rates.png")
 
 - So how can we make causal inference then? 
 
-- The **Potential Outcomes Framework** will be our guide.
+- The ***Potential Outcomes Framework*** will be our guide.
 
 
 
@@ -478,12 +483,18 @@ Other ***conditional*** average treatment effects may be of interest:
 
 $$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
 
+--
+
 * For example, it would consist in taking the difference between:
   * Death rates for smokers and non-smokers,
   * GDP growth rates for democratic and non democratic countries,
   * Unemployment rates for countries with and without a minimum wage.
 
+--
+
 * Most of the time, such a difference **will fail to capture the causal effect** of the treatment.
+
+--
 
 * Notice that this kind raw comparison is often done by journalists, politicians, badly trained scientists (but not you now! `r emo::ji("wink")`).
 
@@ -519,20 +530,23 @@ And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) =
 
 Let's now relax the assumption that the treatment effect is constant among all individuals.
 
-After tedious calculations that we skip, we can get that the SDO is now decomposed as : 
+After tedious calculations that we skip, we get that the SDO is now decomposed as: 
 
 \begin{align}
   SDO &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
   & \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
 \end{align}
 
-where $1 - \pi$ denotes the share of people in the control group. 
-
-* So there is a novel source of bias that comes from the potential **heterogeneity in the individual treatment effect** $\delta_i$.
+where $1 - \pi$ denotes the share of people in the control group.
 
 --
 
-* **Intuition** : Suppose that *education* is our treatment and this is people who will most benefit from school (higer $\delta_i$) who stay in school longer. Then, simply comparing outcomes between highly educated and low educated would ovestimate the effect of schooling among the whole population. 
+So there is a novel source of bias that comes from the potential ***heterogeneity in the individual treatment effect*** $\delta_i$.
+
+--
+
+* ***Selection bias***: those who attend university are likely to have higher baseline cognitive skills (regardless of whether they actually attend college).
+* ***Heterogeneous treatment effect bias***: those who attend university may improve their cognitive skills more at university because they are more motivated.
 
 ---
 
@@ -568,34 +582,38 @@ toy_data = data.frame(D_i, Y0_i, Y1_i, D_i_random)
 1. Using `D_i_random`, compute the ***SDO under randomization***. Remember that you need to recompute $Y_i$ because the assignment is not the same anymore.   
 If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
 
-1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treat effect bias*** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$
+1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treatment effect bias*** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$
 
 
 ---
 
-# Randomization solves the pb of causal inference ! 
+# Randomization solves the problem of causal inference!
 
-* Let's imagine you can **randomly** assign people to each treatment group. That is what **randomized experiments** are. 
+* ***Randomized experiments***: you ***randomly*** assign people to a treatment and a control group.
 
-* Then the treatment status would be **independant** of the potential outcomes.
+* In this case, the treatment status **independent** of the potential outcomes.
+
+--
 
 * In particular, there is no reason for $\mathop{\mathbb{E}}(Y_i^0 | D_i = 1)$ to be different from $\mathop{\mathbb{E}}(Y_i^0 | D_i = 0)$
 
-  * So the **selection bias is equal to O** 
+  * Therefore the ***selection bias is equal to 0***.
   
-* In the same way, so there is no reason for $\delta_i$ to be different among treated than among controls. 
+--
+  
+* In the same way, there is no reason for $\mathop{\mathbb{E}}[\delta_i]$ to be different in the treatment and control group. 
 
-  * So ATT will equal ATU, implying the **Heterogenous treatment effect bias to be 0** 
+  * There $ATT = ATU$, implying the ***heterogenous treatment effect bias will also be 0***.
 
 ---
 
-# Randomization solves the pb of causal inference ! 
+# Randomization solves the problem of causal inference!
 
-Thanks to randomization we then have : 
+With random assignment we have: 
 
 $$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) = ATE$$ 
 
-It means we can directly estimate the ATE from the data! 
+`r emo::ji("point_right")` We can directly estimate the ATE from the data!
 
 ---
 
@@ -615,17 +633,17 @@ layout: true
 
 - Often called **R**andomized **C**ontrolled **T**rials (RCT).
 
-- The first RCTs were conducted, long time ago (18th and 19th century), mainly in **Medecine**. 
+- The first RCTs were conducted a long time ago (18th and 19th century), mainly in **Medecine**. 
 
-- In the beginning of the 20th century they have popularized by famous statisticians like **J. Neyman** or **R.A. Fisher**. 
+- In the beginning of the 20th century they were popularized by famous statisticians like **J. Neyman** or **R.A. Fisher**. 
 
-- Since then they have been a growing influence and progressively accepted as a [tool for public policy](https://www.povertyactionlab.org/fr). 
+- Since then they have had a growing influence and have progressively become a reliable [tool for public policy evaluation](https://www.povertyactionlab.org/fr). 
 
-- As for Economics, the **Nobel Price in Economics 2019** has been awarded to three exponents of the RCT literature, [Duflo, Banerje and Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty).
+- As for economics, the **2019 Nobel Price in Economics** was awarded to three exponents of RCTs, [Abhijit Banerjee, Esther Duflo and Michael Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty), "for their experimental approach to alleviating global poverty".
 
 ---
 
-# Back to class size and students' achievements
+# Back to class size and students' achievement
 
 Last week we regressed class size on average student math and reading scores.
 
@@ -883,32 +901,36 @@ class:inverse
 
 ---
 
-# RCTs Shortcomings 
+# Shortcomings of RCTs 
 
-Although randomized experiments make causal inference much more convincing it also has several shortcomings 
+RCTs have very strong ***internal validity***, that is they can convincingly establish causal links.
 
-* RCT are often **infeasible**
+However, they have some shortcomings:
 
-  * RCTs are **costly**
-  * RCTs may face some **ethical issues** : some *treatment* just cannot be given to people
-  * RCTs take time and we may be **time constrained** 
+* RCT are often **infeasible**:
+
+  * RCTs are **costly**,
+  * RCTs may face some **ethical issues**: some *treatments* simply cannot be given to people,
+  * RCTs take time and we may be **time constrained**.
 
 --
 
-* **Interpretation** of the results
+* **Interpretation** of the results:
 
-  * **External validity issue**: How much the results from a given RCT's can be generalized to other context (countries, populations,...?
+  * ***External validity***: To what extent can the results from a given RCT be generalized to other contexts (countries, populations,...)?
   
-  * Uncovering the mechanisms that are at stake may be difficult
+  * Uncovering the mechanisms that are at stake may be difficult,
   
-  * Imperfect randomization issues, attrition,...
+  * Imperfect randomization, attrition, ...
 
 ---
 
 
 # What comes next? 
 
-* So if we cannot rely on RCTs to make our life easy, it means we have to find a way to make causal inference from **observational data** (as opposed to experimental data) 
+* So if we cannot rely on RCTs to make our life easy, it means we have to find a way to make causal inference from ***observational data*** (as opposed to ***experimental data***).
+
+--
 
 * It brings us back to models 
 
@@ -916,12 +938,24 @@ Although randomized experiments make causal inference much more convincing it al
 
   - We have to make some assumptions about what this is!
 
-* If we are confident that **selection occurs on the observables**, i.e. variables that we have in our data : we will use **Multiple Regression**
-  * That's next course !
-  
-* If we think that some confounding factors are unobserved : we will have to rely on more *fancy* techniques, such as **RDD** or **Diff-in-Diff**
-  * That's session 10 and 11 ! 
+--
 
+2 broad cases:
+
+* ***selection occurs on observable characteristics***: *multiple regression* (next week!)
+
+* ***selection occurs on unobservable characteristics***: *regression discontinuity design* or  *difference-in-differences* (lectures 10 and 11!)
+
+---
+
+<br>
+<br>
+
+.center[
+```{r, echo = FALSE, out.width = "1000px"}
+knitr::include_graphics("../img/photos/correlation_funny.png")
+```
+]
 
 ---
 
@@ -930,7 +964,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# END
+# SEE YOU NEXT WEEK!
 
 
 
