@@ -6,8 +6,8 @@
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="..\css\scpo.css" type="text/css" />
-    <link rel="stylesheet" href="..\css\scpo-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -207,25 +207,11 @@ Smokers and non-smokers may be different in the first place:
 
 --
 
-<<<<<<< HEAD
 - Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
 
 - For each country 3 groups of men were studied for 20 months (U.S.) to 5 five years (U.K.).
-||||||| merged common ancestors
-- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents), we will use death rates from lung cancer in Canada, the U.K. and the U.S.
 
-- Add simple details about sample size and years!
-=======
-- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
-
-<<<<<<< HEAD
 --
-||||||| merged common ancestors
-Death rates per 1,000 person-years
-=======
-- In each study 3 groups of men have been followed from 20 months (U.S.) to 5 five years (U.K.)
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 - The following table gives the death rates per 1000 persons-years among these people. 
 
@@ -249,21 +235,9 @@ Death rates per 1,000 person-years
 
 class:inverse
 
-<<<<<<< HEAD
 # Task 1 (5 minutes)
-||||||| merged common ancestors
-# Correlation vs. causality : smoking and lung cancer #3
-=======
-# Task 1 (5 min)
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
-<<<<<<< HEAD
 Let's adjust our Canadian statistics **taking the age distribution into account **.
-||||||| merged common ancestors
-Let's consider adjust our statistics taking into account the age distribution of pipe-smokers.
-=======
-Let's adjust our statistics **taking into account the age distribution** of pipe-smokers.
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 
 |           | Death rates of &lt;br&gt; Pipe-smokers| Nb. of &lt;br&gt; pipe smokers | Nb. of &lt;br&gt; non-smokers |
@@ -273,40 +247,15 @@ Let's adjust our statistics **taking into account the age distribution** of pipe
 | Age +70   | 50 | 16 | 2  |
 | Total     |    | 40 | 40 |
 
-<<<<<<< HEAD
 1. Compute the average death rate for pipe smokers in Canada.
-||||||| merged common ancestors
-This table replicates the 3 age group distribution of pipe-smokers and non-smokers, as well as the death rate of pipe-smokers for each age group in Canada.
-=======
-This table replicates, for Canada, the 3 age group distribution of pipe-smokers and non-smokers, and death rate of pipe-smokers.
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
-<<<<<<< HEAD
 1. What would the average mortality rate be for pipe smokers if they had the same age distribution as non-smokers?
-||||||| merged common ancestors
-**Questions** 
-
-- Compute the average death rate for pipe smokers in Canada from age grouped death rates?
-
-- What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
-=======
-1) Compute the average death rate for pipe smokers in Canada from age grouped death rates?
-
-2) What would be the average mortality rate be for pipe smokers if they had the same age distribution as the non-smokers?
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 ---
 
 
-<<<<<<< HEAD
 # Correlation vs Causation: Smoking and Lung Cancer
 
-||||||| merged common ancestors
-# Correlation vs. causality : smoking and lung cancer #4
-=======
-# Correlation vs. causality : smoking and lung cancer #3
-
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 Here is the age-adjusted death rates table found by [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&amp;seq=11#metadata_info_tab_contents).
 
@@ -379,23 +328,9 @@ $$
 
 .pull-right[
 
-<<<<<<< HEAD
 ***Treatment group***: all the individuals such that `\(D_i = 1\)`.
 
 ***Control group***: all the individuals such that `\(D_i = 0\)`.
-||||||| merged common ancestors
-**Treatment group**: all the individuals such that `\(D_i = 1\)`.
-
-**Control group**: all the individuals such that `\(D_i = 0\)`.
-]
-
-.footnote[
-[1]: The potential outcomes framework was first proposed by Jerzy Neyman in his 1923 Master's thesis.
-=======
-***Treatment group***: all the individuals such that `\(D_i = 1\)`.
-
-***Control group***: all the individuals such that `\(D_i = 0\)`.
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 ]
 
 ---
@@ -512,32 +447,20 @@ Other ***conditional*** average treatment effects may be of interest:
 
 * From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
 
-<<<<<<< HEAD
 $$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
 
 --
-||||||| merged common ancestors
-$$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
-=======
-$$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 * For example, it would consist in taking the difference between:
   * Death rates for smokers and non-smokers,
   * GDP growth rates for democratic and non democratic countries,
   * Unemployment rates for countries with and without a minimum wage.
 
-<<<<<<< HEAD
 --
 
 * Most of the time, such a difference **will fail to capture the causal effect** of the treatment.
 
 --
-||||||| merged common ancestors
-* Most of the time, such an estimate **will fail to the capture causal effect** of the treatment.
-=======
-* Most of the time, such a difference **will fail to capture the causal effect** of the treatment.
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 * Notice that this kind raw comparison is often done by journalists, politicians, badly trained scientists (but not you now! 😉).
 
@@ -569,7 +492,6 @@ And because `\(ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta)
 
 ---
 
-<<<<<<< HEAD
 # The Problem of Causal Inference
 
 Let's now relax the assumption that the treatment effect is constant among all individuals.
@@ -594,30 +516,6 @@ So there is a novel source of bias that comes from the potential ***heterogeneit
 
 ---
 
-||||||| merged common ancestors
-=======
-# The Problem of Causal Inference
-
-Let's now relax the assumption that the treatment effect is constant among all individuals.
-
-After tedious calculations that we skip, we can get that the SDO is now decomposed as : 
-
-`\begin{align}
-  SDO &amp;= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
-  &amp; \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
-\end{align}`
-
-where `\(1 - \pi\)` denotes the share of people in the control group. 
-
-* So there is a novel source of bias that comes from the potential **heterogeneity in the individual treatment effect** `\(\delta_i\)`.
-
---
-
-* **Intuition** : Suppose that *education* is our treatment and this is people who will most benefit from school (higer `\(\delta_i\)`) who stay in school longer. Then, simply comparing outcomes between highly educated and low educated would ovestimate the effect of schooling among the whole population. 
-
----
-
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 class:inverse
 
 # Task 2 (10 minutes)
@@ -635,13 +533,7 @@ Let's compute these various quantities and biases with some toy data (i.e. data 
 1. Using `D_i_random`, compute the ***SDO under randomization***. Remember that you need to recompute `\(Y_i\)` because the assignment is not the same anymore.   
 If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
 
-<<<<<<< HEAD
 1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treatment effect bias*** and check that we have `$$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$`
-||||||| merged common ancestors
-5) Bonus :  Compute the value of the **selection bias** and the **heterogenous trt effect bias** and check that we have `$$SDO = ATE + \textrm{selection bias} + \textrm{heter. trt. effect bias}$$` 
-=======
-1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treat effect bias*** and check that we have `$$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$`
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 
 ---
@@ -690,7 +582,6 @@ layout: true
 
 # Randomized experiments
 
-<<<<<<< HEAD
 - Often called **R**andomized **C**ontrolled **T**rials (RCT).
 
 - The first RCTs were conducted a long time ago (18th and 19th century), mainly in **Medecine**. 
@@ -700,19 +591,6 @@ layout: true
 - Since then they have had a growing influence and have progressively become a reliable [tool for public policy evaluation](https://www.povertyactionlab.org/fr). 
 
 - As for economics, the **2019 Nobel Price in Economics** was awarded to three exponents of RCTs, [Abhijit Banerjee, Esther Duflo and Michael Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty), "for their experimental approach to alleviating global poverty".
-||||||| merged common ancestors
-- Often called **R**andom **C**ontrolled **T**rial (RCT).
-=======
-- Often called **R**andomized **C**ontrolled **T**rials (RCT).
-
-- The first RCTs were conducted, long time ago (18th and 19th century), mainly in **Medecine**. 
-
-- In the beginning of the 20th century they have popularized by famous statisticians like **J. Neyman** or **R.A. Fisher**. 
-
-- Since then they have been a growing influence and progressively accepted as a [tool for public policy](https://www.povertyactionlab.org/fr). 
-
-- As for Economics, the **Nobel Price in Economics 2019** has been awarded to three exponents of the RCT literature, [Duflo, Banerje and Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty).
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 ---
 
@@ -800,13 +678,6 @@ Compute the average percentage of girls, african americans, and free lunch quali
 
 # The Project STAR Experiment
 
-<<<<<<< HEAD
-We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the treatment and control groups.
-
-Let's only focus on:
-||||||| merged common ancestors
-We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the control and treatment groups.
-=======
 We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the treatment and control groups.
 
 Let's only focus on:
@@ -816,21 +687,8 @@ Let's only focus on:
 - One control group: **regular classes**,
 
 - One grade: **kindergarten** (k).
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
-
-<<<<<<< HEAD
-- One treatment group: **small classes**,
-
-- One control group: **regular classes**,
-
-- One grade: **kindergarten** (k).
 
 --
-||||||| merged common ancestors
-Let's only focus on one treatment group: **small classes**; and on one grade: **kindergarten** (k).
-=======
---
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 
 
@@ -891,7 +749,6 @@ D_i = \begin{cases}
 $$
 
 
-<<<<<<< HEAD
 ```r
 star_df_k_small &lt;- star_df %&gt;%
   filter(
@@ -902,26 +759,8 @@ star_df_k_small &lt;- star_df %&gt;%
 ]
 
 --
-||||||| merged common ancestors
-=======
-```r
-star_df_k_small &lt;- star_df %&gt;%
-  filter(
-    star %in% c("regular", "small") &amp;
-      grade == "k") %&gt;% 
-  mutate(small = (star == "small"))
-```
-]
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
-
-<<<<<<< HEAD
-.pull-right[
-||||||| merged common ancestors
-=======
---
 
 .pull-right[
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 ```r
 lm(math ~ small, star_df_k_small)
@@ -987,25 +826,9 @@ class:inverse
 
 1. Filter the dataset to only keep first graders and the small class and regular class groups.
 
-<<<<<<< HEAD
 1. Compute the average math score for both groups, and the difference between the two. (Use base `R`.)
 
 1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
-||||||| merged common ancestors
-1. Compute the average math score for both groups.
-
-1. Regress the treatment dummy variable on math score. Are the results in line with the previous question?
-
-1. Go back to the original data and this time keep first graders but don't get rid of the regular+aide treatment group.
-
-1. Compute the average math score for the regular+aide treatment group.
-
-1. Regress the treatment dummy variable on math score. What do you observe? How do you interpret the coefficients? What's the ATE of small class size compared to regular+aide?
-=======
-1. Compute the average math score for both groups, and the difference between the two. (Use base `R`.)
-
-1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 1. Regress the treatment dummy variable on math score. Are the results in line with the previous question?
 
@@ -1027,27 +850,13 @@ However, they have some shortcomings:
 
 --
 
-<<<<<<< HEAD
 * **Interpretation** of the results:
-||||||| merged common ancestors
-* **Interpretating** the results
-=======
-* **Interpretation** of the results
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
   * ***External validity***: To what extent can the results from a given RCT be generalized to other contexts (countries, populations,...)?
   
   * Uncovering the mechanisms that are at stake may be difficult,
   
-<<<<<<< HEAD
   * Imperfect randomization, attrition, ...
-||||||| merged common ancestors
-  * Identifying the mechanisms that are at stake may be difficult
-=======
-  * Uncovering the mechanisms that are at stake may be difficult
-  
-  * Imperfect randomization issues, attrition,...
->>>>>>> 8e41343abd4d3b1a2406ce7df22377c133dac098
 
 ---
 
