@@ -1,10 +1,11 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Session 4"
-author: "Florian Oswald"
+subtitle: "Multiple regression Model"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
@@ -16,6 +17,7 @@ output:
     includes:
       in_header: "../libs/partials/header.html"
 ---
+
 
 layout: true
 
@@ -39,169 +41,521 @@ knitr::opts_chunk$set(
 om = par("mar")
 lowtop = c(om[1],om[2],0.1,om[4])
 library(magrittr)
-
-```
-
-# Multiple Regression
-
-.pull-left[
-* Last session we learned how to run a simple regression.
-
-* We had one $x$ on the right hand side:
-    $$mpg_i = b_0 + b_1 hp_i + e_i$$
-
-* We can add more!
-]
-
---
-
-.pull-right[
-## Cars Again!
-
-* Suppose `mpg` also depends on the weight of a car.
-
-* We would write
-    $$mpg_i = b_0 + b_1 hp_i + b_2 wt_i e_i$$
-
-* Now we have two slope coefficients!
-]
-
----
-
-# Cars in 3D
-
-
-```{r plane3D-reg,echo=FALSE,fig.align='center',fig.cap='Multiple Regression - a plane in 3D. The red lines indicate the residual for each observation.',warning=FALSE,message=FALSE}
 library(plotly)
 library(reshape2)
-data(mtcars)
- 
-# linear fit
-fit <- lm(mpg ~ wt+hp,data=mtcars)
- 
-to_plot_x <- range(mtcars$wt)
-to_plot_y <- range(mtcars$hp)
+library(haven)
+library(tidyverse)
+```
 
-df <- data.frame(wt = rep(to_plot_x, 2),
-           hp = rep(to_plot_y, each = 2))
+
+# Recap from last week and today Plan 
+
+* Introduction to causality
+
+  * Causality versus correlation
+  * The Potential Outcome Framework a.k.a. Rubin's Causal Model
+  * Randomized controlled trials (RCTs)
+
+--
+
+## Today - Multiple Linear Regression Model
+.pull-left[
+* Multiple regression model
+  * What does it look like? 
+  * How do we interpretation change? 
+
+* Variations from the baseline model
+  * Dummy / continuous variables case 
+  * Interacting variables 
+  * Standardized regression
+]
+--
+.pull-right[
+* Applications 
+
+  * Class size and student achievments (again !)
+  * Gender wage gap 
+]
+
+---
+
+# Why making Multiple Regression
+
+* We already introduced what a **Simple Linear Model** is ...
+
+$$y_i = b_0 + b_1 x_i + e_i$$
+
+For example : 
+
+$$\textrm{Score_i} = b_0 + b_1 \textrm{classsize}_i + e_i$$
+
+* ... and how to estimate $b_0$ and $b_1$ from the data, that is making an **OLS** regression. 
+
+* Most of the time such a simple approach will **prevent you from making causal claim** about $b_1$. 
+
+--
+
+* So, what if we can **enrich the model** and take into account more factors? 
+
+  * For example, what if we also **control for** (some) schools and student characteristics (share of disaventaged people, school size,...)?
+  
+* That's what **Multiple Regression** allows us to do!
+
+---
+
+# Mutiple Regression model 
+
+Let's consider the following model
+
+$$y_i = b_0 + b_1 x_i^1 + b_2x_i^2 + b_3x_i^3 + e_i$$
+* It's a multiple linear regression model with $3$ regressors. It can easily be generalized to more.
+
+  * N.B. : $x$ is now also indexed by 1,2,3,... to indicate a particular regressor (age, level of education, experience, ....)
+
+--
+
+* **Estimation** : We get the values for $(b_0, b_1, b_2, b_3)$ in the same way as before, with **OLS** estimation. 
+
+--
+
+  * $(b_0^{OLS}, b_1^{OLS}, b_2^{OLS}, b_3^{OLS})$ are the values that minimize the **Sum of Squared Residuals**. 
+  
+  *  Still choose $b$'s to minimize $\sum_{i}{e_i^2} = \sum_{i}{(y_i - \hat{y_i})^2}$
+  
+  ( where $\hat{y_i} = b_0 + b_1 x_i^1 + b_2x_i^2 + b_3x_i^3$ )
+
+---
+
+# Interpreting coefficients in Multiple Regression Model 
+
+What's the meaning of all coefficients since we changed the model : 
+
+> Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if all the regressors ( $x^1$, $x^2$, $x^3$,...) are equal to 0. **
+
+> Slope $(b_k)$: **The predicted change, on average, in the value of $y$ *associated* to a one-unit increase in $x^k$...** <br/>
+> $\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad$ **... keeping all the other regressors constant** !
+
+* This *keeping all the other regressors constant* is the only things that changes compared to SLM. 
+
+* It means that you are considering the indidivudal effect of the variable $k$ on $y$ **in isolation** of the effect that the other regressors might have. 
+
+* In math we talk it refers to the notion of *partial derivative* :  $b_k = \frac{\partial y}{\partial x^k}$
+
+* .small[N.B. : We're only keeping the other regressors in the models constant, not things that are not in the models!]
+
+---
+
+# Interpreting coefficients in Multiple Regression Model 
+
+* Why is it interesting to keep other regressors constant when considering the effect of one in particular? 
+
+* Adding more regressors in your model will not just bring new estimates, it also potentially affects the previous ones!  
+
+* Let's take back our class size example this point. 
+
+.pull-left[
+
+```{r, echo=FALSE, fig.height=4}
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+grades_avg_cs = grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,45) +
+    ylim(50, 100) +
+    labs(
+      x = "Class size",
+      y = "Average score",
+      title = "Mathematics") +
+    theme_bw(base_size = 18) +
+  geom_smooth(se = FALSE, method = "lm")
+```
+
+]
+
+.pull-right[
+
+<br/>
+* We found $b_1$ = 0.19 for the effect of class size.  
+
+* On average, an increase in class size is associated to an increase in math test score. 
+]
+
+---
+
+# Interpreting coefficients in Multiple Regression Model
+
+* .small[But we may suspect that (a lot of) other things also change when considering classes of smaller / bigger size.]
+
+* .small[In previous session we mentioned the **location effect** : Large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.]
+
+* .small[Let's look at the link between class size and the share of student that come from disadvantaged background in the class.]
+
+```{r, echo = FALSE, fig.height=3, fig.width=5}
+disadvantaged_avg_cs = grades %>%
+  group_by(classize) %>%
+  summarise(disadvantaged_cs = mean(disadvantaged))
+ggplot(disadvantaged_avg_cs, aes(x = classize, y = disadvantaged_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,45) +
+    ylim(0, 50) +
+    labs(
+      x = "Class size",
+      y = "Average",
+      title = "Percent of class coming from disadvantaged background") +
+    theme_bw(base_size = 10) +
+  geom_smooth(se = FALSE, method = "lm")
+```
+
+---
+
+# Interpreting coefficients in Multiple Regression Model
+
+On average, small size classes concentrate **more students from disadvantaged background**
+
+```{r, echo = FALSE, fig.height=4, fig.width=7.5}
+disadvantaged_avg_cs = grades %>%
+  group_by(classize) %>%
+  summarise(disadvantaged_cs = mean(disadvantaged))
+ggplot(disadvantaged_avg_cs, aes(x = classize, y = disadvantaged_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,50) +
+    ylim(0,45) +
+    labs(
+      x = "Class size",
+      y = "Average",
+      title = "Percent of class coming from disadvantaged background") +
+    theme_bw(base_size = 15) +
+  geom_smooth(se = FALSE, method = "lm")
+```
+
+---
+
+# Interpreting coefficients in Multiple Regression Model
+
+In the same time, we observe that students from disadvantaged background **also have lower scores on average**. 
+
+```{r, echo = FALSE, fig.height=4, fig.width=7.5}
+grades_avg_dis = grades %>%
+  group_by(disadvantaged) %>%
+  summarise(avgmath_cs = mean(avgmath))
+ggplot(grades_avg_dis, aes(x = disadvantaged, y = avgmath_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,80) +
+    ylim(0, 100) +
+    labs(
+      x = "Percent of class coming from disadvantaged background",
+      y = "Average Score",
+      title = "Mathematics") +
+    theme_bw(base_size = 15) +
+  geom_smooth(se = FALSE, method = "lm")
+```
+
+
+---
+
+# Interpreting coefficients in Multiple Regression Model
+
+* We just illustrated what the **omitted variable bias** is.
+
+* It is when you omit a variable that **causes your outcome and that is correlated with your regressor(s)**.
+
+  * .small[N.B. : Here we did not actually proove that more `disadvantaged` students causes the grades to be lower but it seems quite reasonable.]
+  
+--
+
+* So, if we want to isolate the effect of class size from the effect of coming from a more/less disadvantaged background...
+
+* ... we have to include both variables in our regression.
+
+* Then, we will be able to get an estimate of the effect of class size on grades, **purged from the effect of the disadvantaged variable**.
+
+---
+
+# Multiple regression in practice 
+
+Let's regress the math test score on class size **and** the share of disadvantaged student per class. 
+
+$$ \textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{disadvantaged} + e_i$$
+
+```{r,echo=FALSE}
+grades_avg_cs = grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb), 
+            avgdisad_cs = mean(disadvantaged))
+```
+
+* The **R command** will be exactly the same as for the SLM, except here your will add the `disadvantaged` variable in the formula. 
+```{r, eval = FALSE}
+lm(avgmath ~ classize + disadvantaged, grades)
+```
+
+* These are the estimates we get from the above regression :   
+```{r, echo=FALSE, eval=TRUE, out.height=3}
+lm(avgmath ~ classize + disadvantaged, grades)$coefficients
+```
+
+--
+
+* **Question** 
+
+  * How do you interpret each of these coefficients?
+  * How do you explain the evolution of the `classize` estimate compared to the SLM case? 
+
+---
+
+# Multiple regression in practice 
+
+
+$$ \textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{disadvantaged} + e_i$$
+
+* These are the estimates we get from the above regression :   
+```{r, echo=FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)$coefficients
+```
+
+* **Answers** 
+
+  * $b_0$ = 69.9 : .small[When `class size` and `disadvantaged` are set to 0, the *predicted* value of the math score is 69.9]
+
+--
+
+  * $b_1$ = 0.07 : .small[Keeping the share of *disadvantaged students* constant in the class, if we increase the class size by 1 student, the math score will increase (on average) by 0.07 (point).]
+
+--
+
+  * $b_2$ = - 0.34 : .small[Keeping the *class size* constant, if we increase the share of *disadvantaged students* by **one percentage point**, the math score will decrease (on average) by 0.34 (point).]
+
+--
+
+  * $b_1$ .small[decreases by taking into account the `disadvantaged` variable. It was expected since part of this positive effect is actually due to the smaller share of disadvantaged students in bigger classes.]
+  
+---
+
+# Multiple regression in 3D
+
+Multiple Regression - a plane in 3D. 
+
+
+```{r plane3D-reg,fig.width=8,fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+# linear fit
+fit <- lm(avgmath ~ classize + disadvantaged, grades)
+ 
+to_plot_x <- range(grades$classize)
+to_plot_y <- range(grades$disadvantaged)
+
+df <- data.frame(classize = rep(to_plot_x, 2),
+           disadvantaged = rep(to_plot_y, each = 2))
+
 df["pred"] <- predict.lm(fit, df, se.fit = F)
 
-surf <- acast(df, wt ~ hp)
+surf <- acast(df,disadvantaged ~ classize)
 
 color <- rep(0, length(df))
-mtcars %>%
-  plot_ly(colors = "grey") %>%
-  add_markers(x = ~wt, y = ~hp, z = ~mpg,name = "data",opacity = .8, marker=list(color = 'red', size = 5, hoverinfo="skip")) %>%
-  add_surface(x = to_plot_x, y = to_plot_y, z = ~surf, inherit = F, name = "Mtcars 3D", opacity = .75, cauto = F, surfacecolor = color) %>%
-  hide_colorbar()
+grades %>%
+  plot_ly(width = 5, height = 5, tickfont = list(size =7)) %>%
+  add_markers(x = ~classize, y = ~disadvantaged, z = ~avgmath,
+              name = "1 dot = 1 class",opacity = .6, 
+              marker=list(color = 'blue',
+                          size = 1.5, 
+                          hoverinfo="skip")) %>%
+  add_surface(x = to_plot_x, y = to_plot_y, z = ~surf,
+              inherit = F,
+              name = "3D regression plane",
+              opacity = .7, cauto = F,
+              colorscale = list(c(0, 1), c("red", "yellow"))) %>%
+   layout(xaxis = list(tickfont = list(size =7)), yaxis = list(tickfont = list(size =7)))
 ```
+
 
 ---
 
-# Multiple $x$
+class:inverse
 
-.pull-left[
-* We could continue and add up to $K$ variables:
-    $$\hat{y}_i = b_0 + b_1 x_{1i} + b_2 x_{2i} + \dots + b_K x_{Ki}$$
+# Task 1 (10 min)
 
-* The mechanics of minimizing the SSR is identical to before!
+Let's see how it goes for the **reading** score. 
 
-* Still choose $b$'s to minimize sum of $e_i^2 = (y_i - \hat{y_i})^2$
-]
+First of all, load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) using the `read_dta()` from the `haven` package. Assign it to a dataframe called `grades`. 
 
---
+1) Regress the `avgverb` (reading) test score on `classize` and `disadvantaged` and assign it to `reg`. 
 
-.pull-right[
-```{r,echo=FALSE}
-summary(fit)
+2) Look at the coefficients of this regression by running `reg$coefficients`. How do they compare with the math score regression? 
+```{r, echo = FALSE, eval=FALSE}
+lm(avgverb ~ classize + disadvantaged, grades)$coefficients
 ```
-]
 
----
-
-# Interpreting Coefficients in Multiple Regression
-
-.pull-left[
-* We think about each $b_i$ as a *partial effect*.
-
-* What's the impact of `wt` *in isolation* of the effect that `hp` might have?
-
-* We formalize this as a *partial derivative*.
-
-* `r emo::ji("thinking")`
-]
-
---
-
-.pull-right[
-* [Partial derivative on wikipedia](https://en.wikipedia.org/wiki/Partial_derivative)
-
-* That sounds like our regression equation. 
-    $$mpg = b_0 + b_1 hp + b_2 wt$$
-    
-* What's the impact of varying `hp` *only*?
-
-* Well, it's $\frac{\partial mpg}{\partial hp} = b_1$.
-
-* We say: *all else equal*, the effect of `hp` is ...
-]
+3) What are the other available variables that we may add in the regression? 
+  * Run the regression with all these variables and assign it to `reg_full`. 
+  * Look at the coefficients.
+  * Discuss all estimates, both their sign and magnitude. 
+```{r, echo = FALSE, eval=FALSE}
+lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)$coefficients
+```
 
 ---
 
 # Multicollinearity
 
-.pull-left[
-* It matters *which* variables we add to a regression.
+There is a rule to follow when adding variables in your model. 
 
-* A priori, we add what we *think* is important to explain the data.
+* Intuitively, we want to add what we thinks is important to explain the variations in our outcome. 
 
-* However, there is also a technical restriction: An additional variable needs to add at least *some* new information.
-]
+* In practice, there is a technical restriction : any additional variable needs to add at least *some* new information. 
 
---
+  * We often refer to this condition as the **Rank condition** : we need our matrix of $X$s (our regressors) to be of [full rank](https://en.wikipedia.org/wiki/Rank_(linear_algebra)). 
 
-.pull-right[
-## Rank Condition: $N \geq K+1$
+* In other words, regressors **must not be perfectly collinear**, i.e. not perfectly linearly dependent.
 
-* Let's create `wtplus = wt + 1`. No new info.
-    $$\begin{align} y &= b_0 + b_1 \text{wt} + b_2 \text{wtplus} + e \\&= b_0 + b_1 \text{wt} + b_2 (\text{wt} + 1) + e \\ &= (b_0 + b_2) + \text{wt} (b_1 + b_2) + e\end{align}$$
+  $$ x_2 = ax_1 + b $$ 
+
+* Even if not perfectly correlated, the individual effects of highly correlated regressors are hard to disantangle
+
+---
+
+# Multicollinearity
+
+For example $\textrm{is.female}$ and $\textrm{is.male}$ are perfectly colinear, we have : $$\textrm{is.male = 1 - is.female}$$
+
+* We don't get any additional info from $\textrm{is.male}_i$ about $i$ if we already know the value of $\textrm{is.female}_i$. 
+
+* Let's write our standard regression model including both variables 
+
+$$ y = b_0 + b_1 \textrm{is.female} + b_2 \textrm{is.male} + e $$ 
+So we have 
+
+
+$$\begin{align}
+y_i &= b_0 + b_1 \textrm{is.female} + b_2 (1 - \textrm{is.female}) + e \\
+                    &= b_0 + b_2 + (b_1 - b_2) \textrm{is.female} +e 
+  \end{align}$$
 
 * We cannot tell $b1$ and $b_2$ apart! That's an *identification problem*.
 
 * We cannot solve the the minimization problem of the SSR! That's a *numerical problem*.
 
-* `r emo::ji("arrow_right")` variables must not be **perfectly colinear**, i.e. not perfectly linearly dependent.
-
-]
-
 ---
+
 class: inverse
 
-# Multicolinearity App!
+# Task (5 min)
+
+.small[Still need to think about this multicollinearity issue? Let's try to run a regression when there is a perfect linear dependence between them.]
+
+1) .small[First, generate some toy data with the following code and make sure you understand each piece of code.]
 
 ```{r,eval=FALSE}
-library(ScPoEconometrics)
-launchApp("multicolinearity")
+set.seed(2)
+toy_data = data.frame(wage = rnorm(10,1000,100), 
+                      is.female = sample(c(0,1),10,replace = T))
+toy_data$is.male = 1 - toy_data$is.female
 ```
 
+2) .small[Run the regression of `wage` on both `is.female` and `is.male`. What happens?] 
+
+3) .small[Run the regression of `wage` on `is.male` only. What is the average predicated `wage` for women?] 
+
+4) .small[Run the regression of `wage` on `is.female` only. What is the average predicated `wage` for women again?]
+
+5) .small[Redo 3) and 4) but computing the predicted wage of men.] 
+
 ---
-# Log Wage Equation Continued
 
+# Variations from the baseline model 
+
+Facing different data and trying to model different relationships, you may need to move away from the baseline model.  
+
+* We will focus on 3 important variations : 
+
+  * **Standardized regressions**
+
+  * **Interactions** between regressors
+
+  * **Log-level**, **log-log**, ... specifications
+
+* In each of these case, the way we interpret the coefficients $(b_1, b_2,..., b_k)$ changes. 
+
+* But the way we estimate these coefficients does not change. 
 
 ---
-class: inverse
 
-# Tutorial
+# Standardizing regression
 
+Let's define what *standardizing* a variable means. 
 
-```{r,eval=FALSE}
-library(ScPoEconometrics)
-runTutorial("lm-example")
+> **Standardizing** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation
+
+$$ z_i^{std} = \frac{z_i - \bar z}{\sigma(z)}$$ 
+where $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{VAR}(z)}$.
+
+* Why would we do that in the first place? i.e. standardizing $Y$ and / or the $X$s 
+
+--
+
+* Standardizing is about **putting variables on the same scale** so we can compare each other. 
+  
+* In our class size / student achievment case, it will help to interpret : 
+
+  * The **magnitude** of the effects 
+  * The **relative importance of each variable**
+
+---
+
+# Standardizing regression
+
+How to **interpret** the regression coefficients?
+
+* If only the dependant variable $y$ is standardized
+
+  * By definition, $b_k$ is measuring the predicted change in ** $y^{stand}$ **  associated with a one unit increase in $x_k$. 
+  
+  * If $y^{stand}$ increases by one, it means that $y$ increases by one standard deviation, so $b_k$ is measuring the change in $y$ **as a share of its own standard deviation**.
+  
+--
+
+* If only the regressors $X_k$ is standardized
+
+  * By definition, $b_k$ is measuring the predicted change in $Y$ associated with a one unit increase in ** $x_k^{stand}$ **. 
+  
+  * If $x_k^{stand}$ increase by one unit, it means that $x_k$ increases by one standard deviation. So $b_k$ is measuring the predicted change in $y$ **associated with a one standard deviation in $x_k$**. 
+  
+---
+
+class:inverse
+
+# Task 3 (7min)
+
+.small[Let's take back our `grades` dataset. This are the estimates we got from regressing the math test score on the full set of regressors.] 
+
+```{r echo = FALSE}
+reg5 = lm(avgmath~classize + disadvantaged + school_enrollment + religious + female, data = grades)
+reg5$coefficients
 ```
 
+.small[1) Add the standardized math score as the `avgmath_stand` variable in your dataset. You can use the `standardie()` function from the `jtools` package or do it by hand with base R.]
+
+.small[2) Run the full regression for the standardized math test score. Interpret the coefficient and their magnitude.]
+
+.small[3) If you were to pick the most influencial variable on the math score, what would it be?]
+
+.small[4) Add the standardized value of each *continous* regressor as a new variable called `*<regressor>*_stand`] . 
+  * .small[Why do we prefer not to standardize the `religious` variable?] 
+  
+.small[5) Reegress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.]
 ---
 
+# Variations from the baseline model
 
+To illustrate the two next variations, **interractions** and **log specifications**, we gonna look at the determinants of wage focusing on **education** and **gender**
+
+---
+
+# 
+
+---
 
 
 class: title-slide-final, middle
@@ -209,9 +563,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# END
-
-
+# SEE YOU NEXT WEEK
 
 
 |                                                                                                            |                                   |
