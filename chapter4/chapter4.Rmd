@@ -553,7 +553,52 @@ To illustrate the two next variations, **interractions** and **log specification
 
 ---
 
-# 
+# Log specifications 
+
+The specification we have seen so far can be called **level-level** specification. Both the dependent and the independent variables are measured in level. 
+
+* Taking the log of the dependent and / or the independent variable leads us to define 3 other type of regression :
+
+  * **Log - level**: $\quad \textrm{log}(y_i) = b_0 + b_1 x_{i,1} + ... + e$
+
+  * **Level - log**: $\quad \textrm{y}_i = b_0 + b_1 log(x_{i,1}) + ... + e$
+
+  * **Log - log**: $\quad \textrm{log}(y_i) = b_0 + b_1 log(x_{i,1}) + ... + e$
+
+---
+
+# Log specifications : interpretation 
+
+Here is a table that summarise how to interpret regressor coefficient in each case:  
+
+|    Model           | Equation  |  Interpretation of $b_1$            |
+|--------------------|:---------:|:-----------------------------------:|
+| Level - Level | $y = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in x is associated with <br/>] $b_1$ .small[**unit change** in y]  |
+| Log - Level | $\textrm{log}(y) = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in x is associated with <br/> ] $b_1$ .small[ **percent change** in y]  |
+| Level - Log | $\textrm{y} = b_0 + b_1 log(x_{1})  + e$ | .small[**One percent** increase in x is associated with<br/>] $b_1/100$ .small[**unit change** in y] |
+| Log - Log  |  $\textrm{log}(y) = b_0 + b_1 log(x_{1}) + e$ | .small[**One percent** increase in x is associated with<br/>] $b_1$ .small[**percent change** in y]  |
+
+
+* It looks like cooking recipes but of course it can be derived from (basic) algebra. 
+
+* Let's practice with a concrete example
+
+---
+
+
+# Log specifications : motivations 
+
+There are various reasons for which we would want to 
+
+---
+
+# Wages, education and Gender
+
+* To investigate this question we will use data from the [**C**urrent **P**opulation **S**urvey](https://www.census.gov/programs-surveys/cps.html). 
+  * This is the U.S. Government's monthly survey of unemployment and labor force participation. 
+  * We'll use an extract of the CPS for the year 1985 direclty available on R. 
+
+* 
 
 ---
 
