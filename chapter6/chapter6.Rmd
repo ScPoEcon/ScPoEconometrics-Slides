@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Session 6"
-author: "Florian Oswald"
+subtitle: "Sampling"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -42,7 +42,16 @@ library(magrittr)
 
 ```
 
-# Hands On Pasta
+# Recap from last week
+
+--
+
+## Today
+
+
+---
+
+# What's the proportion of green Fusilli?
 
 .pull-left[
 * In class we did a hands-on activity.
