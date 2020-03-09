@@ -59,22 +59,24 @@ library(tidyverse)
 --
 
 ## Today - Multiple Linear Regression Model
+
 .pull-left[
 * Multiple regression model
-  * What does it look like? 
-  * How do we interpretation change? 
+  * Interpretation of coefficients 
 
 * Variations from the baseline model
-  * Dummy / continuous variables case 
-  * Interacting variables 
   * Standardized regression
+  * Log models 
+  * Interacting variables 
+  
 ]
 --
 .pull-right[
-* Applications 
+* **Applications** 
 
-  * Class size and student achievments (again !)
-  * Gender wage gap 
+  * Class size and student achievments
+  
+  * Wage, education and gender 
 ]
 
 ---
@@ -441,7 +443,7 @@ y_i &= b_0 + b_1 \textrm{is.female} + b_2 (1 - \textrm{is.female}) + e \\
 
 class: inverse
 
-# Task (5 min)
+# Task 2 (5 min)
 
 .small[Still need to think about this multicollinearity issue? Let's try to run a regression when there is a perfect linear dependence between them.]
 
@@ -547,13 +549,7 @@ reg5$coefficients
 .small[5) Reegress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.]
 ---
 
-# Variations from the baseline model
-
-To illustrate the two next variations, **interractions** and **log specifications**, we gonna look at the determinants of wage focusing on **education** and **gender**
-
----
-
-# Log specifications 
+# Log models 
 
 The specification we have seen so far can be called **level-level** specification. Both the dependent and the independent variables are measured in level. 
 
@@ -567,7 +563,7 @@ The specification we have seen so far can be called **level-level** specificatio
 
 ---
 
-# Log specifications : interpretation 
+# Interpretating log models
 
 Here is a table that summarise how to interpret regressor coefficient in each case:  
 
@@ -579,26 +575,159 @@ Here is a table that summarise how to interpret regressor coefficient in each ca
 | Log - Log  |  $\textrm{log}(y) = b_0 + b_1 log(x_{1}) + e$ | .small[**One percent** increase in x is associated with<br/>] $b_1$ .small[**percent change** in y]  |
 
 
-* It looks like cooking recipes but of course it can be derived from (basic) algebra. 
+* It looks like cooking recipes but of course it can be derived with (basic) algebra. 
 
-* Let's practice with a concrete example
+---
+
+# Why do we use log models?
+
+There are various reasons for which we would want to use log models
+
+* Account for **non linearity** in the relationship between $y$ and $x$.
+
+* Log-log models allow us to interpret coefficients as <a href="https://en.wikipedia.org/wiki/Elasticity_(economics)">elasticities</a> which have a central role in economic theory.
+
+* Limit the influence of **outliers**. 
+  * It comes from the concavity of the *log* function. 
 
 ---
 
 
-# Log specifications : motivations 
 
-There are various reasons for which we would want to 
+# Wages, education and gender
 
----
-
-# Wages, education and Gender
+* Let's see if these new *tools* can help understanding the relationship between wages, education and gender. 
 
 * To investigate this question we will use data from the [**C**urrent **P**opulation **S**urvey](https://www.census.gov/programs-surveys/cps.html). 
-  * This is the U.S. Government's monthly survey of unemployment and labor force participation. 
-  * We'll use an extract of the CPS for the year 1985 direclty available on R. 
+  * .small[This is the U.S. Government's monthly survey of unemployment and labor force participation.] 
+  * .small[We'll use a sample of 534 individuals from the 1985 CPS available in the `AER` package.]
 
-* 
+--
+
+* Let's first have a look at the distribution of wage broken down by education and gender 
+
+.pull-left[
+```{r, echo = FALSE, fig.height=2.5,fig.width=3.5}
+data("CPS1985")
+cps = CPS1985
+cps$education_gp = quantcut(cps$education,3)
+cps$log_wage = log(cps$wage)
+  
+ggplot(cps, aes(x = gender, y = wage, fill = gender)) + 
+    geom_boxplot() + 
+    theme_bw() + 
+    labs(title = "Boxplot: Wage ~ gender")+
+    guides(fill=FALSE)
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, fig.height=2.5,fig.width=4.5}
+ggplot(cps, aes(x = education_gp, y = wage, fill = education_gp)) + 
+    geom_boxplot() + 
+    theme_bw() + 
+    labs(title = "Boxplot: Wage ~ education group (in years)")+
+    guides(fill=FALSE)
+```
+
+]
+
+---
+
+# Wages, education and gender
+
+* So, wages are higher for men and higher educated people, well nothing really new. 
+
+* But, what about the evolution of the gender gap when considering different levels of education?  
+
+  * Do you have any prior?
+
+--
+
+.pull-left[
+```{r, echo = FALSE, fig.height=3,fig.width=5}
+ggplot(cps, aes(x = gender, y = wage, fill = gender)) + 
+    geom_boxplot() + 
+    facet_wrap(~education_gp, ) +
+    theme_bw() + 
+    labs(title = "Education group (in years)")+
+    guides(fill=FALSE)
+```
+]
+
+--
+
+.pull-right[
+<br/>
+
+* We observe a gender gap for each education group
+
+* It is not clear if/how it varies with education
+
+* Let's test it with a regression!  
+
+]
+
+---
+
+class:inverse
+
+# Task 4 (10 min)
+
+Load the data `CPS1985` from the `AER` package
+
+* Look at the `help` to get the definition of each variable: `?CPS1985`
+
+  * We don't know if people are working part time or full time, does it matter here? 
+
+* Add the`log_wage` variable (log of the `wage`)
+
+* Regress the `log_wage` on `gender` and `education`, save it as `reg1`.
+  
+  * Interpret each coefficient
+
+* Regress the `log_wage` on `gender`, `education` and `gender*education`, save it as `reg2`.
+  * Do the results confirm our previous guess?
+
+* Add all the other regressors available in our data and run a new regression saved as `reg3`.
+
+---
+
+# Wage, Gender and Education
+
+```{r,echo=F, fig.height=2.75, fig.width=5}
+ggplot(cps, aes(x = education, y = log_wage, group = gender, color = gender)) +
+    geom_point(alpha = 0.2) + 
+    geom_smooth(method = "lm", se = F) +
+    theme_bw() +
+    ylim(0,4)
+```
+
+* We provided evidence that the average wage gap is decreasing with education... 
+
+* ...even after controling for several factors like *experience*, *occupation*, *sector*, ...
+
+
+
+---
+
+# Teaser for next chapters 
+
+* You may have noticed that since the beginning we always work with **samples** drawn from the overall population. 
+
+* Each time, imagine we could draw another sample from population. 
+
+  * Would we obtain the same results? 
+  
+  * In other words, how confident can we be that our estimates (sign, magnitude) are not just driven by hazard. 
+
+* The next chapters will answwer those kind of questions:
+
+  * the notion of **sampling**
+  
+  * Understand the concept of **statistical inference**
+  
+
 
 ---
 
