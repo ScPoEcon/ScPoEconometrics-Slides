@@ -100,51 +100,51 @@ For example :
 
 Let's consider the following model
 
-`$$y_i = b_0 + b_1 x_i^1 + b_2x_i^2 + b_3x_i^3 + e_i$$`
+`$$y_i = b_0 + b_1 x_{i,1} + b_2x_{i,2} + b_3x_{i,3} + e_i$$`
 * It's a multiple linear regression model with `\(3\)` regressors. It can easily be generalized to more.
 
-  * N.B. : `\(x\)` is now also indexed by 1,2,3,... to indicate a particular regressor (age, level of education, experience, ....)
+  * N.B. : we now also have an index for the regressors: k=1,2,3,...
 
 --
 
 * **Estimation** : We get the values for `\((b_0, b_1, b_2, b_3)\)` in the same way as before, with **OLS** estimation. 
 
---
-
   * `\((b_0^{OLS}, b_1^{OLS}, b_2^{OLS}, b_3^{OLS})\)` are the values that minimize the **Sum of Squared Residuals**. 
   
-  *  Still choose `\(b\)`'s to minimize `\(\sum_{i}{e_i^2} = \sum_{i}{(y_i - \hat{y_i})^2}\)`
+  *  That is the `\(b\)`'s which minimize `\(\sum_{i}{e_i^2} = \sum_{i}{(y_i - \hat{y_i})^2}\)` 
   
-  ( where `\(\hat{y_i} = b_0 + b_1 x_i^1 + b_2x_i^2 + b_3x_i^3\)` )
+  where `\(\hat{y_i} = b_0 + b_1 x_{i,1} + b_2x_{i,2} + b_3x_{i,3}\)`
 
 ---
 
 # Interpreting coefficients in Multiple Regression Model 
 
-What's the meaning of all coefficients since we changed the model : 
+How do we interpret each individual coefficient in a multiple regression model: 
 
-&gt; Intercept `\((b_0)\)`: **The predicted value of `\(y\)` `\((\widehat{y})\)` if all the regressors ( `\(x^1\)`, `\(x^2\)`, `\(x^3\)`,...) are equal to 0. **
+&gt; Intercept `\((b_0)\)`: **The predicted value of `\(y\)` `\((\widehat{y})\)` if all the regressors ( `\(x_1\)`, `\(x_2\)`, `\(x_3\)`,...) are equal to 0. **
 
-&gt; Slope `\((b_k)\)`: **The predicted change, on average, in the value of `\(y\)` *associated* to a one-unit increase in `\(x^k\)`...** &lt;br/&gt;
+&gt; Slope `\((b_k)\)`: **The predicted change, on average, in the value of `\(y\)` *associated* to a one-unit increase in `\(x_k\)`...** &lt;br/&gt;
 &gt; `\(\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad\)` **... keeping all the other regressors constant** !
 
-* This *keeping all the other regressors constant* is the only things that changes compared to SLM. 
+* Notice that the *keeping all the other regressors constant* is the only part that changes compared to SLM. 
 
 * It means that you are considering the indidivudal effect of the variable `\(k\)` on `\(y\)` **in isolation** of the effect that the other regressors might have. 
 
-* In math we talk it refers to the notion of *partial derivative* :  `\(b_k = \frac{\partial y}{\partial x^k}\)`
+* In math we talk it refers to the notion of *partial derivative* :  `\(b_k = \frac{\partial y}{\partial x_k}\)`
 
-* .small[N.B. : We're only keeping the other regressors in the models constant, not things that are not in the models!]
+--
+
+* **Link with causal inference**: Only the regressors included in the model are hold constant, those who are not in the models can still vary and bias your estimates.  
 
 ---
 
-# Interpreting coefficients in Multiple Regression Model 
+# Class size and student achievment
 
-* Why is it interesting to keep other regressors constant when considering the effect of one in particular? 
+* Let's reconsider the effect of class size on student achievment in a multiple regression framework.
 
-* Adding more regressors in your model will not just bring new estimates, it also potentially affects the previous ones!  
-
-* Let's take back our class size example this point. 
+* Remember fom the previous class that we found : 
+  * .small[A predicted **increase** in test scores when class size increases with a **simple linear regression**.] 
+  * .small[A predicted **decrease** in test scores when class size increases with the **STAR experiment** data.]
 
 .pull-left[
 
@@ -155,49 +155,42 @@ What's the meaning of all coefficients since we changed the model :
 .pull-right[
 
 &lt;br/&gt;
-* We found `\(b_1\)` = 0.19 for the effect of class size.  
 
-* On average, an increase in class size is associated to an increase in math test score. 
+* On average, an increase in class size (by one student) is associated to an increase in math test score by 0.32. 
 ]
 
 ---
 
-# Interpreting coefficients in Multiple Regression Model
+# Class size and student achievment
 
 * .small[But we may suspect that (a lot of) other things also change when considering classes of smaller / bigger size.]
 
-* .small[In previous session we mentioned the **location effect** : Large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.]
+* .small[In particular, we mentioned the **location effect** : Large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.]
 
-* .small[Let's look at the link between class size and the share of student that come from disadvantaged background in the class.]
+* .small[Let's look at the link between class size and **the share of student who come from disadvantaged background** in the class (`disadvantaged` variable).]
 
 &lt;img src="chapter4_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Interpreting coefficients in Multiple Regression Model
+# Class size and student achievment
 
-On average, small size classes concentrate **more students from disadvantaged background**
+* On average, small size classes concentrate **more students from disadvantaged background**
+
+* And in the same time, we observe that students from disadvantaged background **also have lower scores on average**. 
 
 &lt;img src="chapter4_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
 
----
-
-# Interpreting coefficients in Multiple Regression Model
-
-In the same time, we observe that students from disadvantaged background **also have lower scores on average**. 
-
-&lt;img src="chapter4_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
-
 
 ---
 
-# Interpreting coefficients in Multiple Regression Model
+# Class size and student achievment
 
-* We just illustrated what the **omitted variable bias** is.
+* Not taking into account the `disadvantaged` variable would then lead to **omitted variable bias** in our class size estimate. 
 
 * It is when you omit a variable that **causes your outcome and that is correlated with your regressor(s)**.
 
-  * .small[N.B. : Here we did not actually proove that more `disadvantaged` students causes the grades to be lower but it seems quite reasonable.]
+  * .small[N.B. : Here we did not actually proove that more `disadvantaged` students *causes* the grades to be lower but it seems quite reasonable.]
   
 --
 
@@ -205,7 +198,7 @@ In the same time, we observe that students from disadvantaged background **also 
 
 * ... we have to include both variables in our regression.
 
-* Then, we will be able to get an estimate of the effect of class size on grades, **purged from the effect of the disadvantaged variable**.
+  * Then, we will be able to get an estimate of the effect of class size on grades, ** *purged* from the effect of the disadvantaged variable**.
 
 ---
 
@@ -213,59 +206,82 @@ In the same time, we observe that students from disadvantaged background **also 
 
 Let's regress the math test score on class size **and** the share of disadvantaged student per class. 
 
-$$ \textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{disadvantaged} + e_i$$
+$$ \textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{disadvantaged}_i + e_i$$
 
 
 
-* The **R command** will be exactly the same as for the SLM, except here your will add the `disadvantaged` variable in the formula. 
+* The **R command** will be exactly the same as for **S**imple **L**inear **R**egressions
+
+  * except here your will put several regressors on the right hand side seprarated by `+`.
+  
+* Here is the command for the above equation: 
 
 ```r
 lm(avgmath ~ classize + disadvantaged, grades)
 ```
 
-* These are the estimates we get from the above regression :   
+--
+
+.pull-left[
+* And these are the estimates we get :   
 
 ```
 ##   (Intercept)      classize disadvantaged 
 ##   69.94438332    0.07167819   -0.33957877
 ```
+]
 
 --
 
-* **Question** 
+.pull-right[
+* You can compare with the class size estimate we got from the SLR :   
 
-  * How do you interpret each of these coefficients?
-  * How do you explain the evolution of the `classize` estimate compared to the SLM case? 
+```
+## (Intercept)    classize 
+##  57.7939158   0.3174906
+```
+]
 
 ---
 
 # Multiple regression in practice 
 
 
-$$ \textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{disadvantaged} + e_i$$
+```
+##   (Intercept)      classize disadvantaged 
+##   69.94438332    0.07167819   -0.33957877
+```
 
-* These are the estimates we get from the above regression :   
+* **Question** 
+
+  * .small[How do you interpret each of these coefficients?]
+  * .small[How do you explain the evolution of `classize` estimate compared to the SLM case?] 
+
+---
+
+# Multiple regression in practice 
+
 
 ```
 ##   (Intercept)      classize disadvantaged 
 ##   69.94438332    0.07167819   -0.33957877
 ```
 
-* **Answers** 
+**Answers** 
 
-  * `\(b_0\)` = 69.9 : .small[When `class size` and `disadvantaged` are set to 0, the *predicted* value of the math score is 69.9]
+1) How do you interpret each of these coefficients?
 
---
+* `\(b_0\)` = 69.9 : .small[When `class size` and `disadvantaged` are set to 0, the *predicted* value of the math score is 69.9]
 
-  * `\(b_1\)` = 0.07 : .small[Keeping the share of *disadvantaged students* constant in the class, if we increase the class size by 1 student, the math score will increase (on average) by 0.07 (point).]
+* `\(b_1\)` = 0.07 : .small[Keeping the share of *disadvantaged students* constant in the class, if we increase the class size by 1 student, the math score will increase (on average) by 0.07 (point).]
 
---
-
-  * `\(b_2\)` = - 0.34 : .small[Keeping the *class size* constant, if we increase the share of *disadvantaged students* by **one percentage point**, the math score will decrease (on average) by 0.34 (point).]
+* `\(b_2\)` = - 0.34 : .small[Keeping the *class size* constant, if we increase the share of *disadvantaged students* by **one percentage point**, the math score will decrease (on average) by 0.34 (point).]
 
 --
 
-  * `\(b_1\)` .small[decreases by taking into account the `disadvantaged` variable. It was expected since part of this positive effect is actually due to the smaller share of disadvantaged students in bigger classes.]
+2) How do you explain the evolution of `classize` estimate compared to the SLM case?
+
+* `\(b_1\)` .small[decreases by taking into account the `disadvantaged` variable. It was expected since part of this positive effect is actually due to the smaller share of disadvantaged students in bigger classes.]
   
 ---
 
@@ -301,13 +317,13 @@ First of all, load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmh
 
 ---
 
-# Multicollinearity
+# Multicollinearity issue
 
 There is a rule to follow when adding variables in your model. 
 
 * Intuitively, we want to add what we thinks is important to explain the variations in our outcome. 
 
-* In practice, there is a technical restriction : any additional variable needs to add at least *some* new information. 
+* In practice, there is a technical restriction : any additional variable needs to add **at least *some* new information**. 
 
   * We often refer to this condition as the **Rank condition** : we need our matrix of `\(X\)`s (our regressors) to be of [full rank](https://en.wikipedia.org/wiki/Rank_(linear_algebra)). 
 
@@ -315,13 +331,13 @@ There is a rule to follow when adding variables in your model.
 
   $$ x_2 = ax_1 + b $$ 
 
-* Even if not perfectly correlated, the individual effects of highly correlated regressors are hard to disantangle
+* N.B.: Even if not perfectly correlated, the individual effects of highly correlated regressors are hard to disantangle. 
 
 ---
 
-# Multicollinearity
+# Multicollinearity : example
 
-For example `\(\textrm{is.female}\)` and `\(\textrm{is.male}\)` are perfectly colinear, we have : `$$\textrm{is.male = 1 - is.female}$$`
+Let's consider `\(\textrm{is.female}\)` and `\(\textrm{is.male}\)` are perfectly colinear, we have : `$$\textrm{is.male = 1 - is.female}$$`
 
 * We don't get any additional info from `\(\textrm{is.male}_i\)` about `\(i\)` if we already know the value of `\(\textrm{is.female}_i\)`. 
 
@@ -370,19 +386,20 @@ toy_data$is.male = 1 - toy_data$is.female
 
 # Variations from the baseline model 
 
-Facing different data and trying to model different relationships, you may need to move away from the baseline model.  
+Facing different datasets and different relationships between the variables of interest, you may need to move away from the baseline model.  
 
 * We will focus on 3 important variations : 
 
   * **Standardized regressions**
 
-  * **Interactions** between regressors
+  * **Log models**
 
-  * **Log-level**, **log-log**, ... specifications
+  * Regressors **interactions**
 
-* In each of these case, the way we interpret the coefficients `\((b_1, b_2,..., b_k)\)` changes. 
 
-* But the way we estimate these coefficients does not change. 
+* In each case,  the way we estimate these coefficients does not change. 
+
+* However, the way we interpret our coefficients `\((b_1, b_2,..., b_k)\)` does change. 
 
 ---
 
@@ -392,14 +409,14 @@ Let's define what *standardizing* a variable means.
 
 &gt; **Standardizing** a variable `\(z\)`  means to *demean* the variable and to divide the demeaned value by its own standard deviation
 
-$$ z_i^{std} = \frac{z_i - \bar z}{\sigma(z)}$$ 
+$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
 where `\(\sigma(z)\)` is the standard deviation of `\(z\)`, i.e. `\(\sigma(z) = \sqrt{\textrm{VAR}(z)}\)`.
 
 * Why would we do that in the first place? i.e. standardizing `\(Y\)` and / or the `\(X\)`s 
 
 --
 
-* Standardizing is about **putting variables on the same scale** so we can compare each other. 
+* Intuitively, standardizing is about **putting things on the same scale** so we can compare between each other. 
   
 * In our class size / student achievment case, it will help to interpret : 
 
@@ -408,11 +425,9 @@ where `\(\sigma(z)\)` is the standard deviation of `\(z\)`, i.e. `\(\sigma(z) = 
 
 ---
 
-# Standardizing regression
+# Standardizing regression : interpretation
 
-How to **interpret** the regression coefficients?
-
-* If only the dependant variable `\(y\)` is standardized
+* If dependant variable `\(y\)` is standardized
 
   * By definition, `\(b_k\)` is measuring the predicted change in ** `\(y^{stand}\)` **  associated with a one unit increase in `\(x_k\)`. 
   
@@ -420,11 +435,11 @@ How to **interpret** the regression coefficients?
   
 --
 
-* If only the regressors `\(X_k\)` is standardized
+* If the regressor `\(X_k\)` is standardized
 
   * By definition, `\(b_k\)` is measuring the predicted change in `\(Y\)` associated with a one unit increase in ** `\(x_k^{stand}\)` **. 
   
-  * If `\(x_k^{stand}\)` increase by one unit, it means that `\(x_k\)` increases by one standard deviation. So `\(b_k\)` is measuring the predicted change in `\(y\)` **associated with a one standard deviation in `\(x_k\)`**. 
+  * If `\(x_k^{stand}\)` increase by one unit, it means that `\(x_k\)` increases by one standard deviation. So `\(b_k\)` is measuring the predicted change in `\(y\)` **associated with an increase in `\(x_k\)` by one standard deviation.**. 
   
 ---
 
@@ -454,7 +469,9 @@ class:inverse
 
 # Log models 
 
-The specification we have seen so far can be called **level-level** specification. Both the dependent and the independent variables are measured in level. 
+* The specification we have seen so far can be called **level-level** specification. Both the dependent and the independent variables are measured in level.
+
+  * This *level* can be: euros, years, number of students,... and even percentage.
 
 * Taking the log of the dependent and / or the independent variable leads us to define 3 other type of regression :
 
@@ -463,6 +480,8 @@ The specification we have seen so far can be called **level-level** specificatio
   * **Level - log**: `\(\quad \textrm{y}_i = b_0 + b_1 log(x_{i,1}) + ... + e\)`
 
   * **Log - log**: `\(\quad \textrm{log}(y_i) = b_0 + b_1 log(x_{i,1}) + ... + e\)`
+
+* We will see how the **interpretation** changes and **why** to use these kind of models. 
 
 ---
 
@@ -482,7 +501,7 @@ Here is a table that summarise how to interpret regressor coefficient in each ca
 
 ---
 
-# Why do we use log models?
+# When do we use log models?
 
 There are various reasons for which we would want to use log models
 
@@ -499,9 +518,9 @@ There are various reasons for which we would want to use log models
 
 # Wages, education and gender
 
-* Let's see if these new *tools* can help understanding the relationship between wages, education and gender. 
+* Let's use these new *tools* to investigate the relationship between wages, education and gender. 
 
-* To investigate this question we will use data from the [**C**urrent **P**opulation **S**urvey](https://www.census.gov/programs-surveys/cps.html). 
+* We will use data from the [**C**urrent **P**opulation **S**urvey](https://www.census.gov/programs-surveys/cps.html). 
   * .small[This is the U.S. Government's monthly survey of unemployment and labor force participation.] 
   * .small[We'll use a sample of 534 individuals from the 1985 CPS available in the `AER` package.]
 
@@ -510,11 +529,11 @@ There are various reasons for which we would want to use log models
 * Let's first have a look at the distribution of wage broken down by education and gender 
 
 .pull-left[
-&lt;img src="chapter4_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter4_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 .pull-right[
-&lt;img src="chapter4_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter4_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -522,16 +541,16 @@ There are various reasons for which we would want to use log models
 
 # Wages, education and gender
 
-* So, wages are higher for men and higher educated people, well nothing really new. 
+* So, wages are higher for men and higher educated people, well, nothing really new. 
 
 * But, what about the evolution of the gender gap when considering different levels of education?  
 
-  * Do you have any prior?
+  * Do you have any prior about this?
 
 --
 
 .pull-left[
-&lt;img src="chapter4_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter4_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
@@ -541,7 +560,7 @@ There are various reasons for which we would want to use log models
 
 * We observe a gender gap for each education group
 
-* It is not clear if/how it varies with education
+* But it's not really clear if/how it varies with education
 
 * Let's test it with a regression!  
 
@@ -574,7 +593,7 @@ Load the data `CPS1985` from the `AER` package
 
 # Wage, Gender and Education
 
-&lt;img src="chapter4_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter4_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
 
 * We provided evidence that the average wage gap is decreasing with education... 
 
