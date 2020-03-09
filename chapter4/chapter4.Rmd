@@ -587,7 +587,90 @@ There are various reasons for which we would want to use log models
 
 ---
 
+# Interacting regressors
 
+* We interact two regressors when we think the effect of one depends on the value of the other. 
+
+  * In our next application, we'll let the return to education on wage vary by gender.
+  
+* In practice, if we interact $x_1$ and $x_2$, we would write our model like this : 
+
+$$y_i =  b_0 + b_1 x_{i,1} + b_2 x_{i,2} + b_{1,2}x_{i,1}*x_{i,2} + ... + e$$
+
+* The interpretation of $b_1$, $b_2$, and $b_{1,2}$ will depend on the type of $x_1$ and $x_2$. 
+  
+* Let's focus on the cases where one regressor is a dummy / categorical variable and the other is continuous.
+
+* It will give you the intuition for the other cases : 
+
+  * Both regresors are dummies / categorical variables
+
+  * Both regresors are continous
+  
+---
+
+# Interacting regressors
+
+* Let's illustrate with the case of **doctors visits**. 
+  *  .small[We use the `DoctorVisits` dataset from the `AER` package contains [cross-section data](https://en.wikipedia.org/wiki/Cross-sectional_data) originating from the 1977–1978 Australian Health Survey]
+
+* In particular we will focus on the role of `gender` and `age` on the number of doctor `visits` in the past two weeks. 
+
+* Our regression model is 
+
+$$ \textrm{visits_i} = b_0 + b_1 \textrm{is.female}_i + b_2 \textrm{age}_i + b_3 \textrm{is.female}_i * \textrm{age}_i + e$$ 
+
+* What is the predicted number of visits for 
+
+  * A woman of age 30: $\hat{\textrm{visits}_i} = b_0 + b_1 + b_2*30 + b_3 * 30$
+  * A man of age 30: $\hat{\textrm{visits}_{i'}} = b_0 + b_2*30$
+  * The difference in the prediction between a man and woman of age 30 is then equal to: $b_1 + b_3*30$
+
+---
+
+# Interacting regressors
+
+Running the regression we obtain 
+
+```{r, echo = FALSE, eval = TRUE}
+library(jtools)
+data("DoctorVisits")
+df = DoctorVisits
+df$age = df$age*100
+df$is.female = 1*(df$gender=="female")
+round(lm(visits~ is.female + age + is.female*age, df)$coefficients,3)
+```
+
+
+* **Interpretation**
+
+--
+
+  * Thanks to our interaction term, we let the difference in the number of visits between men and women vary with age.
+  
+--
+  
+  * The coefficient assocciated to `is.female` is equal to 0.179 which means that we observe more doctor visits among *relatively young women.* 
+
+--
+
+  * The coefficient assocciated to `is.female:age` being negative it means this differential will *decrease with age*. 
+  
+---
+
+# Interacting regressors
+
+Here is a visualization of our model prediction
+
+```{r,echo=F, fig.height=4, fig.width=7}
+ggplot(df, aes(x = age, y = visits, group = gender, color = gender)) +
+    geom_smooth(method = "lm", se = F) +
+    theme_bw() +
+  labs(title = "Number of visits in the past 2 weeks")
+```
+
+
+---
 
 # Wages, education and gender
 
@@ -633,14 +716,16 @@ ggplot(cps, aes(x = education_gp, y = wage, fill = education_gp)) +
 
 * So, wages are higher for men and higher educated people, well, nothing really new. 
 
-* But, what about the evolution of the gender gap when considering different levels of education?  
+* But, are the return to education the same for women and men? 
+
+* In other words, how the gender gap evolves when considering different levels of education?  
 
   * Do you have any prior about this?
 
 --
 
 .pull-left[
-```{r, echo = FALSE, fig.height=3,fig.width=5}
+```{r, echo = FALSE, fig.height=2.8,fig.width=5}
 ggplot(cps, aes(x = gender, y = wage, fill = gender)) + 
     geom_boxplot() + 
     facet_wrap(~education_gp, ) +
@@ -655,7 +740,7 @@ ggplot(cps, aes(x = gender, y = wage, fill = gender)) +
 .pull-right[
 <br/>
 
-* We observe a gender gap for each education group
+* We do observe a gender gap for each education group
 
 * But it's not really clear if/how it varies with education
 
@@ -681,7 +766,7 @@ Load the data `CPS1985` from the `AER` package
   
   * Interpret each coefficient
 
-* Regress the `log_wage` on `gender`, `education` and `gender*education`, save it as `reg2`.
+* Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`.
   * Do the results confirm our previous guess?
 
 * Add all the other regressors available in our data and run a new regression saved as `reg3`.
@@ -718,9 +803,9 @@ ggplot(cps, aes(x = education, y = log_wage, group = gender, color = gender)) +
 
 * The next chapters will answwer those kind of questions:
 
-  * the notion of **sampling**
+  * We'll present the notion of **sampling**
   
-  * Understand the concept of **statistical inference**
+  * Understand what **statistical inference** is and how to do it. 
   
 
 
