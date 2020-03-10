@@ -326,3 +326,6 @@ ru-blockquote {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
 }
+
+.large { font-size: 120% }
+.small { font-size: 90% }

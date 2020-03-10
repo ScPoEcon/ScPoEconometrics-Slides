@@ -32,7 +32,9 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 **Chapter 1, Mastering Metrics**
 
-[Deaton and Cartwright (2016, VoxEU), "The limitations of randomised controlled trials"](https://voxeu.org/article/limitations-randomised-controlled-trials)
+["Potential outcomes causal model", Causal Inference: The Mixtape, Scott Cunningham](http://scunning.com/cunningham_mixtape.pdf)
+
+"Introduction" and "Counterfactuals and the Potential Outcome Model", Counterfactuals and Causal Inference, Morgan and Winship, 2015
 
 
 ### Lecture 6: Multiple Linear Regression
