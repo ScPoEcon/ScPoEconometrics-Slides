@@ -16,7 +16,8 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Intro To Causality
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-03-04
+### SciencesPo Paris </br> 2020-03-10
+
 
 ---
 
@@ -596,7 +597,7 @@ layout: true
 
 # Back to class size and students' achievement
 
-Last week we regressed class size on average student math and reading scores.
+Last week we regressed average student math and reading scores on class size.
 
 `$$\textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + e_i$$`
 We briefly discuss why `\(b_1^{OLS}\)` could only establish an ***association*** and not a ***causal relationship***.
@@ -664,7 +665,7 @@ class:inverse
 1. Why are there so many `NA`s? What do they correspond to?
 
 1. Keep only cases with no `NA`s with the following code:  
-`star_df &lt;- star_df[complete.cases(star_long),]`
+`star_df &lt;- star_df[complete.cases(star_df),]`
 
 1. Let's check how well the randomization was done by doing ***balancing checks***.  
 Compute the average percentage of girls, african americans, and free lunch qualifiers by grade *and* treatment class.  
@@ -804,11 +805,11 @@ mean(star_df_k_small[
 
 From the estimation output we get the following:
 
-`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = 0]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 0] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = 0] \\ &amp;= b_0 \end{align}\)`
+`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = 0]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 0] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = 0] + \mathbb{E}[e_i|D_i = 0] \\ &amp;= b_0 \end{align}\)`
 
 --
 
-`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = 1]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 1] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = 1] \\ &amp;= b_0 + \delta \end{align}\)`
+`\(\begin{align} \mathbb{E}[\textrm{math score} | D_i = 1]&amp;= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 1] \\ &amp;= b_0 + \delta \mathbb{E}[D_i| D_i = 1] + \mathbb{E}[e_i|D_i = 1] \\ &amp;= b_0 + \delta \end{align}\)`
 
 --
 
@@ -830,7 +831,7 @@ class:inverse
 
 1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
 
-1. Regress the treatment dummy variable on math score. Are the results in line with the previous question?
+1. Regress math score on the treatment dummy variable. Are the results in line with the previous question?
 
 1. How do you interpret these coefficients?
 
