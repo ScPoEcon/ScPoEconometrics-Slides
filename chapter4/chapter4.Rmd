@@ -1,6 +1,6 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Multiple Linear Regression Model"
+subtitle: "Multiple Regression Model"
 author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
@@ -60,9 +60,9 @@ library(gtools)
 
 --
 
-## Today - Multiple Linear Regression Model
+## Today - Multiple Regression Model
 
-* **Multiple Linear Regression Model**
+* **Multiple Regression Model**
 
 * *Extensions:* standardized regression; log models; interacting variables
 
@@ -255,7 +255,7 @@ where $y_i$ is the ***dependent variable*** and $x_i$ is the ***independent vari
 
 --
 
-`r emo::ji("warning")` Unless all other factors affecting $y_i$, i.e. $e_i$, are uncorrelated with $x_i$, $b_1$ **cannot be interpreted as a causal effect**.
+`r emo::ji("warning")` Unless all other factors affecting $y_i$ are uncorrelated with $x_i$, $b_1$ **cannot be interpreted as a causal effect**.
 
 --
 
@@ -460,7 +460,7 @@ Note that this implies that the number of observations has to be greater than th
 
 class: inverse
 
-# Task 2 (7) minutes)
+# Task 2 (7 minutes)
 
 Still need to think about this perfect collinearity issue? Let's run a regression where there is perfect linear dependence between regressors.
 
@@ -500,7 +500,7 @@ Keep only second graders and small and regular class groups.
 
 --
 
-* Recall our previous example of class size and disadvantaged students. Not taking into account the `disadvantaged` variable let to a OVB for our class size estimate.
+* Recall our previous example of class size and disadvantaged students. Not taking into account the `disadvantaged` variable led to a OVB for our class size estimate.
 
 --
 
@@ -586,7 +586,7 @@ where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $
 
 class:inverse
 
-# Task 3 (7 minutes)
+# Task 3: To do at home (7 minutes)
 
 Let's go back our `grades` dataset. These are the estimates we got from regressing the math test score on the full set of regressors.
 
@@ -661,168 +661,218 @@ There are several reasons why we would want to use log models:
 
 ---
 
-# Interacting regressors
+# Interacting Regressors
 
-* We interact two regressors when we think the effect of one depends on the value of the other. 
+* We interact two regressors when we believe the effect of one depends on the value of the other. 
 
-  * In our next application, we'll let the return to education on wage vary by gender.
+  * *Example:* The returns to education on wage vary by gender.
+  
+--
   
 * In practice, if we interact $x_1$ and $x_2$, we would write our model like this : 
 
-$$y_i =  b_0 + b_1 x_{i,1} + b_2 x_{i,2} + b_{1,2}x_{i,1}*x_{i,2} + ... + e$$
+$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i}*x_{2,i} + ... + e_i$$
 
-* The interpretation of $b_1$, $b_2$, and $b_{1,2}$ will depend on the type of $x_1$ and $x_2$. 
+--
+
+* The interpretation of $b_1$, $b_2$, and $b_3$ will depend on the type of $x_1$ and $x_2$.
+
+--
   
-* Let's focus on the cases where one regressor is a dummy / categorical variable and the other is continuous.
+* Let's focus on the cases where one regressor is a dummy/categorical variable and the other is continuous.
 
-* It will give you the intuition for the other cases : 
+* It will give you the intuition for the other cases:
 
-  * Both regresors are dummies / categorical variables
+  * Both regresors are dummies/categorical variables,
 
-  * Both regresors are continous
+  * Both regresors are continuous variables.
   
 ---
 
-# Interacting regressors
+# Interacting Regressors
 
-* Let's see hw it works taking back the **STAR experiment data**. 
+* Let's go back to the *STAR* experiment data.
 
-* In particular we will focus on how the effect of being in a small vs regular class vary with the experience of the teacher. 
+--
 
-* Our regression model is 
+* How does the effect of being in a small vs regular class vary with the experience of the teacher?
 
-$$ \textrm{score_i} = b_0 + b_1 \textrm{SMALL}_i + b_2 \textrm{experience}_i + b_3 \textrm{SMALL}_i * \textrm{experience}_i + e$$ 
+--
 
-* What is the predicted test score of a student in a:
+* Our regression model becomes:
 
-  * .small[small class with a 10 years experienced teacher:] $\hat{\textrm{score}_i} = b_0 + b_1 + b_2*10 + b_3 * 10$
-  
-  * .small[regular class with a 10 years experienced teacher:]: $\hat{\textrm{score}_{i'}} = b_0 + b_2*10$
-  
-  * .small[The difference in the predicted score for a student in small vs regular class with a 10 years experienced teacher is then:] $b_1 + b_3*30$
+$$ \textrm{score}_i = b_0 + b_1 \textrm{small}_i + b_2 \textrm{experience}_i + b_3 \textrm{small}_i * \textrm{experience}_i + e_i$$ 
 
+--
+
+Effect of small class with teacher with 10 years of experience?
+
+--
+
+$\mathbb{E}[\textrm{score}_i | \textrm{small}_i = 1 \textrm{ & experience}_i = 10] = b_0 + b_1 + b_2*10 + b_3*10$
+
+--
+
+$\mathbb{E}[\textrm{score}_i | \textrm{small}_i = 0 \textrm{ & experience}_i = 10] = b_0 + b_2*10$
+
+--
+
+$\begin{split} \mathbb{E}[\textrm{score}_i &| \textrm{small}_i = 1 \textrm{ & experience}_i = 10] - \mathbb{E}[\textrm{score}_i | \textrm{small}_i = 0 \textrm{ & experience}_i = 10] \\ &= b_0 + b_1 + b_2*10 + b_3*10 - (b_0 + b_2*10) \\ &= b_1 + b_3*10 \end{split}$
 ---
 
-# Interacting regressors
+# Interacting Regressors
 
-Running the regression for the `avgmath` score, we obtain: 
+Running the regression for the `math` score (for all grades), we obtain:
 
-```{r, echo=FALSE}
-star_df = read.csv("../../../../../../Dropbox/ScPoEconometrics/pierre_gustave/star_data.csv")
+```{r, echo = FALSE}
+star_df = read.csv("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
 star_df = star_df %>%filter(star != "regular+aide")
-star_df$SMALL = star_df$star == "small"
+star_df$small = star_df$star == "small"
 star_df = star_df[complete.cases(star_df),]
 ```
 
 
 ```{r}
-round(lm(math ~ SMALL + experience + SMALL*experience, star_df)$coefficients,3)
+lm(math ~ small+ experience + small*experience, star_df)
 ```
 
-
-* **Interpretation**
+***Interpretation:***
 
 --
 
-  * Thanks to our interaction term, we let the impact of being in a small class vary with the experience of the teacher. 
+* The interaction term allows the impact of being in a small class to vary with the experience of the teacher. 
   
 --
   
-  * In particular, we still observe a positive impact of being in a small class on math score....
+* In particular, we still observe a positive impact of being in a small class on math score,
   
-  * ... but this effect is decreasing in the experience of the teacher.
+* but this effect is decreasing in the experience of the teacher.
   
 ---
 
-# Interacting regressors
+# Interacting Regressors: Visually
 
-Here is a visualization of our model prediction
+```{r,echo=F, fig.height=4.75, fig.width = 8}
+ggplot(star_df, aes(x = experience, y = math, group = small, color = small)) +
+  geom_smooth(method = "lm", se = F) +
+  theme_bw(base_size = 14) +
+  labs(
+    x = "Teacher experience",
+    y = "Total math score",
+    title = "Predicted mathematics score",
+    color = "Small class") +
+  theme(legend.position="top")
+```
 
-```{r,echo=F, fig.height=3.8, fig.width=6}
-ggplot(star_df, aes(x = experience, y = math, group = SMALL, color = SMALL)) +
+---
+
+# Interacting Regressors: Visually by grade
+
+```{r,echo=F, fig.height=4.75, fig.width = 8}
+star_df %>%
+  mutate(grade = factor(grade, levels = c("k","1","2","3"))) %>%
+  ggplot(aes(x = experience, y = math, group = small, color = small)) +
     geom_smooth(method = "lm", se = F) +
-    theme_bw() +
-  labs(title = "Mathematics test score")
-```
-
-* It gives you the predicted value of student's math score at any level of teacher experience depending on the class size: small or regular. 
-
----
-
-# Interacting regressors
-
-Here is the same visualization broken down by grades. 
-
-```{r,echo=F, fig.height=4, fig.width=7}
-ggplot(star_df, aes(x = experience, y = math, group = SMALL, color = SMALL)) +
-    geom_smooth(method = "lm", se = F) +
-    theme_bw() +
-  facet_wrap(~grade) +
-  labs(title = "Mathematics test score")
+    theme_bw(base_size = 14) +
+    theme(legend.position="top") +
+    labs(
+      x = "Teacher experience",
+      y = "Total math score",
+      title = "Predicted mathematics score",
+      color = "Small class") +
+    facet_wrap(~ grade, nrow = 2, labeller = as_labeller(
+          c(`k` = "Kindergarten",
+            `1` = "First grade",
+            `2` = "Second grade",
+            `3` = "Third grade")
+      ))
+    
 ```
 
 ---
 
-# Wages, education and gender
+# Wages, Education and Gender
 
-* Let's use these new *tools* to investigate the relationship between wages, education and gender. 
-
-* We will use data from the [**C**urrent **P**opulation **S**urvey](https://www.census.gov/programs-surveys/cps.html). 
-  * .small[This is the U.S. Government's monthly survey of unemployment and labor force participation.] 
-  * .small[We'll use a sample of 534 individuals from the 1985 CPS available in the `AER` package.]
+* Let's use these new *tools* to investigate the relationship between wages, education and gender.
 
 --
 
-* Let's first have a look at the distribution of wage broken down by education and gender 
+* We will use data from the [**C**urrent **P**opulation **S**urvey (CPS)](https://www.census.gov/programs-surveys/cps.html), the U.S. government's monthly survey of unemployment and labor force participation.
+
+* We'll use a sample of 534 individuals from the May 1985 CPS available in the `AER` package.
+
+--
 
 .pull-left[
-```{r, echo = FALSE, fig.height=2.5,fig.width=3.5}
+```{r, echo = FALSE, fig.height=2.9,fig.width=4.5}
 data("CPS1985")
 cps = CPS1985
-cps$education_gp = quantcut(cps$education,3)
-cps$log_wage = log(cps$wage)
+cps <- cps %>%
+  mutate(
+    education_gp = case_when(
+      education <= 12 ~ "High school or below",
+      education %in% 13:15 ~ "Some college",
+      education >= 16 ~ "College degree"
+    ),
+    log_wage = log(wage))
   
 ggplot(cps, aes(x = gender, y = wage, fill = gender)) + 
     geom_boxplot() + 
     theme_bw() + 
-    labs(title = "Boxplot: Wage ~ gender")+
+    labs(
+      x = "Gender",
+      y = "Hourly wage ($)",
+      title = "Wage distribution by gender") +
     guides(fill=FALSE)
 ```
 ]
 
+--
+
 .pull-right[
-```{r, echo = FALSE, fig.height=2.5,fig.width=4.5}
-ggplot(cps, aes(x = education_gp, y = wage, fill = education_gp)) + 
-    geom_boxplot() + 
-    theme_bw() + 
-    labs(title = "Boxplot: Wage ~ education group (in years)")+
-    guides(fill=FALSE)
+```{r, echo = FALSE, fig.height=2.9,fig.width=4.5}
+cps %>%
+  mutate(
+    education_gp = factor(education_gp, levels = c("High school or below", "Some college", "College degree"))
+  ) %>%
+  ggplot(aes(x = education_gp, y = wage, fill = education_gp)) + 
+      geom_boxplot() + 
+      theme_bw() + 
+      labs(
+        x = "Education group",
+        y = "Hourly wage ($)",
+        title = "Wage distribution by education group") +
+      guides(fill=FALSE)
 ```
 
 ]
 
 ---
 
-# Wages, education and gender
+# Wages, Education and Gender
 
-* So, wages are higher for men and higher educated people, well, nothing really new. 
+* So, wages are higher for men and higher for educated people, well, nothing really new.
 
-* But, are the return to education the same for women and men? 
+--
 
-* In other words, how the gender gap evolves when considering different levels of education?  
+* But, are the returns to education the same for women and men? 
 
-  * Do you have any prior about this?
+* In other words, how does the gender gap evolve for different levels of education?  
 
 --
 
 .pull-left[
-```{r, echo = FALSE, fig.height=2.8,fig.width=5}
-ggplot(cps, aes(x = gender, y = wage, fill = gender)) + 
-    geom_boxplot() + 
-    facet_wrap(~education_gp, ) +
-    theme_bw() + 
-    labs(title = "Education group (in years)")+
-    guides(fill=FALSE)
+```{r, echo = FALSE, fig.height=3.5,fig.width=5}
+cps %>%
+  mutate(
+    education_gp = factor(education_gp, levels = c("High school or below", "Some college", "College degree"))
+  ) %>%
+  ggplot(aes(x = gender, y = wage, fill = gender)) + 
+      geom_boxplot() + 
+      facet_wrap(~education_gp) +
+      theme_bw() + 
+      labs(x = "Gender", y = "Hourly wage ($)")+
+      guides(fill=FALSE)
 ```
 ]
 
@@ -843,62 +893,62 @@ ggplot(cps, aes(x = gender, y = wage, fill = gender)) +
 
 class:inverse
 
-# Task 4 (10 min)
+# Task 4 (10 minutes)
 
-Load the data `CPS1985` from the `AER` package
+1. Load the data `CPS1985` from the `AER` package.
 
-* Look at the `help` to get the definition of each variable: `?CPS1985`
+1. Look at the `help` to get the definition of each variable: `?CPS1985`
 
-  * We don't know if people are working part time or full time, does it matter here? 
+1. We don't know if people are working part-time or full-time, does it matter here? 
 
-* Add the`log_wage` variable (log of the `wage`)
+1. Create the`log_wage` variable equal to the log of `wage`.
 
-* Regress the `log_wage` on `gender` and `education`, save it as `reg1`.
-  
-  * Interpret each coefficient
+1. Regress `log_wage` on `gender` and `education`, and save it as `reg1`. Interpret each coefficient.
 
-* Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`.
-  * Do the results confirm our previous guess?
+1. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`. Interpret each coefficient. Does the gender wage gap decrease with education?
 
-* Add all the other regressors available in our data and run a new regression saved as `reg3`.
+1. Add all of other regressors to `reg2` and save it as `reg3`. Do our coefficients of interest change?
 
 ---
 
-# Wage, Gender and Education
+# Wage, Gender and Education - Visually (Simple Model)
 
-```{r,echo=F, fig.height=2.75, fig.width=5}
+```{r, echo=FALSE, fig.height=4.75, fig.width = 8}
 ggplot(cps, aes(x = education, y = log_wage, group = gender, color = gender)) +
-    geom_point(alpha = 0.2) + 
-    geom_smooth(method = "lm", se = F) +
-    theme_bw() +
-    ylim(0,4)
+  geom_point(alpha = 0.2) +
+  theme_bw(base_size = 14) +
+  theme(legend.position="top") +
+  geom_smooth(method = "lm", se = F) +
+  ylim(0,4) +
+  xlim(0,20) +
+  labs(
+    x = "Years of education",
+    y = "Hourly wage ($)",
+    color = "Gender")
+
 ```
 
-* We provided evidence that the average wage gap is decreasing with education... 
-
-* ...even after controling for several factors like *experience*, *occupation*, *sector*, ...
-
-
-
 ---
 
-# Teaser for next chapters 
+# Teaser for the Next 3 Lectures
 
-* You may have noticed that since the beginning we always work with **samples** drawn from the overall population. 
+* You may have noticed that since the beginning we always work with **samples** drawn from the overall population.
 
-* Each time, imagine we could draw another sample from population. 
+--
+
+* Each time, imagine we could draw another sample from population:
 
   * Would we obtain the same results? 
   
-  * In other words, how confident can we be that our estimates (sign, magnitude) are not just driven by hazard. 
+  * In other words, how confident can we be that our estimates (sign, magnitude) are not just driven by hazard?
+  
+--
 
 * The next chapters will answwer those kind of questions:
 
-  * We'll present the notion of **sampling**
+  * We'll present the notion of **sampling**, and
   
   * Understand what **statistical inference** is and how to do it. 
-  
-
 
 ---
 
@@ -908,7 +958,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK
+# SEE YOU NEXT WEEK!
 
 
 |                                                                                                            |                                   |
