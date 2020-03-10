@@ -685,34 +685,38 @@ $$y_i =  b_0 + b_1 x_{i,1} + b_2 x_{i,2} + b_{1,2}x_{i,1}*x_{i,2} + ... + e$$
 
 # Interacting regressors
 
-* Let's illustrate with the case of **doctors visits**. 
-  *  .small[We use the `DoctorVisits` dataset from the `AER` package contains [cross-section data](https://en.wikipedia.org/wiki/Cross-sectional_data) originating from the 1977–1978 Australian Health Survey]
+* Let's see hw it works taking back the **STAR experiment data**. 
 
-* In particular we will focus on the role of `gender` and `age` on the number of doctor `visits` in the past two weeks. 
+* In particular we will focus on how the effect of being in a small vs regular class vary with the experience of the teacher. 
 
 * Our regression model is 
 
-$$ \textrm{visits_i} = b_0 + b_1 \textrm{is.female}_i + b_2 \textrm{age}_i + b_3 \textrm{is.female}_i * \textrm{age}_i + e$$ 
+$$ \textrm{score_i} = b_0 + b_1 \textrm{SMALL}_i + b_2 \textrm{experience}_i + b_3 \textrm{SMALL}_i * \textrm{experience}_i + e$$ 
 
-* What is the predicted number of visits for 
+* What is the predicted test score of a student in a:
 
-  * A woman of age 30: $\hat{\textrm{visits}_i} = b_0 + b_1 + b_2*30 + b_3 * 30$
-  * A man of age 30: $\hat{\textrm{visits}_{i'}} = b_0 + b_2*30$
-  * The difference in the prediction between a man and woman of age 30 is then equal to: $b_1 + b_3*30$
+  * .small[small class with a 10 years experienced teacher:] $\hat{\textrm{score}_i} = b_0 + b_1 + b_2*10 + b_3 * 10$
+  
+  * .small[regular class with a 10 years experienced teacher:]: $\hat{\textrm{score}_{i'}} = b_0 + b_2*10$
+  
+  * .small[The difference in the predicted score for a student in small vs regular class with a 10 years experienced teacher is then:] $b_1 + b_3*30$
 
 ---
 
 # Interacting regressors
 
-Running the regression we obtain 
+Running the regression for the `avgmath` score, we obtain: 
 
-```{r, echo = FALSE, eval = TRUE}
-library(jtools)
-data("DoctorVisits")
-df = DoctorVisits
-df$age = df$age*100
-df$is.female = 1*(df$gender=="female")
-round(lm(visits~ is.female + age + is.female*age, df)$coefficients,3)
+```{r, echo=FALSE}
+star_df = read.csv("../../../../../../Dropbox/ScPoEconometrics/pierre_gustave/star_data.csv")
+star_df = star_df %>%filter(star != "regular+aide")
+star_df$SMALL = star_df$star == "small"
+star_df = star_df[complete.cases(star_df),]
+```
+
+
+```{r}
+round(lm(math ~ SMALL + experience + SMALL*experience, star_df)$coefficients,3)
 ```
 
 
@@ -720,15 +724,13 @@ round(lm(visits~ is.female + age + is.female*age, df)$coefficients,3)
 
 --
 
-  * Thanks to our interaction term, we let the difference in the number of visits between men and women vary with age.
+  * Thanks to our interaction term, we let the impact of being in a small class vary with the experience of the teacher. 
   
 --
   
-  * The coefficient assocciated to `is.female` is equal to 0.179 which means that we observe more doctor visits among *relatively young women.* 
-
---
-
-  * The coefficient assocciated to `is.female:age` being negative it means this differential will *decrease with age*. 
+  * In particular, we still observe a positive impact of being in a small class on math score....
+  
+  * ... but this effect is decreasing in the experience of the teacher.
   
 ---
 
@@ -736,13 +738,28 @@ round(lm(visits~ is.female + age + is.female*age, df)$coefficients,3)
 
 Here is a visualization of our model prediction
 
-```{r,echo=F, fig.height=4, fig.width=7}
-ggplot(df, aes(x = age, y = visits, group = gender, color = gender)) +
+```{r,echo=F, fig.height=3.8, fig.width=6}
+ggplot(star_df, aes(x = experience, y = math, group = SMALL, color = SMALL)) +
     geom_smooth(method = "lm", se = F) +
     theme_bw() +
-  labs(title = "Number of visits in the past 2 weeks")
+  labs(title = "Mathematics test score")
 ```
 
+* It gives you the predicted value of student's math score at any level of teacher experience depending on the class size: small or regular. 
+
+---
+
+# Interacting regressors
+
+Here is the same visualization broken down by grades. 
+
+```{r,echo=F, fig.height=4, fig.width=7}
+ggplot(star_df, aes(x = experience, y = math, group = SMALL, color = SMALL)) +
+    geom_smooth(method = "lm", se = F) +
+    theme_bw() +
+  facet_wrap(~grade) +
+  labs(title = "Mathematics test score")
+```
 
 ---
 
