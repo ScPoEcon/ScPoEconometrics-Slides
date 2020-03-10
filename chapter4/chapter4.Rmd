@@ -1,6 +1,6 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Multiple regression Model"
+subtitle: "Multiple Linear Regression Model"
 author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
@@ -45,296 +45,346 @@ library(plotly)
 library(reshape2)
 library(haven)
 library(tidyverse)
+library(AER)
+library(gtools)
 ```
 
 
-# Recap from last week and today Plan 
+# Recap from last week
 
-* Introduction to causality
+* Causality versus correlation
 
-  * Causality versus correlation
-  * The Potential Outcome Framework a.k.a. Rubin's Causal Model
-  * Randomized controlled trials (RCTs)
+* The Potential Outcome Framework a.k.a. Rubin's Causal Model
+
+* Randomized controlled trials (RCTs)
 
 --
 
 ## Today - Multiple Linear Regression Model
 
-.pull-left[
-* Multiple regression model
-  * Interpretation of coefficients 
+* **Multiple Linear Regression Model**
 
-* Variations from the baseline model
-  * Standardized regression
-  * Log models 
-  * Interacting variables 
-  
-]
---
-.pull-right[
-* **Applications** 
+* *Extensions:* standardized regression; log models; interacting variables
 
-  * Class size and student achievments
+* Empirical applications:
+
+  * *Class size* and *student performance*
   
-  * Wage, education and gender 
-]
+  * *Wage*, *education* and *gender* 
 
 ---
 
-# Why making Multiple Regression
+# Class size and student performance
 
-* We already introduced what a **Simple Linear Model** is ...
-
-$$y_i = b_0 + b_1 x_i + e_i$$
-
-For example : 
-
-$$\textrm{Score_i} = b_0 + b_1 \textrm{classsize}_i + e_i$$
-
-* ... and how to estimate $b_0$ and $b_1$ from the data, that is making an **OLS** regression. 
-
-* Most of the time such a simple approach will **prevent you from making causal claim** about $b_1$. 
+* Let's go back to Angrist and Lavy's (1999)'s analysis of the effect of class size on student performance in Israel.
 
 --
 
-* So, what if we can **enrich the model** and take into account more factors? 
-
-  * For example, what if we also **control for** (some) schools and student characteristics (share of disaventaged people, school size,...)?
-  
-* That's what **Multiple Regression** allows us to do!
+* With a **simple linear regression**, we found that class size was positively ***associated*** with students' scores in maths and reading.
 
 ---
 
-# Mutiple Regression model 
+# Class size and student performance: Raw relationship
 
-Let's consider the following model
-
-$$y_i = b_0 + b_1 x_{i,1} + b_2x_{i,2} + b_3x_{i,3} + e_i$$
-* It's a multiple linear regression model with $3$ regressors. It can easily be generalized to more.
-
-  * N.B. : we now also have an index for the regressors: k=1,2,3,...
-
---
-
-* **Estimation** : We get the values for $(b_0, b_1, b_2, b_3)$ in the same way as before, with **OLS** estimation. 
-
-  * $(b_0^{OLS}, b_1^{OLS}, b_2^{OLS}, b_3^{OLS})$ are the values that minimize the **Sum of Squared Residuals**. 
-  
-  *  That is the $b$'s which minimize $\sum_{i}{e_i^2} = \sum_{i}{(y_i - \hat{y_i})^2}$ 
-  
-  where $\hat{y_i} = b_0 + b_1 x_{i,1} + b_2x_{i,2} + b_3x_{i,3}$
-
----
-
-# Interpreting coefficients in Multiple Regression Model 
-
-How do we interpret each individual coefficient in a multiple regression model: 
-
-> Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if all the regressors ( $x_1$, $x_2$, $x_3$,...) are equal to 0. **
-
-> Slope $(b_k)$: **The predicted change, on average, in the value of $y$ *associated* to a one-unit increase in $x_k$...** <br/>
-> $\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad$ **... keeping all the other regressors constant** !
-
-* Notice that the *keeping all the other regressors constant* is the only part that changes compared to SLM. 
-
-* It means that you are considering the indidivudal effect of the variable $k$ on $y$ **in isolation** of the effect that the other regressors might have. 
-
-* In math we talk it refers to the notion of *partial derivative* :  $b_k = \frac{\partial y}{\partial x_k}$
-
---
-
-* **Link with causal inference**: Only the regressors included in the model are hold constant, those who are not in the models can still vary and bias your estimates.  
-
----
-
-# Class size and student achievment
-
-* Let's reconsider the effect of class size on student achievment in a multiple regression framework.
-
-* Remember fom the previous class that we found : 
-  * .small[A predicted **increase** in test scores when class size increases with a **simple linear regression**.] 
-  * .small[A predicted **decrease** in test scores when class size increases with the **STAR experiment** data.]
-
-.pull-left[
-
-```{r, echo=FALSE, fig.height=4}
+```{r, echo=FALSE, fig.height=4.75, fig.width = 8}
 grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
 
-ggplot(grades, aes(x = classize, y = avgmath)) + 
-    geom_point(size = 2, alpha = 0.4) +
-  geom_jitter(alpha = 0.4) +
-    xlim(0,45) +
-    ylim(50, 100) +
-    labs(
-      x = "Class size",
-      y = "Average score",
-      title = "Mathematics test score") +
-    theme_bw(base_size = 18) +
+set.seed(123)
+
+grades %>%
+ggplot(aes(x = classize, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.5, position = "jitter") +
+  xlim(0,45) +
+  ylim(0, 100) +
+  labs(
+    x = "Class size",
+    y = "Average score",
+    title = "Mathematics") +
+  theme_bw(base_size = 14)
+```
+
+---
+
+# Class size and student performance: Raw relationship
+
+```{r, echo=FALSE, fig.height=4.75, fig.width = 8}
+set.seed(123)
+
+grades %>%
+ggplot(aes(x = classize, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.5, position = "jitter") +
+  xlim(0,45) +
+  ylim(0, 100) +
+  labs(
+    x = "Class size",
+    y = "Average score",
+    title = "Mathematics") +
+  theme_bw(base_size = 14) +
   geom_smooth(se = FALSE, method = "lm")
 ```
 
+---
+
+# Class size and student performance: Raw relationship
+
+.pull-left[
+```{r, echo=FALSE, fig.height=6}
+set.seed(123)
+
+grades %>%
+ggplot(aes(x = classize, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.5, position = "jitter") +
+  xlim(0,45) +
+  ylim(0, 100) +
+  labs(
+    x = "Class size",
+    y = "Average score",
+    title = "Mathematics") +
+  theme_bw(base_size = 20) +
+  geom_smooth(se = FALSE, method = "lm")
+```
 ]
 
 .pull-right[
 
-<br/>
+```{r}
+lm(avgmath ~ classize, grades)
+```
 
-* On average, an increase in class size (by one student) is associated to an increase in math test score by `r round(lm(avgmath~classize, grades)$coefficients[2],2)`. 
+* *Interpretation:* ***On average***, a 1-student increase in class size is ***associated*** to a `r round(lm(avgmath~classize, grades)$coefficients[2],2)` points increase in average math score.
 ]
 
 ---
 
-# Class size and student achievment
+# Class size and student performance
 
-* .small[But we may suspect that (a lot of) other things also change when considering classes of smaller / bigger size.]
+* Let's go back to Angrist and Lavy's (1999)'s analysis of the effect of class size on student performance in Israel.
 
-* .small[In particular, we mentioned the **location effect** : Large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.]
+* With a **simple linear regression**, we found that class size was positively ***associated*** with students' scores in maths and reading.
 
-* .small[Let's look at the link between class size and **the share of student who come from disadvantaged background** in the class (`disadvantaged` variable).]
+* This is intuitively unexpected, and contrasts with the simple results from the *STAR* randomized experiment.
 
-```{r, echo = FALSE, fig.height=3, fig.width=5}
-ggplot(grades, aes(x = classize, y = disadvantaged)) + 
-    geom_point(size = 2, alpha = 0.4) +
-  geom_jitter(alpha = 0.4) +
-    xlim(0,45) +
-    ylim(0,85) +
-    labs(
-      x = "Class size",
-      y = "Average",
-      title = "Percent of class coming from disadvantaged background") +
-    theme_bw(base_size = 10) +
-  geom_smooth(se = FALSE, method = "lm")
-```
-
----
-
-# Class size and student achievment
-
-* On average, small size classes concentrate **more students from disadvantaged background**
-
-* And in the same time, we observe that students from disadvantaged background **also have lower scores on average**. 
-
-```{r, echo = FALSE, fig.height=3.5, fig.width=6}
-ggplot(grades, aes(x = disadvantaged, y = avgmath)) + 
-    geom_point(size = 2, alpha = 0.4) +
-  geom_jitter(alpha = 0.4) +
-    xlim(0,80) +
-    ylim(25, 100) +
-    labs(
-      x = "Percent of class coming from disadvantaged background",
-      y = "Average Score",
-      title = "Mathematics") +
-    theme_bw(base_size = 15) +
-  geom_smooth(se = FALSE, method = "lm")
-```
-
-
----
-
-# Class size and student achievment
-
-* Not taking into account the `disadvantaged` variable would then lead to **omitted variable bias** in our class size estimate. 
-
-* It is when you omit a variable that **causes your outcome and that is correlated with your regressor(s)**.
-
-  * .small[N.B. : Here we did not actually proove that more `disadvantaged` students *causes* the grades to be lower but it seems quite reasonable.]
-  
 --
 
-* So, if we want to isolate the effect of class size from the effect of coming from a more/less disadvantaged background...
+* Could it be that some other variable may be related to class size ***as well as*** students' performance?
 
-* ... we have to include both variables in our regression.
+* In particular, we mentioned the **location effect**: large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.
 
-  * Then, we will be able to get an estimate of the effect of class size on grades, ** *purged* from the effect of the disadvantaged variable**.
+--
+
+* Let's investigate this hypothesis.
 
 ---
 
-# Multiple regression in practice 
+# Class size and student performance: Confounders
 
-Let's regress the math test score on class size **and** the share of disadvantaged student per class. 
+.pull-left[
+Link between **class size** and **the share of student who come from `disadvantaged` background** in the class.
 
-$$ \textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{disadvantaged}_i + e_i$$
-
-```{r,echo=FALSE}
-grades_avg_cs = grades %>%
-  group_by(classize) %>%
-  summarise(avgmath_cs = mean(avgmath),
-            avgverb_cs = mean(avgverb), 
-            avgdisad_cs = mean(disadvantaged))
+```{r, echo = FALSE, fig.height=4.75, fig.width = 8}
+ggplot(grades, aes(x = disadvantaged, y = classize)) + 
+  geom_point(size = 2, alpha = 0.4, position = "jitter") +
+  xlim(0,100) +
+  ylim(0,45) +
+  labs(
+    x = "% class coming from disadvantaged background",
+    y = "Class size",
+    title = "Relationship with class size") +
+  theme_bw(base_size = 20) +
+  geom_smooth(se = FALSE, method = "lm")
 ```
 
-* The **R command** will be exactly the same as for **S**imple **L**inear **R**egressions
+`r emo::ji("point_right")` On average, there is a greater % of disadvantaged students in smaller classes.
+]
 
-  * except here your will put several regressors on the right hand side seprarated by `+`.
+--
+
+.pull-right[
+Link between **average math score** and **the share of student who come from `disadvantaged` background** in the class.
+
+```{r, echo = FALSE, fig.height=4.75, fig.width = 8}
+ggplot(grades, aes(x = disadvantaged, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.4, position = "jitter") +
+  xlim(0,100) +
+  ylim(0,100) +
+  labs(
+    x = "% class coming from disadvantaged background",
+    y = "Average math score",
+    title = "Relationship with average math score") +
+  theme_bw(base_size = 20) +
+  geom_smooth(se = FALSE, method = "lm")
+```
+
+`r emo::ji("point_right")` On average, the greater the % of students coming from a disadvantaged background, the lower the average math score.
+
+]
+---
+
+# Class size and student performance: Multiple regression
+
+* Suppose we want to know the effect of class size on average math scores, ***controlling for*** the fact that there is a negative relationship between the % of disadvantaged students and class size **AND** average math score.
+
+--
+
+* To do so, we have to include both `classize` and `disadvantaged` variables as *regressors* in the regression.
+
+--
+
+* As such we can obtain an estimate of the effect of class size on average math score, ** *purged* of the effect of the disadvantaged variable**.
+
+--
+
+* The model we want to estimate becomes:
+
+$$
+ \textrm{mathscore}_i = b_0 + b_1 \textrm{classize}_i + b_2 \textrm{disadvantaged}_i + e_i
+$$
+--
+
+* This is ***multiple regression***! We will estimate this model in a few slides. Let's formalize what we have seen so far.
+
+---
+
+# Multiple Regression's Purpose
+
+* Recall from two weeks ago, the **Simple Linear Model** can be written as
+
+$$y_i = b_0 + b_1 x_i + e_i,$$
+
+where $y_i$ is the ***dependent variable*** and $x_i$ is the ***independent variable***.
+
+--
+
+`r emo::ji("warning")` Unless all other factors affecting $y_i$, i.e. $e_i$, are uncorrelated with $x_i$, $b_1$ **cannot be interpreted as a causal effect**.
+
+--
+
+We need to **enrich the model** and take into account factors that are simultaneously related to $y_i$ **and** $x_i$.
+
+---
+
+# Mutiple Regression Model
+
+The expanded model can be written as:
+
+$$y_i = b_0 + b_1 x_{1,i} + b_2 x_{2,i}  + b_3 x_{3,i} + \dots + b_k x_{k,i} + e_i,$$
+
+where $x_1$, $x_2$, ..., $x_k$ are $k$ regressors, and $b_1$, $b_2$, ..., $b_k$ are the associated $k$ coefficients.
+
+--
+
+***Estimation***: We obtain the values for $(b_0, b_1, b_2, ..., b_k)$ in the same way as before, using **OLS**. 
+
+* $(b_0^{OLS}, b_1^{OLS}, b_2^{OLS}, ..., b_k^{OLS})$ are the values that minimize the **Sum of Squared Residuals**. 
   
-* Here is the command for the above equation: 
-```{r, eval = FALSE}
+* That is they minimize
+$$
+\begin{align}
+\sum_{i}{e_i^2} &= \sum_{i}{(y_i - \hat{y_i})^2} \\
+&= \sum_{i}{[y_i - (b_0 + b_1 x_{1,i} + b_2 x_{2,i}  + b_3 x_{3,i} + \dots + b_k x_{k,i})]^2}
+\end{align}
+$$
+
+---
+
+# Multiple Regression Model: Interpretation
+
+For now assume both the dependent variable $(y_i)$ and the independent variables $(x_k)$ are numeric.
+
+> Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if all the regressors $(x_1, x_2, x_3,...)$ are equal to 0.**
+
+--
+
+> Slope $(b_k)$: **The predicted change, on average, in the value of $y$ *associated* to a one-unit increase in $x_k$...** <br/>
+> $\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad$ **... keeping all the other regressors constant!**
+
+--
+
+* Notice that the *keeping all the other regressors constant* is the only part that changes compared to SLM.
+
+* In other words, you are considering the indidivudal effect of the variable $x_k$ on $y$ **in isolation** of the effect that the other regressors might have on $y$.
+
+--
+
+* **Link with causal inference**: Only the regressors included in the model are held constant, those that are not in the model can still vary and "bias" your estimates.
+
+---
+
+# Multiple Regression with `R`
+
+* Very similar to simple linear regression:
+
+```{r, echo = TRUE, eval = FALSE}
+lm(formula = dependent variable ~  independent variable 1 + independent variable 2 + ...,
+   data = data.frame containing the data)
+```
+
+--
+
+## Class size and student performance: Multiple regression
+
+Let's estimate the model from earlier on by OLS: $\textrm{mathscore}_i = b_0 + b_1 \textrm{classize}_i + b_2 \textrm{disadvantaged}_i + e_i$
+ 
+```{r}
 lm(avgmath ~ classize + disadvantaged, grades)
 ```
 
---
-
-.pull-left[
-* And these are the estimates we get :   
-```{r, echo=FALSE, eval=TRUE, out.height=3}
-lm(avgmath ~ classize + disadvantaged, grades)$coefficients
-```
-]
-
---
-
-.pull-right[
-* You can compare with the class size estimate we got from the SLR :   
-```{r, echo=FALSE, eval=TRUE, out.height=3}
-lm(avgmath ~ classize, grades)$coefficients
-```
-]
 
 ---
 
-# Multiple regression in practice 
+# Class size and student performance: Multiple regression
 
-```{r, echo=FALSE, eval=TRUE, out.height=3}
-lm(avgmath ~ classize + disadvantaged, grades)$coefficients
+```{r, echo = FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)
 ```
 
-* **Question** 
+***Questions***
 
-  * .small[How do you interpret each of these coefficients?]
-  * .small[How do you explain the evolution of `classize` estimate compared to the SLM case?] 
+1. How do you interpret each of these coefficients?
+1. How do you explain the change in the `classize` coefficient compared to the SLM case?
 
 ---
 
-# Multiple regression in practice 
+# Class size and student performance: Multiple regression
 
-```{r, echo=FALSE, eval=TRUE, out.height=3}
-lm(avgmath ~ classize + disadvantaged, grades)$coefficients
+```{r, echo = FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)
 ```
 
-**Answers** 
+***Answers***
 
-1) How do you interpret each of these coefficients?
+1\. How do you interpret each of these coefficients?
 
-* $b_0$ = 69.9 : .small[When `class size` and `disadvantaged` are set to 0, the *predicted* value of the math score is 69.9]
-
-* $b_1$ = 0.07 : .small[Keeping the share of *disadvantaged students* constant in the class, if we increase the class size by 1 student, the math score will increase (on average) by 0.07 (point).]
-
-* $b_2$ = - 0.34 : .small[Keeping the *class size* constant, if we increase the share of *disadvantaged students* by **one percentage point**, the math score will decrease (on average) by 0.34 (point).]
+* $b_0$ = 69.9: When `class size` and `disadvantaged` are set to 0, the *predicted* value of the average math score is 69.9.
 
 --
 
-2) How do you explain the evolution of `classize` estimate compared to the SLM case?
+* $b_1$ = 0.07: Keeping the share of *disadvantaged students* constant in the class, a 1-student increase in class size is ***associated, on average,*** with a 0.07 point increase in average math score.
 
-* $b_1$ .small[decreases by taking into account the `disadvantaged` variable. It was expected since part of this positive effect is actually due to the smaller share of disadvantaged students in bigger classes.]
+--
+
+* $b_2$ = - 0.34: Keeping the *class size* constant, a 1-percentage point increase in the share of *disadvantaged students* is ***associated, on average,*** with a 0.34 point decrease in average math score.
+
+---
+
+# Class size and student performance: Multiple regression
+
+```{r, echo = FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)
+```
+
+***Answers***
+
+2\. How do you explain the change in the `classize` coefficient compared to the SLM case?
+
+* $b_1$ decreases when the `disadvantaged` variable is taken into account. This was expected since part of the positive effect of class size was partly due to the smaller share of disadvantaged students in bigger classes.
   
 ---
 
-# Multiple regression in 3D
-
-Multiple Regression - a plane in 3D. 
+# Multiple Regression in 3D
 
 
-```{r plane3D-reg,fig.width=8,fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+```{r plane3D-reg, echo=FALSE, message=FALSE, warning=FALSE}
 # linear fit
 fit <- lm(avgmath ~ classize + disadvantaged, grades)
  
@@ -369,221 +419,245 @@ grades %>%
 
 class:inverse
 
-# Task 1 (10 min)
+# Task 1 (10 minutes)
 
-Let's see how it goes for the **reading** score. 
+Let's analyse the regression results using **reading** score as the dependent variable.
 
-First of all, load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) using the `read_dta()` from the `haven` package. Assign it to a dataframe called `grades`. 
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) using the `read_dta()` function from the `haven` package. Assign it to an object `grades`.
 
-1) Regress the `avgverb` (reading) test score on `classize` and `disadvantaged` and assign it to `reg`. 
+1. Regress `avgverb` on `classize` and `disadvantaged`. Assign the output to a new object `reg`. 
 
-2) Look at the coefficients of this regression by running `reg$coefficients`. How do they compare with the math score regression? 
-```{r, echo = FALSE, eval=FALSE}
-lm(avgverb ~ classize + disadvantaged, grades)$coefficients
-```
+1. Look at the coefficients of this regression by running `reg$coefficients`. How do they compare with the math score regression coefficients?
 
-3) What are the other available variables that we may add in the regression? 
-  * Run the regression with all these variables and assign it to `reg_full`. 
+1. What are the other available variables that we may add in the regression? 
+  * Run the regression with all these variables and assign it to `reg_full`.
   * Look at the coefficients.
-  * Discuss all estimates, both their sign and magnitude. 
-```{r, echo = FALSE, eval=FALSE}
-lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)$coefficients
-```
+  * Discuss all coefficients: sign and magnitude.
 
 ---
 
-# Multicollinearity issue
+# No Perfect Collinearity
 
-There is a rule to follow when adding variables in your model. 
+There is one condition to satisfy to add regressors to the model:
 
-* Intuitively, we want to add what we thinks is important to explain the variations in our outcome. 
+> Any additional variable needs to add **at least *some* new information**.
 
-* In practice, there is a technical restriction : any additional variable needs to add **at least *some* new information**. 
+--
 
-  * We often refer to this condition as the **Rank condition** : we need our matrix of $X$s (our regressors) to be of [full rank](https://en.wikipedia.org/wiki/Rank_(linear_algebra)). 
+In other words, regressors **cannot be perfectly collinear**, i.e. not linear combinations of one another:
 
-* In other words, regressors **must not be perfectly collinear**, i.e. not perfectly linearly dependent.
+  $$ x_2 \neq ax_1 + b $$ 
 
-  $$ x_2 = ax_1 + b $$ 
+--
 
-* N.B.: Even if not perfectly correlated, the individual effects of highly correlated regressors are hard to disantangle. 
+Even if not perfectly correlated, the individual effects of highly correlated regressors are hard to disantangle.
 
----
+--
 
-# Multicollinearity : example
-
-Let's consider $\textrm{is.female}$ and $\textrm{is.male}$ are perfectly colinear, we have : $$\textrm{is.male = 1 - is.female}$$
-
-* We don't get any additional info from $\textrm{is.male}_i$ about $i$ if we already know the value of $\textrm{is.female}_i$. 
-
-* Let's write our standard regression model including both variables 
-
-$$ y = b_0 + b_1 \textrm{is.female} + b_2 \textrm{is.male} + e $$ 
-So we have 
-
-
-$$\begin{align}
-y_i &= b_0 + b_1 \textrm{is.female} + b_2 (1 - \textrm{is.female}) + e \\
-                    &= b_0 + b_2 + (b_1 - b_2) \textrm{is.female} +e 
-  \end{align}$$
-
-* We cannot tell $b1$ and $b_2$ apart! That's an *identification problem*.
-
-* We cannot solve the the minimization problem of the SSR! That's a *numerical problem*.
+Note that this implies that the number of observations has to be greater than the number of independent variables.
 
 ---
 
 class: inverse
 
-# Task 2 (5 min)
+# Task 2 (7) minutes)
 
-.small[Still need to think about this multicollinearity issue? Let's try to run a regression when there is a perfect linear dependence between them.]
+Still need to think about this perfect collinearity issue? Let's run a regression where there is perfect linear dependence between regressors.
 
-1) .small[First, generate some toy data with the following code and make sure you understand each piece of code.]
+1. Load the *STAR* data from [here]("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1") and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_df),]`  
+Keep only second graders and small and regular class groups.
 
-```{r,eval=FALSE}
-set.seed(2)
-toy_data = data.frame(wage = rnorm(10,1000,100), 
-                      is.female = sample(c(0,1),10,replace = T))
-toy_data$is.male = 1 - toy_data$is.female
-```
+1. Create a dummy variable `small` equal to `TRUE` if students are in a small class and `FALSE` if they are in a regular class. In the same way, create a dummy variable `regular` equal to `TRUE` if students are in a regular class and to `FALSE` if they are in a small class. Clearly these two variables are perfectly collinear.
 
-2) .small[Run the regression of `wage` on both `is.female` and `is.male`. What happens?] 
+1. Regress `small` on `math`. What is the average predicted `math` score of students in a small class?
 
-3) .small[Run the regression of `wage` on `is.male` only. What is the average predicated `wage` for women?] 
+1. Regress `regular` on `math`. What is the average predicted `math` score of students in a regular class?
 
-4) .small[Run the regression of `wage` on `is.female` only. What is the average predicated `wage` for women again?]
+1. Regress `small` and `regular` on `math`. What do you notice? Can you explain why?
 
-5) .small[Redo 3) and 4) but computing the predicted wage of men.] 
+---
+
+# Adjusted $R^2$
+
+* Not of great importance but because it is so widely reported you just need to know it.
+
+--
+
+* By construction, $R^2$ will always increase when a new regressor is added to the regression.
+
+--
+
+* The *adjusted $R^2$* imposes a penalty for adding regressors to the model. The details are not crucial as in the vast majority of cases the $R^2$ and the adjusted $R^2$ are pretty similar.
+
+---
+
+# Ommitted variable bias (OVB)
+
+* ***ommitted variable bias***: Omitting important control variables from the regression model
+
+* This renders the coefficient for your regressor of interest unreliable.
+
+--
+
+* Recall our previous example of class size and disadvantaged students. Not taking into account the `disadvantaged` variable let to a OVB for our class size estimate.
+
+--
+
+* The formula for OVB is:
+
+$$\textrm{OVB} = \{ \textrm{Relationship between } disadvantaged_i \textrm{ and } classize_i \} \\ * \{ \textrm{Effect of } disadvantaged_i \textrm{ in multiple regression} \}$$
+
+--
+
+* From this formula you obtain both the *mangitude* of OVB and its *sign* (positive/negative).
+
+--
+
+* The relationship between `disadvantaged` and `classize` is negative, and the effect of `disadvantaged` in the multiple regression is negative, therefore the OVB is positive. In other words, ommitting `disadvantaged` from the regression leads to an inflated coefficient for class size.
 
 ---
 
 # Variations from the baseline model 
 
-Facing different datasets and different relationships between the variables of interest, you may need to move away from the baseline model.  
+Depending on the dataset and the relationships between the variables of interest, you may need to move away from the baseline model.  
 
-* We will focus on 3 important variations : 
+* We will focus on 3 important variations:
 
-  * **Standardized regressions**
+  * ***Standardized regressions***
 
-  * **Log models**
+  * ***Log models***
 
-  * Regressors **interactions**
+  * ***Interactions between regressors***
 
+--
 
-* In each case,  the way we estimate these coefficients does not change. 
+* In each case, the way we estimate these coefficients does not change (i.e OLS).
 
-* However, the way we interpret our coefficients $(b_1, b_2,..., b_k)$ does change. 
+--
+
+* However, the way we interpret our coefficients $(b_1, b_2,..., b_k)$ does change!
 
 ---
 
-# Standardizing regression
+# Standardized Regression
 
-Let's define what *standardizing* a variable means. 
+Let's define what *standardizing* a variable means.
 
-> **Standardizing** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation
+> ***Standardizing*** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
 
 $$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
-where $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{VAR}(z)}$.
+where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{VAR}(z)}$.
 
-* Why would we do that in the first place? i.e. standardizing $Y$ and / or the $X$s 
+* Why would we do that in the first place?
 
 --
 
-* Intuitively, standardizing is about **putting things on the same scale** so we can compare between each other. 
+* Intuitively, standardizing **puts variables on the same scale** so we can compare them.
   
-* In our class size / student achievment case, it will help to interpret : 
+* In our class size and student performance example, it will help to interpret: 
 
-  * The **magnitude** of the effects 
-  * The **relative importance of each variable**
+  * The **magnitude** of the effects,
+  * The **relative importance of each variable**.
 
 ---
 
-# Standardizing regression : interpretation
+# Standardizing Regression: Interpretation
 
-* If dependant variable $y$ is standardized
+* If the dependent variable $y$ is standardized:
 
-  * By definition, $b_k$ is measuring the predicted change in ** $y^{stand}$ **  associated with a one unit increase in $x_k$. 
+--
+
+  * By definition, $b_k$ measures the predicted change in ** $y^{stand}$ **  associated with a one unit increase in $x_k$.
   
-  * If $y^{stand}$ increases by one, it means that $y$ increases by one standard deviation, so $b_k$ is measuring the change in $y$ **as a share of its own standard deviation**.
+  * If $y^{stand}$ increases by one, it means that $y$ increases by one standard deviation. So $b_k$ measures the change in $y$ **as a share of $y$'s standard deviation**.
   
 --
 
-* If the regressor $X_k$ is standardized
+* If the regressor $x_k$ is standardized:
 
-  * By definition, $b_k$ is measuring the predicted change in $Y$ associated with a one unit increase in ** $x_k^{stand}$ **. 
+--
+
+  * By definition, $b_k$ measures the predicted change in $y$ associated with a one unit increase in ** $x_k^{stand}$ **. 
   
-  * If $x_k^{stand}$ increase by one unit, it means that $x_k$ increases by one standard deviation. So $b_k$ is measuring the predicted change in $y$ **associated with an increase in $x_k$ by one standard deviation.**. 
+  * If $x_k^{stand}$ increases by one unit, it means that $x_k$ increases by one standard deviation. So $b_k$ measures the predicted change in $y$ **associated with an increase in $x_k$ by one standard deviation**. 
   
 ---
 
 class:inverse
 
-# Task 3 (7min)
+# Task 3 (7 minutes)
 
-.small[Let's take back our `grades` dataset. This are the estimates we got from regressing the math test score on the full set of regressors.] 
+Let's go back our `grades` dataset. These are the estimates we got from regressing the math test score on the full set of regressors.
 
 ```{r echo = FALSE}
-reg5 = lm(avgmath~classize + disadvantaged + school_enrollment + religious + female, data = grades)
-reg5$coefficients
+reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
+reg_full$coefficients
 ```
 
-.small[1) Add the standardized math score as the `avgmath_stand` variable in your dataset. You can use the `standardie()` function from the `jtools` package or do it by hand with base R.]
+1. Create a new variable `avgmath_stand` equal to the the standardized math score. You can use the `standardize()` function from the `jtools` package or do it by hand with base `R`.
 
-.small[2) Run the full regression for the standardized math test score. Interpret the coefficient and their magnitude.]
+1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
 
-.small[3) If you were to pick the most influencial variable on the math score, what would it be?]
+1. If you were to pick the most influential variable on the math score, what would it be?
 
-.small[4) Add the standardized value of each *continous* regressor as a new variable called `*<regressor>*_stand`] . 
-  * .small[Why do we prefer not to standardize the `religious` variable?] 
-  
-.small[5) Reegress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.]
+1. Add the standardized variables for each *continuous* regressor as `<regressor>_stand`.
+  * Would it make sense to standardize the `religious` variable?
+
+1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
 ---
 
-# Log models 
+# Log Models
 
-* The specification we have seen so far can be called **level-level** specification. Both the dependent and the independent variables are measured in level.
+* The models we have seen so far can be called ***level-level*** specifications. Both the dependent and the independent variables have been measured in level.
+
+--
 
   * This *level* can be: euros, years, number of students,... and even percentage.
+  
+--
 
-* Taking the log of the dependent and / or the independent variable leads us to define 3 other type of regression :
+* Taking the log of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions:
 
-  * **Log - level**: $\quad \textrm{log}(y_i) = b_0 + b_1 x_{i,1} + ... + e$
+  * ***Log - level***: $\quad log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i$
 
-  * **Level - log**: $\quad \textrm{y}_i = b_0 + b_1 log(x_{i,1}) + ... + e$
+  * ***Level - log***: $\quad \textrm{y}_i = b_0 + b_1 log(x_{1,i}) + ... + e_i$
 
-  * **Log - log**: $\quad \textrm{log}(y_i) = b_0 + b_1 log(x_{i,1}) + ... + e$
-
-* We will see how the **interpretation** changes and **why** to use these kind of models. 
+  * ***Log - log***: $\quad log(y_i) = b_0 + b_1 log(x_{1,i}) + ... + e_i$
 
 ---
 
-# Interpretating log models
+# Log Models: Interpretation
 
-Here is a table that summarise how to interpret regressor coefficient in each case:  
+Here is a table that summarise how to interpret regressor coefficients in each case:  
 
 |    Model           | Equation  |  Interpretation of $b_1$            |
 |--------------------|:---------:|:-----------------------------------:|
-| Level - Level | $y = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in x is associated with <br/>] $b_1$ .small[**unit change** in y]  |
-| Log - Level | $\textrm{log}(y) = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in x is associated with <br/> ] $b_1$ .small[ **percent change** in y]  |
-| Level - Log | $\textrm{y} = b_0 + b_1 log(x_{1})  + e$ | .small[**One percent** increase in x is associated with<br/>] $b_1/100$ .small[**unit change** in y] |
-| Log - Log  |  $\textrm{log}(y) = b_0 + b_1 log(x_{1}) + e$ | .small[**One percent** increase in x is associated with<br/>] $b_1$ .small[**percent change** in y]  |
+| Level - Level | $y = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with ] $b_1$ .small[**unit change** in y]  |
+| Log - Level | $log(y) = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1$ .small[ **percent change** in y]  |
+| Level - Log | $y = b_0 + b_1 log(x_{1})  + e$ | .small[**One percent** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1/100$ .small[**unit change** in y] |
+| Log - Log  |  $log(y) = b_0 + b_1 log(x_{1}) + e$ | .small[**One percent** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1$ .small[**percent change** in y]  |
 
 
-* It looks like cooking recipes but of course it can be derived with (basic) algebra. 
+* It looks like cooking recipes but of course it can be derived with some calculus. 
 
 ---
 
 # When do we use log models?
 
-There are various reasons for which we would want to use log models
+There are several reasons why we would want to use log models:
 
-* Account for **non linearity** in the relationship between $y$ and $x$.
+--
 
-* Log-log models allow us to interpret coefficients as <a href="https://en.wikipedia.org/wiki/Elasticity_(economics)">elasticities</a> which have a central role in economic theory.
+* Account for ***non linearity*** in the relationship between $y$ and $x$.
 
-* Limit the influence of **outliers**. 
-  * It comes from the concavity of the *log* function. 
+--
+
+* Interpret coefficients as <a href="https://en.wikipedia.org/wiki/Elasticity_(economics)">***elasticities***</a> which play a central role in economic theory.
+
+--
+
+* Limit the influence of ***outliers*** (due to the concavity of the *log* function).
 
 ---
 
