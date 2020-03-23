@@ -35,10 +35,10 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-# define vars
-om = par("mar")
-lowtop = c(om[1],om[2],0.1,om[4])
-library(magrittr)
+library(tidyverse)
+library(tweenr)
+library(ggforce)
+library(gganimate)
 
 ```
 
@@ -61,51 +61,36 @@ library(magrittr)
 
 .center[
 ```{r, echo = FALSE, out.width = "600px"}
-knitr::include_graphics("../img/photos/pasta1.JPG")
+knitr::include_graphics("../img/photos/pasta/pasta_bowl.JPG")
 ```
 ]
 
 --
 
-We could count every green pasta but that would be tedious! `r emo::ji("weary")`
-
----
-
-# Full Census is Costly
-
-
-.center[
-```{r, echo = FALSE, out.width = "600px"}
-knitr::include_graphics("../img/photos/pasta3.JPG")
-```
-]
-
---
-
-What else could we do?
+We could count every green pasta but that would be tedious! `r emo::ji("weary")` What else could we do?
 
 ---
 
 # Sampling
 
 .pull-left[
-* Let's take a sample of $20$ fusilli.
+* Let's take a sample of 20 pasta.
 
-* We made sure to selected fusilli at **random**.
+* We made sure to selecte them at **random**.
 
 * Here is what we found.
 
 Color | Count | Proportion
 :------:|:------:|:--------:
-Red   |  7        |  0.35
-Green   |  5     |   0.25
-White   |  8    |     0.4
+Red   |  14        |  `r round(14/20,2)`
+Green   |  5     |   `r round(5/20,2)`
+White   |  1    |     `r round(1/20,2)`
 
-* 0.34 can be thought of as our guess of the proportion of green pasta in the entire bowl.
+* 0.70 can be thought of as our guess of the proportion of green pasta in the entire bowl.
 ]
 
 .pull-right[
-<div><img src="../img/photos/pasta5.JPG"?></div>
+<div><img src="../img/photos/pasta/sample1.JPG"?></div>
 ]
 
 ---
@@ -113,7 +98,7 @@ White   |  8    |     0.4
 # Sampling Variation
 
 
-* What would happen if we took a *new* sample (putting the 20 previous pasta back in the bowl)? Would we also get 5 *greens* as before?
+* What would happen if we took a *new* sample (putting the 20 previous pasta back in the bowl)? Would we also get 14 *greens* as before?
 
 --
 
@@ -137,6 +122,11 @@ White   |  8    |     0.4
 
 * This is what each looked like:
 
+![:scale 100%](../img/photos/pasta/sample1.JPG) | ![:scale 100%](../img/photos/pasta/sample2.JPG) | ![:scale 100%](../img/photos/pasta/sample3.JPG) | ![:scale 100%](../img/photos/pasta/sample4.JPG) | ![:scale 100%](../img/photos/pasta/sample5.JPG) | ![:scale 100%](../img/photos/pasta/sample6.JPG)
+:------:|:------:|:--------:|:--------:|:--------:|:--------:
+![:scale 100%](../img/photos/pasta/sample7.JPG) | ![:scale 100%](../img/photos/pasta/sample8.JPG) | ![:scale 100%](../img/photos/pasta/sample9.JPG) | ![:scale 100%](../img/photos/pasta/sample10.JPG) | ![:scale 100%](../img/photos/pasta/sample11.JPG) | ![:scale 100%](../img/photos/pasta/sample12.JPG)
+![:scale 100%](../img/photos/pasta/sample13.JPG) | ![:scale 100%](../img/photos/pasta/sample14.JPG) | ![:scale 100%](../img/photos/pasta/sample15.JPG) | ![:scale 100%](../img/photos/pasta/sample16.JPG) | ![:scale 100%](../img/photos/pasta/sample17.JPG) | ![:scale 100%](../img/photos/pasta/sample18.JPG)
+
 ---
 
 # Taking 18 Samples (One per Student)
@@ -148,29 +138,29 @@ White   |  8    |     0.4
 .pull-left[
 Sample # | Count | Proportion
 :------:|:------:|:--------:
-1 | 6 | 0.3
-2 | 5 | 0.25
-3 | 5 | 0.25
-4 | 6 | 0.3
-5 | 3 | 0.15
-6 | 6 | 0.3
-7 | 5 | 0.25
-8 | 5 | 0.25
-9 | 4 | 0.2
+1 | 14 | `r round(14/20,2)`
+2 | 14 | `r round(14/20,2)`
+3 | 10 | `r round(10/20,2)`
+4 | 10 | `r round(10/20,2)`
+5 | 6 | `r round(6/20,2)`
+6 | 10 | `r round(10/20,2)`
+7 | 8 | `r round(8/20,2)`
+8 | 9 | `r round(9/20,2)`
+9 | 11 | `r round(11/20,2)`
 ]
 
 .pull-right[
 Sample # | Count | Proportion
 :------:|:------:|:--------:
-10 | 5 | 0.25
-11 | 4 | 0.2
-12 | x | x
-13 | x | x
-14 | x | x
-15 | x | x
-16 | x | x
-17 | x | x
-18 | x | x
+10 | 8 | `r round(8/20,2)`
+11 | 7 | `r round(7/20,2)`
+12 | 9 | `r round(9/20,2)`
+13 | 9 | `r round(9/20,2)`
+14 | 14 | `r round(14/20,2)`
+15 | 11 | `r round(11/20,2)`
+16 | 10 | `r round(10/20,2)`
+17 | 7 | `r round(7/20,2)`
+18 | 13 | `r round(13/20,2)`
 ]
 
 ---
@@ -191,15 +181,10 @@ class: inverse
 
 .pull-left[
 ```{r, echo=FALSE, eval = TRUE, fig.height=8}
-pasta_samples <- data.frame(group = 1:11, replicate = 1:11, prop_green = c(0.3,0.25,0.25,0.3,0.15,0.3,0.25,0.25,0.2,0.25,0.2))
-
-library(tidyverse)
-library(tweenr) # Available on CRAN
-library(ggforce) # Install from thomasp85/ggforce
-library(gganimate) # Install from dgrtwo/gganimate
+pasta_samples <- data.frame(replicate = 1:18, prop_green = c(0.7,0.7,0.5,0.5,0.3,0.5,0.4,0.45,0.55,0.4,0.35,0.45,0.45,0.7,0.55,0.5,0.35,0.65))
 
 # set.seed(2)
-# x = c(0.3,0.25,0.25,0.3,0.15,0.3,0.25,0.25,0.2,0.25,0.2,0.2,0.35,0.25,0.3,0.35,0.4,0.2,0.25)
+# x = pasta_samples[,2]
 # 
 # df <- data.frame(x = x, y = 15)
 # dfs <- list(df)
@@ -220,8 +205,8 @@ library(gganimate) # Install from dgrtwo/gganimate
 #     x = "Proportion of green fusilli",
 #     y = "Frequency"
 #   ) +
-#   ylim(0, 13.5) +
-#   xlim(0, 0.5) +
+#   xlim(0.25, 0.75) +
+#   scale_y_continuous(breaks = seq(0,12, 2)) +
 #   theme_bw(base_size = 14) +
 #   transition_manual(.frame)
 # p
@@ -230,6 +215,8 @@ library(gganimate) # Install from dgrtwo/gganimate
 knitr::include_graphics("../img/photos/hist_building.gif")
 ```
 ]
+
+--
 
 .pull-right[
 ```{r, echo=FALSE, eval = TRUE, fig.height=7}
@@ -240,7 +227,7 @@ pasta_samples %>%
     x = "Proportion of green pasta",
     y = "Frequency"
   ) +
-  xlim(0,0.5) +
+  xlim(0.25, 0.7) +
   theme_bw(base_size = 20)
 ```
 ]
@@ -251,7 +238,21 @@ pasta_samples %>%
 
 .pull-left[
 ```{r, echo=FALSE, eval = TRUE, fig.height=8}
-knitr::include_graphics("../img/photos/hist_building.gif")
+# p_vline <- ggplot(dft) +
+#   geom_vline(xintercept = 352/(352+211+150), size = 1, colour = "black") +
+#   geom_point(aes(x, y), shape = 21, colour = "black", fill = "darkgreen", size = 13, stroke = 1) +
+#   labs(
+#     x = "Proportion of green fusilli",
+#     y = "Frequency"
+#   ) +
+#   xlim(0.25, 0.75) +
+#   scale_y_continuous(breaks = seq(0,12, 2)) +
+#   theme_bw(base_size = 14) +
+#   transition_manual(.frame)
+# p_vline
+# anim_save(filename = "img/photos/hist_building_vline.gif", animation = p_vline)
+
+knitr::include_graphics("../img/photos/hist_building_vline.gif")
 ```
 ]
 
@@ -264,8 +265,9 @@ pasta_samples %>%
     x = "Proportion of green pasta",
     y = "Frequency"
   ) +
-  xlim(0,0.5) +
-  theme_bw(base_size = 20)
+  xlim(0.25, 0.7) +
+  theme_bw(base_size = 20) +
+  geom_vline(xintercept = 352/(352+211+150), size = 1, colour = "black")
 ```
 ]
 
@@ -365,7 +367,7 @@ virtual_shovel
 
 .pull-left[
 ```{r}
-virtual_shovel %>% 
+sample_1 <- virtual_shovel %>% 
   summarize(
     num_red = sum(color == "red"),
     sample_n = n()) %>% 
