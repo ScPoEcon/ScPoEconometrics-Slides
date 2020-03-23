@@ -586,9 +586,9 @@ df %>%
     title = "Comparing distributions of proportions of green pasta for different sample sizes"
   ) +
     facet_wrap(~sample_n, labeller = as_labeller(
-        c(`25` = "Samples of size 25",
-          `50` = "Samples of size 50",
-          `100` = "Samples of size 100"))) +
+        c(`25` = "1000 samples of size 25",
+          `50` = "1000 samples of size 50",
+          `100` = "1000 samples of size 100"))) +
     theme_bw(base_size = 14)
 ```
 
@@ -651,9 +651,9 @@ Sample Size | Standard Deviation
 
 * 2 key concepts relating to sampling for estimation:
 
-  1. The effect of *sampling variation* on our estimates.
+  1. The effect of *sampling variation* on our estimates : how different our estimate would have been with another sample? 
   
-  1. The effect of sample size on *sampling variation*.
+  1. The effect of sample size on *sampling variation* : the bigger the size of our sample the closer our estimate should be from the true value. 
 
 
 ---
@@ -670,7 +670,7 @@ $N = 713$ pasta.
 
 ***Census:*** exhaustive enumeration or counting of all $N$ individuals or observations in the population in order to compute the population parameter’s value *exactly*.
 
-***Sampling:*** dollecting samples of size $n$ from the population of size $N$.
+***Sampling:*** collecting sample(s) of size $n$ from the population of size $N$.
 ]
 
 --
@@ -759,9 +759,9 @@ df %>%
       y = "Frequency",
       title = expression(paste("Sampling distributions of ", hat(p), " based on n = 25, 50, 100."))) +
   facet_wrap(~sample_n, labeller = as_labeller(
-      c(`25` = "n = 25",
-          `50` = "n = 50",
-          `100` = "n = 100"))) +
+      c(`25` = "1000 samples of size n = 25",
+          `50` = "1000 samples of size n = 50",
+          `100` = "1000 samples of size n = 100"))) +
   theme_bw(base_size = 14) +
   geom_vline(xintercept = p, col = "black", size = 0.75) +
   annotate("text", x = 0.655, y = 410, label = "True population proportion", size = 3)
@@ -788,7 +788,7 @@ Scenario | Population parameter | Notation | Point estimate | Symbol(s)
 
 --
 
-* It's due to a famous result know as the ***central limit theorem***.
+* It's due to a famous result known as the ***central limit theorem***.
 
 --
 
