@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
-subtitle: "Session 6"
-author: "Florian Oswald"
+subtitle: "Sampling"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -35,64 +35,72 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-# define vars
-om = par("mar")
-lowtop = c(om[1],om[2],0.1,om[4])
-library(magrittr)
+library(tidyverse)
+library(tweenr)
+library(ggforce)
+library(gganimate)
 
 ```
 
-# Hands On Pasta
+# Recap from last week
 
-.pull-left[
-* In class we did a hands-on activity.
+* *Multiple Linear Regression Model*: $y_i = b_0 + b_1 x_{1,i} + \dots + b_k x_{k,i} + e_i$
 
-* Consider the picture on the right:
+* Interpretation: effect holding all other independent variables constant
 
-* What's the proportion of green Fusilli?
-]
+* Important extensions: *standardized regression*, *log models*, *interaction terms*
 
-.pull-right[
-<div><img src="../img/photos/pasta1.JPG"?></div>
-]
+--
+
+## Today<sup>1</sup>
+
+.footnote[
+[1]: This lecture is very heavily based on the wonderful [sampling chapter](https://moderndive.com/7-sampling.html) of [ModernDive](https://moderndive.com/)]
+
+* Fun activity to discover sampling, sampling variation and sampling distributions.
+
+* Sampling terminology: population, sample, population parameter, point estimate or sample statistic, etc.
+
+* Definition of an ***unbiased estimator***.
+
+* Fundamental statistical theorem for inference: ***Central Limit Theorem***.
 
 ---
 
-# Full Census is Costly
+# What's the proportion of green pasta?
 
-.pull-left[
-* We decided counting all Fusilli is painful.
-
-* And draws worried looks of people. `r emo::ji("nerd")`
-
-* So what else could we do?
+.center[
+```{r, echo = FALSE, out.width = "600px"}
+knitr::include_graphics("../img/photos/pasta/pasta_bowl.JPG")
+```
 ]
 
-.pull-right[
-<div><img src="../img/photos/pasta3.JPG"?></div>
-]
+--
 
+We could count every green pasta but that would be tedious! `r emo::ji("weary")` What else could we do?
 
 ---
 
 # Sampling
 
 .pull-left[
-* We took a first sample of size $n=20$
+* Let's take a sample of 20 pasta.
 
-* We made sure it selected noodles at **random**
+* We made sure to select them at **random**.
 
 * Here is what we found.
 
 Color | Count | Proportion
 :------:|:------:|:--------:
-Red   |  7        |  0.35
-Green   |  5     |   0.25
-White   |  8    |     0.4
+Green   |  14        |  `r format(signif(14/20,2), nsmall = 2)`
+Red   |  5     |   `r format(round(5/20,2), nsmall = 2)`
+Yellow   |  1    |     `r format(round(1/20,2), nsmall = 2)`
+
+* `r format(signif(14/20,2), nsmall = 2)` can be thought of as our guess of the proportion of green pasta in the entire bowl.
 ]
 
 .pull-right[
-<div><img src="../img/photos/pasta5.JPG"?></div>
+<div><img src="../img/photos/pasta/sample1.JPG"?></div>
 ]
 
 ---
@@ -100,106 +108,220 @@ White   |  8    |     0.4
 # Sampling Variation
 
 
-* We asked ourselves, what would happen if we took a *new* sample? Would we also get 5 Greens as before?
+* What would happen if we took a *new* sample (putting the 20 previous pasta back in the bowl)? Would we also get 14 *greens* as before?
 
-* Some of you said *maybe*, some said *maybe not*.
+--
 
-* We agreed that samples would vary from draw to draw.
+* What if we repeated this activity multiple times?
 
-* Key to this observation: they are *randomly* drawn samples.
+--
 
-* We made sure it selected noodles at **random**
+* Probably not. The samples will vary from draw to draw.
 
+--
 
+* Key to this observation: these are *randomly* drawn samples.
 
 ---
 
-# Taking 11 Samples
+# Taking 18 Samples (One per Student)
+
+* Because we can't do this activity in class, we drew 18 samples of 20 pasta (with replacement).
+
+--
+
+* This is what each looked like:
+
+![:scale 100%](../img/photos/pasta/sample1.JPG) | ![:scale 100%](../img/photos/pasta/sample2.JPG) | ![:scale 100%](../img/photos/pasta/sample3.JPG) | ![:scale 100%](../img/photos/pasta/sample4.JPG) | ![:scale 100%](../img/photos/pasta/sample5.JPG) | ![:scale 100%](../img/photos/pasta/sample6.JPG)
+:------:|:------:|:--------:|:--------:|:--------:|:--------:
+![:scale 100%](../img/photos/pasta/sample7.JPG) | ![:scale 100%](../img/photos/pasta/sample8.JPG) | ![:scale 100%](../img/photos/pasta/sample9.JPG) | ![:scale 100%](../img/photos/pasta/sample10.JPG) | ![:scale 100%](../img/photos/pasta/sample11.JPG) | ![:scale 100%](../img/photos/pasta/sample12.JPG)
+![:scale 100%](../img/photos/pasta/sample13.JPG) | ![:scale 100%](../img/photos/pasta/sample14.JPG) | ![:scale 100%](../img/photos/pasta/sample15.JPG) | ![:scale 100%](../img/photos/pasta/sample16.JPG) | ![:scale 100%](../img/photos/pasta/sample17.JPG) | ![:scale 100%](../img/photos/pasta/sample18.JPG)
+
+---
+
+# Taking 18 Samples (One per Student)
+
+* Because we can't do this activity in class, we drew 18 samples of 20 fusilli (with replacement) at home.
+
+* For each sample, we computed the share of green pasta.
 
 .pull-left[
-
-* Then it was **your turn**!
-
-* 11 groups of 2 students took a sample of 20.
-
-* We made a table and a histogram.
+Sample # | Count | Proportion
+:------:|:------:|:--------:
+1 | 14 | `r format(round(14/20,2), nsmall = 2)`
+2 | 14 | `r format(round(14/20,2), nsmall = 2)`
+3 | 10 | `r format(round(10/20,2), nsmall = 2)`
+4 | 10 | `r format(round(10/20,2), nsmall = 2)`
+5 | 6 | `r format(round(6/20,2), nsmall = 2)`
+6 | 10 | `r format(round(10/20,2), nsmall = 2)`
+7 | 8 | `r format(round(8/20,2), nsmall = 2)`
+8 | 9 | `r format(round(9/20,2), nsmall = 2)`
+9 | 11 | `r format(round(11/20,2), nsmall = 2)`
 ]
 
 .pull-right[
-```{r,echo=FALSE}
-pasta_samples <- data.frame(group = 1:11, replicate = 1:11, prop_green = c(0.3,0.25,0.25,0.3,0.15,0.3,0.25,0.25,0.2,0.25,0.2))
-pasta_samples
-```
-
+Sample # | Count | Proportion
+:------:|:------:|:--------:
+10 | 8 | `r format(round(8/20,2), nsmall = 2)`
+11 | 7 | `r format(round(7/20,2), nsmall = 2)`
+12 | 9 | `r format(round(9/20,2), nsmall = 2)`
+13 | 9 | `r format(round(9/20,2), nsmall = 2)`
+14 | 14 | `r format(round(14/20,2), nsmall = 2)`
+15 | 11 | `r format(round(11/20,2), nsmall = 2)`
+16 | 10 | `r format(round(10/20,2), nsmall = 2)`
+17 | 7 | `r format(round(7/20,2), nsmall = 2)`
+18 | 13 | `r format(round(13/20,2), nsmall = 2)`
 ]
-
 
 ---
 
-# Samples Follow a Distribution
+class: inverse
+
+# Task 1 (10 minutes)
+
+1. Create a vector containing the proportions of green pasta from the previous slide. Name it `pasta`. (Hint: remember that vectors are created using the `c()` function.)
+
+1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.3, binwidth = 0.05`.
+
+1. What do you observe?
+
+---
+
+# Sample Distribution: Histogram
 
 .pull-left[
-## Hand Drawn
-<div><img src="../img/photos/pasta6.JPG"?></div>
-]
+```{r, echo=FALSE, eval = TRUE, fig.height=8}
+pasta_samples <- data.frame(replicate = 1:18, prop_green = c(0.7,0.7,0.5,0.5,0.3,0.5,0.4,0.45,0.55,0.4,0.35,0.45,0.45,0.7,0.55,0.5,0.35,0.65))
 
-.pull-right[
-## `R` Drawn
+# set.seed(2)
+# x = pasta_samples[,2]
+# 
+# df <- data.frame(x = x, y = 15)
+# dfs <- list(df)
+# for(i in seq_len(nrow(df))) {
+#     dftemp <- tail(dfs, 1)
+#     dftemp[[1]]$y[i] <- sum(dftemp[[1]]$x[seq_len(i)] == dftemp[[1]]$x[i])
+#     dfs <- append(dfs, dftemp)
+# }
+# dfs <- append(dfs, dfs[rep(length(dfs), 3)])
+# dft <- tween_states(dfs, 10, 1, 'cubic-in', 200)
+# dft$y <- dft$y - 0.5
+# dft <- dft[dft$y != 14.5, ]
+# dft$type <- 'Animate'
+# 
+# p <- ggplot(dft) +
+#   geom_point(aes(x, y), shape = 21, colour = "black", fill = "darkgreen", size = 12.5, stroke = 1) +
+#   labs(
+#     x = "Proportion of green pasta",
+#     y = "Frequency"
+#   ) +
+#   xlim(0.25, 0.75) +
+#   scale_y_continuous(breaks = seq(0,12, 2)) +
+#   theme_bw(base_size = 14) +
+#   transition_manual(.frame)
+# p
+# anim_save(filename = "img/photos/hist_building.gif", animation = p)
 
-```{r,echo=FALSE,fig.height=5.5}
-par(mar = lowtop)
-hist(pasta_samples$prop_green, xlab = "Proportion Green", main = "",breaks = c(0.125,0.175,0.225,0.275,0.325))
-par(mar = om)
+knitr::include_graphics("../img/photos/hist_building.gif")
 ```
 ]
 
+--
+
+.pull-right[
+```{r, echo=FALSE, eval = TRUE, fig.height=7}
+pasta_samples %>%
+  ggplot(aes(x = prop_green)) +
+  geom_histogram(boundary = 0.3, binwidth = 0.05, col = "white", fill = "darkgreen") +
+  labs(
+    x = "Proportion of green pasta",
+    y = "Frequency"
+  ) +
+  xlim(0.25, 0.7) +
+  theme_bw(base_size = 20)
+```
+]
 
 ---
 
-# Handover to `Moderndive`
+# What Did We Just Do?
 
-* The [moderndive](https://moderndive.com) project used red and white balls instead of Fusilli.
+--
 
-<div align="center"><img src="../img/photos/transition.png"?></div>
+* Demonstrated the statistical concept of ***sampling***.
 
-* The rest is identical. We will continue with their example now!
+--
 
+* *Objective*: know the proportion of green pasta
 
+--
 
+* *Methods*:
+
+  1. **Census**: time-consuming (and in many cases very costly);
+  
+--
+  
+  1. **Sampling**: extract a *sample* of 20 pasta from the bowl to obtain an ***estimate***.  
+  Out first ***estimate*** of the proportion of green pasta was 0.70, but it was actually larger than most other ***estimates***.
+  
+--
+
+* *Important*: each *sample* was drawn ***randomly*** $\rightarrow$ samples are different from each other! $\rightarrow$ different proportions `r emo::ji("point_right")` ***sampling variation***
 
 ---
 
 # Taking Virtual (not Real) Samples
 
 .pull-left[
-* We have all balls in the bowl in a data.frame.
+* We counted the exact number of green, red and yellow pasta in the bowl `r emo::ji("monocle")` `#confinement`
 
-* Instead of with our hands and a shovel, let's write code that takes a sample form it!
+* All the pasta in the bowl are stored in a csv file [here](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1).
 
-* We'll use the *virtual shovel* to take a sample of 50 balls from our virtual bowl.
+```{r, echo = TRUE}
+bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
 
-* The dataset `bowl` holds the data.
+head(bowl)
+```
 ]
 
 --
 
 .pull-right[
-```{r}
-library(dplyr)
-library(ggplot2)
-library(moderndive)  # load their package
-print(bowl)  # you dont need the print
+* `pasta_ID`: ball identifier
+
+* `color`: ball color
+
+```{r, echo = TRUE}
+nrow(bowl)
 ```
+
+* Instead of selecting pasta with our hands, we'll take *virtual* draws from the bowl.
+
+* We'll use the *virtual shovel* to take a sample of 50 pasta from our virtual bowl.
 ]
 
 ---
 
 # Using A Virtual Shovel Once
 
-.pull-left[
-* We will take a first sample of size 50 now.
+* We will take a first sample of size 50, using the `moderndive` function `rep_sample_n`.
 
-* We will use the `moderndive` function `rep_sample_n`.
+--
+
+```{r}
+#load moderndive package
+library(moderndive)
+
+virtual_shovel <- bowl %>% # notice that moderndive functions can be "pipped"
+  rep_sample_n(size = 50) # take a sample of 50 balls
+```
+
+.pull-left[
+```{r, echo = TRUE}
+# display the sample's first 6 rows
+head(virtual_shovel)
+```
 
 * Column `replicate` tells us the ID of the sample. Here: `1`.
 ]
@@ -207,50 +329,54 @@ print(bowl)  # you dont need the print
 --
 
 .pull-right[
-```{r}
-virtual_shovel <- bowl %>% 
-  rep_sample_n(size = 50)
-virtual_shovel
+```{r, echo = TRUE}
+# number of observations in sample
+nrow(virtual_shovel)
 ```
 ]
 
-
 ---
 
-# Calculating Proportions of *Red*
+# Proportion of Green Pasta
 
 .pull-left[
 ```{r}
 sample_1 <- virtual_shovel %>% 
-  mutate(is_red = color == "red") %>%
-  summarize(num_red = sum(is_red)) %>% 
-  mutate(prop_red = num_red / 50)
+  summarize(
+    # number of green pasta in sample
+    num_green = sum(color == "green"),
+    # number of observations in sample
+    sample_n = n()) %>% 
+  mutate(
+    # proportion of green pasta in sample
+    prop_green = num_green / sample_n)
 sample_1
 ```
 ]
 
 .pull-right[
-1. adds a column `is_red` TRUE/FALSE
+1. Compute:
+  * sum of green pasta in sample,
+  * number of observations in sample (i.e. 50 in this case)
 
-2. computes sum over this (counting how many TRUE)
+1. Compute proportion of green pasta
 
-3. computes proportion out of total (50)
+`r emo::ji("point_right")` `r sample_1$prop_green` are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
 
-4. So `r sample_1$prop_red` are red! What if we try again?
-
-5. What if we try many times, like, 33 times?
+What if we try many times, like, 33 times?
 ]
-
-
-
 
 ---
 
 # Using The Virtual Shovel 33 Times
 
 .pull-left[
+
+33 samples (*replicates*) of size 50.
+
 ```{r}
-virtual_samples <- bowl %>% 
+virtual_samples <- bowl %>%
+  # get 33 samples of size 50
   rep_sample_n(size = 50, reps = 33)
 virtual_samples
 ```
@@ -259,12 +385,17 @@ virtual_samples
 --
 
 .pull-right[
+
+Compute the proportion of green pasta in each sample.
+
 ```{r}
-virtual_prop_red <- virtual_samples %>% 
-  group_by(replicate) %>% 
-  summarize(red = sum(color == "red")) %>% 
-  mutate(prop_red = red / 50)
-print(virtual_prop_red)
+virtual_prop_green <- virtual_samples %>% 
+  group_by(replicate) %>% # calculate stat by sample
+  summarize(
+    num_green = sum(color == "green"),
+    sample_n = n()) %>% 
+  mutate(prop_green = num_green / sample_n)
+virtual_prop_green
 ```
 ]
 
@@ -274,19 +405,23 @@ print(virtual_prop_red)
 # (Virtual!) Sampling Variation
 
 .pull-left[
-* Just as when *you* did it, the virtual sampler *also* creates random samples.
+* Just as when we did it, the virtual sampler *also* creates random samples.
 
-* The `prop_red` column in the `virtual_prop_red` data.frame differs across replicates (i.e., samples)
+* The `prop_green` column in the `virtual_prop_green` data.frame differs across samples.
 
-* And again, we can visualize the **sampling distribution**:
+* And again, we can visualize the ***sampling distribution***:
 
 ```{r,eval=FALSE}
-ggplot(virtual_prop_red, aes(x = prop_red)) +
+ggplot(virtual_prop_green, aes(x = prop_green)) +
   geom_histogram(binwidth = 0.05, 
                  boundary = 0.4,
-                 color = "white") +
-  labs(x = "Proportion of 50 balls that were red", 
-       title = "Distribution of 33 proportions red") 
+                 color = "white",
+                 fill = "darkgreen") +
+  scale_y_continuous(breaks = seq(0, 12, by = 2)) +
+  labs(x = "Proportion of 50 pasta that were green",
+       y = "Frequency",
+       title = "Distribution of 33 samples of size 50") +
+  theme_bw(base_size = 20)
 ```
 ]
 
@@ -294,221 +429,170 @@ ggplot(virtual_prop_red, aes(x = prop_red)) +
 
 .pull-right[
 ```{r,echo = FALSE,fig.height=6}
-ggplot(virtual_prop_red, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 50 balls that were red", 
-       title = "Distribution of 33 proportions red") 
-```
-]
-
-
----
-
-# Designing a Function to Compute Proportions
-
-.pull-left[
-* We will have to repeat the above steps quite often now.
-
-* Let's write a function.
-
-* Let's call it `prop_red`
-
-* It should take a data.frame, group by `replicate`, summarize by color red and compute a proportion for each replicate.
-]
-
-.pull-right[
-```{r}
-prop_red <- function(s){
-  s %>%
-    group_by(replicate) %>%
-    summarise(red = sum(color == "red"),n = n()) %>%
-    mutate(prop_red = red / n)
-}
-# check
-pr <- prop_red(virtual_samples)
-print(pr)  # just for slides...
+ggplot(virtual_prop_green, aes(x = prop_green)) +
+  geom_histogram(binwidth = 0.05, 
+                 boundary = 0.4,
+                 color = "white",
+                 fill = "darkgreen") +
+  scale_y_continuous(breaks = seq(0, 12, by = 2)) +
+  labs(x = "Proportion of 50 pasta that were green",
+       y = "Frequency",
+       title = "Distribution of 33 samples of size 50") +
+  theme_bw(base_size = 20)
 ```
 ]
 
 ---
 
+class: inverse
 
-# Using The Virtual Shovel 1000 Times!
+# Task 2 (10 minutes)
 
-.pull-left[
+Instead of taking only 33 samples, let's take ***1000***!
 
-* The good thing about *virtual* sampling: the computer can do it very fast.
+1. Why do we not take 1000 samples "by hand"?
 
-* We can effortlessly increase either the sample size, or the number of replications.
+1. Load the [data](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1") into an object `pasta`.
 
-* Let's take 1000 samples!
+1. Obtain 1000 samples of size 50 using the `rep_sample_n()` function from the `moderndive` package.
 
-* Notice that this has 50000 rows now!
+1. Calculate the proportion of green pasta in each sample.
 
-* Each `replicate` will have 50 rows, as before.
-]
+1. Plot a histogram of the obtained proportion of green pasta in each sample.
 
+1. What do you observe? Which proportions occur most frequently? How does the shape of the histogram compare to when we took only 33 samples?
 
-.pull-right[
-```{r}
+1. How likely is it that we sample 50 pasta of which less than 20% are green?
+
+---
+
+# Sampling Distribution of 1000 Samples
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 4.5, fig.width = 7.75}
 virtual_samples <- bowl %>% 
   rep_sample_n(size = 50, reps = 1000)
-virtual_samples
-```
-]
 
-
-
----
-
-# Computing Proportions from 1000 Samples
-
-.pull-left[
-```{r}
-virtual_prop_red <- virtual_samples %>% 
+virtual_prop_green <- virtual_samples %>% 
   group_by(replicate) %>% 
-  summarize(red = sum(color == "red")) %>% 
-  mutate(prop_red = red / 50)
-print(virtual_prop_red)
-```
+  summarize(
+    num_green = sum(color == "green"),
+    sample_n = n()) %>% 
+  mutate(prop_green = num_green / sample_n)
 
-(or shorter:
-`virtual_prop_red <- prop_red(virtual_samples)`)
-]
+virtual_prop_green %>% ggplot(
+  aes(x = prop_green)) +
+  geom_histogram(
+    binwidth = 0.05,
+    boundary = 0.4,
+    color = "white",
+    fill = "darkgreen") +
+  labs(x = "Proportion of green pasta in sample",
+       y = "Frequency",
+       title = "Distribution of 1000 samples of size 50") +
+  theme_bw(base_size = 14)
+```
 
 --
 
-.pull-right[
-```{r,echo = FALSE,fig.height=6}
-ggplot(virtual_prop_red, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 50 balls that were red", 
-       title = "Distribution of 1000 proportions red") 
-```
-]
-
-
----
-
-# 1000 Samples and Their Distribution
-
-.pull-left[
-* We have seen that with 1000 samples, this strongly resembles a normal distribution.
-
-* There are some very low values, some very high, but the mass is clearly at around 0.38 or so.
-
-* The **red** line estimates a continuous density, and it looks kind of normal.
-
-* So: The *more* samples of a certain size we take, *more* their distribution will resemble a normal. `r emo::ji("check")`.
-]
-
-.pull-right[
-```{r,echo = FALSE,fig.height=6}
-ggplot(virtual_prop_red, aes(x = prop_red)) +
-  geom_histogram(aes(y=..density..),binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = "Proportion of 50 balls that were red", 
-       title = "Distribution of 1000 proportions red") +
-  geom_density(aes(y=..density..),size = 2, color = "red")
-
-```
-]
-
+Looks remarkably close to a ***normal distribution*** $\rightarrow$ the more samples we take, the more their ***sampling distribution*** will resemble a ***normal distribution***.
 
 ---
 
 # Role of Sample Size
 
-.pull-left[
-* Let's repeat this now for different samples sizes.
+Imagine you could change the size of your samples and had the option of the following sizes: 25, 50 and 100.
 
-* Let's take 1000 samples each for $n=25,n=50,n=100$! 
+If your goal is still to estimate the proportion of the bowl’s pasta that are green, which shovel would you choose?
 
-* Let's first generate all samples of different sizes.
+---
 
-* using `rep_sample_n` again, and keeping `reps=1000` fixed.
+# Role of Sample Size
 
-]
+* Let's repeat what we did previously but for different sample sizes.
+
+* Let's take 1000 samples each for $n=25,n=50,n=100$.
 
 --
 
-.pull-right[
+* We will use `rep_sample_n()` again.
+
+--
+
+.pull-left[
+
+Generate all samples of different sizes:
+
 ```{r}
-# 1.a) Virtually use shovel 1000 times
+# Sample size: 25
 virtual_samples_25 <- bowl %>% 
   rep_sample_n(size = 25, reps = 1000)
 
-# 2.a) Virtually use shovel 1000 times
+# Sample size: 50
 virtual_samples_50 <- bowl %>% 
   rep_sample_n(size = 50, reps = 1000)
 
-# 3.a) Virtually using shovel with 100 slots 1000 times
+# Sample size: 100
 virtual_samples_100 <- bowl %>% 
   rep_sample_n(size = 100, reps = 1000)
 ```
 ]
 
----
-
-# Compute Proportions and Plot Them!
-
-.pull-left[
-## Computing Proportions
-<br>
-
-```{r}
-# 1.b) Compute proportion red in each of 1000 samples
-virtual_prop_red_25 <- prop_red(virtual_samples_25)
-
-
-# 2.b) Compute proportion red in each of 1000 samples
-virtual_prop_red_50 <- prop_red(virtual_samples_50)
-
-
-# 3.b) Compute proportion red in each of 1000 samples
-virtual_prop_red_100 <- prop_red(virtual_samples_100)
-```
-]
+--
 
 .pull-right[
-## Plotting Each
 
-```{r,eval = FALSE}
-# 1.c) Plot distribution via a histogram
-ggplot(virtual_prop_red_25, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, 
-                 color = "white") +
-  labs(x = "Proportion of 25 balls that were red", 
-       title = "25") 
+Compute proportion of green pasta:
 
-# 2.c) Plot distribution via a histogram
-ggplot(virtual_prop_red_50, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, 
-                 color = "white") +
-  labs(x = "Proportion of 50 balls that were red", 
-       title = "50")  
-
-# 3.c) Plot distribution via a histogram
-ggplot(virtual_prop_red_100, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, 
-                 color = "white") +
-  labs(x = "Proportion of 100 balls that were red", 
-       title = "100") 
+```{r}
+# Sample size: 25
+# The same code is used for the other sample sizes
+virtual_prop_green_25 <- virtual_samples_25 %>% 
+  group_by(replicate) %>% 
+  summarize(
+    num_green = sum(color == "green"),
+    sample_n = n()) %>% 
+  mutate(prop_green = num_green / sample_n)
 ```
 ]
 
 ---
 
-# Look at That!
+# Role of Sample Size
 
-```{r,fig.height=5,echo = FALSE,fig.width=10}
-df = rbind(virtual_prop_red_25,virtual_prop_red_50,virtual_prop_red_100)
-df %>%  mutate(
-    n = stringr::str_c("n = ", n),
-    n = factor(n, levels = c("n = 25", "n = 50", "n = 100"))
-    ) %>% 
-  ggplot(aes(x = prop_red)) +
-    geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-    facet_wrap(~n)
+```{r, echo = FALSE, fig.height=5, fig.width=10}
+
+# Sample size: 50
+virtual_prop_green_50 <- virtual_samples_50 %>% 
+  group_by(replicate) %>% 
+  summarize(
+    num_green = sum(color == "green"),
+    sample_n = n()) %>% 
+  mutate(prop_green = num_green / sample_n)
+
+# Sample size: 100
+virtual_prop_green_100 <- virtual_samples_100 %>% 
+  group_by(replicate) %>% 
+  summarize(
+    num_green = sum(color == "green"),
+    sample_n = n()) %>% 
+  mutate(prop_green = num_green / sample_n)
+
+df = rbind(virtual_prop_green_25,virtual_prop_green_50,virtual_prop_green_100)
+
+df %>% 
+  ggplot(aes(x = prop_green)) +
+    geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white", fill = "darkgreen") +
+  scale_x_continuous(breaks = round(seq(0, 1, by = 0.2),1)) +
+  labs(
+    x = "Proportion of green pasta in sample",
+    y = "Frequency",
+    title = "Comparing distributions of proportions of green pasta for different sample sizes"
+  ) +
+    facet_wrap(~sample_n, labeller = as_labeller(
+        c(`25` = "1000 samples of size 25",
+          `50` = "1000 samples of size 50",
+          `100` = "1000 samples of size 100"))) +
+    theme_bw(base_size = 14)
 ```
 
 ---
@@ -516,84 +600,92 @@ df %>%  mutate(
 
 # Sample Size and Sampling Distributions
 
-.pull-left[
-* The larger the sample size, the *narrower* the resulting sampling distribution.
-
-* At a constant number of replicates (i.e. 1000 in our case), bigger samples will yield normal distributions with smaller standard deviation.
-
-* Let us actually compute the standard deviation of estimated proportions from each of our three trial datasets:
-]
+* The larger the sample size, the *narrower* the resulting ***sampling distribution***.
 
 --
 
-.pull-right[
-```{r}
+* In other words, there are fewer differences due to ***sampling variation***.
+
+--
+
+* Holding constant the number of replicates (i.e. 1000 in our case), ***bigger samples*** will yield *normal distributions* with ***smaller standard deviations***.
+
+--
+
+```{r, echo = FALSE}
 # n = 25
-sd25 = virtual_prop_red_25 %>% 
-  summarize(sd = sd(prop_red))
+sd25 = virtual_prop_green_25 %>% 
+  summarize(sd = sd(prop_green))
 
 # n = 50
-sd50 = virtual_prop_red_50 %>% 
-  summarize(sd = sd(prop_red))
+sd50 = virtual_prop_green_50 %>% 
+  summarize(sd = sd(prop_green))
 
 # n = 100
-sd100 = virtual_prop_red_100 %>% 
-  summarize(sd = sd(prop_red))
+sd100 = virtual_prop_green_100 %>% 
+  summarize(sd = sd(prop_green))
 ```
-
-]
-
----
-
-# Sample Size and Standard Deviation
-
-.pull-left[
-
-* Let's remember what the *standard deviation* actually measures.
-
-* It's about the *spread* of a certain variable.
-
-* The Normal Distibution is *described* by it's mean and standard deviation.
-
-* We are concerned with standard deviation of *proportions red* found across replicates.
-]
-
-.pull-right[
-
-<br>
 
 Sample Size | Standard Deviation
 :---------:|:--------------:
-25          | `r round(sd25$sd,2)`
-50          | `r round(sd50$sd,2)`
-100          |`r round(sd100$sd,2)`
+25          | `r format(round(sd25$sd,2), nsmall = 2)`
+50          | `r format(round(sd50$sd,2), nsmall = 2)`
+100         |`r format(round(sd100$sd,2), nsmall = 2)`
 
-]
+--
+
+* Remember that the ***standard deviation*** measures the *spread* of a variable around its mean.
+
+--
+
+* So as the sample size increases, our ***estimates*** of the true proportion of the bowl's green pasta get more *precise*.
+
+---
+
+# Sampling Framework
+
+* We used sampling for the purpose of ***estimation***.
+
+--
+
+* We extracted samples in order to ***estimate*** the proportion of the bowl's pasta that are green.
+
+--
+
+* 2 key concepts relating to sampling for estimation:
+
+  1. The effect of *sampling variation* on our estimates: different samples give different estimates. 
+  
+  1. The effect of sample size on *sampling variation*: the bigger the size of our sample the closer our estimate should be from the true value.
+
 ---
 
 
 # Sampling Glossary `r emo::ji("book")`
 
 .pull-left[
-* Population: $N = 2400$ balls
+***Population:*** collection of individuals or observations we are interested in.  
+$N = 713$ pasta.
 
-* Population Parameter: Quantity we wish to learn, like: $p$ = *proportion red*, or $\mu$ = *mean of X*.
+***Population parameter:*** numerical summary quantity about the population that is unknown but that we want to know.  
+*Examples:* population mean $(\mu)$, proportion of green pasta $(p)$.
 
-* Census: Counting all the Fusilli `r emo::ji("laugh")`
+***Census:*** exhaustive enumeration or counting of all $N$ individuals or observations in the population in order to compute the population parameter’s value *exactly*.
 
-* Sampling: Collecting samples from population of size $n < N$
-
-* Point estimate or Sample Statistic: Quantity (summary stat) computed from sample. $\hat{p}$ = *proportion red*
+***Sampling:*** collecting sample(s) of size $n$ from the population of size $N$.
 ]
 
 --
 
 .pull-right[
-* Representative Sampling: Does the sample *look like* the population?
+* ***Point estimate*** or ***Sample statistic:*** summary statistic computed from a sample that estimates an unknown population parameter.  
+*Example:* *sample proportion* of green pasta $(\hat{p})$. The "hat" on top of the $p$ indicates that it is an *estimate* of the population proportion $p$.
 
-* Biased Sampling: Did all balls have equal chance to get selected?
+* ***Representative sampling:*** does the sample *look like* the population?
 
-* Random Sampling: We sample in an unbiased fashion.
+* ***Biased sampling:*** did all pasta have an equal chance of being included in a sample?
+
+* ***Random sampling:*** randomly sampling in an unbiased fashion.
 
 ]
 
@@ -601,56 +693,56 @@ Sample Size | Standard Deviation
 
 # Statistical Definitions
 
-.pull-left[
-* So we have been estimating $\hat{p}$ all along.
+* We have been estimating $\hat{p}$ all along.
 
-* We have illustrated the *sampling distribution* of $\hat{p}$.
+--
 
-* We computed the standard deviation in the various collections of $\hat{p}$. It has a special name: It's the standard **error** of the *point estimate* $\hat{p}$.
+* We plotted the *sampling distribution* to display the *sampling variation* of the *sample proportion* $\hat{p}$.
 
-* Let's reproduce the table but label properly:
-]
+--
 
-.pull-right[
+* We computed the *standard deviation* of the *sampling distribution* of $\hat{p}$. This standard deviation has a special name: ***standard error*** of the *point estimate* $\hat{p}$.
 
-<br>
+--
+
+* Let's reproduce the summary table and labelling properly:
 
 Sample Size $(n)$ | Standard Error of $\hat{p}$
 :---------:|:--------------:
-25          | `r round(sd25$sd,2)`
-50          | `r round(sd50$sd,2)`
-100          |`r round(sd100$sd,2)`
+25          | `r format(round(sd25$sd,2), nsmall = 2)`
+50          | `r format(round(sd50$sd,2), nsmall = 2)`
+100         |`r format(round(sd100$sd,2), nsmall = 2)`
 
-]
+* Key takeaway: as the *sample size* $n$ goes up, the “typical” error of your *point estimate* will go down, as quantified by the *standard error*.
 
 ---
 
 # Putting It All Together
 
-.pull-left[
-* Point estimtes from random samples provide a *good guess* about an underlying **population parameter**.
-
-* How good? Sometimes $\hat{p}$ will be far from $p$, sometimes close. There's variation.
-
-* **On average**, our estimates will be correct. This is because of unbiasedness. We'd say: 
-> $\hat{p}$ is an **unbiased estimator** of $p$.
-
-* We achieved unbiasedness through random sampling.
-]
+* ***Point estimates*** from ***random samples*** provide a *good guess* of the true unknown ***population parameter***.
 
 --
 
-.pull-right[
-* What is the **true** proportion $p$ of red balls in the population of $N=2400$ balls?
+* How good? Sometimes $\hat{p}$ will be far from $p$, sometimes close. There's ***sampling variation***.
 
-* There were 900 of them, or 900/2400 = 0.375 = 37.5%.
+--
 
-* The authors did not count them (they were told).
+* ***On average***, our estimates will be correct. This is because of random sampling. We say that: 
+> ### $\hat{p}$ is an ***unbiased estimator*** of $p$, i.e. $\mathop{\mathbb{E}}[\hat{p}] = p$
 
-* Never forget that I *did* count (at least the green fusilli `r emo::ji("wink")`)
+--
 
-* Let's insert the **truth** $p=0.375$ into our previous plots!
-]
+* What is the true population proportion $p$ of green pasta in the population of $N=713$ pasta?
+
+--
+
+```{r}
+sum(bowl$color == "green")/nrow(bowl)
+```
+
+--
+
+* Let's insert the ***true population proportion*** $p=`r round(sum(bowl$color == "green")/nrow(bowl), 2)`$ into our previous plots!
 
 ---
 
@@ -658,19 +750,23 @@ Sample Size $(n)$ | Standard Error of $\hat{p}$
 
 ```{r,echo = FALSE,fig.width=10,fig.height=5}
 p <- bowl %>% 
-  summarize(p = mean(color == "red")) %>% 
+  summarize(p = mean(color == "green")) %>% 
   pull(p)
 df %>% 
-  mutate(
-    n = stringr::str_c("n = ", n),
-    n = factor(n, levels = c("n = 25", "n = 50", "n = 100"))
-    ) %>% 
-  ggplot( aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
-  labs(x = expression(paste("Sample proportion ", hat(p))), 
-       title = expression(paste("Sampling distributions of ", hat(p), " based on n = 25, 50, 100.")) ) +
-  facet_wrap(~n) +
-  geom_vline(xintercept = p, col = "red", size = 1)
+  ggplot(aes(x = prop_green)) +
+    geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white", fill = "darkgreen") +
+    scale_x_continuous(breaks = round(seq(0, 1, by = 0.2),1)) +
+    labs(
+      x = expression(paste("Sample proportion ", hat(p))),
+      y = "Frequency",
+      title = expression(paste("Sampling distributions of ", hat(p), " based on n = 25, 50, 100."))) +
+  facet_wrap(~sample_n, labeller = as_labeller(
+      c(`25` = "1000 samples of size n = 25",
+          `50` = "1000 samples of size n = 50",
+          `100` = "1000 samples of size n = 100"))) +
+  theme_bw(base_size = 14) +
+  geom_vline(xintercept = p, col = "black", size = 0.75) +
+  annotate("text", x = 0.655, y = 410, label = "True population proportion", size = 3)
 ```
 
 ---
@@ -688,21 +784,29 @@ Scenario | Population parameter | Notation | Point estimate | Symbol(s)
 
 ---
 
-# The Central Limit Theorem
+# The Central Limit Theorem (CLT)
 
-* The fact hat our sample statistics converge to a *central limit* is well known in statistics.
+* The fact that our sample statistics ***converge*** to a *central limit* is well known in statistics.
 
-* It's due to a famous result know as the central limit theorem.
+--
 
-* It states that whatever the underlying population distribution looks like, as we add statistics computed from random samples, **those** will converge to a normal distribution.
+* It's due to a famous result known as the ***central limit theorem***.
 
-* Movie?
+--
+
+> ### *Central Limit Theorem:* regardless of how the underlying population distribution looks like, **when sample *means* are based on larger and larger sample sizes, the sampling distribution of these sample *means* becomes both more and more normally shaped and more and more narrow**.
+
+--
+
+* In other words, their sampling distribution increasingly follows a ***normal distribution*** and the *variation of these sampling distributions gets smaller*, as quantified by their ***standard errors***.
 
 ---
 
-# Central Limit Theorem
+# Central Limit Theorem - NYTimes video
 
-<iframe width="760" height="515" src="https://www.youtube.com/embed/jvoxEYmQHNM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+.center[
+<iframe width="684" height="464" src="https://www.youtube.com/embed/jvoxEYmQHNM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
 
 ---
 
@@ -719,7 +823,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# END
+# SEE YOU NEXT WEEK!
 
 
 

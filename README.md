@@ -10,18 +10,17 @@ Lecture 1: Introduction [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics
 
 Lectures 2/3: Summarizing, Visualizing and Tidying Data [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter2/chapter2.pdf)
 
-
 Lecture 4: Simple Linear Regression [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.pdf)
-
 
 Lecture 5: Introduction to Causality [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.pdf)
 
-
 Lecture 6: Multiple Linear Regression [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter4/chapter4.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter4/chapter4.pdf)
 
-Lecture 7: Sampling (*coming soon!*)
+Lecture 7: Sampling [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter6/chapter6.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter6/chapter6.pdf)
 
-Lectures 8/9: Statistical Inference and Hypothesis Testing (*coming soon!*)
+Lectures 8: Confidence Intervals and Hypothesis Testing (*coming soon!*)
+
+Lectures 9: Regression Inference (*coming soon!*)
 
 Lecture 10: Differences-in-Differences (*coming soon!*)
 
