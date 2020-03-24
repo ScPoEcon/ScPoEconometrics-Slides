@@ -55,7 +55,7 @@ library(gganimate)
 ## Today<sup>1</sup>
 
 .footnote[
-[1]: This lecture is very heavily based on the wonderful [sampling chapter](https://moderndive.com/7-sampling.html) of [ModernDive](https://moderndive.com/)]
+[1]: This lecture is very heavily based on the wonderful [Sampling chapter](https://moderndive.com/7-sampling.html) of [ModernDive](https://moderndive.com/)]
 
 * Fun activity to discover sampling, sampling variation and sampling distributions.
 
