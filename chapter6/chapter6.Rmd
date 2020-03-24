@@ -282,17 +282,20 @@ pasta_samples %>%
 bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
 
 head(bowl)
-nrow(bowl)
 ```
-
-* `pasta_ID`: ball identifier
-
-* `color`: ball color
 ]
 
 --
 
 .pull-right[
+* `pasta_ID`: ball identifier
+
+* `color`: ball color
+
+```{r, echo = TRUE}
+nrow(bowl)
+```
+
 * Instead of selecting pasta with our hands, we'll take *virtual* draws from the bowl.
 
 * We'll use the *virtual shovel* to take a sample of 50 pasta from our virtual bowl.
@@ -651,10 +654,9 @@ Sample Size | Standard Deviation
 
 * 2 key concepts relating to sampling for estimation:
 
-  1. The effect of *sampling variation* on our estimates : how different our estimate would have been with another sample? 
+  1. The effect of *sampling variation* on our estimates: different samples give different estimates. 
   
-  1. The effect of sample size on *sampling variation* : the bigger the size of our sample the closer our estimate should be from the true value. 
-
+  1. The effect of sample size on *sampling variation*: the bigger the size of our sample the closer our estimate should be from the true value.
 
 ---
 
