@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Sampling
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-03-24
+### SciencesPo Paris </br> 2020-03-30
 
 ---
 
@@ -126,7 +126,7 @@ Yellow   |  1    |     0.05
 
 # Taking 18 Samples (One per Student)
 
-* Because we can't do this activity in class, we drew 18 samples of 20 fusilli (with replacement) at home.
+* Because we can't do this activity in class, we drew 18 samples of 20 pasta (with replacement) at home.
 
 * For each sample, we computed the share of green pasta.
 
@@ -166,7 +166,7 @@ class: inverse
 
 1. Create a vector containing the proportions of green pasta from the previous slide. Name it `pasta`. (Hint: remember that vectors are created using the `c()` function.)
 
-1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.3, binwidth = 0.05`.
+1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`.
 
 1. What do you observe?
 
@@ -286,14 +286,14 @@ head(virtual_shovel)
 ```
 ## # A tibble: 6 x 3
 ## # Groups:   replicate [1]
-##   replicate pasta_ID color
-##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt;
-## 1         1       66 red  
-## 2         1       95 green
-## 3         1      100 red  
-## 4         1      607 green
-## 5         1      693 red  
-## 6         1      163 red
+##   replicate pasta_ID color 
+##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt; 
+## 1         1      345 red   
+## 2         1      619 yellow
+## 3         1      289 green 
+## 4         1       10 green 
+## 5         1      136 green 
+## 6         1      148 green
 ```
 
 * Column `replicate` tells us the ID of the sample. Here: `1`.
@@ -336,7 +336,7 @@ sample_1
 ## # A tibble: 1 x 4
 ##   replicate num_green sample_n prop_green
 ##       &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-## 1         1        25       50        0.5
+## 1         1        22       50       0.44
 ```
 ]
 
@@ -347,7 +347,7 @@ sample_1
 
 1. Compute proportion of green pasta
 
-👉 0.5 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
+👉 0.44 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
 
 What if we try many times, like, 33 times?
 ]
@@ -373,16 +373,16 @@ virtual_samples
 ## # Groups:   replicate [33]
 ##    replicate pasta_ID color 
 ##        &lt;int&gt;    &lt;int&gt; &lt;fct&gt; 
-##  1         1       19 green 
-##  2         1      527 green 
-##  3         1      119 green 
-##  4         1       50 yellow
-##  5         1      145 yellow
-##  6         1      490 yellow
-##  7         1      624 red   
-##  8         1      214 green 
-##  9         1      610 yellow
-## 10         1      590 green 
+##  1         1      246 red   
+##  2         1      340 red   
+##  3         1      597 red   
+##  4         1      352 green 
+##  5         1      553 green 
+##  6         1      174 green 
+##  7         1      173 yellow
+##  8         1      158 yellow
+##  9         1      231 green 
+## 10         1      415 yellow
 ## # … with 1,640 more rows
 ```
 ]
@@ -408,16 +408,16 @@ virtual_prop_green
 ## # A tibble: 33 x 4
 ##    replicate num_green sample_n prop_green
 ##        &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-##  1         1        23       50      0.46 
-##  2         2        28       50      0.56 
-##  3         3        22       50      0.44 
-##  4         4        25       50      0.5  
-##  5         5        23       50      0.46 
-##  6         6        27       50      0.54 
-##  7         7        24       50      0.48 
+##  1         1        21       50      0.42 
+##  2         2        19       50      0.38 
+##  3         3        26       50      0.52 
+##  4         4        23       50      0.46 
+##  5         5        22       50      0.44 
+##  6         6        20       50      0.4  
+##  7         7        21       50      0.42 
 ##  8         8        29       50      0.580
 ##  9         9        25       50      0.5  
-## 10        10        19       50      0.38 
+## 10        10        23       50      0.46 
 ## # … with 23 more rows
 ```
 ]
@@ -437,8 +437,8 @@ virtual_prop_green
 
 ```r
 ggplot(virtual_prop_green, aes(x = prop_green)) +
-  geom_histogram(binwidth = 0.05, 
-                 boundary = 0.4,
+  geom_histogram(binwidth = 0.02, 
+                 boundary = 0.515,
                  color = "white",
                  fill = "darkgreen") +
   scale_y_continuous(breaks = seq(0, 12, by = 2)) +
