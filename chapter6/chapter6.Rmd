@@ -414,7 +414,7 @@ virtual_prop_green
 ```{r,eval=FALSE}
 ggplot(virtual_prop_green, aes(x = prop_green)) +
   geom_histogram(binwidth = 0.02, 
-                 boundary = 0.515,
+                 boundary = 0.51,
                  color = "white",
                  fill = "darkgreen") +
   scale_y_continuous(breaks = seq(0, 12, by = 2)) +
