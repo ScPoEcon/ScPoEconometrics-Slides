@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Sampling
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-03-30
+### SciencesPo Paris </br> 2020-03-31
 
 ---
 
@@ -164,7 +164,7 @@ class: inverse
 
 # Task 1 (10 minutes)
 
-1. Create a vector containing the proportions of green pasta from the previous slide. Name it `pasta`. (Hint: remember that vectors are created using the `c()` function.)
+1. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
 
 1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`.
 
@@ -286,14 +286,14 @@ head(virtual_shovel)
 ```
 ## # A tibble: 6 x 3
 ## # Groups:   replicate [1]
-##   replicate pasta_ID color 
-##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt; 
-## 1         1      345 red   
-## 2         1      619 yellow
-## 3         1      289 green 
-## 4         1       10 green 
-## 5         1      136 green 
-## 6         1      148 green
+##   replicate pasta_ID color
+##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt;
+## 1         1      176 red  
+## 2         1      198 green
+## 3         1      705 green
+## 4         1      410 green
+## 5         1      215 red  
+## 6         1      398 green
 ```
 
 * Column `replicate` tells us the ID of the sample. Here: `1`.
@@ -336,7 +336,7 @@ sample_1
 ## # A tibble: 1 x 4
 ##   replicate num_green sample_n prop_green
 ##       &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-## 1         1        22       50       0.44
+## 1         1        23       50       0.46
 ```
 ]
 
@@ -347,7 +347,7 @@ sample_1
 
 1. Compute proportion of green pasta
 
-👉 0.44 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
+👉 0.46 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
 
 What if we try many times, like, 33 times?
 ]
@@ -373,16 +373,16 @@ virtual_samples
 ## # Groups:   replicate [33]
 ##    replicate pasta_ID color 
 ##        &lt;int&gt;    &lt;int&gt; &lt;fct&gt; 
-##  1         1      246 red   
-##  2         1      340 red   
-##  3         1      597 red   
-##  4         1      352 green 
-##  5         1      553 green 
-##  6         1      174 green 
-##  7         1      173 yellow
-##  8         1      158 yellow
-##  9         1      231 green 
-## 10         1      415 yellow
+##  1         1      270 green 
+##  2         1      377 red   
+##  3         1      697 red   
+##  4         1      189 green 
+##  5         1      166 yellow
+##  6         1      313 yellow
+##  7         1      293 yellow
+##  8         1      108 green 
+##  9         1      154 red   
+## 10         1      111 red   
 ## # … with 1,640 more rows
 ```
 ]
@@ -409,15 +409,15 @@ virtual_prop_green
 ##    replicate num_green sample_n prop_green
 ##        &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
 ##  1         1        21       50      0.42 
-##  2         2        19       50      0.38 
-##  3         3        26       50      0.52 
-##  4         4        23       50      0.46 
-##  5         5        22       50      0.44 
-##  6         6        20       50      0.4  
-##  7         7        21       50      0.42 
+##  2         2        27       50      0.54 
+##  3         3        25       50      0.5  
+##  4         4        26       50      0.52 
+##  5         5        20       50      0.4  
+##  6         6        26       50      0.52 
+##  7         7        27       50      0.54 
 ##  8         8        29       50      0.580
-##  9         9        25       50      0.5  
-## 10        10        23       50      0.46 
+##  9         9        22       50      0.44 
+## 10        10        21       50      0.42 
 ## # … with 23 more rows
 ```
 ]
@@ -465,7 +465,7 @@ Instead of taking only 33 samples, let's take ***1000***!
 
 1. Why do we not take 1000 samples "by hand"?
 
-1. Load the [data](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1") into an object `pasta`.
+1. Load the [data](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1) into an object `pasta`.
 
 1. Obtain 1000 samples of size 50 using the `rep_sample_n()` function from the `moderndive` package.
 
