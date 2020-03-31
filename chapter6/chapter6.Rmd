@@ -179,9 +179,9 @@ class: inverse
 
 # Task 1 (10 minutes)
 
-1. Create a vector containing the proportions of green pasta from the previous slide. Name it `pasta`. (Hint: remember that vectors are created using the `c()` function.)
+1. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
 
-1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`.
+1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`. Hint: you need to 
 
 1. What do you observe?
 
@@ -452,7 +452,7 @@ Instead of taking only 33 samples, let's take ***1000***!
 
 1. Why do we not take 1000 samples "by hand"?
 
-1. Load the [data](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1") into an object `pasta`.
+1. Load the [data](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1) into an object `pasta`.
 
 1. Obtain 1000 samples of size 50 using the `rep_sample_n()` function from the `moderndive` package.
 
