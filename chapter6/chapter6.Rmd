@@ -581,14 +581,16 @@ df = rbind(virtual_prop_green_25,virtual_prop_green_50,virtual_prop_green_100)
 
 df %>% 
   ggplot(aes(x = prop_green)) +
-    geom_histogram(binwidth = 0.05, boundary = 0.425, color = "white", fill = "darkgreen") +
-  scale_x_continuous(breaks = round(seq(0.3, 0.7, by = 0.1),1)) +
+    geom_histogram(data = df %>% filter(sample_n == 25), binwidth = 0.04, boundary = 0.42, color = "white", fill = "darkgreen") +
+  geom_histogram(data = df %>% filter(sample_n == 50), binwidth = 0.02, boundary = 0.41, color = "white", fill = "darkgreen") +
+  geom_histogram(data = df %>% filter(sample_n == 100), binwidth = 0.01, boundary = 0.405, color = "white", fill = "darkgreen") +
+  scale_x_continuous(breaks = round(seq(0, 1, by = 0.2),1), limits = c(0.2,0.8)) +
   labs(
     x = "Proportion of green pasta in sample",
     y = "Frequency",
     title = "Comparing distributions of proportions of green pasta for different sample sizes"
   ) +
-    facet_wrap(~sample_n, labeller = as_labeller(
+    facet_wrap(~sample_n, scales = "free_y", labeller = as_labeller(
         c(`25` = "1000 samples of size 25",
           `50` = "1000 samples of size 50",
           `100` = "1000 samples of size 100"))) +
@@ -752,21 +754,32 @@ sum(bowl$color == "green")/nrow(bowl)
 p <- bowl %>% 
   summarize(p = mean(color == "green")) %>% 
   pull(p)
+
+dat_text <- data.frame(
+  sample_n   = c(25, 50, 100),
+  # x     = c(0.655, 0.655, 0.655),
+  # y     = c(175, 95, 45),
+  label = rep("True population proportion", 3)
+)
+
 df %>% 
   ggplot(aes(x = prop_green)) +
-    geom_histogram(binwidth = 0.05, boundary = 0.525, color = "white", fill = "darkgreen") +
-    scale_x_continuous(breaks = round(seq(0.3, 0.7, by = 0.1),1)) +
-    labs(
-      x = expression(paste("Sample proportion ", hat(p))),
-      y = "Frequency",
-      title = expression(paste("Sampling distributions of ", hat(p), " based on n = 25, 50, 100."))) +
-  facet_wrap(~sample_n, labeller = as_labeller(
-      c(`25` = "1000 samples of size n = 25",
-          `50` = "1000 samples of size n = 50",
-          `100` = "1000 samples of size n = 100"))) +
-  theme_bw(base_size = 14) +
+    geom_histogram(data = df %>% filter(sample_n == 25), binwidth = 0.04, boundary = 0.42, color = "white", fill = "darkgreen") +
+  geom_histogram(data = df %>% filter(sample_n == 50), binwidth = 0.02, boundary = 0.41, color = "white", fill = "darkgreen") +
+  geom_histogram(data = df %>% filter(sample_n == 100), binwidth = 0.01, boundary = 0.405, color = "white", fill = "darkgreen") +
+  scale_x_continuous(breaks = round(seq(0, 1, by = 0.2),1), limits = c(0.2,0.8)) +
+  labs(
+    x = "Proportion of green pasta in sample",
+    y = "Frequency",
+    title = "Comparing distributions of proportions of green pasta for different sample sizes"
+  ) +
+    facet_wrap(~sample_n, scales = "free_y", labeller = as_labeller(
+        c(`25` = "1000 samples of size 25",
+          `50` = "1000 samples of size 50",
+          `100` = "1000 samples of size 100"))) +
+    theme_bw(base_size = 14) +
   geom_vline(xintercept = p, col = "black", size = 0.75) +
-  annotate("text", x = 0.655, y = 410, label = "True population proportion", size = 3)
+  geom_text(data = dat_text, mapping = aes(x = 0.662, y = Inf, label = label), vjust = 2, size = 3)
 ```
 
 ---
