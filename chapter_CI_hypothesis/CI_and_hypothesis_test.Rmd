@@ -49,27 +49,28 @@ overwrite = FALSE
 
 ```
 
-# Recap from last week?
+# Recap from last week
 
+* Sampling: ***sampling variation*** and ***distribution distributions***
 
-* Last week we learned about **sampling distributions**
+* population, population parameter, sample statistic or point estimate, random sampling
+
+* ***Unbiased estimator***: $\mathop{\mathbb{E}}[\hat{p}] = p$
+
+* ***Central Limit Theorem***: as sample increases, sampling distribution is more ***normally distributed***, centered around the ***population parameter***, and has a smaller ***standard error***
 
 --
 
-* We took repeated **random samples** from a our **population** (i.e. our pasta bowl)
+## Today: Deeper dive into ***statistical inference*** <sup>1</sup>
 
-  * For each sample, we computed the **point estimate** $\hat{p}$ of the proportion of green pasta.
+.footnote[
+[1]: This lecture is based on the wonderful [confidence interval](https://moderndive.com/8-confidence-intervals.html) and [hypothesis testing](https://moderndive.com/9-hypothesis-testing.html) chapters of [ModernDive](https://moderndive.com/)]
 
---
+* Process of making claims about a population based on information from a sample
 
-* The resulting distribution is called **sampling distribution**
+* *Confidence intervals*: providing plausible ***range*** of values
 
-  * It is **normally shaped** around the **population parameter**.
-  
-  * It becomes *narrower* when considering samples of bigger size.
---
-
-* Looking at this sampling distribution, it seemed fairly easy to infer what the true proportion of green pasta was. 
+* *Hypothesis testing*: comparing statistics between groups
 
 ---
 
@@ -77,24 +78,24 @@ background-image: url(https://media.giphy.com/media/hXG93399r19vi/giphy.gif)
 background-position: 18% 45%
 background-size: 450px
 
-# Back to reality
+# Back to reality (there goes gravity `r emo::ji("wink")`)
 
 .pull-right[
 
-* In real life we only get to take **one** sample from the population.
+* In real life we only get to take ***one*** sample from the population (not ***1000***!).
 
-  * So nobody could ever take **1000** samples from the population!
+* Also, we obviously don't know the true population parameter, that's what we are interested in!
 
-* Also, we obviously don't know about the true proportion of green pasta!
-  
-  * That's what we are interested in. 
-
-* So what on earth was all of this good for? Fun Only?! 😧
+* So what on earth was all of this good for? Fun Only?! `r emo::ji("anguished")`
 
 ]
 
+--
 
-* Well, even unobserved, we **know** that the sampling distribution does exist, and even better, we know how it behaves!
+<br>
+<br>
+
+* Even unobserved, we **know** that the sampling distribution does exist, and even better, we know how it behaves!
 
 * Let's see what we can do with this...
 
@@ -113,37 +114,37 @@ layout: true
 
 ---
 
-# From Point Estimate to Confidence Intervals
+# From Point Estimates to Confidence Intervals
 
-* From now, we only get **point estimates** from our samples: either simple statistics like *means* or *proportions* or *regression coefficients*
-
---
-
-* We know that this sample estimate differs from the true population parameter because of sampling variation. 
+* Until now, we have only estimated ***point estimates*** from our samples: *sample means*, *sample proportions*, *regression coefficients*, etc.
 
 --
 
-* Rather than a point estimate, we could give a range of plausible values for the population parameter. 
+* We know that this ***sample statistic*** differs from the ***true population parameter*** due to ***sampling variation***. 
 
 --
 
-* That is precisely what a **Confidence Interval** (CI) provides.
+* Rather than a point estimate, we could give a ***range of plausible values*** for the population parameter.
+
+--
+
+* That is precisely what a ***confidence interval*** (CI) provides.
 
 ---
 
 # Constructing Confidence Intervals 
 
-* There are several approaches to construct CI's:
+There are several approaches to constructing confidence intervals:
     
-  1. *Theory*: Use mathematical formulas (**Central Limit Theorem**) to derive the sampling distributions of our point estimates under certain conditions.
+  1. *Theory*: Use mathematical formulas (***Central Limit Theorem***) to derive the sampling distributions of our point estimates under certain conditions.
 
 --
 
-  1. *Simulation.* We can use the **Bootstrap** method to *reconstruct* the sampling distribution.
+  1. *Simulation.* We can use the ***bootstrapping*** method to *reconstruct* the sampling distribution.
     
 --
     
-* We'll focus on the bootstrap to give you the intuition and come back to the maths approach later (in the next course).
+* We'll focus on simulation to give you the intuition and come back to the maths approach next week.
 
 --
 
@@ -151,26 +152,13 @@ layout: true
 
 ---
 
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/c/c3/Gustave_Dor%C3%A9_-_Baron_von_M%C3%BCnchhausen_-_037.jpg)
-background-position: 20% 70%
-background-size: 350px
+# Bootstrapping
 
-# Baron von Münchhausen (not)
+* ***Key idea***: *pretend* the sample **is** the population, and repeatedly *resample with replacement* from it until obtaining a new sample of the same size as the original sample.
 
-.pull-right[
+* Bootstrapping does ***not*** improve point estimation.
 
-* The ethymology of *bootstrapping* is apparently [wrongly attributed](https://en.wikipedia.org/wiki/Bootstrapping) to the Baron of Münchhausen (who pulled himself out of the swamp by his own pigtail)
-
-* The idea is to *pull oneself up by one's own bootstraps*.
-
-* It sounds as if one had super-powers.
-
-* It's a simple but powerful idea. 
- 
- * We just *pretend* that our sample **is** the population. Then we repeatedly *resample* from it. 
-
-]
-
+* But it yields a very good estimate of the ***standard error*** of the ***sampling distribution***.
 
 ---
 
@@ -180,7 +168,7 @@ background-size: 800px
 
 ---
 
-# Our initial pasta sample
+# Back to Pasta
 
 ```{r, echo = FALSE}
 bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
@@ -201,32 +189,35 @@ p_hat = mean(my_sample$color=="green")
 
 * As in real life, we have access to *only one random sample* from the entire population.
 
-.pull-left[
+--
+
 * So let's start by drawing one random sample of size $n = 40$ from our bowl:
 
 ```{r, eval = FALSE}
+bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
+
 my_sample = bowl %>%
   mutate(color = as.factor(ifelse(color == "green","green","non-green"))) %>%
-  rep_sample_n(size = sample_size) %>%
+  rep_sample_n(size = 40) %>%
   ungroup() %>%
   select(pasta_ID, color) %>%
   arrange(pasta_ID)
 ```
-]
 
-.pull-right[
+.pull-left[
 ```{r}
 head(my_sample)
 ```
 ]
 
-</br>
-
-* The proportion of green pasta in this sample is: $\hat{p} = `r p_hat`$.
+.pull-right[
 ```{r}
-(p_hat = mean(my_sample$color=="green"))
+p_hat = mean(my_sample$color == "green")
 ```
 
+The proportion of green pasta in this sample is: $\hat{p} = `r p_hat`$.
+
+]
 ---
 
 # Boostrapping our pasta sample
