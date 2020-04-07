@@ -4,12 +4,10 @@
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
-    <script src="libs/jquery/jquery.min.js"></script>
-    <script src="libs/elevate-section-attrs/elevate-section-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="..\css\scpo.css" type="text/css" />
-    <link rel="stylesheet" href="..\css\scpo-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -31,27 +29,28 @@ layout: true
 
 
 
-# Recap from last week?
+# Recap from last week
 
+* Sampling: ***sampling variation*** and ***distribution distributions***
 
-* Last week we learned about **sampling distributions**
+* population, population parameter, sample statistic or point estimate, random sampling
+
+* ***Unbiased estimator***: `\(\mathop{\mathbb{E}}[\hat{p}] = p\)`
+
+* ***Central Limit Theorem***: as sample size increases, sampling distribution is more ***normally distributed***, centered around the ***population parameter***, and has a smaller ***standard error***
 
 --
 
-* We took repeated **random samples** from a our **population** (i.e. our pasta bowl)
+## Today: Deeper dive into ***statistical inference*** &lt;sup&gt;1&lt;/sup&gt;
 
-  * For each sample, we computed the **point estimate** `\(\hat{p}\)` of the proportion of green pasta.
+.footnote[
+[1]: This lecture is based on the wonderful [confidence interval](https://moderndive.com/8-confidence-intervals.html) and [hypothesis testing](https://moderndive.com/9-hypothesis-testing.html) chapters of [ModernDive](https://moderndive.com/)]
 
---
+* Process of making claims about a population based on information from a sample
 
-* The resulting distribution is called **sampling distribution**
+* *Confidence intervals*: providing plausible ***range*** of values
 
-  * It is **normally shaped** around the **population parameter**.
-  
-  * It becomes *narrower* when considering samples of bigger size.
---
-
-* Looking at this sampling distribution, it seemed fairly easy to infer what the true proportion of green pasta was. 
+* *Hypothesis testing*: comparing statistics between groups
 
 ---
 
@@ -59,24 +58,24 @@ background-image: url(https://media.giphy.com/media/hXG93399r19vi/giphy.gif)
 background-position: 18% 45%
 background-size: 450px
 
-# Back to reality
+# Back to reality (there goes gravity 😉)
 
 .pull-right[
 
-* In real life we only get to take **one** sample from the population.
+* In real life we only get to take ***one*** sample from the population (not ***1000***!).
 
-  * So nobody could ever take **1000** samples from the population!
+* Also, we obviously don't know the true population parameter, that's what we are interested in!
 
-* Also, we obviously don't know about the true proportion of green pasta!
-  
-  * That's what we are interested in. 
-
-* So what on earth was all of this good for? Fun Only?! 😧
+* So what on earth was all of this good for? Fun only?! 😧
 
 ]
 
+--
 
-* Well, even unobserved, we **know** that the sampling distribution does exist, and even better, we know how it behaves!
+&lt;br&gt;
+&lt;br&gt;
+
+* Even unobserved, we ***know*** that the sampling distribution does exist, and even better, we know how it behaves!
 
 * Let's see what we can do with this...
 
@@ -95,64 +94,55 @@ layout: true
 
 ---
 
-# From Point Estimate to Confidence Intervals
+# From Point Estimates to Confidence Intervals
 
-* From now, we only get **point estimates** from our samples: either simple statistics like *means* or *proportions* or *regression coefficients*
-
---
-
-* We know that this sample estimate differs from the true population parameter because of sampling variation. 
+* Until now, we have only estimated ***point estimates*** from our samples: *sample means*, *sample proportions*, *regression coefficients*, etc.
 
 --
 
-* Rather than a point estimate, we could give a range of plausible values for the population parameter. 
+* We know that this ***sample statistic*** differs from the ***true population parameter*** due to ***sampling variation***. 
 
 --
 
-* That is precisely what a **Confidence Interval** (CI) provides.
+* Rather than a point estimate, we could give a ***range of plausible values*** for the population parameter.
+
+--
+
+* This is precisely what a ***confidence interval*** (CI) provides.
 
 ---
 
 # Constructing Confidence Intervals 
 
-* There are several approaches to construct CI's:
+There are several approaches to constructing confidence intervals:
     
-  1. *Theory*: Use mathematical formulas (**Central Limit Theorem**) to derive the sampling distributions of our point estimates under certain conditions.
+  1. *Theory*: use mathematical formulas (***Central Limit Theorem***) to derive the sampling distribution of our point estimate under certain conditions.
 
 --
 
-  1. *Simulation.* We can use the **Bootstrap** method to *reconstruct* the sampling distribution.
+  1. *Simulation.* use the ***bootstrapping*** method to *reconstruct* the sampling distribution of our point estimate.
     
 --
     
-* We'll focus on the bootstrap to give you the intuition and come back to the maths approach later (in the next course).
+We'll focus on simulation to give you the intuition and come back to the maths approach next week.
 
 --
 
-* But first: what is a *bootstrap*?
+But first: what is a *bootstrap*?
 
 ---
 
-background-image: url(https://upload.wikimedia.org/wikipedia/commons/c/c3/Gustave_Dor%C3%A9_-_Baron_von_M%C3%BCnchhausen_-_037.jpg)
-background-position: 20% 70%
-background-size: 350px
+# Bootstrapping
 
-# Baron von Münchhausen (not)
+* ***Key idea***: *pretend* the sample **is** the population, and repeatedly *resample with replacement* from it until obtaining a new sample of the same size as the original sample.
 
-.pull-right[
+--
 
-* The ethymology of *bootstrapping* is apparently [wrongly attributed](https://en.wikipedia.org/wiki/Bootstrapping) to the Baron of Münchhausen (who pulled himself out of the swamp by his own pigtail)
+* Bootstrapping does ***not*** improve point estimation.
 
-* The idea is to *pull oneself up by one's own bootstraps*.
+--
 
-* It sounds as if one had super-powers.
-
-* It's a simple but powerful idea. 
- 
- * We just *pretend* that our sample **is** the population. Then we repeatedly *resample* from it. 
-
-]
-
+* But it yields a very good estimate of the ***standard error*** of the ***sampling distribution***.
 
 ---
 
@@ -162,27 +152,29 @@ background-size: 800px
 
 ---
 
-# Our initial pasta sample
+# Back to Pasta
 
 
 
 * As in real life, we have access to *only one random sample* from the entire population.
 
-.pull-left[
-* So let's start by drawing one random sample of size `\(n = 40\)` from our bowl:
+--
+
+* So let's start by drawing one random sample of size `\(n = 40\)` from our bowl
 
 
 ```r
+bowl &lt;- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
+
 my_sample = bowl %&gt;%
   mutate(color = as.factor(ifelse(color == "green","green","non-green"))) %&gt;%
-  rep_sample_n(size = sample_size) %&gt;%
+  rep_sample_n(size = 40) %&gt;%
   ungroup() %&gt;%
   select(pasta_ID, color) %&gt;%
   arrange(pasta_ID)
 ```
-]
 
-.pull-right[
+.pull-left[
 
 ```r
 head(my_sample)
@@ -192,73 +184,12 @@ head(my_sample)
 ## # A tibble: 6 x 2
 ##   pasta_ID color    
 ##      &lt;int&gt; &lt;fct&gt;    
-## 1        8 green    
-## 2       54 non-green
-## 3       71 green    
-## 4       85 green    
-## 5       92 non-green
-## 6      122 green
-```
-]
-
-&lt;/br&gt;
-
-* The proportion of green pasta in this sample is: `\(\hat{p} = 0.55\)`.
-
-```r
-(p_hat = mean(my_sample$color=="green"))
-```
-
-```
-## [1] 0.55
-```
-
----
-
-# Boostrapping our pasta sample
-
-How do we get 1 **bootstrap sample**:
-  
-  1. Randomly pick one pasta from your sample and record the associated color.
-  
-  1. Put this pasta back in your sample.
-  
-  1. Repeat step 1 to 2 39 times (i.e. `\(n-1\)`)
-
-  1. Compute the proportion of green pasta from your bootstrap sample
-
----
-
-# Boostrapping our pasta sample
-
-Here is one bootstrap sample: 
-
-.pull-left[
-
-
-```r
-one_bootstrapp = my_sample %&gt;%
-  rep_sample_n(size = 40, replace = TRUE) %&gt;%
-  arrange(pasta_ID)
-```
-
-
-```
-## # A tibble: 40 x 3
-## # Groups:   replicate [1]
-##    replicate pasta_ID color    
-##        &lt;int&gt;    &lt;int&gt; &lt;fct&gt;    
-##  1         1       54 non-green
-##  2         1       71 green    
-##  3         1      122 green    
-##  4         1      123 non-green
-##  5         1      128 non-green
-##  6         1      128 non-green
-##  7         1      146 green    
-##  8         1      149 green    
-##  9         1      149 green    
-## 10         1      184 green    
-## # ... with 30 more rows
+## 1       21 green    
+## 2       83 green    
+## 3       84 green    
+## 4      117 non-green
+## 5      161 green    
+## 6      162 green
 ```
 ]
 
@@ -266,30 +197,118 @@ one_bootstrapp = my_sample %&gt;%
 
 .pull-right[
 
-* All pasta have been draw from our initial sample
+```r
+p_hat = mean(my_sample$color == "green")
+p_hat
+```
+
+```
+## [1] 0.65
+```
+
+The proportion of green pasta in this sample is: `\(\hat{p} = 0.65\)`.
+]
+
+---
+
+# Boostrapping our Pasta Sample
+
+How do we get a ***bootstrap sample***?
+
+--
+  
+  1. Randomly pick ***one*** pasta from the sample and record the associated color.
+  
+--
+  
+  1. Put this pasta back in the sample.
+  
+--
+  
+  1. Repeat steps 1 and 2 39 times, i.e. until your new sample is of the same size as the original sample.
+
+--
+
+  1. Compute the proportion of green pasta in the bootstrap sample.
+
+---
+
+# Boostrapping our Pasta Sample
+
+Here is one bootstrap sample: 
+
+.pull-left[
+
+
+```r
+one_bootstrap = my_sample %&gt;%
+  rep_sample_n(size = 40, replace = TRUE) %&gt;%
+  arrange(pasta_ID)
+
+head(one_bootstrap)
+```
+
+```
+## # A tibble: 6 x 3
+## # Groups:   replicate [1]
+##   replicate pasta_ID color
+##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt;
+## 1         1       21 green
+## 2         1       21 green
+## 3         1       21 green
+## 4         1       21 green
+## 5         1       83 green
+## 6         1       84 green
+```
+
+```r
+nrow(one_bootstrap)
+```
+
+```
+## [1] 40
+```
+
+```r
+mean(one_bootstrap$color == "green")
+```
+
+```
+## [1] 0.725
+```
+]
+
+--
+
+.pull-right[
+
+* All pasta are drawn from our initial sample.
 
 * You can notice that:
 
-  * Several pasta have been drawn multiple times (ID=128,149,...)! That's normal.
+  * Several pasta have been drawn multiple times! That's normal because we did ***resampling with replacement***.
 
-  * The bootstrap sample size is equal to our initial sample size. 
-
+  * The bootstrap sample size is equal to our initial sample size.
+  
+  * The proportion of green pasta is very similar to that in our sample.
 ]
 
   
 ---
 
-# Getting the Bootstrap distribution
+# Obtaining the Bootstrap Distribution
 
-* Repeating the whole procedure 1000 times, you will get 1000 bootstrap samples and 1000 bootstrapped estimates! 
+* Repeating the whole procedure 1000 times, you will get 1000 bootstrap samples and 1000 bootstrap estimates!
 
-* We use the `infer` package that makes the whole bootstrapping procedure easier. 
+* We use the `infer` package to ease the bootstrapping procedure.
 
 
 
 
 
 ```r
+library(infer)
+
 bootstrap_distrib = my_sample %&gt;% # take my random sample
   specify(response = color, success = "green") %&gt;% # specify the variable and level of interest
   generate(reps = 1000, type = "bootstrap") %&gt;% # generate 1000 bootstrap samples 
@@ -298,9 +317,7 @@ bootstrap_distrib = my_sample %&gt;% # take my random sample
 
 --
 
-.pull-left[
-
-* Here is the first 3 rows:
+* Here are the first 3 rows:
 
 
 ```r
@@ -311,77 +328,75 @@ head(bootstrap_distrib,3)
 ## # A tibble: 3 x 2
 ##   replicate  stat
 ##       &lt;int&gt; &lt;dbl&gt;
-## 1         1 0.5  
-## 2         2 0.475
-## 3         3 0.5
+## 1         1 0.75 
+## 2         2 0.675
+## 3         3 0.725
 ```
-]
-
---
-
-.pull-right[
-
-&lt;/br&gt;
-
-***Question***
-
-* What 0.475 is referring to? 
-
-* How many rows has this dataframe? 
-]
-
 
 ---
 
 # Visualizing Our Simulated Distribution
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Building a 95% confidence interval
+# Building a 95% Confidence Interval
 
 * Let's define an interval that covers 95% of our bootstrapped estimates.
 
-* We get it by cutting the boostrap distribution at the 2.5% and 97.5% quantiles
+* We get it by cutting the boostrap distribution at the 2.5% and 97.5% quantiles.
+
+--
 
 * It defines our 95% CI as: `\(CI^B = [q_{2,5\%} ; q_{97,5\%}]\)`
 
-.pull-left[
-
-&lt;/br&gt;
-
-* In our case gives: `\([0.4 ; 0.7]\)`
+* In our case gives: `\([0.5 ; 0.8]\)`
 
 
 ```r
-c(quantile(bootstrap_distrib$stat,0.025),
-  quantile(bootstrap_distrib$stat,0.975))
+quantile(bootstrap_distrib$stat,0.025)
 ```
 
 ```
-##  2.5% 97.5% 
-##   0.4   0.7
+## 2.5% 
+##  0.5
 ```
-]
 
-.pull-right[
+```r
+quantile(bootstrap_distrib$stat,0.975)
+```
+
+```
+## 97.5% 
+##   0.8
+```
+
+---
+
+# Building a 95% Confidence Interval: Visually
+
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+* Does the interval contain the true population proportion?
+
+---
+
+# Building a 95% Confidence Interval: Visually
+
 &lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
-]
+
+--
+
+True population parameter (blue line) is indeed in our 95% interval! Will it always be?
 
 ---
 
 # Interpreting a 95% confidence interval
 
-* Let's first check if the interval we built from our sample contains the true value.
-
-  * Again, in reality we cannot do this check, here we simply show you that we are not loosing our mind. 
-  
---
-
-* In our example we have: `\(p = 0.494\)`
-
---
+* Let's repeatedly draw 100 different samples from our `bowl` and for each sample compute the associated 95% CI.
 
 .pull-left[
 
@@ -395,38 +410,11 @@ c(quantile(bootstrap_distrib$stat,0.025),
 
 &lt;/br&gt;
 
-* So yes, the true value (blue line) is indeed in our 95% interval! 
-
-* Ok but, what if we had another sample from the begining, i.e. a different sample from the `bowl`.
-
-  * Would `\(p\)` be also contained in it?
-
-]
-
-
----
-
-# Interpreting a 95% confidence interval
-
-* Let's repeatedly draw 100 different samples from our `bowl` and for each sample compute the associated 95% CI.
-
-.pull-left[
-
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
-
-]
-
---
-
-.pull-right[
-
-&lt;/br&gt;
-
 * Looking at what we obtained:
 
-  * There are only 5 of our CI which missed `\(p\)`!
+  * There are only 4 of our CIs which missed `\(p\)`!
 
-  * In other words, 95 of our CI contains the true value `\(p\)`!
+  * In other words, 96 of our CIs contain the true value `\(p\)`!
 
 * That illustrate what a 95% Confidence Interval **is**.
 
@@ -449,13 +437,15 @@ c(quantile(bootstrap_distrib$stat,0.025),
   
 --
 
-* For a 95% CI, we say that we are **95% confident that the interval contains the true parameter**
-
-  * .small[If we repeated our sampling procedure a large number of times, we expect about 95% of the resulting confidence intervals to capture the value of the population parameter. As we saw in the previous slide.]
+&gt; *Precise interpretation:* If we repeated our sampling procedure ***a large number of times***, we ***expect about 95%*** of the resulting confidence intervals to capture the value of the population parameter.
 
 --
 
-***Question*** 
+&gt; *Short-hand interpretation:* We are ***95% “confident”*** that a 95% confidence interval captures the value of the population parameter.
+
+--
+
+***Questions:*** 
 
   * How does the size of the confidence interval evolves when setting higher levels of confidence?
   * How does the size of the confidence interval evolves when the sample size increases?
@@ -464,11 +454,21 @@ c(quantile(bootstrap_distrib$stat,0.025),
 
 # From Confidence Intervals to Hypothesis Testing
 
-* Now that we’ve equipped ourselves with confidence intervals
+* *Confidence intervals* can be thought of as an extension of *point estimation*.
 
-* Let's see another common tool for statistical inference: hypothesis testing. 
+--
 
-* Just like confidence intervals, hypothesis tests are used to infer about a population using a sample.
+* What if we want to ***compare*** a sample statistic for two groups?
+  
+  * *Example*: differences in average wages between men and women.
+  
+--
+
+* These comparisons are the realm of ***hypothesis testing***.
+
+--
+
+* Just like confidence intervals, hypothesis tests are used to make claims about a population based on information from a sample.
 
 * However, we’ll see that the framework for making such inferences is slightly different.
 
@@ -493,11 +493,11 @@ Let's start with a example.
 .left-wide[
 * We will use data from an [article](https://pdfs.semanticscholar.org/39f6/d40e907ff08af4ddd3280c2ceee55ee1ddb6.pdf) published in the *Journal of Applied Psychology* in 1974 which investigates whether female employees at Banks are discriminated against.
 
-* 48 (male) supervisors were given *identical* candidate CVs - identical up to the first name, which was male or female. 
+* 48 (male) supervisors were given *identical* candidate CVs, differing only with respect to the first name, which was male or female.
 
-  * Each CV was "*in the form of a memorandum requesting a decision on the promotion of an employee to the position of branch manager*";
+  * Each CV was "*in the form of a memorandum requesting a decision on the promotion of an employee to the position of branch manager.*"
 
-* **Hypothesis** we want to test : *Is there gender discrimination?*
+* ***Hypothesis*** we want to test: *Is there gender discrimination?*
 
 * The data from the experiment are provided in the `promotions` dataset from the `moderndive` package.
 
@@ -528,137 +528,80 @@ promotions
 ##  8     8 promoted male  
 ##  9     9 promoted male  
 ## 10    10 promoted male  
-## # ... with 38 more rows
+## # … with 38 more rows
 ```
 ]
 
 ---
 
-# Conclusive evidence of discrimination
+# Evidence of Discrimination?
+
+
+.pull-left[
+
+How many men and women were offered a promotion (and not)?
+
+
+```r
+promotions %&gt;% 
+  group_by(gender, decision) %&gt;% 
+  tally %&gt;%
+  mutate(percentage = 100* n / sum(n))
+```
+
+```
+## # A tibble: 4 x 4
+## # Groups:   gender [2]
+##   gender decision     n percentage
+##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
+## 1 male   not          3       12.5
+## 2 male   promoted    21       87.5
+## 3 female not         10       41.7
+## 4 female promoted    14       58.3
+```
+
+There is a ***29.2 percentage points difference*** in promotions between men and women.
+]
+
+--
 
 .pull-left[
 &lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
-
-]
-
-.pull-right[
-&lt;/br&gt;
-
-
-```r
-promotions %&gt;% 
-  group_by(gender, decision) %&gt;% 
-  summarize(n = n()) %&gt;%
-  mutate(proportion = 100* n / sum(n))
-```
-
-```
-## # A tibble: 4 x 4
-## # Groups:   gender [2]
-##   gender decision     n proportion
-##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
-## 1 male   not          3       12.5
-## 2 male   promoted    21       87.5
-## 3 female not         10       41.7
-## 4 female promoted    14       58.3
-```
 ]
 
 --
 
-
-There is **29.2 percentage points difference** in favor of "men".
-
-  * 87.5% of "men" were promoted.
-  
-  * 58.3% of "women" were promoted.
+***Question***: Is this difference ***conclusive evidence*** of differences in promotion rates between men and women? Could such a difference have been observed ***by chance***?
 
 ---
 
-# Conclusive evidence of discrimination
+# Hypothesis testing: Basic Framework
 
-.pull-left[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+1. We assume that the hypothesis we want to test is true.
 
-]
-
-.pull-right[
-&lt;/br&gt;
-
-
-```r
-promotions %&gt;% 
-  group_by(gender, decision) %&gt;% 
-  summarize(n = n()) %&gt;%
-  mutate(proportion = 100* n / sum(n))
-```
-
-```
-## # A tibble: 4 x 4
-## # Groups:   gender [2]
-##   gender decision     n proportion
-##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
-## 1 male   not          3       12.5
-## 2 male   promoted    21       87.5
-## 3 female not         10       41.7
-## 4 female promoted    14       58.3
-```
-]
+  * In our case: no gender discrimination in promotions.
 
 --
 
-***Question***: Is the 29%p advantage for men **conclusive evidence**? 
+1. Then we evaluate how consistent the data is with this hypothetical world. 
 
-  * Could we have observed a 29% difference *by chance*?
-
----
-
-# Hypothesis testing: Basic idea 
-
-The idea of hypothesis tests is quite simple: 
-
-&lt;/br&gt;
-
---
-
-1. We asusme that the hypothesis we want to test is true. 
-
-  * In our case: we live in a world with no gender discrimination in promotions. 
-
---
-
-1. Then we look how consistent are our data with this hypothetical world. 
-
-  * In our case: We gonna ask how likely it is to get a 29%p difference in promotion rate if there is no discrimination. 
-  
+  * In our case: how likely it is to observe a 29 percentage point difference in promotion rates in a world with no discrimination. 
 
 ---
 
 
-# Imposing A Hypothetical World: No Gender Discriminiation
+# Imposing A Hypothetical World: No Gender Discrimination
 
-.pull-left[
 * Suppose we lived in a world without gender discrimination.
 
-* The promotion decision would have been completely independent from gender.
-
-  * i.e. the label `gender` in our dataframe would be meaningless.
+* The promotion decision would be completely ***independent*** from gender.
 
 * Let's randomly reassign `gender` to each row and see how this affects the result.
 
-  * This is what has been done to obtain the `promotions_shuffled` dataset
-]
-
 --
 
-.pull-right[
+.pull-left[
 
-&lt;/br&gt;
-
-
-```r
-head(bind_cols(promotions, promotions_shuffled))
-```
 
 ```
 ## # A tibble: 6 x 6
@@ -671,32 +614,26 @@ head(bind_cols(promotions, promotions_shuffled))
 ## 5     5 promoted male       5 promoted  male   
 ## 6     6 promoted male       6 promoted  male
 ```
+]
 
+.pull-right[
 * The `decision1` equals the original `decision` column...
 
 * ... but the `gender` column has been suffled to obtain `gender1`. 
-
 ]
 
 ---
 
 # Reshuffled Promotions
 
-What does the promotions look like in our reshuffled sample? 
-
 .pull-left[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
-
-]
-
-.pull-right[
-&lt;/br&gt;
+How do the promotion rates look like in our reshuffled sample?
 
 
 ```r
 promotions_shuffled %&gt;% 
   group_by(gender, decision) %&gt;% 
-  summarize(n = n()) %&gt;%
+  tally() %&gt;%
   mutate(proportion = n / sum(n))
 ```
 
@@ -711,171 +648,155 @@ promotions_shuffled %&gt;%
 ## 4 female promoted    17      0.708
 ```
 
+* The difference is much lower: ***4.2 percentage points***!
 ]
 
-&lt;/br&gt;
+--
 
-* The difference is much lower: 4.2%p.
+.pull-right[
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+
 
 ---
 
-# Sampling Variation?
+# Sampling Variation
 
-* In our hypothetical world, the difference in promotion rate was only about 4.2%p.
+* In our hypothetical world, the difference in promotion rate was only about 4.2 percentage points.
 
 * Can we answer our initial question about the existence of gender discrimination now?
 
 --
 
-* No, we must look at the role of **sampling variation**? 
+* No, we must look at the role of ***sampling variation***!
 
-  * What if we reshuffle once again, how different from 4.2%p the difference would be?
-  
-  * In other words, how representative of that hypothetical world is 4.2%?
-  
-  * Relatedly, how likely a 29%p difference is going to occur in such a world? 
+  * What if we reshuffle once again, how different from 4.2%p would the difference be?
 
-* We need to know about the whole sampling distribution under the *no discrimination* hypothesis. 
+--
+  
+  * In other words, how representative of that hypothetical world is 4.2%p?
+  
+--
+  
+  * Relatedly, how likely is a 29%p difference to occur in such a world?
+  
+--
+
+* We need to know about the whole sampling distribution under the *no discrimination* hypothesis.
 
 --
 
-* How? Just by redoing the reshuffling a large number of times, computing the difference each time.
+* How? Just by redoing the reshuffling a large number of times, and computing the difference each time.
 
 ---
 
-# Sampling Variation in Reshuffling
+# Sampling Variation with 1000 Reshufflings
 
-Here is our sampling distribution in a world without discrimination. 
-
-.pull-left[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-.pull-right[
-&lt;/br&gt;
-
-```r
-null_distribution &lt;- promotions %&gt;% 
-  # takes formula, defines success
-  specify(formula = decision ~ gender,
-          success = "promoted") %&gt;% 
-  # decisions are independent of gender
-  hypothesize(null = "independence") %&gt;% 
-  # generate 1000 reshufflings of data
-  generate(reps = 1000, type = "permute") %&gt;% 
-  # compute p_m - p_f from each reshuffle
-  calculate(stat = "diff in props",
-            order = c("male", "female"))
-
-visualize(null_distribution, bins = 10, fill = "darkgreen") +
-  labs(title = "Sampling distribution", x = "Diff. in promotion rates") +
-  theme_bw(base_size = 20)
-```
-]
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Comparing with the observed difference
+# Sampling Variation with 1000 Reshufflings
 
-Where does the observed difference of 29.2%p lie in this distribution?
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
 
-.pull-left[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-.pull-right[
-&lt;/br&gt;
-* This distribution was generated under our **hypothetical** scenario: no discrimination.
-
-* We see how sampling variation affects the difference in promotion rates.
-
-* The red line denotes the *observed difference* in the **real world**.
-
-* Now we can tell: how *likely* is it to observe a 29.2%p difference if no discrimination? 
-
-]
+How ***likely*** is it to observe a 29.2 percentage point difference in a world with no discrimination?
 
 ---
 
 # Recap
 
-* We observed a 29%p difference in promotion rate between women and men in the real world.
-
-* The question is whether in a hypothetical universe with no discrimination, 29%p is *likely* to occur.
-
-* We concluded *rather not*, i.e. we tended to **reject** that hypothesis.
+* We observed a 29 percentage point difference in promotion rate between women and men in the real world.
 
 --
 
-* You just conducted your first hypothesis test! 
-
-  * We actually did a **permutation test**. We randomly reshuffled gender accross promotion decisions and checked if it makes a difference.
+* The question is whether in a hypothetical universe with no discrimination, 29%p is ***likely*** to occur.
 
 --
 
-* Let's introduce the formal framework of hypothesis testing now. 
+* We concluded ***rather not***, i.e. we tended to ***reject*** the no discrimination hypothesis.
+
+--
+
+* We just conducted our first hypothesis test! 
+
+  * We actually did a ***permutation test***. We randomly reshuffled gender accross promotion decisions and checked if it makes a difference.
+
+--
+
+* Let's introduce the formal framework of hypothesis testing now.
 
 ---
 
 # Hypothesis Test Notation and Definitions
 
-* In Hypothesis testing we compare two **competing hypothesis** about our parameter of interest. 
-    * In the previous example:
-        `$$\begin{align}H_0:&amp; p_m - p_f = 0\\H_A:&amp; p_m - p_f &gt; 0\end{align}$$`
+* A ***hypothesis test*** consists of a test between ***two competing hypotheses*** about the population parameter:
 
-* `\(H_0\)` stands for the **null hypothesis**, where *no effect* is observed. That's our hypothetical world from above.
+--
 
-* `\(H_A\)` or `\(H_1\)` is the **alternative** hypothesis. 
-  * Here, we considered a *one-sided* alternative, saying that `\(p_m &gt; p_f\)`, ie women are discriminated against.
+  * The ***null hypothesis*** `\((H_0)\)`: generally hypothesis of no difference;
+--
+  
+  * The ***alternative hypothesis*** `\((H_A \textrm{or }H_1)\)`: the research hypothesis.
+
+--
+
+* In the previous example:
+`$$\begin{align}H_0&amp;: p_m - p_f = 0\\H_A&amp;: p_m - p_f &gt; 0,\end{align}$$`
+where `\(p_m =\)` promotion rate of men, and `\(p_f =\)` promotion rate of women.
+
+--
+
+  * Here, we considered a *one-sided* alternative, saying that `\(p_m &gt; p_f\)`, i.e. women are discriminated against.
   * The *two-sided* formulation is just `\(H_A: p_m - p_f \neq 0\)`
 
 ---
 
 # Hypothesis Test Notation and Definitions
 
-* A **test statistic** is a summary statistic which we use to summarise a certain aspect of our sample. 
-  * In our previous case it was: `\(\hat{p}_m - \hat{p}_f\)`
+* ***Test statistic***: *point estimate/sample statistic* formula used for hypothesis testing. 
 
-* The **observed test statistic** is the number we get from our real world sample: 
-`$$\hat{p}_m - \hat{p}_f = 29.2\%$$`
+--
 
-* The **null distribution** is the sampling distribution of our test statistic, assuming the Null hypothesis is **true**. 
-  *  All the possible values that `\(\hat{p}_m - \hat{p}_f\)` can take assuming there is no discrimination.
+  * *In our previous case*: `\(\hat{p}_m - \hat{p}_f\)`.
 
-  * That's the distribution we have seen just before. 
+--
+
+* ***Observed test statistic***: value of the test statistic that we observed in real life.
+
+--
+
+  * *In our previous case*: `\(\hat{p}_m - \hat{p}_f = 29.2\)` percentage points.
+  
+--
+
+* ***Null distribution***: sampling distribution of the test statistic *assuming the null hypothesis `\(H_0\)` is true*.
+
+--
+  *  *In our previous case*: All the possible values that `\(\hat{p}_m - \hat{p}_f\)` can take assuming there is no discrimination.
+  * That's the distribution we have seen just before.
  
 ---
 
 # Null Distribution
 
-.pull-left[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-.pull-right[
-&lt;/br&gt;
-&lt;/br&gt;
-
-* This is the sampling distribution of `\(\hat{p}_m - \hat{p}_f\)`, assuming `\(H_0\)` is true.
-
-&lt;/br&gt;
-
-* The red line is the *observed test statistic*.
-]
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Hypothesis Test Notation and Definitions
 
-* The **p-value** is the probability of observing a test statistic *more extreme* than the one we obtained, assuming `\(H_0\)` is true. 🤔
+&gt; ### ***p-value:*** probability of observing a test statistic *more extreme* than the one we obtained, assuming `\(H_0\)` is true. 🤔
 
-  * How *strong* a piece of evidence is it to observe `\(\hat{p}_m - \hat{p}_f=29\%\)` in a world where `\(p_m - p_f=0\)` is assumed true? Very strong? Not so strong?
+  * How *strong* a piece of evidence is it to observe `\(\hat{p}_m - \hat{p}_f=29\)` percentage points in a world where `\(p_m - p_f=0\)` is assumed true? Very strong? Not so strong?
 
-  * How many samples did we obtain that had a difference *greater* than 29%? Many, or not so many?
+  * How many samples did we obtain that had a difference *greater* than 29%p? Many, or not so many?
 
 --
 
-* ***Interpretation***: The lower the p-value, the less consistent our Null hypothesis is with the observed statistic.
+* ***Interpretation***: The lower the p-value, the *less consistent our null hypothesis is with the observed statistic*.
 
 --
 
@@ -885,19 +806,21 @@ Where does the observed difference of 29.2%p lie in this distribution?
 
 # Hypothesis Test Notation and Definitions
 
-* To decide wether we reject `\(H_0\)` or not, we set a **significance level** for the test. 
+* To decide wether we reject `\(H_0\)` or not, we set a ***significance level*** for the test.
 
-* The **significance level** `\(\alpha\)` is a *cutoff* on the p-value.
+--
+
+* The ***significance level*** `\(\alpha\)` is a *cutoff* on the p-value.
 
   * Common values are `\(\alpha = 1\%\)`, `\(5\%\)`, or `\(10\%\)` .
 
 --
 
-* **Decision**: If the p-value falls below the cutoff `\(\alpha\)`, we **reject** the null hypothesis at the significance level `\(\alpha\)`.
+* ***Decision***: If the p-value falls below the cutoff `\(\alpha\)`, we ***reject*** the null hypothesis at the significance level `\(\alpha\)`.
 
 --
 
-* ***Interpretation***: If what we observe *is too unlikely to happen* under the Null, it means that this hypothesis is *likely to be false*.
+* ***Interpretation***: If what we observe *is too unlikely to happen* under the null hypothesis, it means that this hypothesis is ***likely to be false***.
 
 --
 
@@ -907,21 +830,12 @@ Where does the observed difference of 29.2%p lie in this distribution?
 
 # Visualizing the P-value
 
-.pull-left[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
-]
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
 
-.pull-right[
+--
 
-&lt;/br&gt;
+The p-value measures the probability of being to the right of the red line.
 
-* The red area **is the p-value**!
-
-* In our case *more extreme* means *bigger difference* (in favor of men).
-
-* So the p-value measures the probability to the right of the red line.
-
-* Is that a *big* or a *small* area?
 ]
 
 
@@ -929,28 +843,28 @@ Where does the observed difference of 29.2%p lie in this distribution?
 
 # Obtaining the p-value and Deciding
 
-* The red area, i.e. the p-value, equals **0.019** in our case.
+* The red areas corresponds to the share of ***simulated differences in promotion rates under the null hypothesis*** that exceed the ***observed test statistic*** (0.292).
 
 
 ```r
-p_value &lt;- null_distribution %&gt;%
-  get_p_value(obs_stat = obs_diff_prop, direction = "right")
-p_value$p_value
+p_value &lt;- mean(null_distribution$stat &gt;= 0.292)
+p_value
 ```
 
 ```
-## [1] 0.019
+## [1] 0.007
 ```
 
-* In a world without discrimination, we would get `\(\hat{p_m} - \hat{p_f}\)` superior (or equal) to 29.2%p only 1.9% of the time. 
+* In a world without discrimination, we would get `\(\hat{p_m} - \hat{p_f}\)` superior (or equal) to 29.2%p only 0.7% of the time. 
+--
 
 * So, we can reject `\(H_0\)`, i.e. the absence of discrimination, at the 5% significance level. 
 
-  * We also say that `\(\hat{p_m} - \hat{p_f} = 29.2\)`%p is **significantly different from 0** at the 5% level. 
+  * We also say that `\(\hat{p_m} - \hat{p_f} = 29.2\)`%p is ***statistically significantly different from 0*** at the 5% level. 
  
 --
 
-* **Question**: Suppose we had set `\(\alpha = 0.01 = 1\%\)`, would we have rejected the absence of discrimination at this level? 
+* ***Question***: Suppose we had set `\(\alpha = 0.01 = 1\%\)`, would we have rejected the absence of discrimination at this level? 
 
 ---
 
@@ -958,9 +872,13 @@ p_value$p_value
 
 Working with probabilities implies that sometimes, we make **errors**.
 
+--
+
 * A 29%p difference may be *unlikely* under `\(H_0\)`, but that **doesn't mean it's *impossible* to occur**.
 
   * In fact, such a difference (or higher) would occur in 1.9% of the cases.
+  
+--
 
 * So, it may happen that we sometimes reject `\(H_0\)`, when in fact it was true.
 
@@ -970,7 +888,7 @@ Working with probabilities implies that sometimes, we make **errors**.
 
 # Testing Errors
 
-In fact, in hypothesis testing, there are even **two types of errors** to make! 😲:
+In hypothesis testing, there are ***two types of errors***:
 
 .pull-left[
 
@@ -980,37 +898,35 @@ In fact, in hypothesis testing, there are even **two types of errors** to make! 
 
 .pull-right[
 
-* **Type I error**: We Reject a *true* Null.
+***Type I error***: reject the null hypothesis when in fact it was true.
   
-* **Type II error**: We *fail* to reject a *wrong* Null.
+***Type II error***: don't reject the null hypothesis when in fact it was false.
 
 ]
 
 * In practice, we choose the frequency of a Type I error by setting `\(\alpha\)` and try to minimize the type II error.
 
-* This is similar to a verdict reach in a court trial:
-
-![:scale 48%](../img/photos/gt_error_table.png)
-
 ---
 
-# Teaser for next week 
+# How does all of this relate to regression analysis? 
 
-* Now you have all the tools to make **statistical inference** for real! 
-
-* The regression tables no longer hold any secrets for you:
-
-  * (OLS) Coefficients estimates
-
-  * (Adjusted) `\(R^2\)`
-
-  * Test-statistics
-
-  * p-value
+* Now you have all the tools to make ***statistical inference*** for real!
 
 --
 
-* Well, we will see this next week!
+* Regression analysis is based on a ***sample*** of data.
+
+--
+
+* So your ***regression coefficient*** is subject to ***sampling variation***, it's not the true population coefficient.
+
+--
+
+* ***Question***: Is the estimated effect statistically significantly different from 0?
+
+--
+
+* The answer in the next episode of *Introduction to Econometrics with R*! 🐵
 
 ---
 
@@ -1039,7 +955,6 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
