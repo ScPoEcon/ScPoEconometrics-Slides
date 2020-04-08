@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Regression Discontinuity Design"
-author: "Gustave Kenedi"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -60,6 +60,12 @@ layout: true
 
 ---
 
+# Recap from last week
+
+## Today
+
+---
+
 # Regression Discontinuity Design (RDD)
 
 * We have seen one "program evaluation" method in the last lecture: __difference-in-differences__.
@@ -94,7 +100,7 @@ layout: true
 
 --
 
-* Imagine you are in assessing the __causal__ impact of alcohol consumption on mortality.
+* Imagine you are interested in assessing the __causal__ impact of alcohol consumption on mortality.
 
 --
 
@@ -162,20 +168,20 @@ class: inverse
 
 # Task 1 (10 minutes)
 
-* Take a look at the dataset and list the variables.
+1. Take a look at the dataset and list the variables.
 
-* How many age cells are there?
+1. How many age cells are there?
 
-* Plot the death rate for all causes (`all`) as a function of age (`agecell`). Does anything seem striking?
+1. Plot the death rate for all causes (`all`) as a function of age (`agecell`). Does anything seem striking?
 
-* Create a `facet_grid` ggplot with death rates for all causes (`mva`), motor vehicle-related causes (`mva`) and alcohol-related causes (`alcohol`) as a function of age.  
+1. Create a `facet_grid` ggplot with death rates for all causes (`mva`), motor vehicle-related causes (`mva`) and alcohol-related causes (`alcohol`) as a function of age.  
 (*Hint:* you need to filter the death causes first and then create the plot. Use the `scales = "free_y"` option in `facet_grid()`)
 
-* Create a dummy variable for individuals over 21 years old.
+1. Create a dummy variable for individuals over 21 years old.
 
-* Compute the average death rate (`all`), the average motor vehicle-related death rate (`mva`) and the average alcohol-related death rate (`alcohol`) for individuals under and over 21 years old. What does this simple comparison suggest?
+1. Compute the average death rate (`all`), the average motor vehicle-related death rate (`mva`) and the average alcohol-related death rate (`alcohol`) for individuals under and over 21 years old. What does this simple comparison suggest?
 
-* Make the same comparisons but keeping only age cells striclty between 20 and 22. Does this restriction change anything?
+1. Make the same comparisons but keeping only age cells striclty between 20 and 22. Does this restriction change anything?
 
 ---
 
@@ -739,6 +745,10 @@ rdd_plot <- mlda_long %>%
   facet_grid(rows = vars(death_cause), scales = "free_y")
 rdd_plot
 ```
+
+---
+
+# Recap
 
 ---
 
