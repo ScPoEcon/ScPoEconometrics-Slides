@@ -653,7 +653,7 @@ There is a ***29.2 percentage points difference*** in promotions between men and
 
 --
 
-.pull-left[
+.pull-right[
 ```{r,echo= FALSE, fig.height=6}
 ggplot(promotions, aes(x = gender, fill = decision)) +
   geom_bar(width = 0.75) +
@@ -977,8 +977,6 @@ The shaded area correponds to the p-value!
 * Recall the definition of the p-value: ***probability of observing a test statistic *just as or more extreme* than the one we obtained, assuming the null hypothesis $H_0$ is true.***
 
 --
-
-* The shaded area corresponds to the share of ***test statistics under the null hypothesis*** that exceed the ***observed test statistic*** (0.292).
 
 ```{r}
 p_value <- mean(null_distribution$stat >= 0.292)
