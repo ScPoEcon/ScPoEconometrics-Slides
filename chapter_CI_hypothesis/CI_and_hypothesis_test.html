@@ -37,7 +37,7 @@ layout: true
 
 * ***Unbiased estimator***: `\(\mathop{\mathbb{E}}[\hat{p}] = p\)`
 
-* ***Central Limit Theorem***: as sample size increases, sampling distribution is more ***normally distributed***, centered around the ***population parameter***, and has a smaller ***standard error***
+* ***Central Limit Theorem***: as sample size increases, sampling distribution of the sample mean is more ***normally distributed*** and has a smaller ***standard error***
 
 --
 
@@ -45,8 +45,6 @@ layout: true
 
 .footnote[
 [1]: This lecture is based on the wonderful [confidence interval](https://moderndive.com/8-confidence-intervals.html) and [hypothesis testing](https://moderndive.com/9-hypothesis-testing.html) chapters of [ModernDive](https://moderndive.com/)]
-
-* Process of making claims about a population based on information from a sample
 
 * *Confidence intervals*: providing plausible ***range*** of values
 
@@ -144,6 +142,7 @@ We'll focus on simulation to give you the intuition and come back to the maths a
 
 
 ```r
+library(tidyverse)
 bowl &lt;- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
 
 my_sample = bowl %&gt;%
@@ -620,7 +619,7 @@ There is a ***29.2 percentage points difference*** in promotions between men and
 
 --
 
-.pull-left[
+.pull-right[
 &lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
@@ -915,8 +914,6 @@ The shaded area correponds to the p-value!
 
 --
 
-* The shaded area corresponds to the share of ***test statistics under the null hypothesis*** that exceed the ***observed test statistic*** (0.292).
-
 
 ```r
 p_value &lt;- mean(null_distribution$stat &gt;= 0.292)
@@ -994,7 +991,7 @@ In hypothesis testing, there are ***two types of errors***:
 
 --
 
-* ***Question***: Is the estimated effect statistically significantly different from 0?
+* ***Question***: Is the estimated effect statistically significantly different from some value `\(z\)`?
 
 --
 
@@ -1007,6 +1004,40 @@ class: title-slide-final, middle
 # THANKS
 
 To the amazing [moderndive](https://moderndive.com/) team!
+
+---
+
+# Appendix: code to generate the null distribution
+
+.pull-left[
+
+```r
+null_distribution &lt;- promotions %&gt;% 
+  # takes formula, defines success
+  specify(formula = decision ~ gender,
+          success = "promoted") %&gt;%
+  # decisions are independent of gender
+  hypothesize(null = "independence") %&gt;% 
+  # generate 1000 reshufflings of data
+  generate(reps = 1000, type = "permute") %&gt;% 
+  # compute p_m - p_f from each reshuffle
+  calculate(stat = "diff in props",
+            order = c("male", "female"))
+
+visualize(null_distribution,
+          bins = 10,
+          fill = "#d90502") + 
+  labs(title = "Sampling distribution",
+       x = "Difference in promotion rates (male - female)",
+       y = "Frequency") +
+  xlim(-0.4, 0.4) +
+  theme_bw(base_size = 14)
+```
+]
+
+.pull-right[
+&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
