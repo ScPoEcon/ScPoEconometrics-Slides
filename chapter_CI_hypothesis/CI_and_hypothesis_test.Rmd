@@ -57,7 +57,7 @@ overwrite = FALSE
 
 * ***Unbiased estimator***: $\mathop{\mathbb{E}}[\hat{p}] = p$
 
-* ***Central Limit Theorem***: as sample size increases, sampling distribution is more ***normally distributed***, centered around the ***population parameter***, and has a smaller ***standard error***
+* ***Central Limit Theorem***: as sample size increases, sampling distribution of the sample mean is more ***normally distributed*** and has a smaller ***standard error***
 
 --
 
