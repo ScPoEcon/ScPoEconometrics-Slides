@@ -66,8 +66,6 @@ overwrite = FALSE
 .footnote[
 [1]: This lecture is based on the wonderful [confidence interval](https://moderndive.com/8-confidence-intervals.html) and [hypothesis testing](https://moderndive.com/9-hypothesis-testing.html) chapters of [ModernDive](https://moderndive.com/)]
 
-* Process of making claims about a population based on information from a sample
-
 * *Confidence intervals*: providing plausible ***range*** of values
 
 * *Hypothesis testing*: comparing statistics between groups
@@ -176,6 +174,7 @@ my_sample = bowl %>%
 ```
 
 ```{r, eval = FALSE}
+library(tidyverse)
 bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
 
 my_sample = bowl %>%
@@ -1050,7 +1049,7 @@ In hypothesis testing, there are ***two types of errors***:
 
 --
 
-* ***Question***: Is the estimated effect statistically significantly different from 0?
+* ***Question***: Is the estimated effect statistically significantly different from some value $z$?
 
 --
 
@@ -1063,6 +1062,44 @@ class: title-slide-final, middle
 # THANKS
 
 To the amazing [moderndive](https://moderndive.com/) team!
+
+---
+
+# Appendix: code to generate the null distribution
+
+.pull-left[
+```{r, eval = FALSE}
+null_distribution <- promotions %>% 
+  # takes formula, defines success
+  specify(formula = decision ~ gender,
+          success = "promoted") %>%
+  # decisions are independent of gender
+  hypothesize(null = "independence") %>% 
+  # generate 1000 reshufflings of data
+  generate(reps = 1000, type = "permute") %>% 
+  # compute p_m - p_f from each reshuffle
+  calculate(stat = "diff in props",
+            order = c("male", "female"))
+
+visualize(null_distribution,
+          bins = 10,
+          fill = "#d90502") + 
+  labs(title = "Sampling distribution",
+       x = "Difference in promotion rates (male - female)",
+       y = "Frequency") +
+  xlim(-0.4, 0.4) +
+  theme_bw(base_size = 14)
+```
+]
+
+.pull-right[
+```{r,echo = FALSE, fig.height=6}
+visualize(null_distribution, bins = 10, fill = "#d90502") + 
+  labs(title = "Sampling distribution", x = "Difference in promotion rates (male - female)", y = "Frequency") +
+  xlim(-0.4, 0.4)+
+  theme_bw(base_size = 14)
+```
+]
 
 ---
 
