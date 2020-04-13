@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Regression Inference"
-author: "Florian Oswald"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -25,6 +25,10 @@ layout: true
 
 ```{r setup, include=FALSE,warning=FALSE,message=FALSE}
 options(htmltools.dir.version = FALSE)
+
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+
+
 knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE,
@@ -34,6 +38,11 @@ knitr::opts_chunk$set(
   #fig.width = 11,
   #fig.height = 5
 )
+
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
 
 # define vars
 om = par("mar")
@@ -49,165 +58,167 @@ layout: true
 
 ---
 
-# Packages used in this set of slides
+# Recap from last week
 
-```{r}
-library(tidyverse)
-library(infer)
-library(moderndive)
-library(wooldridge)
-```
+* **Confidence Interval**
+
+* **Hypothesis testing**
+
+--
+
+## Today: 
+
+* Understand regression tables 
 
 ---
 
-# Back To Wages!
 
-.pull-left[
-```{r,echo=FALSE,fig.height=5}
-library(wooldridge)
-hourly_wage <- lm(formula = lwage ~ educ, data = wage1)
-ggplot(wage1, aes(educ, y = lwage)) + geom_point() + geom_smooth(method = "lm",se = FALSE)
+
+# Back to class size and student achievments
+
+* Take back the STAR experiment data and keep: 
+
+  * *small* and *regular* classes
+  * *Kindegarten* grade
+  
+* Let's consider the model:
+
+$$ \textrm{math_score}_i = b_0 + b_1 \textrm{small}_i + e_i$$ 
+
+* By running the regression we find:
+
+```{r echo = FALSE}
+star_df = read.csv("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_df = star_df %>%filter(star != "regular+aide" & grade == "k") 
+star_df$small = star_df$star == "small"
+star_df = star_df[complete.cases(star_df),]
+
+reg_star = lm(math~small, star_df)
+coeff_star = round(reg_star$coefficients,1)
 ```
 
+$$ \hat{\textrm{math_score}_i} = `r coeff_star[1]` + `r coeff_star[2]` * \textrm{small}_i$$
+* *Interpretation*: Being in a small class is associated to an average 8.9 increase in the math test score for *kindergarten* students.
+  
+
+* Is this coefficient really significantly different from 0? 
+
+---
+
+
+# Regression inference: $b$ vs $\beta$ 
+
+* Let's clarify what we are looking for when running regression. 
+
+* $b_0, b_1$ are the **point estimates** computed from our sample.
+  * Like the sample proportion $\hat{p}$ was in our pasta example!
+
+.pull-left[
+
+* In fact, our model's prediction...
+    $$\hat{y} = b_0 + b_1 x_1 + b_2x_2 + b_3x_3$$
 ]
 
 --
 
 .pull-right[
-* We started this *looong* detour into sampling while talking about **wages**.
 
-* We were interested in the determinants of hourly wage of US workers.
-
-* We used a sample of 526 US workers.
-
-* We had estimated intercept $b_0$ and slope $b_1$.
-
-* You should be asking now: Is that slope **really** different from zero? Let's look at the model output.
-
-
+... is an **estimate** about an unknown, **true population line**
+$$y = \beta_0 + \beta_1 x_1 + \beta_2x_2 + \beta_3x_3$$
 ]
 
+where $\beta_0, \beta_1, \beta_2, \beta_3$ are the **population parameters** of interest.
+
+--
+
+* Let's bring what we know about Confidence Intervals, Hypothesis tests and Standard Errors to bear on those estimates!
+
 ---
+
 
 # Regression Table
 
-.pull-left[
+Here is the R `summary` of our regression:
 ```{r}
-summary(hourly_wage)
+reg_wage = lm(log_wage~education + gender + education*gender, cps)
+summary(reg_wage)
 ```
-]
-
-.pull-right[
-* We know how to get *predicted* values from this:
-    $$\hat{y} = b_0 + b_1 x$$
-    
-* Filling in our estimates:
-    $$\hat{\text{lwage}} = 0.58 + 0.08 \text{educ}$$
-    
-* Remind yourself what both $b_0, b_1$ stand for.
-]
-
----
-
-# Sampling Scenario
-
-.pull-left[
-* We took a sample!
-
-* $b_0, b_1$ are **point estimates** much like the sample proportion $\hat{p}$ was!
-
-* In fact, we imagine that our prediction
-    $$\hat{y} = b_0 + b_1 x$$
-    is an **estimate** about an unknown, true population line
-    $$y = \beta_0 + \beta_1 x$$
-    
-* We *really* want to know $\beta$. $b$ is our gest guess.
-]
-
---
-
-.pull-right[
-* Sampling implies sampling variation.
-
-* If we collected a *different* sample of 526 workers, would we have obtained **different** estimates $b_0, b_1$? 🤔
-
-* Let's bring what we know about Confidence Intervals, Hypothesis tests and Standard Errors to bear on those estimates!
-]
 
 ---
 
 # Understanding Regression Tables
 
+* Let's focus on:
 
-```{r,eval = FALSE}
-# get alternative regression table:
-moderndive::get_regression_table(hourly_wage)
+```{r, echo=FALSE}
+round(summary(reg_wage)$coefficients,3)
 ```
-```{r,echo = FALSE}
-knitr::kable(moderndive::get_regression_table(hourly_wage), "html",align = "c")
-```
+
+* There are 3 new columns: `std_error`, `statistic`, `p value`.
+
 --
-
-* We know the meaning of all column names in that table by now (we focus on $b_1$, case for $b_0$ is identical):
-
 
 Entry | Meaning
 ----- | ----
-`std_error` |  std.deviation of sampling dist of $b_1$.
-`statistic` |  Test statistic associated to $H_0: \beta_1 = 0,H_A:\beta_1 \neq 0$
-`p value` |  p value associated to $H_0:\beta_1 = 0,H_A:\beta_1 \neq 0$
-`lower_ci, upper_ci` |  range of plausible values for $\beta_1$
+`std_error` |  Standard Error of $b_k$
+`statistic` |  Observed Test statistic associated to $H_0:\beta_k = 0,H_A:\beta_k \neq 0$
+`p value` |  p-value associated to $H_0:\beta_k = 0,H_A:\beta_k \neq 0$
+
+--
+
+* So, nothing really new after all, but let's make sense of each in the case of a regression.
+
+* We will take the example of b1
 
 ---
 
-# Standard Error of $b_1, SE(b_1) = 0.008$
+# Standard Error of $b_k$
 
-.pull-left[
-* If we took 1000 samples of workers, we'd get 1000 different estimates for $b$.
+> *Standard Error of $b_k$* $\equiv$ Standard deviation of the sampling distribution of $b_k$.
 
-* Those estimates would follow the *sampling distribution of $b$. 
+Let's imagine we could draw 1000 samples of workers from the US population. 
 
-* Notice that we'd get 1000 different slopes $b_1$ **and** 1000 different intercept $b_0$!
-]
+* We'd run 1000 regression and would get 1000 estimates for each $b_k$.
 
-.pull-right[
-* The standard error measures the *spread* of the associated sampling distribution.
-
-* Again, theory can tell us how to obtain this measure.
-
-* Again, we will show a quick simulation study, as an alternative.
-]
-
+* The standard error of $b_k$ quantifies how much variation in the fitted slope $b_k$ one would expect between different samples
 
 ---
 
-# Hypothesis: True $\beta = 0$?
+# Testing $H_0$: $\beta_k = 0$?
 
-.pull-left[
-* We set up this hypothesis test:
-    $$\begin{align}H_0:& \beta_1 = 0\\H_A:& \beta \neq 0\end{align}$$
-    
-* If $H_0$ is true, the true slope is zero: There is in fact **no** relationship between `educ` and `lwage`. In that case observing $b_1 > 0$ was just chance.
+By default, the regression output provides the results associated to following hypothesis test: 
 
-* If $H_0$ is false, then there is a true relationship.
+$$\begin{align}H_0:& \beta_k = 0\\H_A:& \beta_k \neq 0\end{align}$$
 
-* We assume $H_0$ is true, derive the **null distribution** and confront with a test statistic.
+* It allows to statistically test if there is a true relationship between the outcome and our regressor. 
+--
 
-]
+* If $H_0$ is true, there is **no** relationship between outcome and our regressor. 
 
+  * In that case observing $b_1 \neq 0$ was just chance.
 
-.pull-right[
+--
 
-* The `statistic` column is *approximately* $\frac{b}{SE(b)} = \frac{0.083}{0.008} = 10.375$.
+* If $H_0$ is false, then there is a true relationship. 
 
-## p-value
+--
 
-* The `pvalue` column tells us *how extreme* the estimated slope $b_1$ is in a universe where the truth is $\beta_1 = 0$
+* How to decide? 
+---
+
+# Test statistic and p-value
+
+* To conduct the test, we assume $H_0$ is true and derive the **null distribution** of $b_k$.
+
+* The `statistic` column is *approximately* $\frac{b}{SE(b)}$.
+
+  * We'll come back and explain this formula later.
+
+* The `pvalue` column tells us *how extreme* the estimated slope $b_k$ is in a universe where the truth is $\beta_k = 0$
 
 * We see a value of `0` here. So, for any significance level $\alpha$, we'd reject $H_0$.
 
 * The pvalue measures the area outside of $\pm$ `statistic` under the Null distribution.
-]
 
 ---
 
@@ -229,6 +240,11 @@ Entry | Meaning
 * That means that $\beta_1 = 0$ is *not* a highly plausible value, given our sample of data.
 
 * We are inclined to believe that there **is** a true relationship between `educ` and `lwage`!
+
+* It means that there is a statistically significant link between ...
+
+* But statistical significance does not imply causality.
+
 ]
 
 ---
@@ -237,7 +253,9 @@ Entry | Meaning
 
 * The values reported by statistical packages like R are obtained from theory under suitable assumptions.
 
-* The theory is based on *large sample approximations*, i.e. one can show that the sampling distributions converge to suitable distributions, which we can then use the conduct tests.
+* The theory is based on *large sample approximations*, i.e. one can show that the sampling distributions converge to suitable distributions,
+
+* We can then use to derive standard errors and conduct tests.
 
 * The set of assumptions needed defines the *Classical Regression Model* (CRM)
 
@@ -337,8 +355,8 @@ layout: true
 
 .pull-right[
 ```{r}
-bootstrap_distn_slope <- wage1 %>% 
-  specify(formula = lwage ~ educ) %>%
+bootstrap_distn_slope <- star_df %>% 
+  specify(formula = math ~ small) %>%
   generate(reps = 1000, type = "bootstrap") %>% 
   calculate(stat = "slope")
 
@@ -370,10 +388,10 @@ visualize(bootstrap_distn_slope)
 
 * SE-method:
     ```{r}
-    observed_slope <- coef(hourly_wage)[2] # [1] is intercept
-    se_ci <- bootstrap_distn_slope %>% 
-      get_ci(level = 0.95, type = "se", point_estimate = observed_slope)
-    se_ci
+    #observed_slope <- coef(hourly_wage)[2] # [1] is intercept
+    #se_ci <- bootstrap_distn_slope %>% 
+    #  get_ci(level = 0.95, type = "se", point_estimate = observed_slope)
+    #se_ci
     ```
 ]
 
@@ -523,7 +541,7 @@ layout: true
 
 ---
 
-# Illustrating Uncertainty
+# Illustrating Model Prediction Uncertainty
 
 .pull-left[
 * So, to answer our initial question: **yes** the slope in this picture is actually different from zero!
