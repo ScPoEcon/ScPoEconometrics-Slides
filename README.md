@@ -20,7 +20,7 @@ Lecture 7: Sampling [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Sli
 
 Lecture 8: Confidence Intervals and Hypothesis Testing [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_CI_hypothesis/CI_and_hypothesis_test.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_CI_hypothesis/CI_and_hypothesis_test.pdf)
 
-Lectures 9: Regression Inference (*coming soon!*)
+Lecture 9: Regression Inference [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.pdf)
 
 Lecture 10: Differences-in-Differences (*coming soon!*)
 
