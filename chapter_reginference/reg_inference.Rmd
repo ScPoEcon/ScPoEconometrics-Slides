@@ -601,6 +601,64 @@ $$ \frac{b}{\hat{\textrm{SE}(b)}} \underset{n \rightarrow \infty}{\longrightarro
 
 ---
 
+# Exogeneity assumption
+
+The CRM assumption #2 is also know as the (strict) **exogeneity assumption**. 
+
+* When this assumption is violated it means our estimate $b$ is a **biased** estimate of $\beta$
+
+--
+
+* For example, imagine you are interested in the effect of education on wage
+
+    $$\text{wage}_i = \beta_0 + \beta_1 \text{educ}_i + \varepsilon_i$$
+  
+  * Under the exogeneity assumption $\beta_1$ denotes the causal effect of education in the poppulation.
+
+--
+
+* Suppose there is *unobserved* ability $a_i$. 
+  * High ability means higher wage.
+  * It *also* means school is easier, and so $i$ selects into more schooling.
+
+---
+
+# Exogeneity assumption 
+
+* Given ability is *unobserved*,  $a_i$ goes into the error $\varepsilon_i$
+
+--
+
+* Our *ceteris paribus* assumption (all else equal) does not hold. 
+
+--
+
+* Then regressing the wage on education we will attribute to `educ` part of the effect on wages that is actually *caused* by ability $a_i$!
+
+--
+
+  * Remember the formula of the **omitted variable bias**:
+  
+  $$\textrm{OVB} = \{ \textrm{Relationship between } ability_i \textrm{ and } educ_i \} \\ * \{ \textrm{Effect of } ability_i \textrm{ in multiple regression} \}$$
+
+--
+
+  * Thus, we have:
+  
+  $$ \mathbb{E}(b_1) = \beta_1 + OVB > \beta_1$$ 
+
+* *Interpratation*: Taking repeated sample from the population and compute $b_1$ each time, we would **systematically overestimate** the effect of education on wage.
+
+---
+
+# Breaking the other assumptions
+
+* You can find examples associated to the other assumptions in our [book](https://scpoecon.github.io/ScPoEconometrics/std-errors.html#class-reg)! 
+
+* Takeaway: if assumptions violated, inference is invalid!
+
+---
+
 # Comparing Simulation and Theory based inference
 
 * Theory and simulated based approaches often yields very similar results.
@@ -719,6 +777,66 @@ $7.$ Let's illustrate what the shaded area stands for.
   
 ---
 
+# Illustrating Uncertainty
+
+.pull-left[
+
+Let's repeat the procedure you just made 100 times! 
+
+```{r eval=FALSE}
+library(AER)
+data("CPS1985")
+cps = CPS1985 %>% mutate(log_wage = log(wage))
+
+set.seed(1)
+bootstrap_sample = cps %>% 
+    rep_sample_n(size = nrow(cps), reps = 100, replace = TRUE)
+
+ggplot(data=cps,aes(y = log_wage, x = education, colour = gender)) +
+  geom_point(size = 1, alpha = 0.7) +
+  geom_smooth(method = "lm", alpha = 2) +
+  geom_smooth(data=bootstrap_sample,
+              size = 0.2,
+              aes(y = log_wage, x = education, group = replicate),
+              method = "lm", se = FALSE) +
+  facet_wrap(~gender) +
+  scale_colour_manual(values = c("darkblue", "darkred")) +
+  labs(x = "Education", y = "Log wage") +
+  guides(colour=FALSE) +
+  theme_bw(base_size = 20)
+```
+]
+
+--
+
+.pull-right[
+
+```{r echo=FALSE, fig.height=7}
+library(AER)
+data("CPS1985")
+cps = CPS1985 %>% mutate(log_wage = log(wage))
+
+set.seed(1)
+bootstrap_sample = cps %>% 
+    rep_sample_n(size = nrow(cps), reps = 100, replace = TRUE)
+
+ggplot(data=cps,aes(y = log_wage, x = education, colour = gender)) +
+  geom_point(size = 1, alpha = 0.7) +
+  geom_smooth(method = "lm", alpha = 2) +
+  geom_smooth(data=bootstrap_sample,
+              size = 0.2,
+              aes(y = log_wage, x = education, group = replicate),
+              method = "lm", se = FALSE) +
+  facet_wrap(~gender) +
+  scale_colour_manual(values = c("darkblue", "darkred")) +
+  labs(x = "Education", y = "Log wage") +
+  guides(colour=FALSE) +
+  theme_bw(base_size = 20)
+```
+
+]
+
+---
 
 # Illustrating Uncertainty
 
@@ -729,13 +847,16 @@ $7.$ Let's illustrate what the shaded area stands for.
 
 .pull-right[
 </br>
-* [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` bring you: Moving Lines!
+
+Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` bring you moving lines!
 
 * We took 20 bootstrap samples from our data
 
 * You can see how different data points are included in each bootstrap sample.
 
 * Those different points imply different regression lines.
+
+* On average, 95% of these lines should fall into the shaded area.
 
 * You should remember those moving lines when looking at the shaded area!
 
