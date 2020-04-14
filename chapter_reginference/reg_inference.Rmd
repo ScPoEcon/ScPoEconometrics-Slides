@@ -500,7 +500,7 @@ layout: true
 
 ---
 
-# Regression inference: Theory
+# Regression Inference: Theory
 
 * Theory-based approach uses one fundamental result: the sampling distribution of the sample statistic $\frac{b - \beta}{\hat{\textrm{SE}(b)}}$ *converges* to a ***standard normal distribution*** as the sample size gets larger and larger.
 
@@ -574,6 +574,16 @@ bootstrap_distrib %>%
 
 ---
 
+class:inverse
+
+# Task 2 (5 min)
+
+1. Using the bootstrap distributed you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
+
+1. How similar is it to the confidence intervals obtained in the previous slide?
+
+---
+
 # Theory-Based Inference: Hypothesis Testing
 
 * As we already mentioned, the default test that is conducted by any statistical software is:
@@ -593,23 +603,33 @@ $$\begin{align}H_0:& \beta_k = 0\\H_A:& \beta_k \neq 0\end{align}$$
 
 --
 
-* Common rule of thumb: if the *estimate* is **twice the size of the standard error***, then it is significant at the 5% level. Why?
+* Common rule of thumb: if the *estimate* is ***twice the size of the standard error***, then it is significant at the 5% level. Why?
 
 ---
 
+layout: false
+class: title-slide-section-red, middle
 
 # Classical Regression Model
 
-* Whether the inference is made from theory of simulations, some assumptions have to be met for this inference to be valid.
+---
 
-* The set of assumptions needed defines the *Classical Regression Model* (CRM)
+# Classical Regression Model
+
+* Whether the inference is made from theory or simulations, some assumptions have to be met for this inference to be valid.
+
+* The set of assumptions needed defines the *Classical Regression Model* (CRM).
 
 --
 
-* Before looking at these assumptions, let's see the small but important modifications we apply to our model (back to [*lecture 4*](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html#1)):
+* Before delving into these assumptions, let's see the small but important modifications we apply to our model (back to [*lecture 4*](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html#1)):
+
+--
 
   * We already mentioned the distinction between the sample estimate $b_k$ (or $\hat{\beta_k}$) and the population parameter $\beta_k$.
-  
+
+--
+
   * In the same way, we distinguish $e$, the sample error, from $\varepsilon$ the error term from the true population model: 
   
   $$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_k x_{k,i} + \varepsilon_i$$
@@ -619,32 +639,32 @@ $$\begin{align}H_0:& \beta_k = 0\\H_A:& \beta_k \neq 0\end{align}$$
 
 # CRM Assumptions
 
-1. The data are **not linearly dependent**: Each variable provides new information for the outcome, and it cannot be replicated as a linear combination of other variables.
+1. ***No perfect collinearity:*** the data are **not linearly dependent**, that is each variable provides new information on the outcome, and it is not a linear combination of the other variables.
 
 --
 
-2. The mean of the residuals conditional on $x$ should be zero, $E[\varepsilon|x] = 0$. Notice that this also means that $Cov(\varepsilon,x) = 0$, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
+2. ***Mean Independence:*** the mean of the residuals conditional on $x$ should be zero, $E[\varepsilon|x] = 0$. Notice that this also means that $Cov(\varepsilon,x) = 0$, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
 
 --
 
-3. The data are drawn from a **random sample** of size $n$: observation $(x_i,y_i)$ comes from the exact same distribution, and is independent of observation $(x_j,y_j)$, for all $i\neq j$.
+3. ***Independently and identically distributed:*** the data are drawn from a **random sample** of size $n$: observation $(x_i,y_i)$ comes from the exact same distribution, and is independent of observation $(x_j,y_j)$, for all $i\neq j$.
 
 --
 
-4. The variance of the error term $\varepsilon$ is the same for each value of $x$: $Var(\varepsilon|x) = \sigma^2$. This property is called **homoskedasticity**.
+4. ***Homoskedasticity:*** the variance of the error term $\varepsilon$ is the same for each value of $x$: $Var(\varepsilon|x) = \sigma^2$.
 
 --
 
-5. The error is normally distributed, i.e. $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ 
-  * This last assumption allows to avoid large sample apprximations, but it is never used in practice since samples are sufficiently large $(n \ge 30)$.
+5. ***Normally distributed errors:*** the error term is normally distributed, i.e. $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ 
+  * This last assumption allows avoiding large sample approximations, but it is never used in practice since samples are sufficiently large $(n \ge 30)$.
 
 ---
 
-# Exogeneity assumption
+# Exogeneity Assumption
 
 The CRM assumption #2 is also know as the (strict) **exogeneity assumption**. 
 
-* When this assumption is violated it means our estimate $b$ is a **biased** estimate of $\beta$
+* When this assumption is violated our estimate $b$ will be a ***biased*** estimate of $\beta$, i.e. $\mathop{\mathbb{E}}[b] \neq \beta$
 
 --
 
@@ -652,7 +672,7 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
     $$\text{wage}_i = \beta_0 + \beta_1 \text{educ}_i + \varepsilon_i$$
   
-  * Under the exogeneity assumption $\beta_1$ denotes the causal effect of education in the poppulation.
+  * Under the exogeneity assumption $\beta_1$ denotes the causal effect of education in the population.
 
 --
 
@@ -662,7 +682,7 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 ---
 
-# Exogeneity assumption 
+# Exogeneity Assumption 
 
 * Given ability is *unobserved*,  $a_i$ goes into the error $\varepsilon_i$
 
@@ -686,7 +706,7 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
   
   $$ \mathbb{E}(b_1) = \beta_1 + OVB > \beta_1$$ 
 
-* *Interpratation*: Taking repeated sample from the population and compute $b_1$ each time, we would **systematically overestimate** the effect of education on wage.
+* *Interpretation*: taking repeated sample from the population and computing $b_1$ each time, we would **systematically overestimate** the effect of education on wage.
 
 ---
 
@@ -698,121 +718,47 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 ---
 
-# Comparing Simulation and Theory based inference
-
-* Theory and simulated based approaches often yields very similar results.
-
---
-
-* Coming back to $b_\textrm{small}$, here is a recap of what we found:
-
-Estimate | Theory |  Simulation 
---------- | ------ | --------
-Std. Error   | `r reg_summary_star_df[2,2]` |  `r se_simul`
-Observed test stat.| `r reg_summary_star_df[2,3]` | `r round(observed_stat,3)`
-p-value | `r reg_summary_star_df[2,4]` | `r p_value`
-
---
-
-
-* Let's have a look at Confidence Intervals from both approaches. 
-
----
-
-# Comparing Confidence Intervals 
-
-* From theory we have: $\textrm{CI}_{95\%} = [8.9 \pm 1.96*1.678]$
-```{r}
-lower_bound_theory = 8.9 - 1.96*1.678
-upper_bound_theory = 8.9 + 1.96*1.678
-(CI_theory = c(lower_bound_theory, upper_bound_theory))
-```
-
---
-
-* From simulation (*percentile method*): 
-```{r}
-lower_bound_simul = quantile(bootstrap_distrib$stat,0.025)
-upper_bound_simul = quantile(bootstrap_distrib$stat,0.975)
-(CI_simul = c(lower_bound_simul, upper_bound_simul))
-```
-
---
-
-* Again, both appraoches yields very similar results. 
-
---
-
-* We used simulation based inference to give you the intuition behind statistical inference.
-
----
-
-# Comparing Confidence Intervals
-
-```{r, echo=FALSE,  fig.height=5, fig.width=8}
-visualize(bootstrap_distrib, fill = "darkgreen") + 
-  shade_confidence_interval(endpoints = CI_theory, fill = NULL, 
-                            linetype = "solid", color = "blue", size =1) + 
-  shade_confidence_interval(endpoints = CI_simul, fill = NULL, 
-                            linetype = "dashed", color = "black", size =1) + 
-  theme_bw(base_size = 14) +
-  labs(x = "b_small", y = "Frequency", title = "Theory based (solid blue) vs Simulated based (dotted black) 95% CIs") +
-  xlim(lower_bound_theory-2,upper_bound_theory+2)
-
-```
-
-
----
-
 class:inverse
 
-# Task 2.1 (10 min)
+# Task 3.1 (10 min)
 
 Let's go back to our question of returns to education and gender. 
 
 1. Load the data `CPS1985` from the `AER` package and look back at the `help` to get the definition of each variable: `?CPS1985`
 
-1. Create the`log_wage` variable equal to the log of `wage`.
-
---
+1. Create the `log_wage` variable equal to the log of `wage`.
 
 1. Regress `log_wage` on `gender` and `education`, and save it as `reg1`. 
 
-  3.1 Interpret each coefficient.
+  * Interpret each coefficient.
   
-  3.2 Are the coefficients statistically significant? At which significance level? 
-  
---
+  * Are the coefficients statistically significant? At which significance level? 
 
 1. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`. 
 
-  4.1 How do you interpret the coefficient associated to $female*education$
+  * How do you interpret the coefficient associated to $female*education$?
   
-  4.2 Can we reject the nullity of this coefficient at the 5% level? At 10%?  
+  * Can we reject the nullity of this coefficient at the 5% level? At 10%?  
   
 ---
 
 class:inverse
 
-# Task 2.2 (10 min)
+# Task 3.2 (10 min)
 
-$5.$ Produce a scatterplot of the relationship between the log wage and the level of education.
+1. Produce a scatterplot of the relationship between the log wage and the level of education.
 
---
+1. Add the *regression line* with `geom_smooth`. What does this line represents?
 
-$6.$ Add the *regression line* with `geom_smooth`. What does this line represents?
+1. Let's illustrate what the shaded area stands for.
 
---
+  1. Draw one bootstrap sample from our `cps` data. 
 
-$7.$ Let's illustrate what the shaded area stands for.
+  1. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg_bootstrap`.
 
-  $\quad 7.1$ Draw one bootstrap sample from our `cps` data. 
+  1. From `reg_bootstrap` extract and save the value of the intercept for men as `intercept_men_bootstrap` and the value of the slope for men as `slope_men_bootstrap`. Do the same for women.
 
-  $\quad 7.2$ Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg_bootstrap`.
-
-  $\quad 7.3$ From `reg_bootstrap` extract and save the value of the intercept for men as `intercept_men_bootstrap` and the value of the slope for men as `slope_men_bootstrap`. Do the same for women.
-
-  $\quad 7.4$ Add both predicted lines from this bootstrap sample to the previous plot (*Hint*: use `geom_abline` (x2))
+  1. Add both predicted lines from this bootstrap sample to the previous plot (*Hint*: use `geom_abline` (x2))
   
 ---
 
@@ -903,8 +849,27 @@ Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` b
 
 ---
 
-# Teaser for the Next (last!) session
+# Teaser for next session (the last one `r emo::ji("cry")`)
 
+* Methods for program evaluation!
+
+--
+
+* 2 options:
+
+--
+
+  1. Cover ***regression discontinuity design*** in-depth,
+
+  ***OR***
+  
+--
+
+  2. Cover both ***regression discontinuity design*** and ***differences-in-differences*** but you will only get the gist of each method.
+
+--
+
+Which do you prefer?
 
 ---
 
@@ -912,7 +877,7 @@ Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` b
 
 class: title-slide-final, middle
 
-# THANKS
+#  THANKS
 
 To the amazing [moderndive](https://moderndive.com/) team!
 
@@ -925,7 +890,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# END
+# SEE YOU NEXT WEEK!
 
 
 
