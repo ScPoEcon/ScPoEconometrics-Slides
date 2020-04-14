@@ -51,10 +51,15 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 [**Chapter 7, ModernDive**](https://moderndive.com/7-sampling.html)
 
 
-### Lecture 8/9: Statistical Inference and Hypothesis Testing
+### Lecture 8: Confidence Intervals and Hypothesis Testing
 
-**Chapters [8](https://moderndive.com/8-confidence-intervals.html), [9](https://moderndive.com/9-hypothesis-testing.html) and [10](https://moderndive.com/10-inference-for-regression.html), ModernDive**
+**Chapters [8](https://moderndive.com/8-confidence-intervals.html) and [9](https://moderndive.com/9-hypothesis-testing.html), ModernDive**
 
+### Lecture 9: Regression Inference
+
+[**Chapter 6, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/std-errors.html)
+
+**[Chapter 10, ModernDive](https://moderndive.com/10-inference-for-regression.html)
 
 ### Lecture 10: Differences-in-Differences
 
