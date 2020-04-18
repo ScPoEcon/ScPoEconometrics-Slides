@@ -62,12 +62,35 @@ layout: true
 
 # Recap from last week
 
-* Regression inference
+* Apply inference tools to regression analysis
 
-* Standard error, test statistic, p-value
+* *Standard error* of regression coefficient
 
-## Today
+* *Statistical significance* of regression coefficient
 
+--
+
+## Today: Program Evaluation 
+
+2 popular methods of causal policy evaluation:
+
+.pull-left[
+***Regression Discontinuity Design***
+
+  * Exploits knowledge of assignment rule
+  
+  * Assignment to treatment is as good as random
+]
+
+--
+
+.pull-left[
+***Differences-in-differences***
+
+  * Exploits changes in policy over time
+  
+  * Find the appropriate control group
+]
 ---
 
 # Regression Discontinuity Design (RDD)
