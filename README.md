@@ -22,7 +22,7 @@ Lecture 8: Confidence Intervals and Hypothesis Testing [HTML](https://raw.githac
 
 Lecture 9: Regression Inference [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.pdf)
 
-Lecture 10: Differences-in-Differences (*coming soon!*)
+Lecture 10: Differences-in-Differences [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_did/chapter_did.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_did/chapter_did.pdf)
 
 Lecture 11: Regression Discontinuity (*coming soon!*)
 
