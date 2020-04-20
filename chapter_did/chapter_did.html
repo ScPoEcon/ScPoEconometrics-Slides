@@ -3,8 +3,9 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Gustave Kenedi" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="libs/kePrint/kePrint.js"></script>
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
     <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
@@ -15,8 +16,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Differences-in-Differences
-### Gustave Kenedi
-### SciencesPo Paris </br> 2020-01-15
+### Florian Oswald, Gustave Kenedi and Pierre Villedieu
+### SciencesPo Paris </br> 2020-04-20
 
 ---
 
@@ -35,7 +36,37 @@ layout: true
 
 ---
 
-# Difference-in-Differences (DiD)
+# Recap from last week
+
+* Applied inference tools to regression analysis
+
+* *Standard error* of regression coefficients
+
+* *Statistical significance* of regression coefficients
+
+--
+
+## Today: ***Differences-in-differences***
+
+* Exploits changes in policy over time that don't affect everyone
+
+* Need to find (or construct) appropriate control group(s)
+
+* *Key assumption:* parallel trends
+
+* *Empirical application*: impact of ***minimum wage*** on ***employment***
+
+---
+
+# Evaluation methods
+
+* Multiple regression often does not provide causal estimates because of ***selection on unobservables***.
+
+--
+
+* RCTs are one way to solve this problem but they are often impossible to do.
+
+--
 
 * Four main causal evaluation methods used in economics:
 
@@ -46,15 +77,44 @@ layout: true
 
 --
 
+* These methods are used to identify __causal relationships__ between treatments and outcomes.
+
+--
+
 * In this lecture, we will cover a popular and rigorous program evaluation method: __differences-in-differences__.
 
 --
 
-* Starting point as usual: subjects are not randomly allocated to treatment ⚠️
+* Next week we will look at __regression discontinuity designs__.
+
+---
+
+# Differences-in-Differences (DiD)
+
+* Usual starting point: subjects are not randomly allocated to treatment ⚠️
 
 --
 
-* In some cases though, possible existence of unobserved confounders
+## DiD Requirements:
+
+--
+
+* 2 time periods: before and after treatment.
+
+--
+
+* 2 groups:
+
+--
+  - ***control group:*** never receives treatment,
+
+--
+
+  - ***treatment group:*** initially untreated and then fully treated.
+  
+--
+
+* Under certain assumptions, control group can be used as the counterfactual for treatment group  
 
 ---
 
@@ -66,15 +126,11 @@ layout: true
 
 --
 
-* Why is this not that straightforward? Why can't you just regress (un)employment rates on the level of the minimum wage?
+* Why is this not that straightforward? What should the control group be?
 
 --
 
-  - The minimum wage level may be __endogenously__ determined: policymakers may want to have a low minimum wage when employment is low and increase it when conditions improve.
-
---
-
-* Seminal [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
+* Seminal 1994 [paper](http://davidcard.berkeley.edu/papers/njmin-aer.pdf) by prominent labor economists David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
 
 --
 
@@ -84,7 +140,7 @@ layout: true
 
 # Institutional Details
 
-* In the US, there is a national minimum wage, but states can depart from it 
+* In the US, there is a national minimum wage, but states can depart from it.
 
 --
 
@@ -92,93 +148,147 @@ layout: true
 
 --
 
-* Neighboring Pennsylvania does not change its minimum wage level. 
+* Neighboring Pennsylvania did not change its minimum wage level.
+
 --
 
-__Map of establishments?__
+.pull-left[
+&lt;img src="../img/photos/nj_penn_map.png" width="600px" style="display: block; margin: auto;" /&gt;
+]
 
-&lt;img src="chapter_rdd_files/figure-html/quota_table.png" width="450px" style="display: block; margin: auto;" /&gt;
+--
 
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+Pennsylvania and New Jersey are ***very similar***: similar institutions, similar habits, similar consumers, similar incomes, similar weather, etc.
+]
 ---
 
-# Institutional Details
+# Card and Krueger (1994): Methodology
 
 * Surveyed 410 fast-food establishments in New Jersey (NJ) and eastern Pennsylvania
 
+--
+
 * Timing:
+
+--
   - Survey before NJ MW increase: Feb/March 1992
+
+--
   - Survey after NJ MW increase: Nov/Dec 1992
-
-
-__Timeline graph?__
-
-## Diff-in-Diff Feature
-
-
-
-
-* What assumption is necessary for the comparison to be valid?
 
 --
 
-* 👉 This is a difference-in-differences!
+* What comparisons do you think they did?
+
+--
+
+.pull-left[
+Let's take a closer at their data
+
+
+
+```r
+  # install package that contains the cleaned data
+remotes::install_github("b-rodrigues/diffindiff")
+  # load package
+library(diffindiff)
+  # load data
+ck1994 &lt;- njmin
+```
+]
+
+--
+
+.pull-right[
+
+```r
+ck1994 %&gt;%
+  select(sheet,chain,state,observation,empft,emppt) %&gt;%
+  head()
+```
+
+```
+## # A tibble: 6 x 6
+##   sheet chain  state        observation   empft emppt
+##   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;
+## 1 46    bk     Pennsylvania February 1992  30    15  
+## 2 49    kfc    Pennsylvania February 1992   6.5   6.5
+## 3 506   kfc    Pennsylvania February 1992   3     7  
+## 4 56    wendys Pennsylvania February 1992  20    20  
+## 5 61    wendys Pennsylvania February 1992   6    26  
+## 6 62    wendys Pennsylvania February 1992   0    31
+```
+
+]
+---
+
+class: inverse
+
+# Task 1 (10 minutes)
+
+1. Take a look at the dataset and list the variables. Check the variable definitions with `?njmin`.
+
+1. Tabulate the number of stores by `state` and by survey wave (`observation`). Does it match what's in *Table 1* of the [paper](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)?
+
+1. Create a full-time equivalent (FTE) employees variable called `empfte` equal to `empft` + 0.5*`emppt` + `nmgrs`. `empft` and `emppt` correspond respectively to the number of full-time and part-time employees. `nmgrs` corresponds to the number of managers. This is how Card and Krueger compute their full-time equivalent (FTE) employment variable (p.775 of the paper).
+
+1. Compute the average number of FTE employment, average percentage of FT employees (out of the number of FTE employees), and average starting wage (`wage_st`) by state and by survey wave. Compare your results with *Table 2* of the paper.
+
+5. How different are New Jersey and Pennsylvania's fast-food restaurants before the minimum wage increase?
 
 ---
 
-# Graphical Results
+# Card and Krueger DiD: Tabular Results
 
-.center[**Timing of Applications and Probability of Obtaining a Residence Permit for Two Lotteries in
-Milan and Bergamo**]
-
-&lt;table&gt;
+.center[__Average Employment Per Store Before and After the Rise in NJ Minimum Wage__]
+&lt;table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
   &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; PA &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; NJ &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Variables &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pennsylvania &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; New Jersey &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; FTE employment before &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 23.33 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 20.44 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     text-align: c;"&gt;23.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     text-align: c;"&gt;20.44&lt;/span&gt; &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; FTE employment after &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 21.17 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 21.03 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     text-align: c;"&gt;21.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     text-align: c;"&gt;21.03&lt;/span&gt; &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Change in mean FTE
 employment &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; -2.16 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(253, 231, 37, 1) !important;text-align: c;"&gt;-2.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(68, 1, 84, 1) !important;text-align: center;"&gt;0.59&lt;/span&gt; &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
----
+--
 
-# Graphical Results
+## DiD Estimate
 
-.center[**Number of Crimes per Applicant Before and After Click Days, Conditional on the Timing of
-Application**]
+Differences-in-differences causal estimate: `\(0.59 - (-2.17) = 2.76\)`
 
-&lt;img src="chapter_rdd_files/figure-html/pinotti_results.png" width="1000px" style="display: block; margin: auto;" /&gt;
+--
 
-$$
-`\begin{aligned}
-\gamma_{DD} &amp; = (Y_{NJ,nov92} - Y_{NJ,feb92}) - (Y_{PA,nov92} - Y_{PA,feb92}) \\
-              &amp; = (21.03 - 20.44) - (21.17 - 23.33) \\
-              &amp; = 2.76
-\end{aligned}`
-$$
----
+Interpretation: the minimum wage increase led to an __increase__ in FTE employment per store of 2.76 on average.
 
-# DiD Graphically
+--
 
-&lt;img src="chapter_did_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+Yes the essence of differences-in-differences is _that_ simple! 😀
+
+--
+
+Let's look at these results graphically.
 
 ---
 
@@ -194,15 +304,406 @@ $$
 
 ---
 
-# What if we had done a naive comparison?
+# DiD Graphically
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# What if we had done a naive comparison?
+# DiD Graphically
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What if we had done a naive after/before comparison?
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What if we had done a naive after/before comparison?
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What if we had done a naive after NJ/PA comparison?
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What if we had done a naive after NJ/PA comparison?
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Estimation
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# DiD in Regression Form
+
+* In practice, DiD is usually estimated on more than 2 periods (4 observations)
+
+* There are more data points before and after the policy change
+
+--
+
+3 ingredients:
+
+--
+
+1. __Treatment dummy variable__: `\(TREAT_s\)` where the `\(s\)` subscript reminds us that the treatment is at the state level
+
+--
+
+1. __Post-treatment periods dummy variables__: `\(POST_t\)` where the `\(t\)` subscript reminds us that this variable varies over time
+
+--
+
+1. __Interaction term between the two__: `\(TREAT_s \times POST_t\)` 👉 the ***coefficient on this term is the DiD causal effect***!
+
+---
+
+# DiD in Regression Form
+
+__Treatment dummy variable__
+$$
+TREAT_s = \begin{cases}\begin{array}{lcl}
+0 \quad \text{if } s = \text{Pennsylvania} \\\
+1 \quad \text{if } s = \text{New Jersey}
+\end{array}\end{cases}
+$$
+
+--
+
+__Post-treatment periods dummy variable__
+$$
+POST_t = \begin{cases}\begin{array}{lcl}
+0 \quad \text{if } t &lt; \text{April 1, 1992} \\\
+1 \quad \text{if } t \geq \text{April 1, 1992}
+\end{array}\end{cases}
+$$
+
+--
+
+__Which observations correspond to `\(TREAT_s \times POST_t = 1\)`?__
+
+--
+
+* Let's put all these ingredients together:
+`$$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta(TREAT_s \times POST_t) + e_{st}$$`
+
+* `\(\delta\)`: causal effect of the minimum wage increase on employment
+
+---
+
+# Understanding the Regression
+
+`$$EMP_{st} = \color{#d96502}\alpha + \color{#027D83}\beta TREAT_s + \color{#02AB0D}\gamma POST_t + \color{#d90502}\delta(TREAT_s \times POST_t) + e_{st}$$`
+
+--
+
+We have the following:
+
+--
+
+`\(\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \color{#d96502}\alpha\)`
+
+--
+
+`\(\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1) = \color{#d96502}\alpha + \color{#02AB0D}\gamma\)`
+
+--
+
+`\(\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0) = \color{#d96502}\alpha + \color{#027D83}\beta\)`
+
+--
+
+`\(\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1) = \color{#d96502}\alpha + \color{#027D83}\beta + \color{#02AB0D}\gamma + \color{#d90502}\delta\)`
+
+--
+
+`$$[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0)] - \\
+[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0)] = \color{#d90502}\delta$$`
+
+---
+
+# Understanding the Regression
+
+`$$EMP_{st} = \color{#d96502}\alpha + \color{#027D83}\beta TREAT_s + \color{#02AB0D}\gamma POST_t + \color{#d90502}\delta(TREAT_s \times POST_t) + e_{st}$$`
+
+In table form:
+
+
+   | Pre mean | Post mean | `\(\Delta\)`(post - pre)
+:-:|:--:|:--:|:--:
+Pennsylvania (PA) | `\(\color{#d96502}\alpha\)` | `\(\color{#d96502}\alpha + \color{#02AB0D}\gamma\)` | `\(\color{#02AB0D}\gamma\)`
+New Jersey (NJ) | `\(\color{#d96502}\alpha + \color{#027D83}\beta\)` | `\(\color{#d96502}\alpha + \color{#027D83}\beta + \color{#02AB0D}\gamma + \color{#d90502}\delta\)` | `\(\color{#02AB0D}\gamma + \color{#d90502}\delta\)`
+`\(\Delta\)`(NJ - PA) | `\(\color{#027D83}\beta\)` | `\(\color{#027D83}\beta + \color{#d90502}\delta\)` | `\(\color{#d90502}\delta\)`
+
+--
+
+This table generalizes to other settings by substituting *Pennsylvania* with *Control* and *New Jersey* with *Treatment*
+---
+
+class: inverse
+
+# Task 2 (10 minutes)
+
+1. Create a dummy variable, `treat`, equal to `FALSE` if `state` is Pennsylvania and `TRUE` if New Jersey.
+
+1. Create a dummy variable, `post`, equal to `FALSE` if `observation` is February 1992 and `TRUE` otherwise.
+
+1. Estimate the following regression model. Do you obtain the same results as in slide 9?
+
+`$$empfte_{st} = \alpha + \beta treat_s + \gamma post_t + \delta(treat_s \times post_t) + \varepsilon_{st}$$`
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Identifying Assumptions
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# DiD Crucial Assumption: Parallel Trends
+
+&gt; __Common or parallel trends assumption__: absent any minimum wage increase, Pennsylvania's fast-food employment trend would have been what we should have expected to see in New Jersey.
+
+--
+
+* This assumption states that Pennsylvania's fast-food employment trend between February and November 1992 provides a reliable counterfactual employment trend New Jersey's fast-food industry *would have experienced* had New Jersey not increased its minimum wage.
+
+--
+
+* Impossible to completely validate or invalidate this assumption.
+
+* *Intuitive check:* compare trends before policy change (and after policy change if no expected medium-term effects)
+
+---
+
+#  Parallel Trends: Graphically
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Checking the parallel trends assumption
+
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Checking the parallel trends assumption
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel trends assumption `\(\rightarrow\)` Verified ✅
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel trends assumption `\(\rightarrow\)` Verified ✅
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel trends assumption `\(\rightarrow\)` Not verified ❌
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel trends assumption `\(\rightarrow\)` Not verified ❌
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel trends assumption `\(\rightarrow\)` Not verified ❌
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel trends assumption `\(\rightarrow\)` Not verified ❌
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Let:
+
+* `\(Y_{ist}^1\)`: fast food employment at restaurant `\(i\)` in state `\(s\)` at time `\(t\)` if there is a high state MW;
+
+--
+
+* `\(Y_{ist}^0\)`: fast food employment at restaurant `\(i\)` in state `\(s\)` at time `\(t\)` if there is a low state MW;
+
+--
+
+These are potential outcomes, you can only observe one of the two.
+
+--
+
+The key assumption underlying DiD estimation is that, in the no-treatment state, restaurant `\(i\)`'s outcome in state `\(s\)` at time `\(t\)` is given by:
+
+`$$\mathbb{E}[Y_{ist}^0|s,t] = \gamma_s + \lambda_t$$`
+
+2 implicit assumptions:
+
+1. ***Selection bias***: relates to fixed state characteristics `\((\gamma)\)`
+
+2. ***Time trend***: same time trend for treatment and control group `\((\lambda)\)`
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Outcomes in the comparison group:
+
+`$$\mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] = \gamma_{PA} + \lambda_{Feb}$$`
+--
+
+`$$\mathbb{E}[Y_{ist}|s = \text{Pennsylvania},t = \text{Nov}] = \gamma_{PA} + \lambda_{Nov}$$`
+
+--
+
+$$
+`\begin{align}
+\mathbb{E}[Y_{ist}&amp;|s = \text{Pennsylvania},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] \\
+&amp;= \gamma_{PA} + \lambda_{Nov} - (\gamma_{PA} + \lambda_{Feb}) \\
+&amp;= \lambda_{Nov} - \lambda_{Feb}
+\end{align}`
+$$
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Outcomes in the comparison group:
+
+`$$\mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] = \gamma_{PA} + \lambda_{Feb}$$`
+
+`$$\mathbb{E}[Y_{ist}|s = \text{Pennsylvania},t = \text{Nov}] = \gamma_{PA} + \lambda_{Nov}$$`
+
+$$
+`\begin{align}
+\mathbb{E}[Y_{ist}&amp;|s = \text{Pennsylvania},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] \\
+&amp;= \gamma_{PA} + \lambda_{Nov} - (\gamma_{PA} + \lambda_{Feb}) \\
+&amp;= \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}`
+$$
+
+--
+
+`\(\rightarrow\)` the comparison group allows to estimate the ***time trend***.
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Let `\(\delta\)` denote the true impact of the minimum wage increase:
+
+`$$\mathbb{E}[Y_{ist}^1 - Y_{ist}^0|s,t] = \delta$$`
+
+--
+
+Outcomes in the treatment group:
+
+`$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] = \gamma_{NJ} + \lambda_{Feb}$$`
+--
+
+`$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Nov}] = \gamma_{NJ} + \delta + \lambda_{Nov}$$`
+--
+
+$$
+`\begin{align}
+\mathbb{E}[Y_{ist}&amp;|s = \text{New Jersey}, t = \text{Nov}] - \mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] \\
+&amp;= \gamma_{NJ} + \delta + \lambda_{Nov} - (\gamma_{NJ} + \lambda_{Feb}) \\
+&amp;= \delta + \lambda_{Nov} - \lambda_{Feb}
+\end{align}`
+$$
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Let `\(\delta\)` denote the true impact of the minimum wage increase:
+
+`$$\mathbb{E}[Y_{ist}^1 - Y_{ist}^0|s,t] = \delta$$`
+
+Outcomes in the treatment group:
+
+`$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] = \gamma_{NJ} + \lambda_{Feb}$$`
+
+`$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Nov}] = \gamma_{NJ} + \delta + \lambda_{Nov}$$`
+
+$$
+`\begin{align}
+\mathbb{E}[Y_{ist}&amp;|s = \text{New Jersey}, t = \text{Nov}] - \mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] \\
+&amp;= \gamma_{NJ} + \delta + \lambda_{Nov} - (\gamma_{NJ} + \lambda_{Feb}) \\
+&amp;= \delta + \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}`
+$$
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Therefore we have:
+
+$$
+`\begin{align}
+\mathbb{E}[Y_{ist}&amp;|s = \text{PA},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{PA},t = \text{Feb}] = \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}`
+$$
+
+--
+
+$$
+`\begin{align}
+\mathbb{E}[Y_{ist}&amp;|s = \text{NJ},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{NJ},t = \text{Feb}] = \delta + \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}`
+$$
+
+--
+
+$$
+`\begin{align}
+DD &amp;= \mathbb{E}[Y_{ist}|s = \text{NJ}, t = \text{Nov}] - \mathbb{E}[Y_{ist}|s = \text{NJ}, t = \text{Feb}] \\
+&amp; \qquad \qquad - \Big(\mathbb{E}[Y_{ist}|s = \text{PA},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{PA},t = \text{Feb}]\Big) \\
+&amp;= \delta + \lambda_{Nov} - \lambda_{Feb} - (\lambda_{Nov} - \lambda_{Feb}) \\
+&amp;= \delta
+\end{align}`
+$$
 
 ---
 class: title-slide-final, middle
