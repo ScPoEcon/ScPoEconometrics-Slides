@@ -458,7 +458,7 @@ layout: true
 
 * Writing in regression form, we have
     $$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_i,$$
-  where $DEATHRATE_a$ is the death rate at age $a$ (defined in months relative to the 21st birthday), $D_a$ is the treatment dummy, and $a$ is age (again, defined relative the 21st birthday).
+  where $DEATHRATE_a$ is the death rate at age $a$, $D_a$ is the treatment dummy, and $a$ is age.
 
 --
 
@@ -467,7 +467,7 @@ layout: true
 --
 
 * The RDD estimator exploits a discontinuity at $a = 21$ in the conditional expectation function:
-$$\underbrace{\lim_{c \to 21^+} E[DEATHRATE_a^1|a = c]}_{\alpha + \delta} - \underbrace{\lim_{c \to 21^-} E[DEATHRATE_a^0|a = c]}_{\alpha} = \delta$$
+$$\underbrace{\lim_{c \to 21^+} \mathbb{E}[DEATHRATE_a^1|a = c]}_{\alpha + \delta} - \underbrace{\lim_{c \to 21^-} \mathbb{E}[DEATHRATE_a^0|a = c]}_{\alpha} = \delta$$
 
 ---
 
@@ -475,7 +475,7 @@ class: inverse
 
 # Task 2 (5 minutes)
 
-1. Estimate the following model on all death causes, where $a$ is defined in months *relative* to the 21st birthday
+1. Estimate the following model on all death causes.
 $$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_i,$$
 
  Does the RDD coefficient correspond to the graphical illustration?
@@ -545,7 +545,7 @@ mean(mlda$all, na.rm = TRUE)
 
 --
    
-   $\rightarow$ an overly flexible specification reduces precision and runs the risk of overfitting.
+   $\rightarrow$ an overly flexible specification reduces precision and runs the risk of overfitting.
 
 
 ---
@@ -1033,7 +1033,7 @@ What if the running variable does not *fully* determine assignment to treatment?
 
 $\rightarrow$ ***Fuzzy RDD***
 
-* Is addressed using *instrumental variables* (not covered in this course but if you do another metrics class you most likely will)
+* Even if all observations that satisfy the treatment condition are not treated, there is still a jump in the probability of being treated.
 
 * For you, just know that problem of imperfect determination of allocation to treatment can still be solved
 
