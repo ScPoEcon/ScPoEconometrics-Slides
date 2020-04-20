@@ -1029,7 +1029,7 @@ $\rightarrow$ ***Fuzzy RDD***
 # 5 Steps for Conducting RDD in Practice<sup>1</sup>
 
 .footnote[
-<sup>1</sup> Taken from [Andrew Weiss' wonderful course on RDD](https://evalsp20.classes.andrewheiss.com/class/11-class/).
+<sup>1</sup> Taken from [Andrew Heiss' wonderful course on RDD](https://evalsp20.classes.andrewheiss.com/class/11-class/).
 ]
 
 ### Step #1: ***Is assignment to treatment rule-based?***
