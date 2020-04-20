@@ -157,7 +157,7 @@
   <path d="M 48.570312 6.972656 L 713.027344 6.972656 L 713.027344 319.605469 L 48.570312 319.605469 Z M 48.570312 6.972656 "/>
 </clipPath>
 </defs>
-<g id="surface1329">
+<g id="surface104">
 <rect x="0" y="0" width="720" height="360" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
 <rect x="0" y="0" width="720" height="360" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
 <path style="fill:none;stroke-width:1.357972;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(100%,100%,100%);stroke-opacity:1;stroke-miterlimit:10;" d="M 0 360 L 720 360 L 720 0 L 0 0 Z M 0 360 "/>
@@ -263,6 +263,8 @@
 <g clip-path="url(#clip18)" clip-rule="nonzero">
 <path style="fill:none;stroke-width:1.066978;stroke-linecap:butt;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:7.468848,3.200935;stroke-miterlimit:10;" d="M 380.796875 319.605469 L 380.796875 6.972656 "/>
 </g>
+<path style="fill:none;stroke-width:4.267913;stroke-linecap:butt;stroke-linejoin:round;stroke:rgb(26.666667%,0.392157%,32.941176%);stroke-opacity:1;stroke-miterlimit:10;" d="M 78.773438 216.015625 L 143.03125 222.773438 L 155.886719 224.125 L 181.589844 226.828125 L 194.441406 228.183594 L 220.144531 230.886719 L 233 232.238281 L 297.257812 238.996094 L 310.109375 240.351562 L 322.964844 241.703125 L 374.371094 247.109375 "/>
+<path style="fill:none;stroke-width:4.267913;stroke-linecap:butt;stroke-linejoin:round;stroke:rgb(99.215686%,90.588235%,14.509804%);stroke-opacity:1;stroke-miterlimit:10;" d="M 387.222656 119.140625 L 400.074219 120.492188 L 412.929688 121.84375 L 425.78125 123.199219 L 477.1875 128.605469 L 490.042969 129.957031 L 528.597656 134.011719 L 541.449219 135.367188 L 567.152344 138.070312 L 580.007812 139.421875 L 644.265625 146.179688 L 657.121094 147.535156 L 682.824219 150.238281 "/>
 <g clip-path="url(#clip19)" clip-rule="nonzero">
 <path style="fill:none;stroke-width:1.357972;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(20%,20%,20%);stroke-opacity:1;stroke-miterlimit:10;" d="M 48.570312 319.605469 L 713.027344 319.605469 L 713.027344 6.972656 L 48.570312 6.972656 Z M 48.570312 319.605469 "/>
 </g>
