@@ -55,13 +55,19 @@ layout: true
 
 ---
 
+# Recap from last week
+
+## Today
+
+---
+
 # Evaluation methods
 
-* Randomized control trials (RCTs) are the gold standard of causal identification
+* Multiple regression often does not provide causal estimates because of ***selection on observables***.
 
 --
 
-* In practice, RCTs are not always possible.
+* RCTs are one way to solve this problem but they are often impossible to do.
 
 --
 
@@ -96,13 +102,18 @@ layout: true
 
 --
 
-* 2 time periods: before and after treatment
+* 2 time periods: before and after treatment.
 
 --
 
 * 2 groups:
-  - control group: never receives treatment
-  - treatment group: initially untreated and then fully treated
+
+--
+  - ***control group:*** never receives treatment,
+
+--
+
+  - ***treatment group:*** initially untreated and then fully treated.
   
 --
 
@@ -118,15 +129,11 @@ layout: true
 
 --
 
-* Why is this not that straightforward? Why can't you just regress (un)employment rates on the level of the minimum wage?
+* Why is this not that straightforward? What should the control group be?
 
 --
 
-  - The minimum wage level may be __endogenously__ determined: policymakers may want to have a low minimum wage when employment is low and increase it when conditions improve.
-
---
-
-* Seminal 1994 [paper](https://www.aeaweb.org/articles?id=10.1257/aer.20150355) by prominent labor economists David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
+* Seminal 1994 [paper](http://davidcard.berkeley.edu/papers/njmin-aer.pdf) by prominent labor economists David Card and Alan Krueger entitled "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
 
 --
 
@@ -148,25 +155,43 @@ layout: true
 
 --
 
+.pull-left[
 ```{r, echo = F, out.width = "600px"}
 knitr::include_graphics("chapter_did_files/figure-html/nj_penn_map.png")
 ```
+]
 
+--
+
+.pull-right[
+<br>
+<br>
+Pennsylvania and New Jersey are ***very similar***: similar institutions, similar habits, similar consumers, similar incomes, similar weather, etc.
+]
 ---
 
 # Card and Krueger (1994): Methodology
 
 * Surveyed 410 fast-food establishments in New Jersey (NJ) and eastern Pennsylvania
 
+--
+
 * Timing:
+
+--
   - Survey before NJ MW increase: Feb/March 1992
+
+--
   - Survey after NJ MW increase: Nov/Dec 1992
-  
+
+--
+
 * What comparisons do you think they did?
 
-## Card and Krueger's data: `diffindiff` package
+--
 
-* Let's take a closer at their data
+.pull-left[
+Let's take a closer at their data
 ```{r, echo = TRUE, eval = TRUE}
   # install package that contains the cleaned data
 remotes::install_github("b-rodrigues/diffindiff")
@@ -175,7 +200,18 @@ library(diffindiff)
   # load data
 ck1994 <- njmin
 ```
+]
 
+--
+
+.pull-right[
+```{r}
+ck1994 %>%
+  select(state,observation,empft,emppt) %>%
+  head()
+```
+
+]
 ---
 
 class: inverse
@@ -186,14 +222,14 @@ class: inverse
 
 * Keep only the following variables: `state`, `region`, `observation`, `empft`, `emppt`, `wage_st`, `pctaff`.
 
-* Tabulate the number of stores by `state` and by survey wage (`observation`). Does it match what's in Table 1 of the paper?
+* Tabulate the number of stores by `state` and by survey wave (`observation`). Does it match what's in Table 1 of the paper?
 
-* Create a variable called `empfte` equal to `empft` + 0.5*`emppt` + `nmgrs`. `empft` and `emppt` correspond respectively to the number of full-time and part-time employees. `nmgrs` corresponds to the number of managers. This is how Card and Krueger compute full-time equivalent (FTE) employment variable (p.775 of the paper).
+* Create a variable called `empfte` equal to `empft` + 0.5*`emppt` + `nmgrs`. `empft` and `emppt` correspond respectively to the number of full-time and part-time employees. `nmgrs` corresponds to the number of managers. This is how Card and Krueger compute their full-time equivalent (FTE) employment variable (p.775 of the paper).
 
 * Create two other variables: (i) percentage of full-time (FT) employees, (ii) percentage of part-time (PT) employees.
 
 
-* Compute the average number of FTE employment, average percentage of FT employees, average PT employees and average starting wave (`wage_st`) by state and by survey wage. Compare your results with Table 2 of the paper.
+* Compute the average number of FTE employment, average percentage of FT employees, average PT employees and average starting wage (`wage_st`) by state and by survey wage. Compare your results with Table 2 of the paper.
 
 ---
 
@@ -247,11 +283,11 @@ ck_mw %>%
 
 ## DiD Estimate
 
-Differences-in-differences causal estimate: 0.59 - 2.17 = __2.76__
+Differences-in-differences causal estimate: $0.59 - (-2.17) = 2.76$
 
 --
 
-=> Interpretation: the minimum wage increase led to an __increase__ in FTE employment per store of 2.76 on average.
+Interpretation: the minimum wage increase led to an __increase__ in FTE employment per store of 2.76 on average.
 
 --
 
@@ -334,7 +370,7 @@ grid.brackets(x,
 
 ---
 
-# What if we had done a naive comparison?
+# What if we had done a naive after/before comparison?
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_graph +
@@ -355,7 +391,7 @@ grid.brackets(x,
 
 ---
 
-# What if we had done a naive comparison?
+# What if we had done a naive after/before comparison?
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_graph +
@@ -388,9 +424,205 @@ grid.brackets(x,
 
 ---
 
+# What if we had done a naive after NJ/PA comparison?
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did_graph +
+  annotate("text", x = as.Date("1992-11-26"), y = 20.9, label = "Naive\nTreatment\nEffect", color = "black", size = 6)
+x = 623
+ymin = 142
+ymax = ymin+6
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+
+```
+
+---
+
+# What if we had done a naive after NJ/PA comparison?
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did_graph +
+  annotate("text", x = as.Date("1992-11-26"), y = 21.1, label = "Naive\nTreatment\nEffect", color = "black", size = 5) +
+  annotate("text", x = as.Date("1992-11-26"), y = 19.45, label = "Real\nTreatment\nEffect", color = "black", size = 5) +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
+               color = "#FDE725FF", linetype = "dashed") +
+  annotate("label", x = as.Date("1992-05-20"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 5)
+x = 623
+ymin = 142
+ymax = ymin+6
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+x = 623
+ymin = 150
+ymax = ymin+114
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+
+```
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Estimation
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# DiD in Regression Form
+
+* In practice, DiD is usually estimated on more than 2 periods (4 observations)
+
+* There are more data points before and after the policy change
+
+--
+
+3 ingredients:
+
+--
+
+1. __Treatment dummy variable__: $TREAT_s$ where the $s$ subscript reminds us that the treatment is at the state level
+
+--
+
+1. __Post-treatment periods dummy variables__: $POST_t$ where the $t$ subscript reminds us that this variable varies over time
+
+--
+
+1. __Interaction term between the two__: $TREAT_s \times POST_t$ `r emo::ji("point_right")` the ***coefficient on this term is the DiD causal effect***!
+
+---
+
+# DiD in Regression Form
+
+__Treatment dummy variable__
+$$
+TREAT_s = \begin{cases}\begin{array}{lcl}
+0 \quad \text{if } s = \text{Pennsylvania} \\\
+1 \quad \text{if } s = \text{New Jersey}
+\end{array}\end{cases}
+$$
+
+--
+
+__Post-treatment periods dummy variables__
+$$
+POST_t = \begin{cases}\begin{array}{lcl}
+0 \quad \text{if } t < \text{April 1, 1992} \\\
+1 \quad \text{if } t \geq \text{April 1, 1992}
+\end{array}\end{cases}
+$$
+
+--
+
+__Which observations correspond to $TREAT_s \times POST_t = 1$?__
+
+--
+
+* Let's put all these ingredients together:
+$$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta(TREAT_s \times POST_t) + e_{st}$$
+
+* $\delta$: causal effect of the minimum wage increase on employment
+
+---
+
+# Understanding the Regression
+
+$$EMP_{st} = \color{#d96502}\alpha + \color{#027D83}\beta TREAT_s + \color{#02AB0D}\gamma POST_t + \color{#d90502}\delta(TREAT_s \times POST_t) + e_{st}$$
+
+--
+
+We have the following:
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \color{#d96502}\alpha$
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1) = \color{#d96502}\alpha + \color{#02AB0D}\gamma$
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0) = \color{#d96502}\alpha + \color{#027D83}\beta$
+
+--
+
+$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1) = \color{#d96502}\alpha + \color{#027D83}\beta + \color{#02AB0D}\gamma + \color{#d90502}\delta$
+
+--
+
+$$[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0)] - \\
+[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0)] = \color{#d90502}\delta$$
+
+---
+
+# Understanding the Regression
+
+$$EMP_{st} = \color{#d96502}\alpha + \color{#027D83}\beta TREAT_s + \color{#02AB0D}\gamma POST_t + \color{#d90502}\delta(TREAT_s \times POST_t) + e_{st}$$
+
+In table form:
+
+
+   | Pre mean | Post mean | $\Delta$(post - pre)
+:-:|:--:|:--:|:--:
+Pennsylvania (PA) | $\color{#d96502}\alpha$ | $\color{#d96502}\alpha + \color{#02AB0D}\gamma$ | $\color{#02AB0D}\gamma$
+New Jersey (NJ) | $\color{#d96502}\alpha + \color{#027D83}\beta$ | $\color{#d96502}\alpha + \color{#027D83}\beta + \color{#02AB0D}\gamma + \color{#d90502}\delta$ | $\color{#02AB0D}\gamma + \color{#d90502}\delta$
+$\Delta$(NJ - PA) | $\color{#027D83}\beta$ | $\color{#027D83}\beta + \color{#d90502}\delta$ | $\color{#d90502}\delta$
+
+--
+
+This table generalizes to other settings by substituting *Pennsylvania* with *Control* and *New Jersey* with *Treatment*
+---
+
+class: inverse
+
+# Task 2 (10 minutes)
+
+* Create a dummy variable, `treat`, equal to `FALSE` if `state` is Pennsylvania and `TRUE` if New Jersey.
+
+* Create a dummy variable, `post`, equal to `FALSE` if `observation` is February 1992 and `TRUE` otherwise.
+
+* Estimate the following regression model using the `lm` function:
+
+$$empfte_{st} = \alpha + \beta treat_s + \gamma post_t + \delta_(treat_s \times post_t) + e_{st}$$
+
+* Do you obtain the same results as before?
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Identifying Assumptions
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
 # DiD Crucial Assumption: Parallel Trends
 
-* __Common or parallel trends__: Absent any minimum wage increase, would Pennsylvania's fast-food employment trend have been what we should have expected to see in New Jersey?
+> __Common or parallel trends assumption__: absent any minimum wage increase, Pennsylvania's fast-food employment trend would have been what we should have expected to see in New Jersey.
 
 --
 
@@ -456,7 +688,7 @@ gg_did_trend +
 
 ---
 
-# Parallel trends assumption => Verified `r emo::ji("white_check_mark")`
+# Parallel trends assumption $\rightarrow$ Verified `r emo::ji("white_check_mark")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_val <- gg_did_trend +
@@ -469,7 +701,7 @@ gg_did_trend_val
 
 ---
 
-# Parallel trends assumption => Verified `r emo::ji("white_check_mark")`
+# Parallel trends assumption $\rightarrow$ Verified `r emo::ji("white_check_mark")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_val +
@@ -479,7 +711,7 @@ gg_did_trend_val +
 
 ---
 
-# Parallel trends assumption => Not verified `r emo::ji("x")`
+# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_notval <- gg_did_trend +
@@ -492,7 +724,7 @@ gg_did_trend_notval
 
 ---
 
-# Parallel trends assumption => Not verified `r emo::ji("x")`
+# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_notval + 
@@ -502,7 +734,7 @@ gg_did_trend_notval +
 
 ---
 
-# Parallel trends assumption => Not verified `r emo::ji("x")`
+# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_notval + 
@@ -511,7 +743,7 @@ gg_did_trend_notval +
 
 ---
 
-# Parallel trends assumption => Not verified `r emo::ji("x")`
+# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_notval + 
@@ -541,116 +773,152 @@ grid.brackets(x,
 
 ---
 
-# DiD in Regression Form
+# Parallel Trends Assumption: Formally
 
-* In practice, DiD is usually estimated on more than 2 periods (4 observations)
+Let:
 
-* There are more data points before and after the policy change
+* $Y_{ist}^1$: fast food employment at restaurant $i$ in state $s$ at time $t$ if there is a high state MW;
 
 --
 
-3 ingredients:
+* $Y_{ist}^0$: fast food employment at restaurant $i$ in state $s$ at time $t$ if there is a low state MW;
 
-1. __Treatment dummy variable__: $TREAT_s$ where the $s$ subscript reminds us that the treatment is at the state level
+--
 
-1. __Post-treatment periods dummy variables__: $POST_t$ where the $t$ subscript reminds us that this variable varies over time
+These are potential outcomes, you can only observe one of the two.
 
-1. __Interaction term between the two__: $TREAT_s \times POST_t$ => the ***coefficient on this term is the DiD causal effect***!
+--
+
+The key assumption underlying DiD estimation is that, in the no-treatment state, restaurant $i$'s outcome in state $s$ at time $t$ is given by:
+
+$$\mathbb{E}[Y_{ist}^0|s,t] = \gamma_s + \lambda_t$$
+
+2 implicit assumptions:
+
+1. ***Selection bias***: relates to fixed state characteristics $(\gamma)$
+
+2. ***Time trend***: same time trend for treatment and control group $(\lambda)$
 
 ---
 
-# DiD in Regression Form
+# Parallel Trends Assumption: Formally
 
-__Treatment dummy variable__
+Outcomes in the comparison group:
+
+$$\mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] = \gamma_{PA} + \lambda_{Feb}$$
+--
+
+$$\mathbb{E}[Y_{ist}|s = \text{Pennsylvania},t = \text{Nov}] = \gamma_{PA} + \lambda_{Nov}$$
+
+--
+
 $$
-TREAT_s = \begin{cases}\begin{array}{lcl}
-0 \quad \text{if } s = \text{Pennsylvania} \\\
-1 \quad \text{if } s = \text{New Jersey}
-\end{array}\end{cases}
+\begin{align}
+\mathbb{E}[Y_{ist}&|s = \text{Pennsylvania},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] \\
+&= \gamma_{PA} + \lambda_{Nov} - (\gamma_{PA} + \lambda_{Feb}) \\
+&= \lambda_{Nov} - \lambda_{Feb}
+\end{align}
+$$
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Outcomes in the comparison group:
+
+$$\mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] = \gamma_{PA} + \lambda_{Feb}$$
+--
+
+$$\mathbb{E}[Y_{ist}|s = \text{Pennsylvania},t = \text{Nov}] = \gamma_{PA} + \lambda_{Nov}$$
+
+--
+
+$$
+\begin{align}
+\mathbb{E}[Y_{ist}&|s = \text{Pennsylvania},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] \\
+&= \gamma_{PA} + \lambda_{Nov} - (\gamma_{PA} + \lambda_{Feb}) \\
+&= \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}
 $$
 
 --
 
-__Post-treatment periods dummy variables__
+$\rightarrow$ the comparison group allows to estimate the ***time trend***.
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Let $\delta$ denote the true impact of the minimum wage increase:
+
+$$\mathbb{E}[Y_{ist}^1 - Y_{ist}^0|s,t] = \delta$$
+
+Outcomes in the treatment group:
+
+$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] = \gamma_{NJ} + \lambda_{Feb}$$
+
+$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Nov}] = \gamma_{NJ} + \delta + \lambda_{Nov}$$
+
 $$
-POST_t = \begin{cases}\begin{array}{lcl}
-0 \quad \text{if } t < \text{April 1, 1992} \\\
-1 \quad \text{if } t \geq \text{April 1, 1992}
-\end{array}\end{cases}
+\begin{align}
+\mathbb{E}[Y_{ist}&|s = \text{New Jersey}, t = \text{Nov}] - \mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] \\
+&= \gamma_{NJ} + \delta + \lambda_{Nov} - (\gamma_{NJ} + \lambda_{Feb}) \\
+&= \delta + \lambda_{Nov} - \lambda_{Feb}
+\end{align}
+$$
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Let $\delta$ denote the true impact of the minimum wage increase:
+
+$$\mathbb{E}[Y_{ist}^1 - Y_{ist}^0|s,t] = \delta$$
+
+Outcomes in the treatment group:
+
+$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] = \gamma_{NJ} + \lambda_{Feb}$$
+
+$$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Nov}] = \gamma_{NJ} + \delta + \lambda_{Nov}$$
+
+$$
+\begin{align}
+\mathbb{E}[Y_{ist}&|s = \text{New Jersey}, t = \text{Nov}] - \mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] \\
+&= \gamma_{NJ} + \delta + \lambda_{Nov} - (\gamma_{NJ} + \lambda_{Feb}) \\
+&= \delta + \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}
+$$
+
+---
+
+# Parallel Trends Assumption: Formally
+
+Therefore we have:
+
+$$
+\begin{align}
+\mathbb{E}[Y_{ist}&|s = \text{PA},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{PA},t = \text{Feb}] = \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}
 $$
 
 --
 
-__Which observations correspond to $TREAT_s \times POST_t$?__
+$$
+\begin{align}
+\mathbb{E}[Y_{ist}&|s = \text{NJ},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{NJ},t = \text{Feb}] = \delta + \underbrace{\lambda_{Nov} - \lambda_{Feb}}_{\text{time trend}}
+\end{align}
+$$
 
 --
 
-* Let's put all these ingredients together:
-$$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta_{DiD} (TREAT_s \times POST_t) + \varepsilon_{st}$$
-
-* $\delta_{DiD}$: causal effect of the minimum wage increase on employment
-
----
-
-# Understanding the Regression
-
-$$EMP_{st} = \alpha + \beta TREAT_s + \gamma POST_t + \delta_{DiD} (TREAT_s \times POST_t) + \varepsilon_{st}$$
-
---
-
-We have the following:
-
---
-
-$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0) = \alpha$
-
---
-
-$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1) = \alpha + \gamma$
-
---
-
-$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0) = \alpha + \beta$
-
---
-
-$\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1) = \alpha + \beta + \gamma + \delta$
-
---
-
-$$[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 1, POST_t = 0)] - \\
-[\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 1)-\mathbb{E}(EMP_{st} \; | \; TREAT_s = 0, POST_t = 0)] = \delta$$
-
-
----
-
-class: inverse
-
-# Task 2 (10 minutes)
-
-* Create a dummy variable, `treat`, equal to 0 if `state` is Pennsylvania and 1 if New Jersey.
-
-* Create a dummy variable, `post`, equal to 0 if `observation` is February 1992 and 1 otherwise.
-
-* Estimate the following regression model using the `lm` function:
-
-$$empfte_{st} = \alpha + \beta treat_s + \gamma post_t + \delta_{DiD} (treat_s \times post_t) + \varepsilon_{st}$$
-
-* Do you obtain the same results as before?
-
----
-
-# Multi-period DiD: Relaxing Common Trends Assumption => Too much?
-
-* When we have data on many years and many states we can relax the common trends assumption
-
-$$EMP_{st} = \alpha + \delta_{DiD} MW_st + \sum_{k=Alaska}^{Wyoming} \beta_k STATE_{kt} + \sum_{j=1985}^{1999} \gamma_j YEAR_{jt} + \varepsilon_{st}$$
-
----
-
-# Clustered Standard Errors => Too much?
-
-
+$$
+\begin{align}
+DD &= \mathbb{E}[Y_{ist}|s = \text{NJ}, t = \text{Nov}] - \mathbb{E}[Y_{ist}|s = \text{NJ}, t = \text{Feb}] \\
+& \qquad \qquad - \Big(\mathbb{E}[Y_{ist}|s = \text{PA},t = \text{Nov}] - \mathbb{E}[Y_{ist}| s = \text{PA},t = \text{Feb}]\Big) \\
+&= \delta + \lambda_{Nov} - \lambda_{Feb} - (\lambda_{Nov} - \lambda_{Feb}) \\
+&= \delta
+\end{align}
+$$
 
 ---
 class: title-slide-final, middle
