@@ -57,7 +57,7 @@ layout: true
 
 # Recap from last week
 
-* Apply inference tools to regression analysis
+* Applied inference tools to regression analysis
 
 * *Standard error* of regression coefficients
 
@@ -73,7 +73,7 @@ layout: true
 
 * *Key assumption:* parallel trends
 
-* Empirical application: impact of *minimum wage* on *employment*
+* *Empirical application*: impact of ***minimum wage*** on ***employment***
 
 ---
 
@@ -104,11 +104,11 @@ layout: true
 
 --
 
-* Next week we will look at regression discontinuity designs.
+* Next week we will look at __regression discontinuity designs__.
 
 ---
 
-# Difference-in-Differences (DiD)
+# Differences-in-Differences (DiD)
 
 * Usual starting point: subjects are not randomly allocated to treatment `r emo::ji("warning")`
 
@@ -208,7 +208,16 @@ Pennsylvania and New Jersey are ***very similar***: similar institutions, simila
 
 .pull-left[
 Let's take a closer at their data
-```{r, echo = TRUE, eval = TRUE}
+```{r, echo = FALSE, eval = TRUE, results = "hide"}
+  # install package that contains the cleaned data
+remotes::install_github("b-rodrigues/diffindiff")
+  # load package
+library(diffindiff)
+  # load data
+ck1994 <- njmin
+```
+
+```{r, echo = TRUE, eval = FALSE}
   # install package that contains the cleaned data
 remotes::install_github("b-rodrigues/diffindiff")
   # load package
@@ -223,7 +232,7 @@ ck1994 <- njmin
 .pull-right[
 ```{r}
 ck1994 %>%
-  select(state,observation,empft,emppt) %>%
+  select(sheet,chain,state,observation,empft,emppt) %>%
   head()
 ```
 
@@ -234,18 +243,15 @@ class: inverse
 
 # Task 1 (10 minutes)
 
-* Take a look at the dataset and list the variables.
+1. Take a look at the dataset and list the variables. Check the variable definitions with `?njmin`.
 
-* Keep only the following variables: `state`, `region`, `observation`, `empft`, `emppt`, `wage_st`, `pctaff`.
+1. Tabulate the number of stores by `state` and by survey wave (`observation`). Does it match what's in *Table 1* of the [paper](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)?
 
-* Tabulate the number of stores by `state` and by survey wave (`observation`). Does it match what's in Table 1 of the paper?
+1. Create a full-time equivalent (FTE) employees variable called `empfte` equal to `empft` + 0.5*`emppt` + `nmgrs`. `empft` and `emppt` correspond respectively to the number of full-time and part-time employees. `nmgrs` corresponds to the number of managers. This is how Card and Krueger compute their full-time equivalent (FTE) employment variable (p.775 of the paper).
 
-* Create a variable called `empfte` equal to `empft` + 0.5*`emppt` + `nmgrs`. `empft` and `emppt` correspond respectively to the number of full-time and part-time employees. `nmgrs` corresponds to the number of managers. This is how Card and Krueger compute their full-time equivalent (FTE) employment variable (p.775 of the paper).
+1. Compute the average number of FTE employment, average percentage of FT employees (out of the number of FTE employees), and average starting wage (`wage_st`) by state and by survey wave. Compare your results with *Table 2* of the paper.
 
-* Create two other variables: (i) percentage of full-time (FT) employees, (ii) percentage of part-time (PT) employees.
-
-
-* Compute the average number of FTE employment, average percentage of FT employees, average PT employees and average starting wage (`wage_st`) by state and by survey wage. Compare your results with Table 2 of the paper.
+5. How different are New Jersey and Pennsylvania's fast-food restaurants before the minimum wage increase?
 
 ---
 
@@ -537,7 +543,7 @@ $$
 
 --
 
-__Post-treatment periods dummy variables__
+__Post-treatment periods dummy variable__
 $$
 POST_t = \begin{cases}\begin{array}{lcl}
 0 \quad \text{if } t < \text{April 1, 1992} \\\
@@ -611,15 +617,13 @@ class: inverse
 
 # Task 2 (10 minutes)
 
-* Create a dummy variable, `treat`, equal to `FALSE` if `state` is Pennsylvania and `TRUE` if New Jersey.
+1. Create a dummy variable, `treat`, equal to `FALSE` if `state` is Pennsylvania and `TRUE` if New Jersey.
 
-* Create a dummy variable, `post`, equal to `FALSE` if `observation` is February 1992 and `TRUE` otherwise.
+1. Create a dummy variable, `post`, equal to `FALSE` if `observation` is February 1992 and `TRUE` otherwise.
 
-* Estimate the following regression model using the `lm` function:
+1. Estimate the following regression model. Do you obtain the same results as in slide 9?
 
-$$empfte_{st} = \alpha + \beta treat_s + \gamma post_t + \delta_(treat_s \times post_t) + e_{st}$$
-
-* Do you obtain the same results as before?
+$$empfte_{st} = \alpha + \beta treat_s + \gamma post_t + \delta(treat_s \times post_t) + \varepsilon_{st}$$
 
 ---
 
@@ -843,11 +847,8 @@ $$
 Outcomes in the comparison group:
 
 $$\mathbb{E}[Y_{ist}| s = \text{Pennsylvania},t = \text{Feb}] = \gamma_{PA} + \lambda_{Feb}$$
---
 
 $$\mathbb{E}[Y_{ist}|s = \text{Pennsylvania},t = \text{Nov}] = \gamma_{PA} + \lambda_{Nov}$$
-
---
 
 $$
 \begin{align}
@@ -869,11 +870,15 @@ Let $\delta$ denote the true impact of the minimum wage increase:
 
 $$\mathbb{E}[Y_{ist}^1 - Y_{ist}^0|s,t] = \delta$$
 
+--
+
 Outcomes in the treatment group:
 
 $$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Feb}] = \gamma_{NJ} + \lambda_{Feb}$$
+--
 
 $$\mathbb{E}[Y_{ist}|s = \text{New Jersey}, t = \text{Nov}] = \gamma_{NJ} + \delta + \lambda_{Nov}$$
+--
 
 $$
 \begin{align}
