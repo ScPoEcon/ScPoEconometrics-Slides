@@ -63,7 +63,7 @@ layout: true
 
 # Evaluation methods
 
-* Multiple regression often does not provide causal estimates because of ***selection on observables***.
+* Multiple regression often does not provide causal estimates because of ***selection on unobservables***.
 
 --
 
