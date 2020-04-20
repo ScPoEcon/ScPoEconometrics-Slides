@@ -57,7 +57,23 @@ layout: true
 
 # Recap from last week
 
-## Today
+* Apply inference tools to regression analysis
+
+* *Standard error* of regression coefficients
+
+* *Statistical significance* of regression coefficients
+
+--
+
+## Today: ***Differences-in-differences***
+
+* Exploits changes in policy over time that don't affect everyone
+
+* Need to find (or construct) appropriate control group(s)
+
+* *Key assumption:* parallel trends
+
+* Empirical application: impact of *minimum wage* on *employment*
 
 ---
 
@@ -157,7 +173,7 @@ layout: true
 
 .pull-left[
 ```{r, echo = F, out.width = "600px"}
-knitr::include_graphics("chapter_did_files/figure-html/nj_penn_map.png")
+knitr::include_graphics("../img/photos/nj_penn_map.png")
 ```
 ]
 
