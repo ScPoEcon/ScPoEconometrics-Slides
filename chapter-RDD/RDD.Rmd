@@ -62,37 +62,24 @@ layout: true
 
 # Recap from last week
 
-* Apply inference tools to regression analysis
+* ***Differences-in-differences*** policy evaluation method
 
-* *Standard error* of regression coefficients
+* Main estimation equation:
+$$Y_{it} = \alpha + \beta TREAT_i + \gamma POST_t + \delta(TREAT_i \times POST_t) + \varepsilon_{it}$$
 
-* *Statistical significance* of regression coefficients
-
---
-
-## Today: Program Evaluation 
-
-.pull-left[
-***Regression Discontinuity Design***
-
-  * Life is full of random rules
-  
-  * Exploits knowledge of assignment rule
-  
-  * *Empirical application:* effect of alchol consumption on mortality
-]
+* Key assumption: ***parallel trends***
 
 --
 
-.pull-left[
-***Differences-in-differences***
+## Today: ***Regression Discontinuity Design***
 
-  * Exploits changes in policy over time
-  
-  * Find the appropriate control group
-  
-  * *Empircal application:* impact of the minimum wage on employment
-]
+* Life is full of random rules which assign some treatment
+
+* Exploits knowledge of assignment rule
+
+* Key assumption: variable which assigns treatment cannot be manipulated by individuals
+
+* *Empirical application:* effect of alchol consumption on mortality
 
 ---
 
@@ -456,9 +443,9 @@ layout: true
 
 --
 
-* Writing in regression form, we have
+* In its simplest form, we can write the following regression model:
     $$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_i,$$
-  where $DEATHRATE_a$ is the death rate at age $a$, $D_a$ is the treatment dummy, and $a$ is age.
+  where $DEATHRATE_a$ is the death rate at age $a$, $D_a$ is the treatment dummy, and $a$ is age (defined in months relative to 21st birthday).
 
 --
 
@@ -467,7 +454,7 @@ layout: true
 --
 
 * The RDD estimator exploits a discontinuity at $a = 21$ in the conditional expectation function:
-$$\underbrace{\lim_{c \to 21^+} \mathbb{E}[DEATHRATE_a^1|a = c]}_{\alpha + \delta} - \underbrace{\lim_{c \to 21^-} \mathbb{E}[DEATHRATE_a^0|a = c]}_{\alpha} = \delta$$
+$$\underbrace{\lim_{c \to 21^+} \mathbb{E}[DEATHRATE_a|a = c]}_{\alpha + \delta} - \underbrace{\lim_{c \to 21^-} \mathbb{E}[DEATHRATE_a|a = c]}_{\alpha} = \delta$$
 
 ---
 
@@ -488,7 +475,7 @@ $$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_i,$$
 
 # Estimation #1: Simple Linear Model
 
-$$DEATHRATE_a = \alpha + \delta D_a + \beta a + e_a,$$
+$$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_a,$$
 
 .pull-left[
 ```{r, eval = FALSE}
@@ -1070,7 +1057,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# See you next week!
+# END
 
 
 
