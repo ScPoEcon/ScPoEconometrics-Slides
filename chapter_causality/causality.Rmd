@@ -1,10 +1,11 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Intro To Causality"
-author: "Florian Oswald"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
@@ -41,6 +42,13 @@ lowtop = c(om[1],om[2],0.1,om[4])
 
 overwrite = FALSE
 
+library(tidyverse)
+library(ggplot2)
+library(emo)
+library(dplyr)
+library(png)
+library(grid)
+library(pander)
 ```
 
 layout: true
@@ -49,146 +57,267 @@ layout: true
 
 ---
 
-# Packages used in this set of slides
+# Recap from last week
 
-```{r}
-library(tidyverse)
-```
+* *Simple Linear Regression Model*: $y_i = b_0 + b_1 x_i + e_i$
 
----
+* *Ordinary Least Squares* (OLS) estimation: minimize the sum of squared errors
 
-# Why Causality?
+* R command to estimate a linear model: `lm(dependent variable ~ independent variable, data)`
 
-- Many of the interesting questions we might want to answer with data are causal<sup>1</sup>
 
-- Some are non-causal, too - for example, "how can we predict whether this photo is of a dog or a cat" is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat
+## Today - Introduction to causal inference
 
-- Nearly every *why* question is causal
+* Causality versus correlation
 
-- *Why* is a first order question for any policy maker thinking about a new policy.
+* The Potential Outcome Framework a.k.a. Rubin's Causal Model
 
-.footnote[
-[1]: This set of slides follows closely the great material by [Nick Huntington Klein](https://nickch-k.github.io/introcausality/)
-]
+* Randomized controlled trials (RCTs)
+
+* Follow up on the empirical application of *class size* and *student performance*
 
 ---
 
-# Also
+# Why do we care about causality?
 
-- This is economists' comparative advantage!
-
-- Plenty of fields do statistics. But very few make it standard training for their students to understand causality
-
-- This understanding of causality makes economists very useful! *This* is one big reason why tech companies have whole economics departments in them
-
----
-
-# So what is causality?
-
-- We say that `X` *causes* `Y` if...
-
-- were we to intervene and *change* the value of `X` without changing anything else...
-
-- then `Y` would also change as a result
-
----
-
-# Some examples of causal relationships
-
-.pull-left[
-## Some Obvious:
-
-- A light switch being set to on causes the light to be on
-
-- Setting off fireworks raises the noise level
-
-]
+Many of the *interesting questions* we might want to answer with data are causal
 
 --
 
-.pull-right[
+- ***Understanding*** the world
 
-## Some less obvious:
+  - *Social sciences*: Why do people behave in the way they do?
+  - *Health sciences*: Why do people get sick? Which medicine can cure them?
 
-- Getting a college degree increases your earnings
+--
 
-- Tariffs reduce the amount of trade
+- Causal understanding is also of first interest to **policymakers**
 
-]
+  - How to lower unemployment?
+  - How to improve student learning?
+  - Whether governments should care about the level of public debt?
+
+--
+
+- Note that some questions we might want to answer are not causal 
+  - Most *Artificial Intelligence* tasks only care about **prediction**
+  - *Example*: predicting whether a photo is of a dog or a cat is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
+
+---
+
+# Causality and Economics
+
+- Making causal inference from data can be seen as economists' *comparative advantage* among the social sciences!
+
+- Plenty of fields do statistics. But very few make it standard training for their students to understand causality.
+
+- Economists' endeavour to establish causal relationships is also what makes them useful both in the private (e.g. tech companies) and public sector (e.g. policy advisors). 
+
+--
+
+- Ok, that's enough preaching `r emo::ji("sweat_smile")`
+
+
+---
+
+# The Concept of Causality
+
+__Causality__: what are we talking about? 
+
+- We say that `X` *causes* `Y`
+
+--
+
+  - if we were to intervene and *change* the value of `X` ***without changing anything else***...
+    
+--
+
+  - then `Y` would also change ***as a result***.
+  
+--
+
+- The key point here is the ***without changing anything else***, often referred as the **ceteris paribus (*all else equal*) assumption**.   
+(*latin* makes things seem more complicated `r emo::ji("nerd_face")`)
+
+--
+
+- `r emo::ji("warning")` It does **NOT** mean that `X` is the only factor that causes `Y`.
 
 ---
 
 # Correlation vs Causation
 
-* That's becomes almost a trueism: *Correlation is not equal Causation*.
+***Correlation does not equal causation*** has become a ubiquitous mantra, but can you tell why it is true?
 
-* Well, we're here to figure out conditions when it **is**!
+--
 
-## Examples of non-zero *correlations* that are not *causal* (or may be causal in the wrong direction!)
+Some correlations obviously don't imply causation ([e.g. spurious correlation website](https://www.tylervigen.com/spurious-correlations)).
+
+--
+
+```{r, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("../img/photos/spurious.png")
+```
+
+---
+
+# Correlation vs Causation: Smoking and Lung Cancer
+
+But not all correlations are so easy to rule out
+
+--
+
+***Does smoking cause lung cancer?***
+
+--
 
 .pull-left[
+- Today, we know the answer is *YES*! 
 
-### Some obvious:
+- But let's go back in the 1950's
 
-- People tend to wear shorts on days when ice cream trucks are out
+  - We are at the start of a big increase in deaths from lung cancer...
+  
+  - ... which is happening after a fast growth of cigarette consumption
+]
 
-- Rooster crowing sounds are followed closely by sunrise
-
-] 
+--
 
 .pull-right[
+```{r, echo = FALSE, out.width = "400px"}
+knitr::include_graphics("../img/photos/Smoking_lung_cancer.png")
+```
+]
 
-### Some less obvious:
+--
 
-- Colds tend to clear up a few days after you take Emergen-C
+- It's very tempting to claim that smoking causes lung cancer based on this graph.
 
-- The performance of the economy tends to be lower or higher depending on the president's political party
+---
 
+# Correlation vs Causation: Smoking and Lung Cancer
+
+At the time many people were still skeptical, including some famous statisticians:
+
+--
+
+.pull-left[
+***Macro confouding factors***:  
+
+Other macro factors which can cause cancers also changed between 1900 and 1950:
+
+  - Tarring of roads,
+  
+  - Inhalation of motor exhausts (leaded gasoline fumes),
+  
+  - General greater air pollution.
+]
+
+--
+
+.pull-right[
+***Self selection***: 
+
+Smokers and non-smokers may be different in the first place: 
+  
+  - __Selection on observable characteristics__: age, education, income, etc.
+  
+  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of [Fisher](https://fr.wikipedia.org/wiki/Ronald_Aylmer_Fisher)). 
 ]
 
 ---
 
-# [Spurious](https://www.tylervigen.com/spurious-correlations) Correlation?
+# Correlation vs Causation: Smoking and Lung Cancer
 
-![](../img/photos/spurious.png)
+- Let's focus on one of these potential confounding characteristics: **age**.
 
----
+--
 
-# Good and Bad Correlation?
+- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
 
-* *Correlation* is a well-defined concept of statistical **association**
+- For each country 3 groups of men were studied for 20 months (U.S.) to 5 five years (U.K.).
 
-* It's clearly true that space launches and Sociology doctorates have a correlation coefficient of 78%.
+--
 
-* However, what relationship lies **behind** this association is a more difficult question. 
+- The following table gives the death rates per 1000 persons-years among these people. 
 
-* In other words, what does it **mean** to measure a correlation between two variables?
+```{r, echo = FALSE, out.width = "500px"}
+knitr::include_graphics("../img/photos/raw_death_rates.png")
+```
 
----
-
-
-# Important Note
-
-- "X causes Y" *doesn't* mean that X is necessarily the *only* thing that causes Y
-
-- And it *doesn't* mean that all Y must be X
-
-- For example, using a light switch causes the light to go on
-
-- But not if the bulb is burned out (no Y, despite X), or if the light was already on (Y without X)
-
-- But still we'd say that using the switch causes the light! The important thing is that X *changes the probability* that Y happens, not that it necessarily makes it happen for certain
-
+- Cigar/pipe smokers are 30% (U.S.) to 75% (Canada) more likely to die from lung cancer than non-smokers.
 
 ---
 
-# So How Can We Tell?
+# Correlation vs Causation: Smoking and Lung Cancer
 
-- As just shown, there are plenty of *correlations* that aren't *causal*
+* But the age *distribution* is also very different depending on smoking status.
 
-- So if we have a correlation, how can we tell if it *is*?
+* The following table gives the mean age by smoking status
 
-- For this we're going to have to think hard about *causal inference*. That is, inferring causality from data.
+```{r, echo = FALSE, out.width = "600px"}
+knitr::include_graphics("../img/photos/age_by_smoking_status.png")
+```
+
+* Because health is likely to deteriorate with age the previous table could be far from giving causal estimates. 
+
+---
+
+class:inverse
+
+# Task 1 (5 minutes)
+
+Let's adjust our Canadian statistics **taking the age distribution into account **.
+
+
+|           | Death rates of <br> Pipe-smokers| Nb. of <br> pipe smokers | Nb. of <br> non-smokers |
+|-----------|:----:|:----:|:----:|
+| Age 20-50 | 15 | 11 | 29 |
+| Age 50-70 | 35 | 13 | 9  |
+| Age +70   | 50 | 16 | 2  |
+| Total     |    | 40 | 40 |
+
+1. Compute the average death rate for pipe smokers in Canada.
+
+1. What would the average mortality rate be for pipe smokers if they had the same age distribution as non-smokers?
+
+---
+
+
+# Correlation vs Causation: Smoking and Lung Cancer
+
+
+Here is the age-adjusted death rates table found by [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents).
+
+```{r, echo = FALSE, out.width = "600px"}
+knitr::include_graphics("../img/photos/adjusted_death_rates.png")
+```
+
+- Cigars/pipes seem much less dangerous than in the previous table...
+
+--
+
+- ... but this table still does not allow us to tell about the causal effect of smoking.
+
+--
+
+- There are still a lot of ***confounding factors*** that are not accounted for. 
+
+---
+
+# How Can We Tell?
+
+- Sometimes correlations are just pure *artefacts*: there is no causal relationship between the variables of interest.
+
+- In some other cases, there are both correlation and causality but not of the same **magnitude**, or even the same **direction**.
+
+--
+
+- So how can we make causal inference then? 
+
+- The ***Potential Outcomes Framework*** will be our guide.
+
+
 
 ---
 layout: false
@@ -196,8 +325,6 @@ class: title-slide-section-red, middle
 
 # Causal Inference
 
-
-
 ---
 layout: true
 
@@ -205,88 +332,295 @@ layout: true
 
 ---
 
-# The Problem of Causal Inference
+# The Potential Outcomes Framework
+
+Often called the **Rubin Causal Model** in memory of the statistician **Donald Rubin** who generalised and formalized this model in the 1970's.
+
+--
+
+***Key idea***: Each individual can be exposed to **multiple alternative treatment states**.
+  - smoking cigarrettes, smoking cigars or not smoking,
+  - growing up in a poor vs a middle class neighborhood vs a rich neighborhood,
+  - being in a small or a big class.
+  
+--
 
 .pull-left[
-- Let's try to think about whether some `X` causes `Y`
+For practicality, let this treatment variable $D_i$ be a binary variable:
 
-- That is, if we manipulated `X`, then `Y` would change as a result
-
-- For simplicity, let's assume that `X` is either 1 or 0, like "got a medical treatment" or "didn't"
-
+$$
+D_i = \begin{cases} 
+                    1 \textrm{ if individual $i$ is treated} \\\\ 
+                    0 \textrm{ if individual $i$ is not treated} 
+      \end{cases}
+$$
 ]
 
 --
 
 .pull-right[
 
-## The Problem of Causal Inference
+***Treatment group***: all the individuals such that $D_i = 1$.
 
-- Now, how can we know *what would happen* if we manipulated `X`?
-
-- Let's consider just one person - Angela. We could just check what Angela's `Y` is when we make `X=0`, and then check what Angela's `Y` is again when we make `X=1`.
-
-- Are those two `Y`s different? If so, `X` causes `Y`!
-
-- Do that same process for everyone in your sample and you know in general what the effect of `X` on `Y` is.
-
+***Control group***: all the individuals such that $D_i = 0$.
 ]
 
 ---
 
+
+# The Potential Outcomes Framework
+
+* In this framework, each individual has two ***potential outcomes***:
+  
+  - $Y_i^1$: *potential outcome in the treatment state* $(D_i = 1)$ for individual $i$,
+  
+  - $Y_i^0$: *potential outcome in the control state* $(D_i = 0)$ for individual $i$.
+
+--
+
+* From these we can define the ***individual treatment effect***:
+
+$$ \delta_i = Y_i^1 - Y_i^0$$
+
+* $\delta_i$ measures the **causal effect of $D_i$ (treatment)** for individual $i$ on outcome $Y$.
+
+--
+
+* In real life we only observe $Y_i$ which can be written as:
+
+$$Y_i = D_i * Y_i^1 + (1- D_i)*Y_i^0$$
+
+--
+
+* ***Fundamental Problem of Causal Inference***: for any individual $i$, we only observe one of either potential outcomes, and thus we cannot compute $\delta_i$ [(Holland, 1986)](http://people.umass.edu/~stanek/pdffiles/causal-holland.pdf).
+
+---
+
+# The Potential Outcomes Framework
+
+```{r, echo = FALSE, out.width = "700px"}
+knitr::include_graphics("../img/photos/fundamental_pb_inference.png")
+```
+
+
+* The potential outcome that is not observed exists in principle, it is called the ***counterfactual outcome***.
+
+  * What your test score would have been if you had been in a big class, knowing that you were in a small one.
+
+--
+
+* Since the treatment effect *cannot* be observed at the individual level, we estimate population averages.
+
+.footnote[
+This table is from Morgan and Winship (2015, p.46).
+]
+---
+
+# Average Treatment Effect (ATE)
+
+Broadest possible average effect: **A**verage **T**reatment **E**ffect (***ATE***)
+
+\begin{align}
+ATE &= \mathop{\mathbb{E}}(\delta_i) \\
+    &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0) \\ 
+    &= \mathop{\mathbb{E}}(Y_i^1) - \mathop{\mathbb{E}}(Y_i^0)
+\end{align}
+  
+* The ATE simply measures the ***average of individual treatment effects over the whole population***. 
+  
+  * The $\mathop{\mathbb{E}}(.)$ operator stands for **expectation** or *population mean*.
+  
+  * The $\mathop{\mathbb{E}}(.)$ operator is linear, in other words, $\mathop{\mathbb{E}}(X+Y) = \mathop{\mathbb{E}}(X) + \mathop{\mathbb{E}}(Y)$ with $X$ and $Y$ being two random variables.
+
+---
+
+# Average Treatment on the Treated (ATT)
+
+Other ***conditional*** average treatment effects may be of interest:
+
+* The **A**verage **T**reatment Effect on the **T**reated (***ATT***)
+
+\begin{align}
+ ATT &= \mathop{\mathbb{E}}(\delta_i | D_i = 1) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 1) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 1)
+\end{align}
+
+* The ATT measures the ***average treatment effect conditional on being in the treatment group***.
+
+    * The $\mathop{\mathbb{E}}(.|D = x)$ operator stands for **conditional expectation**. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition $D = x$.
+  * The $\mathop{\mathbb{E}}(.|D = x)$ operator is also linear.
+
+---
+
+# Average Treatment on the Untreated (ATU)
+
+Other ***conditional*** average treatment effects may be of interest:
+
+* The **A**verage **T**reatment Effect on the **U**ntreated (***ATU***)
+
+\begin{align}
+ ATU &= \mathop{\mathbb{E}}(\delta_i | D_i = 0) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 0) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 0) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
+\end{align}
+
+* The ATU measures the ***average treatment effect conditional on being in the control group***.
+
+--
+
+* In the majority of cases, ATE $\neq$ ATT $\neq$ ATU!
+
+---
+
 # The Problem of Causal Inference
 
+* We have the same **missing data problem** for computing the ATE, ATT or ATU as we did for $\delta_i$. Either $Y_i^1$ or $Y_i^0$ is missing for each $i$.
 
-- You may have spotted the problem!
+--
 
-- Just like you can't be in two places at once, Angela can't exist both with `X=0` and with `X=1`. She either got that medical treatment or she didn't.
+* From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
 
-- Let's say she did. So for Angela, `X=1` and, let's say, her outcome is `Y=10`.
+$$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
 
-- The other one, what `Y` *would have been* if we made `X=0`, is **missing**. 
+--
 
-- We don't know what it is! Could also be `Y=10`. Could be `Y=9`. Could be `Y=1000`!
+* For example, it would consist in taking the difference between:
+  * Death rates for smokers and non-smokers,
+  * GDP growth rates for democratic and non democratic countries,
+  * Unemployment rates for countries with and without a minimum wage.
+
+--
+
+* Most of the time, such a difference **will fail to capture the causal effect** of the treatment.
+
+--
+
+* Notice that this kind raw comparison is often done by journalists, politicians, badly trained scientists (but not you now! `r emo::ji("wink")`).
+
+---
+
+# The Problem of Causal Inference
+
+Let's rewrite the SDO to make the individual treatment effect $(\delta_i)$ appear in the equation. 
+
+\begin{align}
+  \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
+\end{align}
+
+For now, suppose **treatment effect is constant** across people: $\forall i, \delta_i = \delta$.
+
+Then,
+
+\begin{align}
+  \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \delta + \mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
+\end{align}
+
+And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) = \delta$ (by assumption), we get: 
+
+
+\begin{align}
+  SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
+  &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias}
+\end{align}
+
+---
+
+# The Problem of Causal Inference
+
+Let's now relax the assumption that the treatment effect is constant among all individuals.
+
+After tedious calculations that we skip, we get that the SDO is now decomposed as: 
+
+\begin{align}
+  SDO &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
+  & \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
+\end{align}
+
+where $1 - \pi$ denotes the share of people in the control group.
+
+--
+
+So there is a novel source of bias that comes from the potential ***heterogeneity in the individual treatment effect*** $\delta_i$.
+
+--
+
+* ***Selection bias***: those who attend university are likely to have higher baseline cognitive skills (regardless of whether they actually attend college).
+* ***Heterogeneous treatment effect bias***: those who attend university may improve their cognitive skills more at university because they are more motivated.
+
+---
+
+class:inverse
+
+# Task 2 (10 minutes)
+
+Let's compute these various quantities and biases with some toy data (i.e. data we generated ourselves).
+
+```{r, echo = FALSE, eval = FALSE}
+set.seed(1)
+D_i = sample(c(0,1), replace = T, size = 10000)
+Y0_i = sample(c(1:10), replace = T, size = 10000) + D_i
+delta_i = sample(c(1:3), replace = T, size = 10000) + 0.2*D_i
+cor(Y0_i, D_i)
+cor(delta_i, D_i)
+Y1_i = Y0_i + delta_i
+set.seed(3)
+D_i_random = sample(c(0,1), replace = T, size = 10000)
+cor(Y0_i, D_i_random)
+cor(delta_i, D_i_random)
+toy_data = data.frame(D_i, Y0_i, Y1_i, D_i_random)
+# fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_data.csv")
+# toy_data = read.csv("https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1")
+```
+
+1. Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). Notice that `Di_random` is a treatment status we would have under random assignment.
+
+1. Create the following variables: $Y_i$ and $\delta_i$. Recall that $Y_i = D_i * Y_i^1 + (1 - D_i) Y_i^0$ and $\delta_i = Y_i^1 - Y_i^0$. 
+
+1. Compute the ***ATE*** and the ***SDO***. (Use base `R`.)  Is there is any *bias*? Is it large in magnitude?
+
+1. Using `D_i_random`, compute the ***SDO under randomization***. Remember that you need to recompute $Y_i$ because the assignment is not the same anymore.   
+If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
+
+1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treatment effect bias*** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$
 
 
 ---
 
+# Randomization solves the problem of causal inference!
 
-# The Problem of Causal Inference
+* ***Randomized experiments***: you ***randomly*** assign people to a treatment and a control group.
 
-- Well, why don't we just take someone who actually DOES have `X=0` and compare their `Y`?
+* In this case, the treatment status **independent** of the potential outcomes.
 
-- Because there are lots of reasons their `Y` could be different BESIDES `X`.
+--
 
-- They're not Angela! A character flaw to be sure. `r emo::ji("grinning")`
+* In particular, there is no reason for $\mathop{\mathbb{E}}(Y_i^0 | D_i = 1)$ to be different from $\mathop{\mathbb{E}}(Y_i^0 | D_i = 0)$
 
-- So if we find someone, Gareth, with `X=0` and they have `Y=9`, is that because `X` increases `Y`, or is that just because Angela and Gareth would have had different `Y`s anyway?
+  * Therefore the ***selection bias is equal to 0***.
+  
+--
+  
+* In the same way, there is no reason for $\mathop{\mathbb{E}}[\delta_i]$ to be different in the treatment and control group. 
 
-- `r emo::ji("thinking")`
+  * There $ATT = ATU$, implying the ***heterogenous treatment effect bias will also be 0***.
+
+---
+
+# Randomization solves the problem of causal inference!
+
+With random assignment we have: 
+
+$$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) = ATE$$ 
+
+`r emo::ji("point_right")` We can directly estimate the ATE from the data!
 
 ---
 
-
-# The Problem of Causal Inference
-
-- The main goal we have in doing causal inference is in making *as good a guess as possible* as to what that `Y` *would have been* if `X` had been different.
-
-- That "would have been" is called a *counterfactual* - counter to the fact of what actually happened.
-
-- In doing so, we want to think about two people/firms/countries that are basically *exactly the same* except that one has `X=0` and one has `X=1`.
-
-- If we could, we'd pick someone *identical* to Angela, the only difference being that they had `X=0` and not `X=1`.
-
-
-
-
-
----
 layout: false
 class: title-slide-section-red, middle
 
-# Experiments
-
-
+# Randomized Experiments
 
 ---
 layout: true
@@ -295,155 +629,333 @@ layout: true
 
 ---
 
-# Experiments
+# Randomized experiments
+
+- Often called **R**andomized **C**ontrolled **T**rials (RCT).
+
+- The first RCTs were conducted a long time ago (18th and 19th century), mainly in **Medecine**. 
+
+- In the beginning of the 20th century they were popularized by famous statisticians like **J. Neyman** or **R.A. Fisher**. 
+
+- Since then they have had a growing influence and have progressively become a reliable [tool for public policy evaluation](https://www.povertyactionlab.org/fr). 
+
+- As for economics, the **2019 Nobel Price in Economics** was awarded to three exponents of RCTs, [Abhijit Banerjee, Esther Duflo and Michael Kremer](https://www.economist.com/finance-and-economics/2019/10/17/a-nobel-economics-prize-goes-to-pioneers-in-understanding-poverty), "for their experimental approach to alleviating global poverty".
+
+---
+
+# Back to class size and students' achievement
+
+Last week we regressed average student math and reading scores on class size.
+
+$$\textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + e_i$$
+We briefly discuss why $b_1^{OLS}$ could only establish an ***association*** and not a ***causal relationship***.
+
+--
+
+* **Student sorting**: There is selection into schools with different sized classes. Suppose parents have a prior that smaller classes are better, they will try to get their kids into those schools.
+
+--
+
+* **Teacher sorting**: Teachers may sort in schools with smaller classes because it’s easier to teach a small rather than a large class, and if there is competition for those places then higher quality teachers will have an advantage.
+
+--
+
+* **Location effect**: Large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.
+
+--
+
+An RCT would take care of all these biases!
+
+---
+
+# The Project STAR Experiment
+
+Tennessee **S**tudent/**T**eacher **A**chievement **R**atio Experiment (see [Krueger (1999)](http://piketty.pse.ens.fr/files/Krueger1999.pdf))
+
+* Funded by Tennesse legislature for a total cost of approx. $12 million.
+
+* The experiment started in the 1985-1986 school year and lasted four years.
+
+--
+
+* 11,600 students and their teachers where **randomly assigned** to one of the following 3 groups from kindergarten through third grade:
+
+  1. ***Small class***: 13-17 students per teacher,
+  
+  2. ***Regular class***: 22-25 students,
+  
+  3. ***Regular/aide class***: 22-25 students with a full-time teacher's *aide*.
+
+--
+
+* Randomization occurred within schools.
+
+* Students' math and reading skills were tested around March each year.
+
+--
+
+* There was a problem of ***non-random attrition*** but we will ignore it.
+
+---
+
+class:inverse
+
+# Task 3 (10 minutes)
+
+1. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1) and assign it to an object called `star_df`.
+
+1. Read the help for `AER::STAR` to understand what the variables correspond to. (Note: the data has been *reshaped* so don't mind the "k", "1", etc. in the variable names in the help.)
+
+1. What's the unit of observation? Which variable contains: (i) the (random) class assignment, (ii) the student's class grade, (iii) the outcomes of interest?
+
+1. How many observations are there? Why so many?
+
+1. Why are there so many `NA`s? What do they correspond to?
+
+1. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_df),]`
+
+1. Let's check how well the randomization was done by doing ***balancing checks***.  
+Compute the average percentage of girls, african americans, and free lunch qualifiers by grade *and* treatment class.  
+*Hint*: The following computes the percentage of girls (without the relevant `dplyr` verbs)
+`share_female = mean(gender == "female") * 100`.
+
+
+```{r, echo = FALSE}
+# data("STAR", package = "AER")
+# star <- STAR %>%
+#     pivot_longer(
+#         cols = -c(gender, ethnicity, birth),
+#         names_to = c(".value", "grade"),
+#         names_pattern = "(.+)(k|1|2|3)$")
+# write.csv2(star, file = "star_data.csv", row.names = F)
+star_df = read.csv(file = "https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_df <- star_df[complete.cases(star_df),]
+```
+
+---
+
+# The Project STAR Experiment
+
+We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the treatment and control groups.
+
+Let's only focus on:
+
+- One treatment group: **small classes**,
+
+- One control group: **regular classes**,
+
+- One grade: **kindergarten** (k).
+
+--
+
+```{r, echo = FALSE}
+diff_table = data.frame(
+    grade = rep(c("1","2","3","k"), each = 2),
+    test = rep(c("math","read"), times = 4),
+    star_df  %>%
+        pivot_longer(cols = c("math","read"), names_to = "test", values_to = "score") %>%
+        filter(star == "regular") %>%
+        group_by(grade, test) %>%
+        summarise(mean_regular = round(mean(score), 3)) %>%
+        ungroup() %>%
+        select(mean_regular),
+    star_df %>%
+        pivot_longer(cols = c("math","read"), names_to = "test", values_to = "score") %>%
+        filter(star == "small") %>% group_by(grade, test) %>%
+        summarise(mean_small = round(mean(score), 3)) %>%
+        ungroup() %>%
+        select(mean_small),
+    star_df %>%
+        pivot_longer(cols = c("math","read"), names_to = "test", values_to = "score") %>%
+        filter(star == "regular+aide") %>%
+        group_by(grade, test) %>%
+        summarise(mean_regular_aide = round(mean(score), 3)) %>%
+        ungroup() %>%
+        select(mean_regular_aide)) %>%
+    mutate(
+        diff_small_regular = round(mean_small - mean_regular, 3),
+        diff_regular_aide_regular = round(mean_regular_aide - mean_regular, 3)
+    ) %>%
+    arrange(factor(grade, levels = c("k","1","2","3")))
+```
+
+grade | test | mean regular | mean small | ATE
+--------|---------|---------|---------|---------
+k | math | `r round(diff_table[1,3], 2)` | `r round(diff_table[1,4], 2)` | `r round(diff_table[1,4] - diff_table[1,3], 2)`
+k | read | `r round(diff_table[2,3], 2)` | `r round(diff_table[2,4], 2)` | `r round(diff_table[2,4] - diff_table[2,3], 2)`
+
+What's the interpretation for these ATEs?
+
+--
+
+That's nice but can't we put this in regression form?
+
+---
+
+# RCT in Regression Form
+
+$$ Y_i = D_i Y_i^1 + (1 - D_i) Y_i^0 $$
+
+--
+
+Rewriting this equation, we get:
+
+$$\begin{align} Y_i &=Y_i^0 +D_i (Y_i^1 - Y_i^0) \\ &= Y_i^0 +D_i \delta_i \end{align}$$
+
+--
+
+Assuming $\delta_i = \delta, \forall i$,
+
+$$Y_i = Y_i^0 + D_i \delta$$
+
+--
+
+Adding $\mathbb{E}[Y_i^0] - \mathbb{E}[Y_i^0] = 0$ to the right-hand side:
+
+$$\begin{align} Y_i &= \mathbb{E}[Y_i^0] + D_i \delta + Y_i^0 - \mathbb{E}[Y_i^0] \\ &= b_0 + \delta D_i + e_i \end{align}$$
+where $b_0 = \mathbb{E}[Y_i^0]$ and $e_i = Y_i^0 - \mathbb{E}[Y_i^0]$
+
+---
+
+# The Project STAR Experiment: Regression
+
+The last equation looks exactly like the simple regression model we saw last week!
+
+Let's therefore estimate the ATE of small class size on math scores using a regression.
+
+--
 
 .pull-left[
-- A common way to do this in many fields is an *experiment*.
+We want to estimate the following model: $mathscore_i = b_0 + \delta D_i + e_i$, with
 
-- If you can *randomly assign* `X`, then you know that the people with `X=0` are, on average, exactly the same as the people with `X=1`.
+$$
+D_i = \begin{cases} 
+                    1 \textrm{  if small class = 1}  \\\\ 
+                    0 \textrm{  if small class = 0} 
+      \end{cases}
+$$
 
-- So that's an easy comparison!
-
+```{r, echo = TRUE}
+star_df_k_small <- star_df %>%
+  filter(
+    star %in% c("regular", "small") &
+      grade == "k") %>% 
+  mutate(small = (star == "small"))
+```
 ]
 
 --
 
 .pull-right[
+```{r, echo = TRUE, eval = TRUE}
+lm(math ~ small, star_df_k_small)
+```
 
+```{r, echo = TRUE, eval = TRUE}
+mean(star_df_k_small[
+    star_df_k_small$small == 1, "math"]) - 
+  mean(star_df_k_small[
+    star_df_k_small$small == 0, "math"])
 
-- When we're working with people/firms/countries, running experiments is often infeasible, impossible, or unethical.
-
-- So we have to think hard about a *model* of what the world looks like.
-
-- So that we can use our model to figure out what the *counterfactual* would be.
-
-]
-
-
----
-
-# Models
-
-- In causal inference, the *model* is our idea of what we think the process is that *generated the data*.
-
-- We have to make some assumptions about what this is!
-
-- We put together what we know about the world with assumptions and end up with our model.
-
-- The model can then tell us what kinds of things could give us wrong results so we can fix them and get the right counterfactual.
-
----
-
-# Models
-
-- Wouldn't it be nice to not have to make assumptions?
-
-- Yeah, but it's impossible to skip!
-
-- We're trying to predict something that hasn't happened - a counterfactual.
-
-- This is literally impossible to do if you don't have some model of how the data is generated.
-
-- You can't even predict the sun will rise tomorrow without a model!
-
-- If you think you can, you're just don't realize the model you're using - that's dangerous!
-
----
-
-# An Example: Randomization
-
-- Let's generate some data.
-- Let's say that getting `X` causes `Y` to increase by 100.
-- And let's run a randomized experiment of who actually gets X and estimate the size of the effect (should be close to `100`!)
-
-.pull-left[
-```{r, echo=TRUE, eval=TRUE}
-true_effect <- 100
-df <- tibble(Y.without.X = rnorm(1000),
-             X=sample(c(0,1),1000,replace=T)) %>%
-  mutate(Y.with.X = Y.without.X + true_effect) %>%
-  #Now assign who actually gets X
-  mutate(Observed.Y = ifelse(X==1,Y.with.X,Y.without.X))
-head(df,4)
+mean(star_df_k_small[
+    star_df_k_small$small == 0, "math"])
 ```
 ]
 
-.pull-right[
-* Now, estimate the group means and simply difference them:
-```{r}
-#And see what effect our experiment suggests X has on Y
-df %>% group_by(X) %>% 
-  summarize(Y = mean(Observed.Y)) %>%
-  pull(Y) %>% diff
-```
-]
-
-* That's pretty close to the true effect there!
-
 ---
 
-# An Example: No Randomization
+# The Project STAR Experiment: Regression
 
-- Suppose now we can *not* randomize the `X`.
+From the estimation output we get the following:
 
-- Instead there is some kind of rule that decides about `X`.
-
-.pull-left[
-```{r, echo=TRUE, eval=TRUE}
-df <- tibble(Z = runif(10000)) %>% 
-  mutate(Y.without.X = rnorm(10000)+100*Z, 
-         Y.with.X = Y.without.X + 100) %>%
-  #Now assign who actually gets X
-  mutate(X = Z > .9,
-         Observed.Y = ifelse(X==1,Y.with.X,Y.without.X))
-head(df)
-```
-]
+$\begin{align} \mathbb{E}[\textrm{math score} | D_i = 0]&= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 0] \\ &= b_0 + \delta \mathbb{E}[D_i| D_i = 0] + \mathbb{E}[e_i|D_i = 0] \\ &= b_0 \end{align}$
 
 --
 
-.pull-right[
+$\begin{align} \mathbb{E}[\textrm{math score} | D_i = 1]&= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 1] \\ &= b_0 + \delta \mathbb{E}[D_i| D_i = 1] + \mathbb{E}[e_i|D_i = 1] \\ &= b_0 + \delta \end{align}$
 
-```{r}
-df %>% group_by(X) %>% 
-  summarize(Y = mean(Observed.Y)) %>%
-  pull(Y) %>% diff
-```
+--
 
-* That's not the correct effect size!
+$\begin{align} ATE &= \mathbb{E}[\textrm{math score} | D_i = 1] - \mathbb{E}[\textrm{math score} | D_i = 0] \\ &= b_0 + \delta - b_0 \\ &= \delta \end{align}$
 
-* But if we properly model the assignment process and compare apples to apples?
+--
 
-```{r}
-df %>% filter(abs(Z-.9)<.01) %>% 
-  group_by(X) %>% 
-  summarize(Y = mean(Observed.Y)) %>%
-  pull(Y) %>% diff
+We knew this already but we now understand why this is true `r emo::ji("v")`
+
+---
+
+class:inverse
+
+# Task 4 (10 minutes)
+
+1. Filter the dataset to only keep first graders and the small class and regular class groups.
+
+1. Compute the average math score for both groups, and the difference between the two. (Use base `R`.)
+
+1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
+
+1. Regress math score on the treatment dummy variable. Are the results in line with the previous question?
+
+1. How do you interpret these coefficients?
+
+---
+
+# Shortcomings of RCTs 
+
+RCTs have very strong ***internal validity***, that is they can convincingly establish causal links.
+
+However, they have some shortcomings:
+
+* RCT are often **infeasible**:
+
+  * RCTs are **costly**,
+  * RCTs may face some **ethical issues**: some *treatments* simply cannot be given to people,
+  * RCTs take time and we may be **time constrained**.
+
+--
+
+* **Interpretation** of the results:
+
+  * ***External validity***: To what extent can the results from a given RCT be generalized to other contexts (countries, populations,...)?
+  
+  * Uncovering the mechanisms that are at stake may be difficult,
+  
+  * Imperfect randomization, attrition, ...
+
+---
+
+
+# What comes next? 
+
+* So if we cannot rely on RCTs to make our life easy, it means we have to find a way to make causal inference from ***observational data*** (as opposed to ***experimental data***).
+
+--
+
+* It brings us back to models 
+
+  - In causal inference, the *model* is our idea of what the process that *generated the data* is.
+
+  - We have to make some assumptions about what this is!
+
+--
+
+2 broad cases:
+
+* ***selection occurs on observable characteristics***: *multiple regression* (next week!)
+
+* ***selection occurs on unobservable characteristics***: *regression discontinuity design* or  *difference-in-differences* (lectures 10 and 11!)
+
+---
+
+<br>
+<br>
+
+.center[
+```{r, echo = FALSE, out.width = "1000px"}
+knitr::include_graphics("../img/photos/correlation_funny.png")
 ```
 ]
-
----
-
-# Building the Counterfactual
-
-* In that last example our first attempt failed because we had not taken selection into account.
-
-* It turns out that `Z` influences `Y.without.X`, which at the same time will be part of our estimator for the true effect size.
-
-* But `Z` also determines who gets treatment! All the ones with `Z > 0.9`!
-
-* So, people with `Z > 0.9` get treated, but **also** have a relatively high `Y.without.X`. 
-
-* You can see that there is a depenence between the assignment and the effect size.
-
-
----
-
-class: title-slide-final, middle
-
-# THANKS
-
-To [Nick Huntington Klein](http://www.nickchk.com/index.html) for making his lecture material available online!
 
 ---
 
@@ -452,7 +964,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# END
+# SEE YOU NEXT WEEK!
 
 
 
