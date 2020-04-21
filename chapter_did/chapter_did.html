@@ -4,11 +4,13 @@
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <script src="libs/jquery/jquery.min.js"></script>
+    <script src="libs/elevate-section-attrs/elevate-section-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="libs/kePrint/kePrint.js"></script>
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
-    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="..\css\scpo.css" type="text/css" />
+    <link rel="stylesheet" href="..\css\scpo-fonts.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -17,7 +19,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Differences-in-Differences
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-04-20
+### SciencesPo Paris </br> 2020-04-21
 
 ---
 
@@ -316,27 +318,39 @@ Let's look at these results graphically.
 
 ---
 
-# What if we had done a naive after/before comparison?
+# DiD Graphically
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# What if we had done a naive after/before comparison?
+# DiD Graphically
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# What if we had done a naive after NJ/PA comparison?
+# What if we had done a naive after/before comparison?
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# What if we had done a naive after NJ/PA comparison?
+# What if we had done a naive after/before comparison?
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What if we had done a naive after NJ/PA comparison?
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What if we had done a naive after NJ/PA comparison?
+
+&lt;img src="chapter_did_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -504,42 +518,30 @@ layout: true
 
 #  Parallel Trends: Graphically
 
-&lt;img src="chapter_did_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-
-# Checking the parallel trends assumption
-
-
-&lt;img src="chapter_did_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-
-# Checking the parallel trends assumption
-
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Parallel trends assumption `\(\rightarrow\)` Verified ✅
+# Checking the parallel trends assumption
+
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Parallel trends assumption `\(\rightarrow\)` Verified ✅
+# Checking the parallel trends assumption
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Parallel trends assumption `\(\rightarrow\)` Not verified ❌
+# Parallel trends assumption `\(\rightarrow\)` Verified ✅
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Parallel trends assumption `\(\rightarrow\)` Not verified ❌
+# Parallel trends assumption `\(\rightarrow\)` Verified ✅
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
@@ -555,6 +557,17 @@ layout: true
 
 &lt;img src="chapter_did_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
 
+---
+
+# Parallel Trends Assumption: [Card and Krueger (2000)](https://inequality.stanford.edu/sites/default/files/media/_media/pdf/Reference%20Media/Card%20and%20Krueger_2000_Policy.pdf)
+
+Here is the actual trends for Pennsylvania and New Jersey
+
+&lt;img src="../img/photos/min_wage_parallel_trends.png" width="600px" style="display: block; margin: auto;" /&gt;
+
+--
+
+* Is the common trend assumption likely to be verified? 
 ---
 
 # Parallel Trends Assumption: Formally
@@ -723,6 +736,7 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

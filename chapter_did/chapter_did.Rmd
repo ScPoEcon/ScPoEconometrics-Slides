@@ -331,20 +331,26 @@ ck_mw <- data.frame(
 )
 
 gg_did <- ggplot(ck_mw, aes(x = date, y = fte_emp, color = state)) +
-  geom_vline(xintercept = as.Date("010492", format = "%d%m%y"), linetype = "longdash") +
-  geom_vline(xintercept = as.Date("010292", format = "%d%m%y"), linetype = "solid") +
-  geom_vline(xintercept = as.Date("011192", format = "%d%m%y"), linetype = "solid") +
-  ylim(17,24) +
-  scale_x_date(labels = date_format("%h %y"),
-               limits = c(min(ck_mw$date),as.Date("011292", format = "%d%m%y")),
-               date_breaks = "1 month",
-               minor_breaks = NULL) +
-  labs(x = NULL, y = "Average number of FTE employees per store", color = NULL) +
-  scale_colour_viridis_d() +
-  theme_bw(base_size = 16) + theme(legend.position="none") +
-  annotate("label", x = as.Date("1992-05-28"), y = 23.99, label = "New Jersey minimum wage increases", color = "black", size = 4.5) +
-  annotate("label", x = as.Date("1992-02-26"), y = 23.99, label = "Survey before", color = "black", size = 4.5) +
-  annotate("label", x = as.Date("1992-11-23"), y = 23.99, label = "Survey after", color = "black", size = 4.5)
+    geom_vline(xintercept = as.Date("010492", format = "%d%m%y"), linetype = "longdash",
+               color  = viridis_pal()(3)[2]) +
+    geom_vline(xintercept = as.Date("010292", format = "%d%m%y"), linetype = "solid") +
+    geom_vline(xintercept = as.Date("011192", format = "%d%m%y"), linetype = "solid") +
+    ylim(17,24) +
+    scale_x_date(labels = date_format("%h %y"),
+                 limits = c(min(ck_mw$date),as.Date("011292", format = "%d%m%y")),
+                 date_breaks = "1 month",
+                 minor_breaks = NULL) +
+    labs(x = NULL, y = "Average number of FTE employees per store", color = NULL) +
+    scale_colour_viridis_d() +
+    theme_bw(base_size = 16) + 
+    theme(legend.position="none") +
+    annotate("label", x = as.Date("1992-05-28"), y = 23.99,
+             label = "New Jersey minimum wage increases", 
+             color =  viridis_pal()(3)[2], size = 4.5) +
+    annotate("label", x = as.Date("1992-02-26"), y = 23.99,
+             label = "Survey before", color = "black", size = 4.5) +
+    annotate("label", x = as.Date("1992-11-22"), y = 23.99,
+             label = "Survey after", color = "black", size = 4.5)
 gg_did
 ```
 
@@ -353,12 +359,17 @@ gg_did
 # DiD Graphically
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_graph <- gg_did +
-  geom_point(size = 3) +
-  geom_line() +
-  annotate("label", x = as.Date("1992-05-15"), y = 23, label = "Pennsylvania", color = viridis_pal()(2)[2], size = 6) +
-  annotate("label", x = as.Date("1992-05-01"), y = 21, label = "New Jersey", color = viridis_pal()(2)[1], size = 6)
-gg_did_graph
+gg_did_2 <- gg_did +
+    geom_point(size = 3) +
+    annotate("label", x = as.Date("1992-03-01"), y = 22.8, 
+             label = "Pennsylvania - feb. 92", color = viridis_pal()(2)[2], size = 4) +
+    annotate("label", x = as.Date("1992-03-01"), y = 20, 
+             label = "New Jersey - feb. 92", color = viridis_pal()(2)[1], size = 4) +
+    annotate("label", x = as.Date("1992-10-01"), y = 21.75, 
+             label = "Pennsylvania - nov. 92", color = viridis_pal()(2)[2], size = 4) +
+    annotate("label", x = as.Date("1992-10-01"), y = 20.5, 
+             label = "New Jersey - nov. 92", color = viridis_pal()(2)[1], size = 4)
+gg_did_2
 ```
 
 ---
@@ -366,11 +377,13 @@ gg_did_graph
 # DiD Graphically
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did2 <- gg_did_graph +
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
-               color = "#FDE725FF", linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-10"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 6)
-gg_did2
+gg_did_3 <- gg_did +
+    geom_point(size = 3) +
+    annotate("label", x = as.Date("1992-05-15"), y = 23, 
+             label = "Pennsylvania", color = viridis_pal()(2)[2], size = 4) +
+    geom_line(data = ck_mw[ck_mw$state == "Pennsylvania",],
+              aes(x = date, y = fte_emp), linetype = "solid")
+gg_did_3
 ```
 
 ---
@@ -378,8 +391,49 @@ gg_did2
 # DiD Graphically
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did2 +
-  annotate("text", x = as.Date("1992-11-26"), y = 19.7, label = "Treatment\nEffect", color = "black", size = 6)
+new_jersey_counterfactual <- data.frame(
+    date = as.Date(c("010292","011192"), format = "%d%m%y"),
+    state = c("New Jersey","New Jersey"),
+    fte_emp = c(20.44, 18.28)
+)
+
+gg_did_4 = gg_did_3 +
+    geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+              linetype = "longdash") +
+    annotate("label", x = as.Date("1992-07-15"), y = 18.5, 
+             label = "New Jersey Counterfactual", color = viridis_pal()(2)[1], size = 4.5)
+gg_did_4
+
+```
+
+---
+
+# DiD Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+# real path 
+new_jersey_real <- data.frame(
+    date = as.Date(c("010292","010492","011192"), format = "%d%m%y"),
+    state = c("New Jersey","New Jersey","New Jersey"),
+    fte_emp = c(20.44, 19.95,21.03)
+)
+
+gg_did_5 = gg_did_3 +
+    geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+              linetype = "longdash") +
+    geom_line(data = new_jersey_real, aes(x = date, y = fte_emp), linetype = "solid") +
+    annotate("label", x = as.Date("1992-05-15"), y = 20.75, 
+             label = "New Jersey", color = viridis_pal()(2)[1], size = 4)
+gg_did_5
+```
+
+---
+
+# DiD Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did_5 +
+  annotate("text", x = as.Date("1992-11-26"), y = 19.7, label = "Treatment\nEffect", color = "black", size = 5)
 x = 623
 ymin = 150
 ymax = ymin+114
@@ -395,11 +449,15 @@ grid.brackets(x,
 # What if we had done a naive after/before comparison?
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_graph +
-  annotate("text", x = as.Date("1992-11-26"), y = 20.9, label = "Naive\nTreatment\nEffect", color = "black", size = 6) +
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
+gg_did_3 +
+  annotate("text", x = as.Date("1992-11-26"), y = 20.9, label = "Naive\nTreatment\nEffect",
+           color = "black", size = 5) +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], 
+                   xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
                color = viridis_pal()(2)[1], linetype = "dashed") +
-  annotate("label", x = as.Date("1992-06-08"), y = 20.1, label = "Naive New Jersey counterfactual", color = viridis_pal()(2)[1], size = 6)
+  annotate("label", x = as.Date("1992-06-08"), y = 20.1, 
+           label = "Naive New Jersey counterfactual", 
+           color = viridis_pal()(2)[1], size = 5)
 x = 623
 ymin = 150
 ymax = ymin+24
@@ -416,15 +474,26 @@ grid.brackets(x,
 # What if we had done a naive after/before comparison?
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_graph +
-  annotate("text", x = as.Date("1992-11-26"), y = 21.1, label = "Naive\nTreatment\nEffect", color = "black", size = 5) +
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
+gg_did_3 +
+  geom_line(data = new_jersey_real, aes(x = date, y = fte_emp), linetype = "solid") +
+  geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], 
+                   xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]),
                color = viridis_pal()(2)[1], linetype = "dashed") +
-  annotate("label", x = as.Date("1992-06-15"), y = 20.1, label = "Naive New Jersey counterfactual", color = viridis_pal()(2)[1], size = 5) +
-  annotate("text", x = as.Date("1992-11-26"), y = 19.45, label = "Real\nTreatment\nEffect", color = "black", size = 5) +
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
-               color = "#FDE725FF", linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-20"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 5)
+  annotate("text", x = as.Date("1992-11-26"), y = 21.1, label = "Naive\nTreatment\nEffect",
+           color = "black", size = 5) +
+  annotate("text", x = as.Date("1992-11-26"), y = 19.45, label = "Real\nTreatment\nEffect",
+           color = "black", size = 5) +
+  annotate("label", x = as.Date("1992-09-01"), y = 21.1, 
+           label = "New Jersey", 
+           color = viridis_pal()(2)[1], size = 5) +
+  annotate("label", x = as.Date("1992-05-01"), y = 20.75, 
+           label = "Naive New Jersey counterfactual", 
+           color = viridis_pal()(2)[1], size = 4) +
+  annotate("label", x = as.Date("1992-06-08"), y = 18.75, 
+           label = "New Jersey counterfactual", 
+           color = viridis_pal()(2)[1], size = 5)
 x = 635
 ymin = 150
 ymax = ymin+24
@@ -449,8 +518,14 @@ grid.brackets(x,
 # What if we had done a naive after NJ/PA comparison?
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_graph +
-  annotate("text", x = as.Date("1992-11-26"), y = 20.9, label = "Naive\nTreatment\nEffect", color = "black", size = 6)
+gg_did_3 +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[3,"fte_emp"], 
+                   xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[3,"fte_emp"]),
+               color = viridis_pal()(2)[1], linetype = "dashed") +
+  annotate("label", x = as.Date("1992-06-08"), y = 21.5, 
+           label = "Naive New Jersey counterfactual", 
+           color = viridis_pal()(2)[1], size = 5) +
+  annotate("text", x = as.Date("1992-11-26"), y = 20.9, label = "Naive\nTreatment\nEffect", color = "black", size = 5)
 x = 623
 ymin = 142
 ymax = ymin+6
@@ -467,12 +542,25 @@ grid.brackets(x,
 # What if we had done a naive after NJ/PA comparison?
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_graph +
+gg_did_3 +
+  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[3,"fte_emp"], 
+                   xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[3,"fte_emp"]),
+               color = viridis_pal()(2)[1], linetype = "dashed") +
+  annotate("label", x = as.Date("1992-06-08"), y = 21.5, 
+           label = "Naive New Jersey counterfactual", 
+           color = viridis_pal()(2)[1], size = 4) +
+  geom_line(data = new_jersey_real, aes(x = date, y = fte_emp), linetype = "solid") +
   annotate("text", x = as.Date("1992-11-26"), y = 21.1, label = "Naive\nTreatment\nEffect", color = "black", size = 5) +
   annotate("text", x = as.Date("1992-11-26"), y = 19.45, label = "Real\nTreatment\nEffect", color = "black", size = 5) +
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
-               color = "#FDE725FF", linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-20"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 5)
+  geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+    annotate("label", x = as.Date("1992-09-01"), y = 20.3, 
+           label = "New Jersey", 
+           color = viridis_pal()(2)[1], size = 5) +
+  annotate("label", x = as.Date("1992-06-08"), y = 18.75, 
+           label = "New Jersey counterfactual", 
+           color = viridis_pal()(2)[1], size = 5)
+
 x = 623
 ymin = 142
 ymax = ymin+6
@@ -659,7 +747,7 @@ layout: true
 #  Parallel Trends: Graphically
 
 ```{r, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
-gg_did2
+gg_did_5
 ```
 
 ---
@@ -669,12 +757,11 @@ gg_did2
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend <- ggplot(ck_mw, aes(x = date, y = fte_emp, color = state)) +
-  geom_point(size = 3) +
-  geom_line() +
-  geom_vline(xintercept = as.Date("010492", format = "%d%m%y"), linetype = "longdash") +
-  geom_vline(xintercept = as.Date("010292", format = "%d%m%y"), linetype = "solid") +
-  geom_vline(xintercept = as.Date("011192", format = "%d%m%y"), linetype = "solid") +
-  ylim(17,24) +
+    geom_vline(xintercept = as.Date("010492", format = "%d%m%y"), linetype = "longdash",
+               color  = viridis_pal()(3)[2]) +
+    geom_vline(xintercept = as.Date("010292", format = "%d%m%y"), linetype = "solid") +
+    geom_vline(xintercept = as.Date("011192", format = "%d%m%y"), linetype = "solid") +
+    ylim(17,24) +
   scale_x_date(labels = date_format("%h %y"),
                limits = c(as.Date("011091", format = "%d%m%y"),as.Date("011292", format = "%d%m%y")),
                date_breaks = "1 month",
@@ -682,12 +769,23 @@ gg_did_trend <- ggplot(ck_mw, aes(x = date, y = fte_emp, color = state)) +
   labs(x = NULL, y = "Average number of FTE employees per store", color = NULL) +
   scale_colour_viridis_d() +
   theme_bw(base_size = 16) + theme(legend.position="none") +
-  annotate("label", x = as.Date("1992-06-25"), y = 23.99, label = "New Jersey minimum wage increases", color = "black", size = 4.5) +
+    annotate("label", x = as.Date("1992-05-28"), y = 23.99,
+             label = "New Jersey minimum wage increases",
+             color =  viridis_pal()(3)[2], size = 4.5) +
   annotate("label", x = as.Date("1991-12-28"), y = 23.99, label = "Survey before", color = "black", size = 4.5) +
   annotate("label", x = as.Date("1992-11-23"), y = 23.99, label = "Survey after", color = "black", size = 4.5)
 
 gg_did_trend +
-  annotate("label", x = as.Date("1991-11-17"), y = 21.5, label = "What happened here?", color = "black", size = 6)
+      geom_point(size = 3) +
+    annotate("label", x = as.Date("1992-03-01"), y = 22.8, 
+             label = "Pennsylvania - feb. 92", color = viridis_pal()(2)[2], size = 4) +
+    annotate("label", x = as.Date("1992-03-01"), y = 20, 
+             label = "New Jersey - feb. 92", color = viridis_pal()(2)[1], size = 4) +
+    annotate("label", x = as.Date("1992-10-01"), y = 21.75, 
+             label = "Pennsylvania - nov. 92", color = viridis_pal()(2)[2], size = 4) +
+    annotate("label", x = as.Date("1992-10-01"), y = 20.5, 
+             label = "New Jersey - nov. 92", color = viridis_pal()(2)[1], size = 4) +
+  annotate("label", x = as.Date("1992-01-15"), y = 21.5, label = "What was happening\nbefore April 92?", color = "black", size = 6)
 ```
 
 ---
@@ -695,15 +793,45 @@ gg_did_trend +
 # Checking the parallel trends assumption
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
+new_jersey_counterfactual <- data.frame(
+    date = as.Date(c("151191","010292","011192"), format = "%d%m%y"),
+    state = c("New Jersey","New Jersey","New Jersey"),
+    fte_emp = c(21.05489,20.44,18.28)
+)
+
+new_jersey_counterfactual_1 <- data.frame(
+    date = as.Date(c("151191","010292","010492","011192"), format = "%d%m%y"),
+    state = c("New Jersey","New Jersey","New Jersey","New Jersey"),
+    fte_emp = c(20.44,20.44,20.44,20.44)
+)
+
+new_jersey_counterfactual_2 <- data.frame(
+    date = as.Date(c("151191","010292","010492","011192"), format = "%d%m%y"),
+    state = c("New Jersey","New Jersey","New Jersey","New Jersey"),
+    fte_emp = c(20,20.44,20.77846,21.98564)
+)
+
+pennsylvania_before =  data.frame(
+    date = as.Date(c("151191","010292"), format = "%d%m%y"),
+    state = c("Pennsylvania","Pennsylvania"),
+    fte_emp = c(23.94489,23.33))
+
 gg_did_trend +
-  # PA
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = 24, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[1,"fte_emp"]), color = "#FDE725FF", linetype = "dashed") +
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = 22, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[1,"fte_emp"]), color = "#FDE725FF", linetype = "dashed") +
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = 20, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[1,"fte_emp"]), color = "#FDE725FF", linetype = "dashed") +
-  # NJ
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = 20, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]), color = "#440154FF", linetype = "dashed") +
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = 19, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]), color = "#440154FF", linetype = "dashed") +
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = 18, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]), color = "#440154FF", linetype = "dashed")
+      annotate("label", x = as.Date("1992-05-15"), y = 23, 
+             label = "Pennsylvania", color = viridis_pal()(2)[2], size = 4) +
+    geom_line(data = ck_mw[ck_mw$state == "Pennsylvania",],
+              aes(x = date, y = fte_emp), linetype = "solid") +
+  geom_point(size = 3) +
+  geom_line(data = pennsylvania_before, aes(x = date, y = fte_emp), 
+            linetype = "longdash",color = viridis_pal()(2)[2]) +
+  geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+  geom_line(data = new_jersey_counterfactual_1, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+  geom_line(data = new_jersey_counterfactual_2, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+  annotate("label", x = as.Date("1992-05-15"), y = 19, label = "New Jersey possible counterfactuals", color = viridis_pal()(2)[1], size = 4)
+
 ```
 
 ---
@@ -711,12 +839,24 @@ gg_did_trend +
 # Parallel trends assumption $\rightarrow$ Verified `r emo::ji("white_check_mark")`
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_trend_val <- gg_did_trend +
-  # PA
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = ck_mw[1,"fte_emp"] + 0.3, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[1,"fte_emp"]), color = "#FDE725FF", linetype = "dashed") +
-  # NJ
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = ck_mw[2,"fte_emp"] + 0.3, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]), color = "#440154FF", linetype = "dashed")
+gg_did_trend_val = gg_did_trend +
+  geom_line(data = pennsylvania_before, aes(x = date, y = fte_emp), 
+            linetype = "longdash",color = viridis_pal()(2)[2]) +
+  annotate("label", x = as.Date("1992-05-15"), y = 23, 
+             label = "Pennsylvania", color = viridis_pal()(2)[2], size = 4) +
+  geom_line(data = ck_mw[ck_mw$state == "Pennsylvania",],
+              aes(x = date, y = fte_emp), linetype = "solid") +
+  geom_point(size = 3) +
+  geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+  geom_line(data = new_jersey_real, aes(x = date, y = fte_emp), 
+            linetype = "solid")  +
+  annotate("label", x = as.Date("1992-05-15"), y = 19, label = "New Jersey counterfactual", color = viridis_pal()(2)[1], size = 4) +
+    annotate("label", x = as.Date("1992-05-15"), y = 20.75, label = "New Jersey", color = viridis_pal()(2)[1], size = 4) +
+    annotate("rect", xmin=as.Date("011091", format = "%d%m%y"), xmax=as.Date("010492", format = "%d%m%y"), ymin=20 , ymax=23.5, alpha=0.4, color="#21908CFF", fill="#21908CFF") +
+  annotate("text", x=as.Date("011291", format = "%d%m%y"), y=22, label = "Employment trends\nare similar", color = "black", size = 5)
 gg_did_trend_val
+
 ```
 
 ---
@@ -725,57 +865,75 @@ gg_did_trend_val
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
 gg_did_trend_val +
-  annotate("rect", xmin=as.Date("011091", format = "%d%m%y"), xmax=as.Date("010292", format = "%d%m%y"), ymin=20 , ymax=24, alpha=0.4, color="#21908CFF", fill="#21908CFF") +
-  annotate("text", x=as.Date("011291", format = "%d%m%y"), y=22, label = "Employment trends\nare similar", color = "black", size = 5)
-```
+  geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+              linetype = "dashed", color = viridis_pal()(2)[2]) +
+  annotate("label", x = as.Date("1992-07-15"), y = 18.5, 
+             label = "New Jersey DID Counterfactual", color = viridis_pal()(2)[2], size = 4.5) +
+   annotate("text", x = as.Date("1992-11-28"), y = 19.6, 
+           label = "Real\nTreatment\nEffect\n=\nDID\nTreatment\nEffect", color = "black", size = 4)
 
----
-
-# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
-
-```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_trend_notval <- gg_did_trend +
-  # PA
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = ck_mw[1,"fte_emp"] + 0.5, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[1,"fte_emp"]), color = "#FDE725FF", linetype = "dashed") +
-  # NJ
-  geom_segment(aes(x = as.Date("011091", format = "%d%m%y"), y = ck_mw[2,"fte_emp"] - 0.6, xend = as.Date("010292", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]), color = "#440154FF", linetype = "dashed")
-gg_did_trend_notval
-```
-
----
-
-# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
-
-```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_trend_notval + 
-  annotate("rect", xmin=as.Date("011091", format = "%d%m%y"), xmax=as.Date("010292", format = "%d%m%y"), ymin=19.5 , ymax=24, alpha=0.4, color="#21908CFF", fill="#21908CFF") +
-  annotate("text", x=as.Date("011291", format = "%d%m%y"), y=22, label = "Employment trends\nare not similar", color = "black", size = 5)
-```
-
----
-
-# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
-
-```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_trend_notval + 
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"] + 1.35), color = "#440154FF", linetype = "dashed")
-```
-
----
-
-# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
-
-```{r, echo = F, fig.width = 10, fig.height = 5}
-gg_did_trend_notval + 
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"] + 1.35), color = "#440154FF", linetype = "dashed") +
-  geom_segment(aes(x = as.Date("010292", format = "%d%m%y"), y = ck_mw[2,"fte_emp"], xend = as.Date("011192", format = "%d%m%y"), yend = ck_mw[2,"fte_emp"]-(ck_mw[1,"fte_emp"]-ck_mw[3,"fte_emp"])),
-               color = "#FDE725FF", linetype = "dashed") +
-  annotate("label", x = as.Date("1992-05-20"), y = 18.9, label = "New Jersey counterfactual", color = viridis_pal()(2)[2], size = 5) +
-  annotate("text", x = as.Date("1992-11-28"), y = 19.45, label = "DiD\nTreatment\nEffect", color = "black", size = 5) +
-  annotate("text", x = as.Date("1992-11-28"), y = 21.6, label = "Real\nTreatment\nEffect", color = "black", size = 5)
 x = 640
-ymin = 117
-ymax = ymin+32
+ymin = 150
+ymax = ymin+114
+grid.brackets(x,
+              ymin,
+              x,
+              ymax,
+              h = 0.05, lwd=1, col="black")
+```
+
+---
+
+# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+
+new_jersey_real_2 <- data.frame(
+    date = as.Date(c("010292","010492","011192"), format = "%d%m%y"),
+    state = c("New Jersey","New Jersey","New Jersey"),
+    fte_emp = c(20.44,20.77846,21.03)
+)
+
+gg_did_trend_not_val = gg_did_trend +
+  geom_line(data = pennsylvania_before, aes(x = date, y = fte_emp), 
+            linetype = "longdash",color = viridis_pal()(2)[2]) +
+  annotate("label", x = as.Date("1992-05-15"), y = 23, 
+             label = "Pennsylvania", color = viridis_pal()(2)[2], size = 4) +
+  geom_line(data = ck_mw[ck_mw$state == "Pennsylvania",],
+              aes(x = date, y = fte_emp), linetype = "solid") +
+  geom_point(size = 3) +
+  geom_line(data = new_jersey_counterfactual_2, aes(x = date, y = fte_emp), 
+            linetype = "longdash") +
+  geom_line(data = new_jersey_real_2, aes(x = date, y = fte_emp), 
+            linetype = "solid")  +
+  annotate("label", x = as.Date("1992-05-01"), y = 21.6, label = "New Jersey counterfactual", color = viridis_pal()(2)[1], size = 4) +
+    annotate("label", x = as.Date("1992-05-15"), y = 20.4, label = "New Jersey", color = viridis_pal()(2)[1], size = 4) +
+    annotate("rect", xmin=as.Date("011091", format = "%d%m%y"), xmax=as.Date("010492", format = "%d%m%y"), ymin=20 , ymax=23.5, alpha=0.4, color="#21908CFF", fill="#21908CFF") +
+  annotate("text", x=as.Date("011291", format = "%d%m%y"), y=22, label = "Employment trends\nare not similar", color = "black", size = 5)
+gg_did_trend_not_val
+```
+
+---
+
+# Parallel trends assumption $\rightarrow$ Not verified `r emo::ji("x")`
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+gg_did_trend_not_val + 
+  geom_line(data = pennsylvania_before, aes(x = date, y = fte_emp), 
+            linetype = "longdash",color = viridis_pal()(2)[2]) +
+  geom_line(data = new_jersey_counterfactual, aes(x = date, y = fte_emp), 
+              linetype = "longdash", color = viridis_pal()(2)[2]) +
+  annotate("label", x = as.Date("1992-07-15"), y = 18.5, 
+             label = "New Jersey DID Counterfactual", 
+             color = viridis_pal()(2)[2], size = 4.5) +
+  annotate("text", x = as.Date("1992-11-28"), y = 19.45, 
+           label = "DiD\nTreatment\nEffect", color = "black", size = 4) +
+  annotate("text", x = as.Date("1992-11-28"), y = 21.4, 
+           label = "Real\nTreatment\nEffect", color = "black", size = 4)
+
+x = 640
+ymin = 108
+ymax = ymin+42
 grid.brackets(x,
               ymin,
               x,
@@ -791,6 +949,19 @@ grid.brackets(x,
               h = 0.05, lwd=1, col="black")
 ```
 
+---
+
+# Parallel Trends Assumption: [Card and Krueger (2000)](https://inequality.stanford.edu/sites/default/files/media/_media/pdf/Reference%20Media/Card%20and%20Krueger_2000_Policy.pdf)
+
+Here is the actual trends for Pennsylvania and New Jersey
+
+```{r, echo = F, out.width = "600px"}
+knitr::include_graphics("../img/photos/min_wage_parallel_trends.png")
+```
+
+--
+
+* Is the common trend assumption likely to be verified? 
 ---
 
 # Parallel Trends Assumption: Formally
