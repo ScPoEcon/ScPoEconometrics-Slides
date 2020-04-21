@@ -24,7 +24,7 @@ Lecture 9: Regression Inference [HTML](https://raw.githack.com/ScPoEcon/ScPoEcon
 
 Lecture 10: Differences-in-Differences [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_did/chapter_did.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_did/chapter_did.pdf)
 
-Lecture 11: Regression Discontinuity [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_RDD/RDD.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_RDD/RDD.pdf)
+Lecture 11: Regression Discontinuity [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter-RDD/RDD.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter-RDD/RDD.pdf)
 
 Lecture 12: Recap (*coming soon!*)
 
