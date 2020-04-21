@@ -1,10 +1,11 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Regression Discontinuity Design"
-author: "Florian Oswald"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
@@ -41,6 +42,16 @@ lowtop = c(om[1],om[2],0.1,om[4])
 
 overwrite = FALSE
 
+library(tidyverse)
+library(ggplot2)
+library(grid)
+library(pBrackets) 
+library(emo)
+library(viridis)
+
+  # set seed
+set.seed(1234)
+
 ```
 
 layout: true
@@ -49,148 +60,1006 @@ layout: true
 
 ---
 
-# Packages used in this set of slides
+# Recap from last week
 
-```{r}
-library(rdrobust)
-```
+* ***Differences-in-differences*** policy evaluation method
+
+* Main estimation equation:
+$$Y_{it} = \alpha + \beta TREAT_i + \gamma POST_t + \delta(TREAT_i \times POST_t) + \varepsilon_{it}$$
+
+* Key assumption: ***parallel trends***
+
+--
+
+## Today: ***Regression Discontinuity Design***
+
+* Life is full of random rules which assign some treatment
+
+* Exploits knowledge of assignment rule
+
+* Key assumption: variable which assigns treatment cannot be manipulated by individuals
+
+* *Empirical application:* effect of alchol consumption on mortality
 
 ---
 
 # Regression Discontinuity Design (RDD)
 
+* Very common research design in applied research because it provides credible causal estimates.
+
+--
+
+* Starting point: subjects are ***not*** randomly allocated to treatment `r emo::ji("warning")`
+
+--
+
+* RDD can be applied when we have specific information about the rules determining treatment.
+
+--
+
+* __RDD__ exploits this precise information about allocation to treatment!
+
+---
+
+# Discontinuities are Everywhere
+
+There are many arbitrary rules in life that determine assignment to some treatment:
+  
+--
+  
+* In North Carolina, you used to have to have reached the age of five by October 16 in the relevant year to be eligible to enter kindergarten [(Cook and Kang, 2016)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.20140323);
+  
+--
+  
+* In the US, a new born baby weighing less than 1,500 grams is considered to be of "very low birth weight" and receive additional treatment [(Almond et al., 2010)](https://academic.oup.com/qje/article/125/2/591/1882183);
+  
+--
+
+* Flagship state universities use a certain SAT cutoff level to select their students [(Hoekstra, 2009)](https://cdn.theatlantic.com/static/mt/assets/business/Hoekstra_Flagship.pdf);
+
+--
+
+* In Italy, there are quotas of residence permits for illegal immigrants that are allocated on a first-come first-served basis until quota is exhausted [(Pinotti, 2017)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/aer.20150355);
+
+--
+
+We will focus our analysis on the following discontinuity:
+
+* In the US, the legal drinking age is 21 years old [(Carpenter and Dobkin, 2009)](http://masteringmetrics.com/wp-content/uploads/2015/01/Carpenter-and-Dobkin-2009.pdf).
+
+---
+
+# An Example: Alcohol Consumption and Mortality
+
+--
+
+* Imagine you are interested in assessing the __causal__ impact of alcohol consumption by young adults on mortality.
+
+--
+
+* Why is this not that straightforward? Why can't you just regress alcohol consumption on dying age and cause of death?
+
+--
+
+  * Because there may be unobserved selection into alcohol consumption that may also be a determinant of mortality.
+  
+--
+
+* In the US, alcohol consumption is prohibited before the age of 21.
+
+--
+
+* Debate on whether the minimum legal drinking age (MLDA) should be lowered to 18, as was the case in the Vietnam-era.
+
+---
+
+# Key Terms and Intuition
+
+> ***Running variable:*** variable that determines assignment to treatment.
+
+--
+
+$\rightarrow$ $a$ = age
+
+--
+
+> ***Cutoff level:*** level of the ***running variable*** above (or below) which individuals are treated (or not).
+
+--
+
+$\rightarrow$ $c = 21$ year old birthday
+
+--
+
+Causal intuition:
+
+* How different are individuals *just before* and *just after* their 21st birthday, other than legal access to alcohol?
+
+--
+
+* Around the threshold, allocation to treatment is ***as good as random***.
+
+--
+
+* `r emo::ji("point_right")` ***Regression discontinuity design*** exploits this allocation to treatment!
+
+---
+
+# Carpenter and Dobkin's data
+
+* Let's take a closer at the data used in the paper
+
 .pull-left[
-* In the book, we talked about how RDD can provide an alternative to full randomization of treatment assigment.
+```{r, echo = TRUE, eval = TRUE}
+# install package containing data
+devtools::install_github("jrnold/masteringmetrics",
+                         subdir = "masteringmetrics")
 
-* We looked at [Clicking on Heaven's Door](https://www.aeaweb.org/articles?id=10.1257/aer.20150355), which uses the (unknown) time an immigrant quota for a certain employer group is full as a **cutoff** value.
-
-* Those who are on the immigration website just before and after $c$ are close to identical - except that the early birds got the permit.
+# load package
+library(masteringmetrics)
+# load data
+data("mlda", package = "masteringmetrics")
+```
 ]
 
 --
 
 .pull-right[
-* Your take home exam will require you to perform an RDD estimation.
-
-* Let's go through some basics here which will be useful for you.
+```{r, echo = FALSE}
+mlda %>%
+  select(agecell, all, internal, external,
+         alcohol, homicide, suicide) %>%
+  head()
+```
 ]
 
----
+--
 
-# Setup
-
-1. Unit $i$ is treated if **running variable** $x_i$ crosses **threshold** $c$:
-    $$D_i = \begin{cases}\begin{array}{c}1\text{ if }x_i > c \\0\text{ if }x_i \leq c. \end{array}\end{cases}$$
-1. Writing the PO framework again in regression form (and again assuming $\delta_i=\delta$), we have
-    $$Y_i = \alpha + \beta x_i + \delta D_i + \varepsilon_i$$
-1. The RDD estimator exploits a discontinuity at $c$ in the conditional expectation function:
-    $$\delta = \lim_{x \to c^+} E[Y_i^1|x = c] - \lim_{x \to c^-} E[Y_i^0|x = c]$$
-    where $\lim_{x\to c^+}$ means $x$ *approaches* $c$ *from above*.
-    
+* This dataset contains aggregate death rates (and their causes) for different age groups (`agecell`) between 19 and 23 years old.
 
 ---
 
-# Simulation
+# Sharp Discontinuity at Cutoff
 
-* Let's whip up a quick simulation dataset.
+```{r, echo = FALSE, eval = TRUE, fig.height = 4.75, fig.width = 10}
+mlda <- mlda %>%
+  mutate(over21 = (agecell >= 21))
+
+rdd_run <- mlda %>%
+  ggplot(aes(x = agecell, y = over21, color = over21)) +
+  geom_point(size = 4, alpha = 0.8) +
+  geom_vline(xintercept = 21, linetype = "longdash") +
+  labs(x = "Age", y = "Above LMDA") +
+  scale_color_viridis_d() +
+  theme_bw(base_size = 14) + theme(legend.position="none")
+rdd_run
+```
+
+At the threshold, the probability of being treated jumps from 0 to 1.
+
+---
+
+# Sharp Discontinuity at Cutoff
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 4.75, fig.width = 10}
+rdd_run +
+  annotate("rect", xmin = 20.5, xmax = 21.5, ymin = -Inf, ymax = Inf, alpha = .2) +
+  annotate("rect", xmin = 21 - 1/12, xmax = 21 + 1/12, ymin = -Inf, ymax = Inf, alpha = .4) +
+  geom_point(size = 4, alpha = 0.8) +
+  geom_vline(xintercept = 21, linetype = "longdash")
+```
+
+---
+
+# Sharp Discontinuity at Cutoff
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 4.75, fig.width = 10}
+rdd_run +
+  annotate("rect", xmin = 20.5, xmax = 21.5, ymin = -Inf, ymax = Inf, alpha = .2) +
+  annotate("rect", xmin = 21 - 1/12, xmax = 21 + 1/12, ymin = -Inf, ymax = Inf, alpha = .4) +
+  geom_point(size = 4, alpha = 0.8) +
+  geom_vline(xintercept = 21, linetype = "longdash") +
+  scale_x_continuous(breaks = c(21 - 6/12, 21 - 3/12, 21, 21 + 3/12, 21 + 6/12),
+                     labels = c("- 6 months", "- 3 months", "21", "+ 3 months", "+ 6 months"),
+                     minor_breaks = seq(from = 21 - 7/12, to = 21 + 7/12, by = 1/12),
+                     lim = c(21 - 7/12, 21 + 7/12))
+```
+
+---
+
+# RDD Framework
+
+* ***Treatment variable***: $D_a$
+
+--
+
+  - $D_a$ = 1 if individual is over 21 years old, $D_a$ = 0 if not.
+
+--
+
+  - $D_a$ is a function of the individual's age, $a$, which is the ***running variable***.
+  
+--
+
+* The ***cutoff*** age, 21, separates those who can drink legally and those who can't:
+  $$
+  D_a = \begin{cases}\begin{array}{lcl}
+  1 \quad \text{if } a \geq 21 \\\
+  0 \quad \text{if } a < 21
+  \end{array}\end{cases}
+  $$
+  
+## Key features of RD designs
+
+1. Treatment status is a __deterministic__ function of $a$ $\rightarrow$ we know the assignment rule
+
+--
+
+1. Treatment status is a __discontinuous__ function of $a$ $\rightarrow$ there is some cutoff level
+
+---
+
+class: inverse
+
+# Task 1 (10 minutes)
+
+1. Import the dataset following the code from slide 7. How many age cells are there?
+
+1. Create a dummy variable for individuals over 21 years old.
+
+1. Plot the death rate for all causes (`all`) as a function of age (`agecell`) colouring observations above and below 21 years old. Does anything seem striking?
+
+1. Add a regression line to the plot. What do you observe?
+
+1. Do the same for motor vehicle-related causes (`mva`) and alcohol-related causes (`alcohol`) as a function of age.
+
+---
+
+# Graphical Results: All Death Rates
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10}
+rdd_plot <- mlda %>%
+  ggplot(aes(x = agecell, y = all, color = over21)) +
+  geom_point(size = 4) +
+  geom_vline(xintercept = 21, linetype = "longdash") +
+  labs(x = "Age",
+       y = "Death rate from all causes (per 100,000)",
+       color = NULL) +
+  scale_colour_viridis_d(aesthetics = c("colour", "fill"), labels = c("FALSE" = "Control", "TRUE" = "Treatment")) +
+  theme_bw(base_size = 14) +
+  theme(legend.position="none")
+rdd_plot
+```
+
+---
+
+# Graphical Results: All Death Rates
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10}
+library(broom)
+all_fit <- augment(lm(all ~ agecell + over21, mlda))
+
+rdd_plot_line <- rdd_plot +
+  geom_line(data = all_fit %>% filter(agecell < 21), aes(x = agecell, y = .fitted), color = viridis_pal()(2)[1], size = 2) +
+  geom_line(data = all_fit %>% filter(agecell >= 21), aes(x = agecell, y = .fitted), color = viridis_pal()(2)[2], size = 2) +
+labs(fill = NULL)
+rdd_plot_line
+```
+
+---
+
+# Graphical Results: All Death Rates
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(21, all_fit$.fitted[all_fit$agecell < 21 & all_fit$agecell > 20.9], 21, all_fit$.fitted[all_fit$agecell > 21 & all_fit$agecell <= 21.1],
+                   h = 0.75, lwd=1.5, col="black")
+
+rdd_plot_line_brack <- rdd_plot_line +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 20.65, y = 96, label = "Treatment\nEffect", colour = "black", size = 5)
+rdd_plot_line_brack
+```
+
+---
+
+# Graphical Results: All Death Rates
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+all_fit_2 <- augment(lm(all ~ agecell + over21, mlda %>% filter(agecell >= 20.4 & agecell <= 21.6)))
+
+b1 <- bracketsGrob(21, all_fit_2$.fitted[all_fit_2$agecell < 21 & all_fit_2$agecell > 20.9], 21, all_fit_2$.fitted[all_fit_2$agecell > 21 & all_fit_2$agecell <= 21.1],
+                   h = 0.75, lwd=1.5, col="black")
+
+rdd_plot +
+  geom_line(data = all_fit_2 %>% filter(agecell < 21), aes(x = agecell, y = .fitted), color = viridis_pal()(2)[1], size = 2) +
+  geom_line(data = all_fit_2 %>% filter(agecell >= 21), aes(x = agecell, y = .fitted), color = viridis_pal()(2)[2], size = 2) +
+  labs(fill = NULL) +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 20.9, y = 97.2, label = "Treatment\nEffect", colour = "black", size = 5) +
+  scale_x_continuous(breaks = c(21 - 6/12, 21 - 3/12, 21, 21 + 3/12, 21 + 6/12),
+                     labels = c("- 6 months", "- 3 months", "21", "+ 3 montsh", "+ 6 months"),
+                     minor_breaks = seq(from = 21 - 7/12, to = 21 + 7/12, by = 1/12),
+                     lim = c(21 - 7/12, 21 + 7/12))
+```
+
+---
+
+# RDD as Local Average Treatment Effect (LATE)
+
+* The RD estimator is a __local average treatment effect (LATE)__.
+
+--
+
+* It only tells you the impact of treatment $D$ on outcome $Y$ ***around*** the cutoff value of the running variable.
+
+--
+
+* Limited ***external validity*** $\rightarrow$ you cannot extrapolate to the entire population.
+
+--
+
+* Using the 21 year old alcohol restriction age in the RD context will only tell you the effect of this restriction on death rates but not the general effect of alcohol consumption.
+
+--
+
+* One may easily argue that all results from quantitative empirical analyses have a local nature.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Estimation
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Estimation
+
+* *Objective:* measure ***gap*** between the two lines at the cutoff.
+
+--
+
+* In its simplest form, we can write the following regression model:
+    $$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_i,$$
+  where $DEATHRATE_a$ is the death rate at age $a$, $D_a$ is the treatment dummy, and $a$ is age (defined in months relative to 21st birthday).
+
+--
+
+  $\rightarrow$ $\delta$ captures the **jump in death rate** between individuals above and below 21 years old.
+
+--
+
+* The RDD estimator exploits a discontinuity at $a = 21$ in the conditional expectation function:
+$$\underbrace{\lim_{c \to 21^+} \mathbb{E}[DEATHRATE_a|a = c]}_{\alpha + \delta} - \underbrace{\lim_{c \to 21^-} \mathbb{E}[DEATHRATE_a|a = c]}_{\alpha} = \delta$$
+
+---
+
+class: inverse
+
+# Task 2 (5 minutes)
+
+1. Estimate the following model on all death causes.
+$$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_i,$$
+
+ Does the RDD coefficient correspond to the graphical illustration?
+ 
+1. How do you interpret each coefficient?
+
+1. What is the causal effect of legal access to alcohol on death rates?
+
+---
+
+# Estimation #1: Simple Linear Model
+
+$$DEATHRATE_a = \alpha + \delta D_a + \beta a + \varepsilon_a,$$
 
 .pull-left[
+```{r, eval = FALSE}
+mlda <- mlda %>%
+  mutate(over21 = (agecell >= 21),
+         agecell_21 = agecell - 21)
+rdd <- lm(all ~ agecell_21 + over21, mlda)
+
+library(broom)
+tidy(rdd)
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+mlda <- mlda %>%
+  mutate(over21 = (agecell >= 21),
+         agecell_21 = agecell - 21)
+rdd <- lm(all ~ agecell_21 + over21, mlda)
+
+library(broom)
+tidy(rdd)
+```
+]
+
+--
+
+<br>
+
+***Interpretation:***
+
+--
+
+On average, the MLDA increases death rates from all causes by 7.66 percentage points.
+
+--
+
+This is a big effect considering the average death rate for individuals between 19 and 22 is:
+
 ```{r}
-library(dplyr)
-library(ggplot2)
-cutoff = 50
-delta = 10.5
-nsim = 500
-d = tibble(x=runif(n=nsim,max=100)) %>%
-    mutate(D = if_else(x > cutoff,TRUE,FALSE),
-           Y = x + D*delta + rnorm(nsim,sd=3))
+mean(mlda$all, na.rm = TRUE)
 ```
-* and laet's plot it: 
 
-]
-
-
-
-.pull-right[
-
-```{r,echo = FALSE,fig.height = 6}
-ggplot(d,aes(x=x,y=Y)) + geom_point() + theme_bw()
-```
-]
 
 ---
 
-# Illustrating the RDD Estimator
+# Estimation Issues
+
+* The ***functional form*** used to approximate the lines really matters!
+
+--
+
+   $\rightarrow$ an insufficiently flexible specification runs the risk of mistaking nonlinearity for treatment effect;
+
+--
+   
+   $\rightarrow$ an overly flexible specification reduces precision and runs the risk of overfitting.
+
+
+---
+
+# Simulations - Linear Relationship and Clear Discontinuity
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 10}
+set.seed(1234)
+
+  # parameters
+cutoff = 0.5
+alpha = 0.2 # intercept
+delta = 0.4 # jump at cutoff
+beta = 2 # slope
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + beta * x + D*delta + u
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y)
+  
+  # plot
+rdd_lin <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point(size = 3, alpha = 0.75) +
+  stat_smooth(method = "lm", se = FALSE) +
+  ylim(0,3) +
+  labs(x = "Running variable",
+       y = "Outcome variable",
+       colour = NULL) +
+  scale_colour_viridis_d(breaks=c("FALSE", "TRUE"), labels = c("Not Treated", "Treated")) +
+  theme_bw(base_size = 14) + theme(legend.position="top")
+rdd_lin
+```
+
+--
+
+$$outcome_i = \alpha + \delta treatment_i + \beta running_i + e_i,$$
+
+---
+
+# Simulations - Linear Relationship and Clear Discontinuity
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 10}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(0.50, 1.20, 0.50, 1.63, h = 0.2, lwd=1.5, col="black")
+
+rdd_lin +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 0.46, y = 1.45, label = "delta", colour = "#d90502", parse = T, size = 8)
+```
+
+$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta running_i + e_i,$$
+
+---
+
+# Simulations - Quadratic Relationship and Clear Discontinuity
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 10}
+set.seed(1234)
+
+  # parameters
+cutoff = 0.5
+alpha = 1.5 # intercept
+delta = 0.4 # jump at cutoff
+beta = -8 # slope
+beta_2 = 25
+beta_3 = -17
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + beta * x + beta_2 * x^2 + beta_3 * x^3 + D*delta + u
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y)
+
+  # plot
+rdd_quad <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point(size = 3, alpha = 0.75) +
+  stat_smooth(method = "lm",
+              formula = y ~ x + I(x^2),
+              se = FALSE) +
+  geom_vline(xintercept = 0.5, linetype = "longdash") +
+  ylim(0,3) +
+  labs(x = "Running variable", y = "Outcome variable", colour = "") +
+  scale_colour_viridis_d(breaks=c("FALSE", "TRUE"), labels = c("Not Treated", "Treated")) +
+  theme_bw(base_size = 14) + theme(legend.position="top")
+rdd_quad
+```
+
+--
+
+$$outcome_i = \alpha + \delta treatment_i + \beta_1 running_i + \color{#d90502}{\beta_2 running_i^2} + e_i,$$
+
+---
+
+# Simulations - Quadratic Relationship and Clear Discontinuity
+
+```{r, echo = FALSE, fig.height = 4.5, , fig.width = 10}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(0.50, 1.68, 0.50, 2.05, h = 0.2, lwd=1.5, col="black")
+
+rdd_quad +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 0.46, y = 1.865, label = "delta", colour = "#d90502", parse = T, size = 8)
+```
+
+$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta_1 running_i + \beta_2 running_i^2 + e_i,$$
+
+---
+
+# Simulations - Linear Relationship but NO Discontinuity
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 10}
+set.seed(123)
+
+  # parameters
+cutoff = 0.5
+alpha = 2.5 # intercept
+beta_1 = 2.5 # slope
+beta_2 = 0.5 # slope 2
+power = 7
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + (1 - alpha) / (1 + (x/beta_2)^power) + u
+
+  # without error term
+Y_true = alpha + (1 - alpha) / (1 + (x/beta_2)^power)
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y,
+                 true = Y_true)
+
+  # plot
+rdd_nodisc <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point(size = 3, alpha = 0.75) +
+  geom_line(aes(x = running, y = true), colour = "black", linetype = "dotted") +
+  stat_smooth(method = "lm",
+              formula = y ~ x,
+              se = FALSE) +
+  geom_vline(xintercept = 0.5, linetype = "longdash") +
+  ylim(0,3) +
+  labs(x = "Running variable", y = "Outcome variable", colour = "") +
+  scale_colour_viridis_d(breaks=c("FALSE", "TRUE"), labels = c("Not Treated", "Treated")) +
+  theme_bw(base_size = 14) + theme(legend.position="top")
+rdd_nodisc
+```
+
+---
+
+# Simulations - Different Slopes
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 10}
+set.seed(1234)
+
+  # parameters
+cutoff = 0.5
+alpha = 1 # intercept
+delta = 0.4 # jump at cutoff
+beta = -1 # slope
+gamma = 4
+nsim = 150 # number of simulated observations
+
+  # running variable
+x = runif(n = nsim,
+          min = 0,
+          max = 1)
+
+  # treatment variable
+D = if_else(x > cutoff, TRUE, FALSE)
+
+  # error term
+u = rnorm(n = nsim, mean = 0, sd = .1)
+
+  # outcome variable
+Y = alpha + beta * (x - cutoff) + D*delta + gamma * D * (x - cutoff) + u
+
+  # create tibble
+rdd_sim = tibble(running = x,
+                 treatment_dum = D,
+                 outcome = Y)
+
+  # plot
+rdd_diffslope <- ggplot(rdd_sim,
+       aes(x = running, y = outcome, color = treatment_dum)) +
+  geom_point(size = 3, alpha = 0.75) +
+  stat_smooth(method = "lm",
+              formula = y ~ x,
+              se = FALSE) +
+  geom_vline(xintercept = 0.5, linetype = "longdash") +
+  ylim(0,3) +
+  labs(x = "Running variable", y = "Outcome variable", colour = "") +
+  scale_colour_viridis_d(breaks=c("FALSE", "TRUE"), labels = c("Not Treated", "Treated")) +
+  theme_bw(base_size = 14) + theme(legend.position="top")
+rdd_diffslope
+```
+
+--
+
+$$outcome_i = \alpha + \delta treatment_i + \beta (running_i - cutoff) + \\ \color{#d90502}{\gamma treatment_i * (running_i - cutoff)} + e_i,$$
+
+---
+
+# Simulations - Different (Linear) Slopes
+
+```{r, echo = FALSE, fig.height = 4.5, fig.width = 10}
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+b1 <- bracketsGrob(0.50, 0.99, 0.50, 1.46, h = 0.2, lwd=1.5, col="black")
+
+rdd_diffslope +
+  annotation_custom(b1,xmin= 0, xmax=1, ymin=0, ymax=1) +
+  annotate("text", x = 0.46, y = 1.225, label = "delta", colour = "#d90502", parse = T, size = 8)
+```
+
+$$outcome_i = \alpha + \color{#d90502}\delta treatment_i + \beta (running_i - cutoff) + \\ \gamma treatment_i * (running_i - cutoff) + e_i,$$
+
+---
+
+# How to Choose Appropriate Functional Form?
+
+* Essential to __visualise__ the data!
+
+--
+
+* Coefficients across models shouldn't vary too much.
+
+--
+
+* Should we expect the relationship between the outcome variable and the running variable to be nonlinear? Should we expect it to differ around the cutoff?
+
+--
+
+* [Gelman and Imbens (2019)](https://www.tandfonline.com/doi/abs/10.1080/07350015.2017.1366909), "Why High-Order Polynomials Should Not Be Used in Regression Discontinuity Designs":  
+  *"We recommend researchers [...] use estimators based on local linear or quadratic polynomials or other smooth functions."*
+
+---
+
+# Going Back to our Example: Nonlinearities / $\neq$ Slopes?
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 4.5, fig.width = 10}
+all_nonlin_fit <- augment(lm(all ~ agecell_21*over21 + I(agecell_21^2)*over21, mlda))
+
+rdd_plot
+```
+
+---
+
+# Going Back to our Example: Nonlinearities / $\neq$ Slopes?
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 4.5, fig.width = 10}
+all_nonlin_fit <- augment(lm(all ~ agecell_21*over21 + I(agecell_21^2)*over21, mlda))
+
+rdd_plot_line +
+  geom_line(data = all_nonlin_fit %>% filter(agecell_21 < 0), aes(x = agecell_21 + 21, y = .fitted), color = viridis_pal()(2)[1], linetype = "dashed", size = 1.25) +
+  geom_line(data = all_nonlin_fit %>% filter(agecell_21 >= 0), aes(x = agecell_21 + 21, y = .fitted), color = viridis_pal()(2)[2], linetype = "dashed", size = 1.25)
+```
+
+--
+
+Gap between the lines is roughly the same for both specifications.
+---
+
+class: inverse
+
+# Task 3 (15 minutes)
+
+1. Estimate the following *quadratic* model on all death causes. Does the RDD coefficient differ from the linear model? 
+$$DEATHRATE_a = \alpha + \delta D_a + \beta a + \beta a^2 + \varepsilon_a,$$
+
+1. Recall that the regression model allowing for different slopes on each side of the cutoff is:
+$$DEATHRATE_a = \alpha + \delta D_a + \beta (a - 21) + \gamma D_a * (a - 21) + \varepsilon_a,$$
+   - Why do we need to substract the `cutoff` from `running_i`? (Hint: compute $\mathbb{E}(DEATHRATE_a|a=21)$)
+   - Should we expect the relationship between death rates and age to change at 21?
+   - Estimate this model. How different is the RDD coefficient from the other models you have estimated?
+
+* Re-run these models (linear, quadratic, different slopes) for the following death causes: motor vehicle accidents (`mva`), alcohol-related (`alcohol`), and internal (`internal`).
+
+---
+
+# Graphical Representation of the Regression Results
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10}
+mlda_long <- mlda %>%
+    select(-contains("fitted")) %>%        # drop "fitted" variables
+    pivot_longer(cols = -c(agecell,over21),          # column to not reshape
+                 names_to = "death_cause", # new variable containing death causes
+                 values_to = "death_rate") %>% # new variable containing death rates by cause
+  filter(death_cause %in% c("all","mva","internal"))
+
+rdd_plot <- mlda_long %>%
+  ggplot(aes(x = agecell, y = death_rate, color = over21)) + geom_point() +
+    geom_smooth(mapping = aes(group = over21), se = FALSE, method = "lm",
+              formula = y ~ x) +
+  geom_vline(xintercept = 21, linetype = "longdash") +
+  labs(x = "Age", y = "Death rate (per 100,000)") +
+  scale_colour_viridis_d() +
+  theme_bw(base_size = 16) + theme(legend.position="none") +
+  facet_grid(rows = vars(death_cause), scales = "free_y")
+rdd_plot
+```
+
+---
+
+# Nonparametric Estimation
+
+* Give more weight to observations close to the cutoff level
+
+--
+
+2 settings:
+
+  * How much more weight?
+
+--
+  
+  $\rightarrow$ depends on the chosen ***kernel***.
+
+--
+
+  * How far away from the cutoff do observations need to be to be discarded?
+  
+--
+
+  $\rightarrow$ depends on the chosen ***bandwidth***.
+  
+--
+
+Luckily there's an `R` package that chooses these settings optimally based on fancy algorythms: `rdrobust`.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Identifying Assumptions
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# RDD Assumptions
+
+> *Key assumption*: ***Potential outcomes are smooth at the threshold.***
+
+--
+
+$\rightarrow$ assignment variable cannot be manipulated!
+
+--
+
+Formally:
+
+$$\lim_{r \to c+} E[Y_i^d|r] = \lim_{r \to c-} E[Y_i^d|r], d \in \{0,1\}$$
+
+--
+
+* The population just below must not be discretely different from the population just above the cutoff.
+
+--
+
+* Assumption is violated if people can manipulate the running variable because they know the cutoff value.
+
+--
+
+  * Knowing the cutoff value in itself does not violate the assumption, only ability to manipulate running variable does.
+
+---
+
+# RDD Assumptions
+
+> *Key assumption*: ***Potential outcomes are smooth at the threshold.***
+
+If the assumption holds, we have:
+
+$$
+\begin{align}
+&\lim_{r \to c^+} \mathbb{E}[Y_i | R_i = r] - \lim_{r \to c^-} \mathbb{E}[Y_i | R_i = r] \\
+= &\lim_{r \to c^+} \mathbb{E}[Y_i^1 | R_i = r] - \lim_{r \to c^-} \mathbb{E}[Y_i^0 | R_i = r] \\
+= &\mathbb{E}[Y_i^1 | R_i = c] - \mathbb{E}[Y_i^0 | R_i = c] \\
+= &\mathbb{E}[Y_i^1 - Y_i^0 | R_i = c] \\
+\end{align}
+$$
+
+---
+
+# RDD Assumptions
+
+> *Key assumption*: ***Potential outcomes are smooth at the threshold.***
+
+If the assumption holds, we have:
+
+$$
+\begin{align}
+&\lim_{c \to 21^+} \mathbb{E}[Y_i | a_i = c] - \lim_{a \to 21^-} \mathbb{E}[Y_i | a_i = c] \\
+= &\lim_{c \to 21^+} \mathbb{E}[Y_i^1 | a_i = c] - \lim_{c \to 21^-} \mathbb{E}[Y_i^0 | a_i = c] \\
+= &\mathbb{E}[Y_i^1 | a_i = 21] - \mathbb{E}[Y_i^0 | a_i = 21] \\
+= &\underbrace{\mathbb{E}[Y_i^1 - Y_i^0}_\text{ATE} | a_i = 21] \\
+\end{align}
+$$
+
+---
+
+# Example of Manipulation: [Camacho and Conover (2011)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/pol.3.2.41)
+
+What happens when threshold for eligibility to social assistance programs becomes known?
 
 .pull-left[
-* Now we fit a line to left and right of cutoff $c$.
-
-* What *kind of* line (straight, curved, polynomial etc) is quite important.
-
+```{r, echo = FALSE, out.width = "700px"}
+knitr::include_graphics("../img/photos/manip_1.png")
+```
 ]
 
 --
 
 .pull-right[
-```{r,echo = FALSE,fig.height = 6}
-d0 = d %>% filter(D==0)
-d1 = d %>% filter(D==1)
-ggplot(d,aes(x=x,y=Y)) + geom_point() + 
-    geom_smooth(data = d0, method = "lm",se = FALSE, size=1.5) +
-    geom_smooth(data = d1, method = "lm",se = FALSE, size=1.5, color = "green")+ theme_bw()
-
+```{r, echo = FALSE, out.width = "700px"}
+knitr::include_graphics("../img/photos/manip_2.png")
 ```
 ]
+---
+
+# Noncompliance
+
+What if the running variable does not *fully* determine assignment to treatment?
+
+$\rightarrow$ ***Fuzzy RDD***
+
+* Even if all observations that satisfy the treatment condition are not treated, there is still a jump in the probability of being treated.
+
+* For you, just know that problem of imperfect determination of allocation to treatment can still be solved
 
 ---
 
-# Computing The Estimate
+# 5 Steps for Conducting RDD in Practice<sup>1</sup>
 
-.pull-left[
-* Finally, the estimate is the difference between red and blue line.
-
-* **At the cutoff**!
-
-* The RD estimator is the size of the **red** errorbar in that picture!
-
+.footnote[
+<sup>1</sup> Taken from [Andrew Heiss' wonderful course on RDD](https://evalsp20.classes.andrewheiss.com/class/11-class/).
 ]
+
+### Step #1: ***Is assignment to treatment rule-based?***
 
 --
 
-.pull-right[
-```{r,echo = FALSE,fig.height = 6}
-d0 = d %>% filter(D==0)
-d1 = d %>% filter(D==1)
-ggplot(d,aes(x=x,y=Y)) + geom_point() + 
-    geom_smooth(data = d0, method = "lm",se = FALSE, size=1.5) +
-    geom_smooth(data = d1, method = "lm",se = FALSE, size=1.5, color = "green") +
-    geom_errorbar(data=data.frame(x=50,y1=max(d0$x),y2=min(d1$x)+delta), 
-               aes(x=x,ymin=y1,ymax=y2),inherit.aes = FALSE,size=2,colour="red", width=2)+ theme_bw()
-
-```
-]
-
----
-
-# `rdrobust` package
-
-.pull-left[
-* Same can be done automatically with the `rdrobust` package
-
-* You should use that in your homework!
-
-* here's how:
-
-]
+### Step #2: ***Is design sharp or fuzzy?***
 
 --
 
-.pull-right[
-```{r,echo = TRUE,fig.height = 6,fig.width=6}
-rdplot(y = d$Y, x = d$x, c = cutoff)
+### Step #3: ***Is there a discontinuity in running variable at cutoff?***
 
-```
-]
+--
+
+### Step #4: ***Is there a discontinuity in outcome variable at cutoff in running variable?***
+
+--
+
+### Step #5: ***How big is the gap?***
 
 ---
 
@@ -211,4 +1080,3 @@ background-position: 9% 19%
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
-

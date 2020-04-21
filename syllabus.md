@@ -59,7 +59,7 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 
 [**Chapter 6, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/std-errors.html)
 
-**[Chapter 10, ModernDive](https://moderndive.com/10-inference-for-regression.html)
+[**Chapter 10, ModernDive**](https://moderndive.com/10-inference-for-regression.html)
 
 ### Lecture 10: Differences-in-Differences
 
@@ -71,6 +71,10 @@ Chapters [2](https://moderndive.com/2-viz.html) and [3](https://moderndive.com/3
 ### Lecture 11: Regression Discontinuity
 
 **Chapter 4, Mastering Metrics**
+
+**Andrew Heiss' excellent [slides](https://evalsp20.classes.andrewheiss.com/slides/PMAP-8521_2020-04-01.pdf) and [lecture videos](https://evalsp20.classes.andrewheiss.com/class/11-class/)**]
+
+[Chris Walters (2020), Regression Discontinuity Designs](https://www.aeaweb.org/webcasts/2020/mastering-mostly-harmless-econometrics-part-7)
 
 [**Carpenter and Dobkin (2009, AEJ: Applied), "The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age"**](https://www.aeaweb.org/articles?id=10.1257/app.1.1.164)
 
