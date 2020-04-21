@@ -1006,12 +1006,23 @@ $$
 
 ---
 
-# Example of Manipulation: French Baccalaureate Grades
+# Example of Manipulation: [Camacho and Conover (2011)](https://pubs.aeaweb.org/doi/pdfplus/10.1257/pol.3.2.41)
 
+What happens when threshold for eligibility to social assistance programs becomes known?
+
+.pull-left[
 ```{r, echo = FALSE, out.width = "700px"}
-knitr::include_graphics("../img/photos/manipulation_rdd.png")
+knitr::include_graphics("../img/photos/manip_1.png")
 ```
+]
 
+--
+
+.pull-right[
+```{r, echo = FALSE, out.width = "700px"}
+knitr::include_graphics("../img/photos/manip_2.png")
+```
+]
 ---
 
 # Noncompliance
