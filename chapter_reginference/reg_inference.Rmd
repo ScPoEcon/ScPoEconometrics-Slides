@@ -60,9 +60,9 @@ layout: true
 
 # Recap from last week
 
-* ***Confidence interval***: a plausible range of value for the population parameter
+* ***Confidence interval***: a plausible range of values for the population parameter.
 
-* ***Hypothesis testing***: null hypothesis $(H_0)$ vs alternative hypothesis $(H_A)$, (observed) test statistic, null distribution
+* ***Hypothesis testing***: null hypothesis $(H_0)$ vs alternative hypothesis $(H_A)$, (observed) test statistic, null distribution.
 
 * ***p-value***: probability of observing a test statistic as or more extreme than the observed test statistic assuming the null hypothesis is true.
 
@@ -89,7 +89,7 @@ layout: true
 
 # Back to class size and student performance
 
-* Let's go back the ***STAR*** experiment data, and focus on: 
+* Let's go back to the ***STAR*** experiment data, and focus on: 
 
   * *small* and *regular* classes,
   * *Kindergarten* grade.
@@ -202,7 +202,7 @@ Entry | Meaning
 
 Let's imagine we could redo the experiment 1000 times on 1000 different samples:
 
-* We'd run 1000 regression and would get 1000 estimates of $\beta_k$, $b_k$.
+* We'd run 1000 regressions and would get 1000 estimates of $\beta_k$, $b_k$.
 
 --
 
@@ -218,7 +218,11 @@ Let's imagine we could redo the experiment 1000 times on 1000 different samples:
 
 --
 
-* Let's simulate the sampling distribution of $b_\textrm{small}$ to see where it comes from.
+* `R` obtains this estimated standard error from ***theory*** which we will see in a few slides.
+
+--
+
+* Let's simulate the bootstrap distribution of $b_\textrm{small}$ to see how close the simulated value is to the theoretical value.
     
 ---
 
@@ -226,13 +230,16 @@ class:inverse
 
 # Task 1 (10 min)
 
-As we did for the sampling distribution of the proportion of *green pasta*, we want to generate the bootstrap distribution of $b_\textrm{small}$. 
+As we did for the bootstrap distribution of the proportion of *green pasta*, we want to generate the bootstrap distribution of $b_\textrm{small}$. 
 
 1. Copy the loading and cleaning code from slide 3 and run it.
 
-1. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1000 samples drawn from `star_df`. *Hint*: use the appropriate functions and arguments from the `infer` package so use the help pages.
+1. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1000 samples drawn from `star_df`. *Hints:*
+  * `specify()`: use the `explanatory` and `response` arguments and set them equal to the relevant variable.
+  * `generate()`: 1000 replicates of type bootstrap.
+  * `calculate()`: set the `stat` argument to `slope` and add the following argument: `order = c("TRUE", "FALSE")`.
 
-1. Plot this simulated sampling distribution and compute mean and the standard error of $b_\textrm{small}$.
+1. Plot this bootstrap distribution and compute the mean and the standard error of $b_\textrm{small}$.
 
 ---
 
@@ -399,7 +406,7 @@ plot_null_distrib +
 
 --
 
-Very unlikely to obtain $b_\textrm{small}$ = `r coeff_star[2]` when $H_0$ is true.
+Very unlikely to obtain $b_\textrm{small}$ = `r reg_summary_star_df[2,1]` when $H_0$ is true.
 
 ---
 
@@ -521,7 +528,7 @@ layout: true
 
 ---
 
-# Standard Normal Distribution: A Refresher
+# Normal Distributions: A Refresher
 
 .center[
 ```{r, echo = FALSE, out.width = "850px"}
@@ -578,7 +585,7 @@ class:inverse
 
 # Task 2 (5 min)
 
-1. Using the bootstrap distributed you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
+1. Using the bootstrap distribution you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
 
 1. How similar is it to the confidence intervals obtained in the previous slide?
 
@@ -746,9 +753,9 @@ class:inverse
 
 # Task 3.2 (10 min)
 
-1. Produce a scatterplot of the relationship between the log wage and the level of education.
+1. Produce a scatterplot of the relationship between the log wage and the level of education, by gender (`color`).
 
-1. Add the *regression line* with `geom_smooth`. What does this line represents?
+1. Add a *linear regression line* to the plot using the `geom_smooth` layer. What does this line represents?
 
 1. Let's illustrate what the shaded area stands for.
 
