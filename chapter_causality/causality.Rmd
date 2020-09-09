@@ -729,7 +729,7 @@ Compute the average percentage of girls, african americans, and free lunch quali
 #         names_to = c(".value", "grade"),
 #         names_pattern = "(.+)(k|1|2|3)$")
 # write.csv2(star, file = "star_data.csv", row.names = F)
-star_df = read.csv(file = "https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_df = readr::read_csv(file = "https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
 star_df <- star_df[complete.cases(star_df),]
 ```
 
