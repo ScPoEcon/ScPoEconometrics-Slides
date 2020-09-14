@@ -165,7 +165,7 @@ As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-E
 
 1. The [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides)
 
-1. The code repository for book and [R package](https://github.com/ScPoEcon/ScPoEconometrics)
+1. The interactive [R Apps](https://github.com/ScPoEcon/ScPoApps)
 
 1. Quizzes on [Moodle](https://moodle.sciences-po.fr)
 
@@ -679,25 +679,25 @@ class: inverse
 
 ---
 
-# `ScPoEconometrics` package
+# `ScPoApps` package
 
 * We wrote an `R` package for you.
 
-* It's hosted on [GitHub](https://github.com/ScPoEcon/ScPoEconometrics)
+* It's hosted on [GitHub](https://github.com/ScPoEcon/ScPoApps)
 
 * You can install (and frequently update!) from here:
     ```{r,eval=FALSE}
     if (!require("devtools")) install.packages("devtools")
     library(devtools)
-    install_github(repo = "ScPoEcon/ScPoEconometrics")
+    install_github(repo = "ScPoEcon/ScPoApps")
     ```
 
 --
 
 * Did it work?
     ```{r,warning=FALSE,message=FALSE}
-    library(ScPoEconometrics)
-    packageVersion("ScPoEconometrics")
+    library(ScPoApps)
+    packageVersion("ScPoApps")
     ```
 
 ---

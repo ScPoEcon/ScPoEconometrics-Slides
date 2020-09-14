@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Introduction
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### Sciences Po Paris </br> 2020-01-28
+### Sciences Po Paris </br> 2020-09-14
 
 ---
 
@@ -148,7 +148,7 @@ As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-E
 
 1. The [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides)
 
-1. The code repository for book and [R package](https://github.com/ScPoEcon/ScPoEconometrics)
+1. The interactive [R Apps](https://github.com/ScPoEcon/ScPoApps)
 
 1. Quizzes on [Moodle](https://moodle.sciences-po.fr)
 
@@ -652,18 +652,18 @@ class: inverse
 
 ---
 
-# `ScPoEconometrics` package
+# `ScPoApps` package
 
 * We wrote an `R` package for you.
 
-* It's hosted on [GitHub](https://github.com/ScPoEcon/ScPoEconometrics)
+* It's hosted on [GitHub](https://github.com/ScPoEcon/ScPoApps)
 
 * You can install (and frequently update!) from here:
     
     ```r
     if (!require("devtools")) install.packages("devtools")
     library(devtools)
-    install_github(repo = "ScPoEcon/ScPoEconometrics")
+    install_github(repo = "ScPoEcon/ScPoApps")
     ```
 
 --
@@ -671,12 +671,12 @@ class: inverse
 * Did it work?
     
     ```r
-    library(ScPoEconometrics)
-    packageVersion("ScPoEconometrics")
+    library(ScPoApps)
+    packageVersion("ScPoApps")
     ```
     
     ```
-    ## [1] '0.2.5'
+    ## [1] '0.1'
     ```
 
 ---
@@ -732,10 +732,10 @@ example_data
 
 ```
 ##   x       y     z
-## 1 1   Hello  TRUE
-## 2 3   Hello FALSE
-## 3 5   Hello  TRUE
-## 4 7 Goodbye  TRUE
+## 1 1   Hello FALSE
+## 2 3   Hello  TRUE
+## 3 5   Hello FALSE
+## 4 7 Goodbye FALSE
 ```
 
 In practice, you will be importing files that contain the data into `R` rather than creating `data.frame`s by hand.
@@ -971,9 +971,25 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
-
-<script>
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
 (function() {
   var links = document.getElementsByTagName('a');
   for (var i = 0; i < links.length; i++) {
@@ -982,7 +998,23 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
   }
 })();
-</script>
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 slideshow._releaseMath = function(el) {

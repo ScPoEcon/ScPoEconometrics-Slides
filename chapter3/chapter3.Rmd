@@ -38,7 +38,7 @@ knitr::opts_chunk$set(
 
 library("tidyverse")
 library("kableExtra")
-library("repmis")
+# library("repmis")
 library("gridExtra")
 library("haven")
 library("ggpubr")
