@@ -36,7 +36,7 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
+# library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
 # Quitting from lines 27-40 (chapter2.Rmd) 
 # Error: package or namespace load failed for 'learnr':
 #  .onAttach failed in attachNamespace() for 'learnr', details:
@@ -707,14 +707,14 @@ Time for our first tutorial!!
 Type this into your `RStudio` console:
 
 ```{r, echo = TRUE, eval=FALSE}
-library(ScPoEconometrics)
+library(ScPoApps)
 runTutorial('chapter2')
 ```
 
 If you have trouble with the interactive doc, try this version (no interactive content):
 
 ```{r, echo = TRUE, eval=FALSE}
-ScPoEconometrics::runTutorial('chapter2-script')
+ScPoApps::runTutorial('chapter2-script')
 ```
 
 ---
@@ -757,7 +757,7 @@ class: inverse
 # Correlation App
 
 ```{r, echo = TRUE, eval=FALSE}
-library(ScPoEconometrics)
+library(ScPoApps)
 runTutorial('correlation')
 ```
 
