@@ -36,7 +36,7 @@ knitr::opts_chunk$set(
   #fig.height = 5
 )
 
-# library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
+#library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
 # Quitting from lines 27-40 (chapter2.Rmd) 
 # Error: package or namespace load failed for 'learnr':
 #  .onAttach failed in attachNamespace() for 'learnr', details:
@@ -164,75 +164,269 @@ class: inverse
 layout: false
 class: title-slide-section-red, middle
 
-# Summarizing
+# Data Wrangling
 
 ---
-
 layout: true
 
 <div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
 ---
 
-# Summarizing Data
+# Intro to `dplyr`
 
+.pull-left[
+<br>
+<br>
+<br>
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [tidyverse](https://www.tidyverse.org) package family.
 
-* One can learn only a limited amount from **looking** at a `data.frame`. `r emo::ji("mag")`
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast but a bit more difficult.
 
---
+* Both have pros and cons. We'll start you off with `dplyr`. 
+]
 
-* Even if you *could* see all rows of the dataset, you would not know very much **about it**.
+.pull-right[
+![:scale 35%](../img/logo/dplyr.svg)
 
---
-
-* We need to **summarize** the data for us to learn from it.
-
---
-
-* In general, we can compute summary statistics, or visualize the data with plots.
-
---
-
-* Let's start with some statistics first!
-
---
-
-* Let's look at two features: *central tendency* and *spread*.
+![:scale 35%](../img/logo/r-datatable.svg)
+]
 
 ---
 
-# Central Tendency
-
+# `dplyr` Overview
 
 .pull-left[
-1. `mean(x)`: the average of all values in `x`.
-$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$
+<br>
+<br>
+* You *must* read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's concise.
 
-```{r}
-x <- c(1,2,2,2,2,100)
-mean(x)
-mean(x) == sum(x) / length(x)
-```
+* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
 
-***Your turn:*** What's the mean of `infant_mortality` in 1960? Read the help for `mean` to remove `NA`s.
+* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
+
+* All *verbs*: First argument is a data.frame, subsequent arguments describe what to do, returns another data.frame.
+
 ]
 
 --
 
 .pull-right[
-1. `median`: the value $x_j$ below and above which 50% of the values in `x` lie. $m$ is the median if
-    $$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$
-    
-1. The median is robust against *outliers*. `r emo::ji("thinking")`? (later).
 
-```{r}
-median(x)
-```
+## Verbs
 
-***Your turn:*** What's the median of `infant_mortality` in 1960?
+1. `filter()`: Choose observations based on a certain value (i.e. subset)
+
+1. `arrange()`: Reorder rows 
+
+1. `select()`: Select variables by name
+
+1. `mutate()`: Create new variables out of existing ones
+
+1. `summarise()`: reduce to a single row (by group)
 ]
 
 ---
+
+# Data on 2016 US election polls from the `dslabs` package
+
+* This dataset contains __real__ data on polls made during the 2016 US Presidential elections and compiled by [fivethirtyeight](fivethirtyeight.com)
+
+```{r dslabs, echo = TRUE}
+library(dslabs)
+library(dplyr)
+data(polls_us_election_2016) # this data is from fivethirtyeight.com
+polls_us_election_2016 <- as_tibble(polls_us_election_2016)
+head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
+```
+
+`r emo::ji("rotating_light")` This is a `tibble` (more informative than `data.frame`)
+
+What variables does this dataset contain?
+
+---
+
+# `filter()`: subset a data.frame
+
+* `filter` has the same purpose as `subset`
+
+* Example: Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+    ```{r, echo = TRUE, eval = FALSE}
+    filter(polls_us_election_2016,
+           grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
+    ```
+--
+    ```{r, echo = FALSE}
+    filter(polls_us_election_2016,
+           grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
+    ```
+   
+---
+
+# Create a Filter: Comparisons and Logical Operators
+
+.pull-left[
+* We have a standard suite of comparison operators:
+  - `>`: greater than,
+  - `<`: smaller than,
+  - `>=`: greater than or equal to,
+  - `<=`: smaller than or equal to,
+  - `!=`: not equal to,
+  - `==`: equal to.
+
+* Construct more complex filters with logical operators
+    1. `x & y`: `x` **and** `y`
+    1. `x | y`: `x` **or** `y`
+    1. `!y`: **not** `y`
+]
+
+.pull-right[
+* `R` has the convenient `x %in% y` operator (conversely `!(x %in% y)`), `TRUE` if `x` is *a member of* `y`.
+    ```{r, echo = TRUE}
+    3 %in% 1:3
+    c(2,5) %in% 2:10  # also vectorized
+    c("S","Po") %in% c("Sciences","Po")  # also strings
+    ```
+]
+
+---
+
+# `mutate()`: create new variables
+
+* *Example*: What was
+    1. the combined vote share of Trump and Clinton for each poll?
+    2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+
+```{r, echo = TRUE, eval = FALSE}
+mutate(polls_us_election_2016,
+       trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+       trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
+```
+
+# `select()`: only keep some variables
+
+* *Example*: Only keep the variables `state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump`
+```{r, echo = TRUE, eval = FALSE}
+select(polls_us_election_2016,
+       state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump)
+```
+
+---
+
+# Split-Apply-Combine
+
+.pull-left[
+* Often we do *some* operation **by** some group in our dataset:
+    * Mean vote share for Clinton by pollster grade.
+    * Maximum vote share for Trump by poll month, etc
+    
+* For this, we need to 
+    1. Split the data **by** group
+    2. Apply to each group the operation
+    3. Recombine all groups into one table
+    
+* In `dplyr`, this is achieved with `group_by()` and `summarise`.
+]
+
+--
+
+.pull-right[
+1. `group_by(polls_us_election_2016, grade)` groups/splits `polls_us_election_2016` by pollster `grade`:
+    ```{r dplyr1}
+    polls_grade = group_by(polls_us_election_2016, grade)
+    ```
+
+1. `summarise` each chunk and re-combine
+    ```{r}
+    head(summarise(polls_grade, mean_vote_clinton = mean(rawpoll_clinton)))
+    ```
+]
+
+---
+
+background-image: url("../img/logo/magrittr.svg")
+background-position: 90% 5%
+background-size: 160px
+
+# Chaining `r emo::ji("link")` Commands Together: The Pipe
+
+* Let's now introduce a **very** useful command: the *pipe* `%>%` operator.
+
+* Pipes are a powerful tool for *clearly* expressing a sequence of multiple operations. 
+
+* It comes with the `magrittr` package.
+
+--
+
+* $f(x, y)$ can be rewritten as `x %>% f(y)`. 
+
+--
+
+.pull-left[
+Our above example would become:
+```{r pipe, echo = TRUE, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>% 
+  summarise(mean_vote_clinton = mean(rawpoll_clinton))
+```
+]
+
+--
+
+.pull-right[
+which is equivalent to, but nicer than:
+```{r, echo = TRUE,eval = FALSE}
+summarise(
+  group_by(polls_us_election_2016, grade),
+  mean_vote_clinton = mean(rawpoll_clinton)
+  )
+```
+]
+
+--
+
+* With the *pipe* you construct data *pipelines*
+
+* When reading your code it should be pronounced “THEN”. 
+
+---
+
+# Chaining `r emo::ji("link")` Commands Together: The Pipe
+
+Works for all `dplyr` verbs:
+```{r, echo = TRUE, eval = TRUE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+  filter(trump_clinton_diff>5 &
+        state == "Iowa" &
+        is.na(rawpoll_johnson)) %>%
+  select(pollster)
+```
+
+--
+
+But also with other R commands:
+
+.pull-left[
+
+```{r, echo = TRUE}
+polls_us_election_2016$samplesize %>% 
+  mean(na.rm = T)
+```
+]
+
+--
+
+.pull-right[
+
+```{r,echo = TRUE}
+c(1:10) %>%
+  sample(size = 1) > 5
+```
+]
+
+---
+
 
 # Missing Values: `NA`
 
@@ -277,67 +471,22 @@ median(x)
 
 ---
 
-# Spread
+class: inverse
 
-.pull-left[
-* Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
+# Task 2 (10 minutes)
 
-* The *variance* is such a measure.
-    $$Var(X) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})^2$$
-    
-* Consider two `normal distributions` with equal mean at `0`:
-]
+1. Which polls had more vote intentions for Trump than for Clinton.
 
---
+1. How many polls have a missing `grade`?
 
-.pull-right[
-```{r,echo = FALSE,fig.height=4,message = FALSE,warning = FALSE}
-library(ggplot2)
-ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
-  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1), aes(color = "1"), size = 2) + ylab("") + scale_y_continuous(breaks = NULL) + theme_bw() +
-  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), aes(color = "4"), size = 2) + scale_color_manual("Variance:", values = c("red","blue")) + theme(text = element_text(size=20))
-```
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
 
-* Compute with:
+*For the following questions you should use `mutate()` as well as `filter()`.*
 
-```{r,eval = FALSE}
-    var(x)
-    range(x)   # range
-    ```
-]
----
+1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000.?
 
-# The `table` function
+1. Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
 
-* `table(x)` is a useful function that counts the occurence of each unique value in `x`:
-    ```{r}
-    table(gapminder$continent)
-    table(gapminder$region)
-    ```
-
----
-
-# Crosstables
-
-
-* Given two vectors, `table` produces a contingency table:
-    ```{r}
-    gapminder_2015 <- subset(gapminder, year == 2015)
-    gapminder_2015$fertility_above_2 = (gapminder_2015$fertility > 2.1) # dummy variable for fertility rate above replacement level fertility
-    table(gapminder_2015$fertility_above_2,gapminder_2015$continent)
-    ```
-
---
-
-* With `prop.table`, we can get proportions:
-    ```{r,eval=FALSE}
-    # proportions by row
-    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 1)
-    # proportions by column
-    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 2) 
-    ```
-
-* `r emo::ji("warning")` To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
 ---
 
 layout: false
@@ -354,17 +503,26 @@ layout: true
 
 # Plotting
 
-.pull-left[
 * `R` base plotting is fairly good.
 
-* There is an extremely powerful alternative in package `ggplot2`. We'll see both.
+* There is an extremely powerful alternative in package `ggplot2`. We'll see both!
 
-* First example: *histograms*. A histogram counts how many obserations fall within a certain bin.
+* Let's take back the `gapminder` dataset to run the examples. 
+
+--
+
+.pull-left[
+
+* First example: *histograms*. 
+
+A histogram counts how many obserations fall within a certain bin.
+
 ]
 
 --
 
 .pull-right[
+
 ```{r,fig.align='center',fig.height=4.5}
 gapminder_2015 <- gapminder[gapminder$year == 2015,]
 hist(gapminder_2015$life_expectancy)
@@ -693,6 +851,144 @@ ggplot(gapminder_2015,
 
 ---
 
+
+layout: false
+class: title-slide-section-red, middle
+
+# Summarizing
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Summarizing Data
+
+
+* One can learn only a limited amount from **looking** at a `data.frame`. `r emo::ji("mag")`
+
+--
+
+* Even if you *could* see all rows of the dataset, you would not know very much **about it**.
+
+--
+
+* We need to **summarize** the data for us to learn from it.
+
+--
+
+* In general, we can compute summary statistics and/or visualize the data with plots.
+
+--
+
+* Let's now turn to summary statistics!
+
+--
+
+* In particular, let's look at two features: *central tendency* and *spread*.
+
+---
+
+# Central Tendency
+
+
+.pull-left[
+1. `mean(x)`: the average of all values in `x`.
+$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$
+
+```{r}
+x <- c(1,2,2,2,2,100)
+mean(x)
+mean(x) == sum(x) / length(x)
+```
+
+***Your turn:*** What's the mean of `infant_mortality` in 1960? Read the help for `mean` to remove `NA`s.
+]
+
+--
+
+.pull-right[
+1. `median`: the value $x_j$ below and above which 50% of the values in `x` lie. $m$ is the median if
+    $$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$
+    
+1. The median is robust against *outliers*.
+
+```{r}
+median(x)
+```
+
+***Your turn:*** What's the median of `infant_mortality` in 1960?
+]
+
+---
+
+# Spread
+
+.pull-left[
+* Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
+
+* The *variance* is such a measure.
+    $$Var(X) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})^2$$
+    
+* Consider two `normal distributions` with equal mean at `0`:
+]
+
+--
+
+.pull-right[
+```{r,echo = FALSE,fig.height=4,message = FALSE,warning = FALSE}
+library(ggplot2)
+ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1), aes(color = "1"), size = 2) + ylab("") + scale_y_continuous(breaks = NULL) + theme_bw() +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), aes(color = "4"), size = 2) + scale_color_manual("Variance:", values = c("red","blue")) + theme(text = element_text(size=20))
+```
+
+* Compute with:
+
+```{r,eval = FALSE}
+    var(x)
+    range(x)   # range
+    ```
+]
+---
+
+# The `table` function
+
+* `table(x)` is a useful function that counts the occurence of each unique value in `x`:
+    ```{r}
+    table(gapminder$continent)
+    table(gapminder$region)
+    ```
+
+---
+
+# Crosstables
+
+
+* Given two vectors, `table` produces a contingency table:
+    ```{r}
+    gapminder_2015 <- subset(gapminder, year == 2015)
+    gapminder_2015$fertility_above_2 = (gapminder_2015$fertility > 2.1) # dummy variable for fertility rate above replacement level fertility
+    table(gapminder_2015$fertility_above_2,gapminder_2015$continent)
+    ```
+
+--
+
+* With `prop.table`, we can get proportions:
+    ```{r,eval=FALSE}
+    # proportions by row
+    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 1)
+    # proportions by column
+    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 2) 
+    ```
+
+* `r emo::ji("warning")` To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
+---
+
+
 class: inverse, middle
 
 
@@ -707,14 +1003,14 @@ Time for our first tutorial!!
 Type this into your `RStudio` console:
 
 ```{r, echo = TRUE, eval=FALSE}
-library(ScPoApps)
+library(ScPoEconometrics)
 runTutorial('chapter2')
 ```
 
 If you have trouble with the interactive doc, try this version (no interactive content):
 
 ```{r, echo = TRUE, eval=FALSE}
-ScPoApps::runTutorial('chapter2-script')
+ScPoEconometrics::runTutorial('chapter2-script')
 ```
 
 ---
@@ -757,259 +1053,12 @@ class: inverse
 # Correlation App
 
 ```{r, echo = TRUE, eval=FALSE}
-library(ScPoApps)
+library(ScPoEconometrics)
 runTutorial('correlation')
 ```
 
 ---
 
-layout: false
-class: title-slide-section-red, middle
-
-# Wrangling
-
----
-layout: true
-
-<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
-
----
-
-# Intro to `dplyr`
-
-.pull-left[
-<br>
-<br>
-<br>
-* [`dplyr`](https://dplyr.tidyverse.org) is part of the [tidyverse](https://www.tidyverse.org) package family.
-
-* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast but a bit more difficult.
-
-* Both have pros and cons. We'll start you off with `dplyr`. 
-]
-
-.pull-right[
-![:scale 35%](../img/logo/dplyr.svg)
-
-![:scale 35%](../img/logo/r-datatable.svg)
-]
-
----
-
-# `dplyr` Overview
-
-.pull-left[
-<br>
-<br>
-* You *must* read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's concise.
-
-* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
-
-* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
-
-* All *verbs*: First argument is a data.frame, subsequent arguments describe what to do, returns another data.frame.
-
-]
-
---
-
-.pull-right[
-
-## Verbs
-
-1. `filter()`: Choose observations based on a certain value (i.e. subset)
-
-1. `arrange()`: Reorder rows 
-
-1. `select()`: Select variables by name
-
-1. `mutate()`: Create new variables out of existing ones
-
-1. `summarise()`: Summarise variables
-]
-
----
-
-# Data on 2016 US election polls from the `dslabs` package
-
-* This dataset contains __real__ data on polls made during the 2016 US Presidential elections and compiled by [fivethirtyeight](fivethirtyeight.com)
-
-```{r dslabs, echo = TRUE}
-library(dslabs)
-library(dplyr)
-data(polls_us_election_2016) # this data is from fivethirtyeight.com
-polls_us_election_2016 <- as_tibble(polls_us_election_2016)
-head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
-```
-
-`r emo::ji("rotating_light")` This is a `tibble` (more informative than `data.frame`)
-
-What variables does this dataset contain?
-
----
-
-# `filter()`: subset a data.frame
-
-* `filter` has the same purpose as `subset`
-
-* Example: Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
-    ```{r, echo = TRUE, eval = FALSE}
-    filter(polls_us_election_2016,
-           grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
-    ```
---
-    ```{r, echo = FALSE}
-    filter(polls_us_election_2016,
-           grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
-    ```
-   
----
-
-# Create a Filter: Comparisons and Logical Operators
-
-.pull-left[
-* We have a standard suite of comparison operators:
-  - `>`: greater than,
-  - `<`: smaller than,
-  - `>=`: greater than or equal to,
-  - `<=`: smaller than or equal to,
-  - `!=`: not equal to,
-  - `==`: equal to.
-
-* Construct more complex filters with logical operators
-    1. `x & y`: `x` **and** `y`
-    1. `x | y`: `x` **or** `y`
-    1. `!y`: **not** `y`
-]
-
-.pull-right[
-* `R` has the convenient `x %in% y` operator (conversely `!(x %in% y)`), `TRUE` if `x` is *a member of* `y`.
-    ```{r, echo = TRUE}
-    3 %in% 1:3
-    c(2,5) %in% 2:10  # also vectorized
-    c("S","Po") %in% c("Sciences","Po")  # also strings
-    ```
-]
-
----
-
-# `mutate()`: create new variables
-
-* *Example*: What was
-    1. the combined vote share of Trump and Clinton for each poll?
-    2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
-
-```{r, echo = TRUE, eval = FALSE}
-mutate(polls_us_election_2016,
-       trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
-       trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
-```
-
-# `select()`: only keep some variables
-
-* *Example*: Only keep the variables `state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump`
-```{r, echo = TRUE, eval = FALSE}
-select(polls_us_election_2016,
-       state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump)
-```
-
----
-
-class: inverse
-
-# Task 2 (10 minutes)
-
-1. Which polls had more vote intentions for Trump than for Clinton.
-
-1. How many polls have a missing `grade`?
-
-1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
-
-*For the following questions you should use `filter` and `mutate`.*
-
-1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000.?
-
-1. Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
-
----
-
-# Split-Apply-Combine
-
-.pull-left[
-* Often we do *some* operation **by** some group in our dataset:
-    * Mean vote share for Clinton by pollster grade.
-    * Maximum vote share for Trump by poll month, etc
-
-* For this, we need to 
-    1. Split the data **by** group
-    2. Apply to each group the operation
-    3. Recombine all groups into one table
-    
-* In `dplyr`, this is achieved with `group_by()` and `summarise`.
-]
-
---
-
-.pull-right[
-1. `group_by(polls_us_election_2016, grade)` groups/splits `polls_us_election_2016` by pollster `grade`:
-    ```{r dplyr1}
-    polls_grade = group_by(polls_us_election_2016, grade)
-    ```
-
-1. `summarise` each chunk and re-combine
-    ```{r}
-    summarise(polls_grade, mean_vote_clinton = mean(rawpoll_clinton))
-    ```
-]
-
----
-
-background-image: url("../img/logo/magrittr.svg")
-background-position: 90% 5%
-background-size: 180px
-
-# Chaining `r emo::ji("link")` Commands Together: The Pipe
-
-* The `magrittr` package gives us the *pipe* `%>%`.
-
-* `x %>% f(y)` becomes `f(x,y)`.
-
-* With the *pipe* you construct data *pipelines*.
-
---
-
-.pull-left[
-Our above example would become:
-```{r pipe, echo = TRUE, eval = FALSE}
-polls_us_election_2016 %>%
-  group_by(grade) %>% 
-  summarise(
-    mean_vote_clinton = mean(rawpoll_clinton)
-    )
-```
-which is equivalent to, but nicer than:
-```{r,eval = FALSE}
-summarise(
-  group_by(polls_us_election_2016, grade),
-  mean_vote_clinton = mean(rawpoll_clinton))
-```
-]
-
---
-
-.pull-right[
-Works for all `dplyr` verbs:
-```{r, echo = TRUE, eval = TRUE}
-polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
-  filter(trump_clinton_diff>5 &
-        state == "Iowa" &
-        is.na(rawpoll_johnson)) %>%
-  select(pollster)
-```
-]
-
----
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
