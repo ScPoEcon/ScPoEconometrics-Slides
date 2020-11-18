@@ -634,7 +634,7 @@ Here is a table that summarise how to interpret regressor coefficients in each c
 |    Model           | Equation  |  Interpretation of $b_1$            |
 |--------------------|:---------:|:-----------------------------------:|
 | Level - Level | $y = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with ] $b_1$ .small[**unit change** in y]  |
-| Log - Level | $log(y) = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1$ .small[ **percent change** in y]  |
+| Log - Level | $log(y) = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with] $100*b_1$ .small[ **percent change** in y]  |
 | Level - Log | $y = b_0 + b_1 log(x_{1})  + e$ | .small[**One percent** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1/100$ .small[**unit change** in y] |
 | Log - Log  |  $log(y) = b_0 + b_1 log(x_{1}) + e$ | .small[**One percent** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1$ .small[**percent change** in y]  |
 
