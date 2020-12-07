@@ -705,6 +705,7 @@ cond_good <- ggplot(data = e_good, aes(x = e, y = as.factor(x))) +
     ) +
     # geom_vline(xintercept = 0, alpha = 0.3) +
     scale_fill_viridis(option = "magma") +
+    scale_x_continuous(breaks = c(-4,4),limits = c(-6,6)) +
     xlab("u") +
     ylab("small class?") +
     theme_bw() +
@@ -721,8 +722,9 @@ cond_bad <- ggplot(data = e_bad, aes(x = e, y = as.factor(x))) +
     ) +
     # geom_vline(xintercept = 0, alpha = 0.3) +
     scale_fill_viridis(option = "magma") +
+    scale_x_continuous(breaks = c(-4,4),limits = c(-6,6)) +
     xlab("u") +
-    ylab("small class") +
+    ylab("small class?") +
     ggtitle("E[u | small] != E[u | not small] != 0") +
     theme_bw() +
     theme(
