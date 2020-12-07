@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
@@ -16,7 +17,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Regression Inference
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-04-14
+### SciencesPo Paris </br> 2020-12-07
 
 ---
 
@@ -97,7 +98,8 @@ star_df = star_df %&gt;%
 .pull-right[
 
 ```r
-lm(math ~ small, star_df)
+reg_star = lm(math ~ small, star_df)
+reg_star
 ```
 
 ```
@@ -238,7 +240,7 @@ As we did for the sampling distribution of the proportion of *green pasta*, we w
 
 --
 
-***standard error:*** 1.69 `\(\rightarrow\)` very close to the one in the table (1.68)!
+***standard error:*** 1.67 `\(\rightarrow\)` very close to the one in the table (1.68)!
 
 ---
 
@@ -297,7 +299,7 @@ round(observed_stat,2)
 
 ```
 ## smallTRUE 
-##      5.26
+##      5.33
 ```
 ]
 
@@ -351,7 +353,7 @@ null_distribution &lt;- null_distribution %&gt;%
   mutate(test_stat = stat/sd(bootstrap_distrib$stat))
 ```
 
-* Remember we got `\(\hat{SE}(b_\textrm{small})\)` = 1.69 from our bootstrap distribution.
+* Remember we got `\(\hat{SE}(b_\textrm{small})\)` = 1.67 from our bootstrap distribution.
 ]
 
   
@@ -373,13 +375,13 @@ null_distribution &lt;- null_distribution %&gt;%
 
 --
 
-Very unlikely to obtain `\(b_\textrm{small}\)` = 8.9 when `\(H_0\)` is true.
+Very unlikely to obtain `\(b_\textrm{small}\)` = 8.8951932 when `\(H_0\)` is true.
 
 ---
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.257 **or** superior to 5.257. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.334 **or** superior to 5.334. 
 
 ---
 
@@ -396,7 +398,7 @@ What does the p-value correspond to?
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.26 **or** superior to 5.26. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.33 **or** superior to 5.33. 
 
 * Computing the *p-value* we get:
 
@@ -422,7 +424,7 @@ p_value
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.26 **or** superior to 5.26. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.33 **or** superior to 5.33. 
 
 * Computing the *p-value* we get:
 
@@ -557,7 +559,7 @@ bootstrap_distrib %&gt;%
 ## # A tibble: 1 x 2
 ##   lower_bound upper_bound
 ##         &lt;dbl&gt;       &lt;dbl&gt;
-## 1        5.58        12.2
+## 1        5.63        12.2
 ```
 ]
 
@@ -650,6 +652,19 @@ class: title-slide-section-red, middle
 
 5. ***Normally distributed errors:*** the error term is normally distributed, i.e. `\(\varepsilon \sim \mathcal{N}(0,\sigma^2)\)` 
   * This last assumption allows avoiding large sample approximations, but it is never used in practice since samples are sufficiently large `\((n \ge 30)\)`.
+
+---
+
+# Mean Independence of Error: E[u | small] = ?
+
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Mean Independence of Error: E[u | small] = ?
+
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -790,7 +805,7 @@ ggplot(data=cps,aes(y = log_wage, x = education, colour = gender)) +
 
 .pull-right[
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -875,6 +890,7 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -924,6 +940,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -941,17 +983,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {

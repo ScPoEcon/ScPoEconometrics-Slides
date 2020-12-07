@@ -118,7 +118,8 @@ star_df = star_df %>%
 
 .pull-right[
 ```{r, echo = TRUE}
-lm(math ~ small, star_df)
+reg_star = lm(math ~ small, star_df)
+reg_star
 ```
 ]
 
@@ -175,6 +176,7 @@ tidy(lm(math ~ small, star_df))
 
 ```{r echo=FALSE}
 reg_summary_star_df = round(summary(reg_star)$coefficients,2)
+coeff_star = coef(reg_star)
 ```
 
 
@@ -657,6 +659,87 @@ class: title-slide-section-red, middle
 
 5. ***Normally distributed errors:*** the error term is normally distributed, i.e. $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ 
   * This last assumption allows avoiding large sample approximations, but it is never used in practice since samples are sufficiently large $(n \ge 30)$.
+
+---
+
+# Mean Independence of Error: E[u | small] = ?
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE,fig.width=8,fig.height=5}
+library(ggridges)
+library(ggthemes)
+library(viridis)
+
+# Data work ------------------------------------------------------------------------------
+# Set seed
+set.seed(555)
+# Sample size
+n <- 1e5
+# Exogenous
+e_good <- tibble(
+    x = runif(n = n, min = -1, max = 1),
+    e = rnorm(n)
+) %>% mutate(x = if_else(x < 0, FALSE, TRUE))
+# Endogenous
+e_bad <- tibble(
+    x = runif(n = n, min = -1, max = 1),
+    e = rnorm(n) + 2.5 * x
+) %>% mutate(x = if_else(x < 0, FALSE, TRUE))
+
+# Figures: Joint densities ---------------------------------------------------------------
+# The joint plot: good
+joint_good <- ggplot(data = e_good, aes(x = e)) +
+    geom_density() +
+    theme_pander()
+# The joint plot: bad
+joint_bad <- ggplot(data = e_bad, aes(x = e)) +
+    geom_density() +
+    theme_pander()
+
+# Figures: Conditional densities ---------------------------------------------------------
+cond_good <- ggplot(data = e_good, aes(x = e, y = as.factor(x))) +
+    geom_density_ridges_gradient(
+        aes(fill = ..x..),
+        color = "white",
+        scale = 2.5,
+        size = 0.2
+    ) +
+    # geom_vline(xintercept = 0, alpha = 0.3) +
+    scale_fill_viridis(option = "magma") +
+    xlab("u") +
+    ylab("small class?") +
+    theme_bw() +
+    ggtitle("E[u | small] = 0") +
+    theme(
+        legend.position = "none"
+    )
+cond_bad <- ggplot(data = e_bad, aes(x = e, y = as.factor(x))) +
+    geom_density_ridges_gradient(
+        aes(fill = ..x..),
+        color = "white",
+        scale = 2.5,
+        size = 0.2
+    ) +
+    # geom_vline(xintercept = 0, alpha = 0.3) +
+    scale_fill_viridis(option = "magma") +
+    xlab("u") +
+    ylab("small class") +
+    ggtitle("E[u | small] != E[u | not small] != 0") +
+    theme_bw() +
+    theme(
+        legend.position = "none"
+    )
+
+cond_good
+```
+
+
+---
+
+# Mean Independence of Error: E[u | small] = ?
+
+```{r, echo = FALSE,fig.width=8,fig.height=5}
+cond_bad
+```
 
 ---
 
