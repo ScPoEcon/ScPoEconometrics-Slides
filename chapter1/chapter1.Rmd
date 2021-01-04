@@ -228,6 +228,7 @@ Lecture 12: **Recap**
 - [ModernDive](https://moderndive.com/)
 - [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
 - [R for Data Science](https://r4ds.had.co.nz/)
+- [Awesome R Learning Resources](https://github.com/iamericfletcher/awesome-r-learning-resources)
 
 ---
 
