@@ -76,7 +76,13 @@ countdown(
 
 ## What is *econometrics*?
 
-- A set of techniques and methods to answer questions with data.
+<blockquote>
+<span style = "font-style: italic; font-weight: bold; color: #d90502">
+The method of econometric research aims, essentially, at a conjunction of economic theory and actual measurements, using the theory and technique of statistical inference as a bridge pier.</span>
+.right[<span style="font-style:italic; font-size: 18px">Haavelmo (1944). The Probability Apporach to Econometrics.</span>]
+</blockquote>
+
+- A set of ***techniques and methods*** to answer (generally) economic questions with ***data***.
 
 - Econometrics shares many things with *applied statistics* and *machine learning*.
 
@@ -116,13 +122,7 @@ Does birth order *cause* differing education trajectories?
 
 ---
 
-background-image: url("https://media.giphy.com/media/3o7TKMMlq8TItpr7Co/giphy.gif")
-background-position: 80% 80%
-background-size: 300pt
-
 # Causality
-
-.pull-left[
 
 * Notice the keyword **cause** in all of the above.
 
@@ -131,140 +131,6 @@ background-size: 300pt
 * Econometrics is often about spelling out conditions under which we can claim to measure causal relationships.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
-]
-
-.pull-right[
-As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-Effect/dp/046509760X) we often ask *why* did something happen?
-]
-
----
-
-
-
-# This Course
-
-- Teach you the basics of ***linear regression***, ***statistical inference*** and ***impact evaluation***.
-
---
-
-- Equip you with a framework to think more deeply about causality.
-
---
-
-- Introduce you to the `R` software environment.
-
---
-
-- `r emo::ji("warning")` This is *not* a course about `R`.
-
---
-
-## Grading
-
-1. There will be ***five quizzes*** on Moodle roughly every two weeks => 40%
-
---
-
-1. There will be ***two take home exams / case studies*** => 60%
-
---
-
-1. There will be _no_ final exam `r emo::ji("sweat_smile")`.
-
----
-
-# Course Materials
-
-1. The [Book](https://scpoecon.github.io/ScPoEconometrics/)
-
-1. The [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides)
-
-1. The interactive [R Apps](https://github.com/ScPoEcon/ScPoApps)
-
-1. Quizzes on [Moodle](https://moodle.sciences-po.fr)
-
----
-
-# Syllabus `r emo::ji("crossed_fingers")`
-
-.pull-left[
-Lecture 1: **Introduction**
-
-*Quiz 1 (after lecture 2)*
-
-Lectures 2 and 3: **Tidying, Visualizing and Summarizing Data**
-
-*Quiz 2*
-
-Lecture 4: **Simple Linear Regression**
-
-Lecture 5: **Introduction to Causality**
-
-*Midterm Project*
-
-Lecture 6: **Multiple Linear Regression**
-
-Lecture 7: **Linear Regression Extensions**
-]
-
-.pull-right[
-*Quiz 3*
-
-Lecture 8: **Sampling**
-
-Lecture 9: **Confidence Intervals and Hypothesis Testing**
-
-*Quiz 4*
-
-Lecture 10: **Statistical Inference**
-
-Lecture 11: **Regression Discontinuity**
-
-*Quiz 5*
-
-Lecture 12: **Recap**
-
-*Final Project*
-]
-
----
-
-# Cheating Policy
-
-strict cheating policy
-
-you can do the quizzes, midterm and final in groups of 2 (3 at most for quizzes)
-
-if I discover that cheating has taken place, you will be awarded a 0
-
----
-
-# Useful Resources (Other Than our [_Book_](https://scpoecon.github.io/ScPoEconometrics/))
-
-## Econometrics
-- [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
-- [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
-- [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
-- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/causalinference_norap.pdf)
-- [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
-
-## Metrics and `R`
-- [ModernDive](https://moderndive.com/)
-- [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
-- [R for Data Science](https://r4ds.had.co.nz/)
-- [Awesome R Learning Resources](https://github.com/iamericfletcher/awesome-r-learning-resources)
-
----
-
-# Mental Health
-
-important especially in these troubled times
-
-scpo mental health resources
-
-don't hesitate to reach out to your friends, family or me, or seek professional help
-
-every friday afternoon at 17h for chatting - find web app for chatting
 
 ---
 
@@ -576,22 +442,6 @@ layout: true
 
 ---
 
-background-image: url("https://media.giphy.com/media/3oKIPqsXYcdjcBcXL2/giphy-downsized.gif")
-background-position: 90% 50%
-background-size: 300pt
-
-# Tool Time!
-
-.pull-left[
-## Getting R and Rstudio
-
-* Download `R` from [CRAN](https://cran.r-project.org) for your OS.
-
-* Download `RStudio` from [here](https://www.rstudio.com/products/rstudio/download/#download) for your OS.
-]
-
----
-
 # Start your `RStudio`!
 
 ## First Glossary of Terms
@@ -675,36 +525,21 @@ class: inverse
 
 # Where to get Help?
 
-* `R` built-in `help`:
+.pull-left[
+`R` built-in `help`:
     ```{r, eval = FALSE}
-    ?log
-    ?sin
-    ?paste
-    ?lm
+    ?log #? in front of function
     help(lm)   # help() is equivalent
     ??plot  # get all help on keyword "plot"
-    help(ggplot,package="ggplot2")  # show help from a certain package
     ```
+]
 
-* Help from Humans!
-  * Google is your best friend!
-  * [stackoverflow.com](https://stackoverflow.com) [SO]
-  * Your classroom channel on Slack
-  * [rstudio forum](https://community.rstudio.com)
-  
----
+--
 
-# HOW to get Help? Follow this for Slack questions!
-
-1. Describe what you want to do.
-
-1. Describe what you *expect* your code to do.
-
-1. Describe what your code *does instead*.
-  * Provide the entire error message.
-  
-1. Provide enough code to *reproduce* your error.
-  * You can post post code snippets on Slack and Stack Overflow
+.pull-right[
+In practice:
+![Learning R](chapter1_files/figure-html/learning_path.png)
+]
 
 ---
 
@@ -720,29 +555,6 @@ class: inverse
 * To *use* the contents of a packge, we must load it from our library:
     ```{r, message = FALSE, warning = FALSE,eval=FALSE}
     library(ggplot2)
-    ```
-
----
-
-# `ScPoApps` package
-
-* We wrote an `R` package for you.
-
-* It's hosted on [GitHub](https://github.com/ScPoEcon/ScPoApps)
-
-* You can install (and frequently update!) from here:
-    ```{r,eval=FALSE}
-    if (!require("devtools")) install.packages("devtools")
-    library(devtools)
-    install_github(repo = "ScPoEcon/ScPoApps")
-    ```
-
---
-
-* Did it work?
-    ```{r,warning=FALSE,message=FALSE}
-    library(ScPoApps)
-    packageVersion("ScPoApps")
     ```
 
 ---
@@ -763,7 +575,7 @@ class: inverse
 
 * Creating a *range*
     ```{r}
-    c(y = 1:6)
+    1:10
     ```
 
 ---
@@ -879,8 +691,6 @@ class: inverse
 
 1. Create a new object `murders_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
 
-1. What is the average value of `total`?
-
 1. What is the average value of `total` for state's in the "South", i.e. with `region == "South"`?
 
 1. Create a total_percap variable:
@@ -889,6 +699,180 @@ class: inverse
     ```
 
 Congratulations, you've created your first variable!
+
+---
+
+# Collaborate!
+
+<img src="chapter1_files/figure-html/gator_error.jpg" alt="Gator collaboration" width="900" style="display: block; margin-left: auto; margin-right: auto"/>
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Class Details
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# This Course
+
+- Teach you the basics of ***linear regression***, ***statistical inference*** and ***impact evaluation***.
+
+--
+
+- Equip you with a framework to think more deeply about causality.
+
+--
+
+- Introduce you to the `R` software environment.
+
+--
+
+- `r emo::ji("warning")` This is *not* a course about `R`.
+
+--
+
+## Grading
+
+1. There will be ***five quizzes*** on Moodle roughly every two weeks => 40%
+
+--
+
+1. There will be ***two take home exams / case studies*** => 60%
+
+--
+
+1. There will be _no_ final exam `r emo::ji("sweat_smile")`.
+
+---
+
+# Syllabus `r emo::ji("crossed_fingers")`
+
+.pull-left[
+Lecture 1: **Introduction**
+
+*Quiz 1 (after lecture 2)*
+
+Lectures 2 and 3: **Tidying, Visualizing and Summarizing Data**
+
+*Quiz 2*
+
+Lecture 4: **Simple Linear Regression**
+
+Lecture 5: **Introduction to Causality**
+
+*Midterm Project*
+
+Lecture 6: **Multiple Linear Regression**
+
+Lecture 7: **Linear Regression Extensions**
+]
+
+.pull-right[
+*Quiz 3*
+
+Lecture 8: **Sampling**
+
+Lecture 9: **Confidence Intervals and Hypothesis Testing**
+
+*Quiz 4*
+
+Lecture 10: **Statistical Inference**
+
+Lecture 11: **Regression Discontinuity**
+
+*Quiz 5*
+
+Lecture 12: **Recap**
+
+*Final Project*
+]
+
+---
+
+# Course Materials and Useful Resources
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [Book](https://scpoecon.github.io/ScPoEconometrics/) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  [Interactive R Apps](https://github.com/ScPoEcon/ScPoApps) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+-- | -- | --
+
+--
+
+.pull-left[
+## Econometrics
+- [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
+- [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
+- [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
+- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/causalinference_norap.pdf)
+- [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
+]
+
+.pull-right[
+## Metrics and `R`
+- [ModernDive](https://moderndive.com/)
+- [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [Awesome R Learning Resources](https://github.com/iamericfletcher/awesome-r-learning-resources)
+]
+
+
+---
+
+# Course Policies<sup>1</sup>
+
+.footnote[
+[1] [Andrew Heiss](https://evalsp20.classes.andrewheiss.com/syllabus/)' put it more concisely than I could!
+]
+
+*Be nice. Be honest. Don't cheat.*
+
+--
+
+(BTW you should apply these principles outside of the classroom as well ***#lifeadvice*** `r emo::ji("wink")`)
+
+--
+
+.pull-left[
+***Student hours***
+
+You can message me through **Slack** (no emails! ***EVER***) if you have any question
+
+I will only be checking my PMs between 12h and 14h
+]
+
+.pull-right[
+***Class conduct and expectations***
+
+*Late work:* 3 points deducted for every late day
+
+*Cheating:* Just don't cheat, it's not worth it
+]
+
+---
+
+# Mental Health
+
+> ***Pay attention to your mental health in the same way you would for your physical health!***
+
+--
+
+Seeking help is a sign perceptive self-awareness, not weakness.
+
+--
+
+Don't hesitate to ***reach out*** to your friends, family, a professor or me if you feel the need
+
+Sciences Po offers free and confidential [psychological support services](https://www.sciencespo.fr/students/en/living/health/health-centre) with professionals
+
+--
+
+To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/) every Friday at 17h.
 
 ---
 
