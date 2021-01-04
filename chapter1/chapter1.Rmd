@@ -215,6 +215,16 @@ Lecture 12: **Recap**
 
 ---
 
+# Cheating Policy
+
+strict cheating policy
+
+you can do the quizzes, midterm and final in groups of 2 (3 at most for quizzes)
+
+if I discover that cheating has taken place, you will be awarded a 0
+
+---
+
 # Useful Resources (Other Than our [_Book_](https://scpoecon.github.io/ScPoEconometrics/))
 
 ## Econometrics
@@ -229,6 +239,18 @@ Lecture 12: **Recap**
 - [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
 - [R for Data Science](https://r4ds.had.co.nz/)
 - [Awesome R Learning Resources](https://github.com/iamericfletcher/awesome-r-learning-resources)
+
+---
+
+# Mental Health
+
+important especially in these troubled times
+
+scpo mental health resources
+
+don't hesitate to reach out to your friends, family or me, or seek professional help
+
+every friday afternoon at 17h for chatting - find web app for chatting
 
 ---
 
