@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
     <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
@@ -16,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Introduction
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### Sciences Po Paris </br> 2020-09-14
+### Sciences Po Paris </br> 2021-01-04
 
 ---
 
@@ -45,7 +47,13 @@ layout: true
 
 ## What is *econometrics*?
 
-- A set of techniques and methods to answer questions with data.
+&lt;blockquote&gt;
+&lt;span style = "font-style: italic; font-weight: bold; color: #d90502"&gt;
+The method of econometric research aims, essentially, at a conjunction of economic theory and actual measurements, using the theory and technique of statistical inference as a bridge pier.&lt;/span&gt;
+.right[&lt;span style="font-style:italic; font-size: 18px"&gt;Haavelmo (1944). The Probability Apporach to Econometrics.&lt;/span&gt;]
+&lt;/blockquote&gt;
+
+- A set of ***techniques and methods*** to answer (generally) economic questions with ***data***.
 
 - Econometrics shares many things with *applied statistics* and *machine learning*.
 
@@ -85,13 +93,7 @@ Does birth order *cause* differing education trajectories?
 
 ---
 
-background-image: url("https://media.giphy.com/media/3o7TKMMlq8TItpr7Co/giphy.gif")
-background-position: 80% 80%
-background-size: 300pt
-
 # Causality
-
-.pull-left[
 
 * Notice the keyword **cause** in all of the above.
 
@@ -100,116 +102,6 @@ background-size: 300pt
 * Econometrics is often about spelling out conditions under which we can claim to measure causal relationships.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
-]
-
-.pull-right[
-As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-Effect/dp/046509760X) we often ask *why* did something happen?
-]
-
----
-
-
-
-# This Course
-
-- Teach you the basics of ***linear regression***, ***statistical inference*** and ***impact evaluation***.
-
---
-
-- Equip you with a framework to think more deeply about causality.
-
---
-
-- Introduce you to the `R` software environment.
-
---
-
-- ⚠️ This is *not* a course about `R`.
-
---
-
-## Grading
-
-1. There will be ***five quizzes*** on Moodle roughly every two weeks =&gt; 40%
-
---
-
-1. There will be ***two take home exams / case studies*** =&gt; 60%
-
---
-
-1. There will be _no_ final exam 😅.
-
----
-
-# Course Materials
-
-1. The [Book](https://scpoecon.github.io/ScPoEconometrics/)
-
-1. The [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides)
-
-1. The interactive [R Apps](https://github.com/ScPoEcon/ScPoApps)
-
-1. Quizzes on [Moodle](https://moodle.sciences-po.fr)
-
----
-
-# Syllabus 🤞
-
-.pull-left[
-&lt;br&gt;
-Lecture 1: **Introduction**
-
-*Quiz 1 (after lecture 2)*
-
-Lecture 2/3: **Summarising Data**
-
-*Quiz 2*
-
-Lecture 4: **Simple Linear Regression**
-
-Lecture 5: **Introduction to Causality**
-
-*Midterm Project*
-
-Lecture 6: **Multiple Linear Regression**
-]
-
-.pull-right[
-Lecture 7: **Sampling**
-
-*Quiz 3*
-
-Lecture 8/9: **Statistical Inference**
-
-*Quiz 4*
-
-Lecture 10: **Differences-in-Differences**
-
-Lecture 11: **Regression Discontinuity**
-
-*Quiz 5*
-
-Lecture 12: ***Recap***
-
-*Final Project*
-]
-
----
-
-# Useful Resources (Other Than our [_Book_](https://scpoecon.github.io/ScPoEconometrics/))
-
-## Econometrics
-- [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
-- [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
-- [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
-- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/cunningham_mixtape.pdf)
-- [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
-
-## Metrics and `R`
-- [ModernDive](https://moderndive.com/)
-- [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
-- [R for Data Science](https://r4ds.had.co.nz/)
 
 ---
 
@@ -234,6 +126,11 @@ layout: true
 
 ## Why are we using `R`?&lt;sup&gt;1&lt;/sup&gt;
 
+.footnote[
+[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
+&lt;span style="visibility:hidden"&gt;[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! 💪.&lt;/span&gt;
+]
+
 --
 
 1. `R` is __free__ and __open source__—saving both you and the university 💰💵💰.
@@ -251,7 +148,7 @@ layout: true
 1. If you put in the work&lt;sup&gt;2&lt;/sup&gt;, you will come away with a __very valuable and marketable__ tool.
 
 .footnote[
-[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
+&lt;span style="visibility:hidden"&gt;[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).&lt;/span&gt;  
 [2]: Learning `R` definitely requires time and effort but it's worth it, trust me! 💪.
 ]
 
@@ -339,9 +236,9 @@ tm_shape(iris_map) +
 
 --
 
-- Santé publique France has created a [simple web application](https://cpelat.shinyapps.io/mass/) to track the epidemiological situation in French regions per week
+[France Stratégie](https://strategie.gouv.fr/) has created a [simple web application](http://segregationresidentielle.strategie.gouv.fr/app_seg) to visualize the evolution of residential segregation in France between 1968 and 2015.
 
-.center[![Santé publique France](chapter1_files/figure-html/sante_publique_france.png)]
+&lt;iframe src="https://francestrategie.shinyapps.io/app_seg/" width="100%" height="60%" frameBorder="0"&gt;&lt;/iframe&gt;
 
 ---
 
@@ -483,22 +380,6 @@ layout: true
 
 ---
 
-background-image: url("https://media.giphy.com/media/3oKIPqsXYcdjcBcXL2/giphy-downsized.gif")
-background-position: 90% 50%
-background-size: 300pt
-
-# Tool Time!
-
-.pull-left[
-## Getting R and Rstudio
-
-* Download `R` from [CRAN](https://cran.r-project.org) for your OS.
-
-* Download `RStudio` from [here](https://www.rstudio.com/products/rstudio/download/#download) for your OS.
-]
-
----
-
 # Start your `RStudio`!
 
 ## First Glossary of Terms
@@ -575,7 +456,11 @@ background-size: 300pt
 
 class: inverse
 
-# Task 1 (5 minutes)
+# Task 1
+
+<div class="countdown" id="timer_5ff349ec" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 * Create a new R script (File `\(\rightarrow\)` New File `\(\rightarrow\)` R Script). Save it somewhere as `lecture_intro.R`.
 
@@ -600,37 +485,22 @@ class: inverse
 
 # Where to get Help?
 
-* `R` built-in `help`:
+.pull-left[
+`R` built-in `help`:
     
     ```r
-    ?log
-    ?sin
-    ?paste
-    ?lm
+    ?log #? in front of function
     help(lm)   # help() is equivalent
     ??plot  # get all help on keyword "plot"
-    help(ggplot,package="ggplot2")  # show help from a certain package
     ```
+]
 
-* Help from Humans!
-  * Google is your best friend!
-  * [stackoverflow.com](https://stackoverflow.com) [SO]
-  * Your classroom channel on Slack
-  * [rstudio forum](https://community.rstudio.com)
-  
----
+--
 
-# HOW to get Help? Follow this for Slack questions!
-
-1. Describe what you want to do.
-
-1. Describe what you *expect* your code to do.
-
-1. Describe what your code *does instead*.
-  * Provide the entire error message.
-  
-1. Provide enough code to *reproduce* your error.
-  * You can post post code snippets on Slack and Stack Overflow
+.pull-right[
+In practice:
+![Learning R](chapter1_files/figure-html/learning_path.png)
+]
 
 ---
 
@@ -648,35 +518,6 @@ class: inverse
     
     ```r
     library(ggplot2)
-    ```
-
----
-
-# `ScPoApps` package
-
-* We wrote an `R` package for you.
-
-* It's hosted on [GitHub](https://github.com/ScPoEcon/ScPoApps)
-
-* You can install (and frequently update!) from here:
-    
-    ```r
-    if (!require("devtools")) install.packages("devtools")
-    library(devtools)
-    install_github(repo = "ScPoEcon/ScPoApps")
-    ```
-
---
-
-* Did it work?
-    
-    ```r
-    library(ScPoApps)
-    packageVersion("ScPoApps")
-    ```
-    
-    ```
-    ## [1] '0.1'
     ```
 
 ---
@@ -708,12 +549,11 @@ class: inverse
 * Creating a *range*
     
     ```r
-    c(y = 1:6)
+    1:10
     ```
     
     ```
-    ## y1 y2 y3 y4 y5 y6 
-    ##  1  2  3  4  5  6
+    ##  [1]  1  2  3  4  5  6  7  8  9 10
     ```
 
 ---
@@ -732,10 +572,10 @@ example_data
 
 ```
 ##   x       y     z
-## 1 1   Hello FALSE
-## 2 3   Hello  TRUE
-## 3 5   Hello FALSE
-## 4 7 Goodbye FALSE
+## 1 1   Hello  TRUE
+## 2 3   Hello FALSE
+## 3 5   Hello  TRUE
+## 4 7 Goodbye  TRUE
 ```
 
 In practice, you will be importing files that contain the data into `R` rather than creating `data.frame`s by hand.
@@ -744,7 +584,11 @@ In practice, you will be importing files that contain the data into `R` rather t
 
 class: inverse
 
-# Task 2 (10 minutes)
+# Task 2
+
+<div class="countdown" id="timer_5ff34a79" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 * Find out (using `help()` or google) how to import a .csv file.
 
@@ -882,7 +726,11 @@ ncol(murders) # number of columns
 
 class: inverse
 
-# Task 3 (10 minutes)
+# Task 3
+
+<div class="countdown" id="timer_5ff34c9e" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 1. How many observations are there in `murders`?
 
@@ -891,8 +739,6 @@ class: inverse
 1. Notice that the colon operator `a:b` is just short for *construct a sequence from `a` to `b`*. Create a new object `murders_2` containing the rows 10 to 25 of `murders`.
 
 1. Create a new object `murders_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
-
-1. What is the average value of `total`?
 
 1. What is the average value of `total` for state's in the "South", i.e. with `region == "South"`?
 
@@ -903,6 +749,182 @@ class: inverse
     ```
 
 Congratulations, you've created your first variable!
+
+---
+
+# Collaborate!
+
+&lt;img src="chapter1_files/figure-html/gator_error.jpg" alt="Gator collaboration" width="900" style="display: block; margin-left: auto; margin-right: auto"/&gt;
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Class Details
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# This Course
+
+- Teach you the basics of ***linear regression***, ***statistical inference*** and ***impact evaluation***.
+
+--
+
+- Equip you with a framework to think more deeply about causality.
+
+--
+
+- Introduce you to the `R` software environment.
+
+--
+
+- ⚠️ This is *not* a course about `R`.
+
+--
+
+## Grading
+
+1. There will be ***five quizzes*** on Moodle roughly every two weeks =&gt; 40%
+
+--
+
+1. There will be ***two take home exams / case studies*** =&gt; 60%
+
+--
+
+1. There will be _no_ final exam 😅.
+
+---
+
+# Syllabus 🤞
+
+.pull-left[
+Lecture 1: **Introduction**
+
+*Quiz 1 (after lecture 2)*
+
+Lectures 2 and 3: **Tidying, Visualizing and Summarizing Data**
+
+*Quiz 2*
+
+Lecture 4: **Simple Linear Regression**
+
+Lecture 5: **Introduction to Causality**
+
+*Midterm Project*
+
+Lecture 6: **Multiple Linear Regression**
+
+Lecture 7: **Linear Regression Extensions**
+]
+
+.pull-right[
+*Quiz 3*
+
+Lecture 8: **Sampling**
+
+Lecture 9: **Confidence Intervals and Hypothesis Testing**
+
+*Quiz 4*
+
+Lecture 10: **Statistical Inference**
+
+Lecture 11: **Regression Discontinuity**
+
+*Quiz 5*
+
+Lecture 12: **Recap**
+
+*Final Project*
+]
+
+---
+
+# Course Materials and Useful Resources
+
+&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; [Book](https://scpoecon.github.io/ScPoEconometrics/) &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; | &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides) &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; | &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;  [Interactive R Apps](https://github.com/ScPoEcon/ScPoApps) &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;
+-- | -- | --
+
+--
+
+.pull-left[
+## Econometrics
+- [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
+- [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
+- [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
+- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/causalinference_norap.pdf)
+- [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
+]
+
+.pull-right[
+## Metrics and `R`
+- [ModernDive](https://moderndive.com/)
+- [Introduction to Econometrics with R](https://www.econometrics-with-r.org/)
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [Awesome R Learning Resources](https://github.com/iamericfletcher/awesome-r-learning-resources)
+]
+
+
+---
+
+# Course Policies
+
+*Be nice. Be honest. Don't cheat.*&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[1] [Andrew Heiss](https://evalsp20.classes.andrewheiss.com/syllabus/)' put it more concisely than I could!
+]
+
+--
+
+(BTW you should apply these principles outside of the classroom as well ***#lifeadvice*** 😉)
+
+--
+
+.pull-left[
+***Student hours***
+
+You can message me through **Slack** (no emails! ***EVER***) if you have any question
+
+I will only be checking my PMs between 12h and 14h
+]
+
+.pull-right[
+***Class conduct and expectations***
+
+*Late work:* 3 points deducted for every late day.
+
+*Cheating:* We will have a chat about it and you will get a 0. Just don't cheat, it's honestly not worth it.
+]
+
+---
+
+# Mental Health
+
+&gt; ***Pay attention to your mental health in the same way you would for your physical health!***
+
+--
+
+Seeking help is a sign perceptive self-awareness, not weakness
+
+Especially important during this difficult period
+
+--
+
+Don't hesitate to ***reach out*** to your friends, family, a professor or me if you feel the need
+
+Sciences Po offers free and confidential [psychological support services](https://www.sciencespo.fr/students/en/living/health/health-centre) with professionals
+
+--
+
+To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/) every Friday at 17h 🤗
 
 ---
 
