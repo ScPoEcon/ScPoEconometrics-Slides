@@ -221,7 +221,7 @@ Lecture 12: **Recap**
 - [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
 - [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
 - [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
-- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/cunningham_mixtape.pdf)
+- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/causalinference_norap.pdf)
 - [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
 
 ## Metrics and `R`
