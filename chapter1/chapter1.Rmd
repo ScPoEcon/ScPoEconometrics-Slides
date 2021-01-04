@@ -253,6 +253,11 @@ layout: true
 
 ## Why are we using `R`?<sup>1</sup>
 
+.footnote[
+[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
+<span style="visibility:hidden">[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`.</span>
+]
+
 --
 
 1. `R` is __free__ and __open source__—saving both you and the university 💰💵💰.
@@ -270,7 +275,7 @@ layout: true
 1. If you put in the work<sup>2</sup>, you will come away with a __very valuable and marketable__ tool.
 
 .footnote[
-[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
+<span style="visibility:hidden">[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).</span>  
 [2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`.
 ]
 
@@ -369,9 +374,9 @@ tm_shape(iris_map) +
 
 --
 
-- Santé publique France has created a [simple web application](https://cpelat.shinyapps.io/mass/) to track the epidemiological situation in French regions per week
+[France Stratégie](https://strategie.gouv.fr/) has created a [simple web application](http://segregationresidentielle.strategie.gouv.fr/app_seg) to visualize the evolution of residential segregation in France between 1968 and 2015.
 
-.center[![Santé publique France](chapter1_files/figure-html/sante_publique_france.png)]
+<iframe src="https://francestrategie.shinyapps.io/app_seg/" width="100%" height="60%" frameBorder="0"></iframe>
 
 ---
 
