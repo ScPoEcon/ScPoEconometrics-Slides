@@ -174,12 +174,11 @@ As in the acclaimed [Book of Why](https://www.amazon.fr/Book-Why-Science-Cause-E
 # Syllabus `r emo::ji("crossed_fingers")`
 
 .pull-left[
-<br>
 Lecture 1: **Introduction**
 
 *Quiz 1 (after lecture 2)*
 
-Lecture 2/3: **Summarising Data**
+Lectures 2 and 3: **Tidying, Visualizing and Summarizing Data**
 
 *Quiz 2*
 
@@ -190,24 +189,26 @@ Lecture 5: **Introduction to Causality**
 *Midterm Project*
 
 Lecture 6: **Multiple Linear Regression**
+
+Lecture 7: **Linear Regression Extensions**
 ]
 
 .pull-right[
-Lecture 7: **Sampling**
-
 *Quiz 3*
 
-Lecture 8/9: **Statistical Inference**
+Lecture 8: **Sampling**
+
+Lecture 9: **Confidence Intervals and Hypothesis Testing**
 
 *Quiz 4*
 
-Lecture 10: **Differences-in-Differences**
+Lecture 10: **Statistical Inference**
 
 Lecture 11: **Regression Discontinuity**
 
 *Quiz 5*
 
-Lecture 12: ***Recap***
+Lecture 12: **Recap**
 
 *Final Project*
 ]
