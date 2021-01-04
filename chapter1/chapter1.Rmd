@@ -824,13 +824,13 @@ Lecture 12: **Recap**
 
 ---
 
-# Course Policies<sup>1</sup>
+# Course Policies
+
+*Be nice. Be honest. Don't cheat.*<sup>1</sup>
 
 .footnote[
 [1] [Andrew Heiss](https://evalsp20.classes.andrewheiss.com/syllabus/)' put it more concisely than I could!
 ]
-
-*Be nice. Be honest. Don't cheat.*
 
 --
 
@@ -849,9 +849,9 @@ I will only be checking my PMs between 12h and 14h
 .pull-right[
 ***Class conduct and expectations***
 
-*Late work:* 3 points deducted for every late day
+*Late work:* 3 points deducted for every late day.
 
-*Cheating:* Just don't cheat, it's not worth it
+*Cheating:* We will have a chat about it and you will get a 0. Just don't cheat, it's honestly not worth it.
 ]
 
 ---
@@ -862,7 +862,9 @@ I will only be checking my PMs between 12h and 14h
 
 --
 
-Seeking help is a sign perceptive self-awareness, not weakness.
+Seeking help is a sign perceptive self-awareness, not weakness
+
+Especially important during this difficult period
 
 --
 
@@ -872,7 +874,7 @@ Sciences Po offers free and confidential [psychological support services](https:
 
 --
 
-To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/) every Friday at 17h.
+To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/) every Friday at 17h `r emo::ji("hugs")`
 
 ---
 
