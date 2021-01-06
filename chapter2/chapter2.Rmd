@@ -354,7 +354,11 @@ polls_us_election_2016 %>%
 
 ---
 
-# Chaining `r emo::ji("link")` Commands Together: The Pipe
+background-image: url("../img/logo/magrittr.svg")
+background-position: 90% 5%
+background-size: 160px
+
+# Chaining `r emo::ji("link")` Commands Together
 
 Works for all `dplyr` verbs:
 ```{r, echo = TRUE, eval = TRUE}
@@ -368,7 +372,7 @@ polls_us_election_2016 %>%
 
 --
 
-But also with other R commands:
+But also with other `R` commands:
 
 .pull-left[
 
@@ -383,8 +387,8 @@ polls_us_election_2016$samplesize %>%
 .pull-right[
 
 ```{r,echo = TRUE}
-c(1:10) %>%
-  sample(size = 1) > 5
+polls_us_election_2016 %>%
+  count()
 ```
 ]
 
@@ -436,9 +440,11 @@ c(1:10) %>%
 
 class: inverse
 
-# Task 2 (10 minutes)
+# Task 2
 
-1. Which polls had more vote intentions for Trump than for Clinton.
+`r countdown(minutes = 10, top = 0)`
+
+1. Which polls had more vote intentions for Trump than for Clinton?
 
 1. How many polls have a missing `grade`?
 
@@ -455,7 +461,7 @@ class: inverse
 layout: false
 class: title-slide-section-red, middle
 
-# Plotting
+# Visualizing Data
 
 ---
 layout: true
@@ -464,40 +470,27 @@ layout: true
 
 ---
 
-# Plotting
+# Base `R` and `ggplot2`
 
-* `R` base plotting is fairly good.
+* Base `R` plotting is fairly good.
 
-* There is an extremely powerful alternative in package `ggplot2`. We'll see both!
+* There is an extremely powerful alternative in package `ggplot2` (part of the `tidyverse` suite). We'll see both!
 
 * Let's take back the `gapminder` dataset to run the examples. 
 
---
+---
 
-.pull-left[
-
-* First example: *histograms*. 
+# Histograms
 
 A histogram counts how many obserations fall within a certain bin.
 
-]
-
 --
 
-.pull-right[
 
-```{r,fig.align='center',fig.height=4.5}
+```{r,fig.align='center',fig.height=4}
 gapminder_2015 <- gapminder[gapminder$year == 2015,]
 hist(gapminder_2015$life_expectancy)
 ```
-
-```{r, echo = FALSE, eval = FALSE, fig.align='center', fig.height=4.5}
-gapminder_2015 <- gapminder[gapminder$year == 2015,]
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram()
-```
-]
 
 ---
 
@@ -811,9 +804,23 @@ ggplot(gapminder_2015,
 ```
 ]
 
-
 ---
 
+class: inverse
+
+# Task 3
+
+`r countdown(minutes = 10, top = 0)`
+
+Using Base R:
+
+1. Question regarding graphs
+
+Using `ggplot2`:
+
+1.
+
+---
 
 layout: false
 class: title-slide-section-red, middle
@@ -859,7 +866,7 @@ layout: true
 
 
 .pull-left[
-1. `mean(x)`: the average of all values in `x`.
+`mean(x)`: the average of all values in `x`.
 $$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$
 
 ```{r}
@@ -874,10 +881,10 @@ mean(x) == sum(x) / length(x)
 --
 
 .pull-right[
-1. `median`: the value $x_j$ below and above which 50% of the values in `x` lie. $m$ is the median if
+`median`: the value $x_j$ below and above which 50% of the values in `x` lie. $m$ is the median if
     $$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$
     
-1. The median is robust against *outliers*.
+The median is robust against *outliers*.
 
 ```{r}
 median(x)
@@ -949,6 +956,29 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
     ```
 
 * `r emo::ji("warning")` To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
+
+---
+
+# The `count` function
+
+Similar `table` but also accomodates crosstables and reports missing values when present
+
+.pull-left[
+```{r}
+gapminder_2015 %>%
+  count(continent)
+```
+]
+
+--
+
+.pull-right[
+```{r}
+gapminder_2015 %>%
+  count(fertility_above_2, continent)
+```
+]
+
 ---
 
 
@@ -959,7 +989,7 @@ class: inverse, middle
 
 ---
 
-# Tutorial 1 (10 minutes)
+# Tutorial 1 (10 minutes) => Get rid of this
 
 Time for our first tutorial!!
 
@@ -1013,12 +1043,13 @@ cor(gapminder_2015$fertility,gapminder_2015$infant_mortality, use = "complete.ob
 
 class: inverse
 
-# Correlation App
+# Task 4
 
-```{r, echo = TRUE, eval=FALSE}
-library(ScPoEconometrics)
-runTutorial('correlation')
-```
+`r countdown(minutes = 10, top = 0)`
+
+1. Question on mean, median, unique, variance, standard deviation
+
+1. Question on correlation => remind students correlation measures strength of linear relationship!
 
 ---
 
