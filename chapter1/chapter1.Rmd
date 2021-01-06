@@ -79,12 +79,12 @@ countdown(
 <blockquote>
 <span style = "font-style: italic; font-weight: bold; color: #d90502">
 The method of econometric research aims, essentially, at a conjunction of economic theory and actual measurements, using the theory and technique of statistical inference as a bridge pier.</span>
-.right[<span style="font-style:italic; font-size: 18px">Haavelmo (1944). The Probability Apporach to Econometrics.</span>]
+.right[<span style="font-style:italic; font-size: 18px">Haavelmo (1944). The Probability Approach to Econometrics.</span>]
 </blockquote>
 
-- A set of ***techniques and methods*** to answer (generally) economic questions with ***data***.
+--
 
-- Econometrics shares many things with *applied statistics* and *machine learning*.
+- A set of ***techniques and methods*** to answer (generally) economic questions with ***data***.
 
 - Some examples!
 
@@ -266,7 +266,8 @@ iris_map <- left_join(iris_shfl, iris_income, by = "CODE_IRIS")
 tmap_mode("plot")
 tm_shape(iris_map) +
   tm_borders() +
-  tm_fill(col = "DISP_MED15", title = "Median household income (euros)")
+  tm_fill(col = "DISP_MED15",
+          title = "Median household income (euros)")
 ```
 ]
 
@@ -504,22 +505,21 @@ class: inverse
 
 `r countdown(minutes = 5, top = 0)`
 
-* Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
+1. Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
 
-* Write in your script and run the following code: (`Ctrl` or `Cmd` + `Enter`)
+1. Write in your script and run the following code: (`Ctrl` or `Cmd` + `Enter`)
     ```{r, eval = F}
     4 * 8
     ```
 
-* Write in your script and run the following code. What happens if you only run the first line of the code?
+1. Write in your script and run the following code. What happens if you only run the first line of the code?
     ```{r, eval = F}
     x = 5 # equivalently x <- 5
     x
     ```
+Congratulations, you have created your first `R` "object"! Everything is an object in R! Objects are assigned using `=` or `<-`.
 
-* Congratulations, you have created your first `R` "object"! Everything is an object in R! Objects are assigned using `=` or `<-`.
-
-* Lastly, find the cube of `x` and assign that value to `x_3`.
+1. Lastly, find the cube of `x` and assign that value to `x_3`.
 
 ---
 
@@ -527,11 +527,11 @@ class: inverse
 
 .pull-left[
 `R` built-in `help`:
-    ```{r, eval = FALSE}
-    ?log #? in front of function
-    help(lm)   # help() is equivalent
-    ??plot  # get all help on keyword "plot"
-    ```
+```{r, eval = FALSE}
+?log #? in front of function
+help(lm)   # help() is equivalent
+??plot  # get all help on keyword "plot"
+```
 ]
 
 --
@@ -599,34 +599,29 @@ class: inverse
 
 # Task 2
 
-`r countdown(minutes = 10, top = 0)`
+`r countdown(minutes = 7, top = 0)`
 
-* Find out (using `help()` or google) how to import a .csv file.
-
-* Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=`)
-
-```{r,echo=F}
+```{r, echo=F}
 library(dslabs)
-
-# Import murders
 data("murders")
 murders <- murders
 ```
 
-* Ensure that `murders` is a data.frame by running:
+1. Find out (using `help()` or google) how to import a .csv file.
+
+1. Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=`).
+
+1. Ensure that `murders` is a data.frame by running: `class(murders)`
     ```{r,eval=F}
-    # Check class
-    class(murder)
+    class(murder) # check class
     ```
 
-* Find out what variables are contained in `murders` by running:
+1. Find out what variables are contained in `murders` by running:
     ```{r, eval = F}
-    # Obain variable names
-    names(murders)
+    names(murders) # obain variable names
     ```
 
-* View the contents of `murders` by clicking on `murders` in your workspace
-  - What does the `total` variable correspond to?
+1. View the contents of `murders` by clicking on `murders` in your workspace. What does the `total` variable correspond to?
 
 .footnote[
 [1]: This dataset is taken from the `dslabs` package.
@@ -636,7 +631,7 @@ murders <- murders
 
 # `data.frame`s
 
-* Useful methods for a dataframe:
+Useful functions to describe a dataframe:
 ```{r}
 str(murders) # describes the data.frame
 names(murders) # column names
@@ -659,6 +654,9 @@ ncol(murders) # number of columns
     ```
 
 * Or we use the column name or index: `murders[,"state"]` or `murders[,1]`
+    ```{r}
+    class(murders[,"state"])  # type of the state variable in the murders data.frame
+    ```
 
 ---
 
@@ -668,11 +666,9 @@ ncol(murders) # number of columns
     ```{r}
     # Only keep states with over 500 gun murders and keep only the "state" and "total" variables
     murders[murders$total > 500, c("state", "total")]
-    ```
     
-* But there is a special function which looks nicer.
-    ```{r}
-    subset(murders, subset = total > 500, select = c("state", "total"))
+    # Only keep California and Texas and keep only the "state" and "total" variables
+    murders[murders$state %in% c("California", "Texas"), c("state", "total")]
     ```
 
 ---
@@ -687,13 +683,13 @@ class: inverse
 
 1. How many variables? What are the data types of each variable?
 
-1. Notice that the colon operator `a:b` is just short for *construct a sequence from `a` to `b`*. Create a new object `murders_2` containing the rows 10 to 25 of `murders`.
+1. Remember that the colon operator `a:b` is just short for *construct a sequence from `a` to `b`*. Create a new object `murders_2` containing the rows 10 to 25 of `murders`.
 
 1. Create a new object `murders_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
 
 1. What is the average value of `total` for state's in the "South", i.e. with `region == "South"`?
 
-1. Create a total_percap variable:
+1. Create a `total_percap` variable equal to the number of murders per 10,000 inhabitants:
     ```{r}
     murders$total_percap = (murders$total / murders$population) * 10000
     ```
@@ -741,15 +737,15 @@ layout: true
 
 ## Grading
 
-1. There will be ***five quizzes*** on Moodle roughly every two weeks => 40%
+1. There will be ***five quizzes*** on Moodle roughly every two weeks $\rightarrow$ 40%
 
 --
 
-1. There will be ***two take home exams / case studies*** => 60%
+1. There will be ***two take home exams / case studies*** $\rightarrow$ 60%
 
 --
 
-1. There will be _no_ final exam `r emo::ji("sweat_smile")`.
+1. There will be _no_ final exam `r emo::ji("sweat_smile")`
 
 ---
 
@@ -799,7 +795,7 @@ Lecture 12: **Recap**
 
 # Course Materials and Useful Resources
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [Book](https://scpoecon.github.io/ScPoEconometrics/) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  [Interactive R Apps](https://github.com/ScPoEcon/ScPoApps) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; [Book](https://scpoecon.github.io/ScPoEconometrics/) &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; [Slides](https://github.com/ScPoEcon/ScPoEconometrics-Slides) &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; [Reading Suggestions](https://github.com/ScPoEcon/ScPoEconometrics-Slides/blob/master/syllabus.md) &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp;  [Interactive R Apps](https://github.com/ScPoEcon/ScPoApps) &nbsp; &nbsp; &nbsp; &nbsp;
 -- | -- | --
 
 --
@@ -839,42 +835,48 @@ Lecture 12: **Recap**
 --
 
 .pull-left[
-***Student hours***
+***Slack***
 
-You can message me through **Slack** (no emails! ***EVER***) if you have any question
+I will ***exclusively*** use Slack for our interactions.
 
-I will only be checking my PMs between 12h and 14h
+Please ***DO NOT*** contact me by email (unless there's a legitimate reason to).
+
+I will be checking Slack once around 14h and once around 18h.
 ]
+
+--
 
 .pull-right[
 ***Class conduct and expectations***
 
 *Late work:* 3 points deducted for every late day.
 
-*Cheating:* We will have a chat about it and you will get a 0. Just don't cheat, it's honestly not worth it.
+*Cheating:* I will have a chat with you. Just don't cheat, it's honestly not worth it.
+
+*Work in groups:* You can work in groups of 2 (3 max) on the quizzes.
 ]
 
 ---
 
 # Mental Health
 
-> ***Pay attention to your mental health in the same way you would for your physical health!***
+> ***Pay attention to your mental health in the same way you would your physical health!***
 
 --
 
-Seeking help is a sign perceptive self-awareness, not weakness
+Seeking help is a sign perceptive self-awareness, [not weakness](https://www.nytimes.com/2020/09/24/well/mind/cord-jefferson-emmy-black-mental-health.html).
 
-Especially important during this difficult period
-
---
-
-Don't hesitate to ***reach out*** to your friends, family, a professor or me if you feel the need
-
-Sciences Po offers free and confidential [psychological support services](https://www.sciencespo.fr/students/en/living/health/health-centre) with professionals
+Especially important during this difficult period.
 
 --
 
-To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/) every Friday at 17h `r emo::ji("hugs")`
+Don't hesitate to ***reach out*** to your friends, family, a professor or me if you feel the need.
+
+***Sciences Po*** offers free and confidential [psychological support services](https://www.sciencespo.fr/students/en/living/health/health-centre) with professionals.
+
+--
+
+To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/app) every Friday at 17h `r emo::ji("hugs")`
 
 ---
 
