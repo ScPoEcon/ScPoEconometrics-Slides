@@ -1168,8 +1168,6 @@ x <- c(1,2,2,2,2,100)
 mean(x)
 mean(x) == sum(x) / length(x)
 ```
-
-***Your turn:*** What's the mean of `infant_mortality` in 1960? Read the help for `mean` to remove `NA`s.
 ]
 
 --
@@ -1183,8 +1181,6 @@ The median is robust against *outliers*.
 ```{r}
 median(x)
 ```
-
-***Your turn:*** What's the median of `infant_mortality` in 1960?
 ]
 
 ---
@@ -1219,92 +1215,60 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 ]
 ---
 
-# The `table` function
+# Tabulating data
 
-* `table(x)` is a useful function that counts the occurence of each unique value in `x`:
-    ```{r}
-    table(gapminder$continent)
-    table(gapminder$region)
-    ```
-
----
-
-# Crosstables
-
-
-* Given two vectors, `table` produces a contingency table:
-    ```{r}
-    gapminder_2015 <- subset(gapminder, year == 2015)
-    gapminder_2015$fertility_above_2 = (gapminder_2015$fertility > 2.1) # dummy variable for fertility rate above replacement level fertility
-    table(gapminder_2015$fertility_above_2,gapminder_2015$continent)
-    ```
+`table(x)` is a useful function that counts the occurence of each unique value in `x`:
+```{r}
+table(gapminder$continent)
+```
 
 --
 
-* With `prop.table`, we can get proportions:
-    ```{r,eval=FALSE}
-    # proportions by row
-    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 1)
-    # proportions by column
-    prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 2) 
-    ```
+The same can be achieved using the `count` function (from `dplyr`)
+```{r}
+gapminder %>% count(continent)
+```
+
+---
+
+# Tabulating data
+
+
+Given two variables, `table` produces a contingency table:
+```{r}
+gapminder_2015 <- gapminder_2015 %>%
+  mutate(infertility_above_2 = (gapminder_2015$fertility > 2.1)) # dummy variable for fertility rate above replacement level fertility
+table(gapminder_2015$fertility_above_2,gapminder_2015$continent)
+```
+
+--
+
+With `prop.table`, we can get proportions:
+```{r,eval=FALSE}
+# proportions by row
+prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 1)
+# proportions by column
+prop.table(table(gapminder_2015$fertility_above_2,gapminder_2015$continent), margin = 2) 
+```
 
 * `r emo::ji("warning")` To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
 
 ---
 
-# The `count` function
+# Tabulating data
 
-Similar `table` but also accomodates crosstables and reports missing values when present
+Again the `count` function can get you there as well:
 
-.pull-left[
 ```{r}
 gapminder_2015 %>%
-  count(continent)
-```
-]
-
---
-
-.pull-right[
-```{r}
-gapminder_2015 %>%
-  count(fertility_above_2, continent)
-```
-]
-
----
-
-
-class: inverse, middle
-
-
-# It's Tutorial Time!
-
----
-
-# Tutorial 1 (10 minutes) => Get rid of this
-
-Time for our first tutorial!!
-
-Type this into your `RStudio` console:
-
-```{r, echo = TRUE, eval=FALSE}
-library(ScPoEconometrics)
-runTutorial('chapter2')
+  count(fertility_above_2,continent)
 ```
 
-If you have trouble with the interactive doc, try this version (no interactive content):
-
-```{r, echo = TRUE, eval=FALSE}
-ScPoEconometrics::runTutorial('chapter2-script')
-```
+Note that `count` will display `NA`s only if there are some.
 
 ---
 
 # How are x and y related? Covariance and Correlation
-
-* [This](https://scpoecon.github.io/ScPoEconometrics/sum.html#summarize-two) is the relevant section in the book about Covariance.
 
 .pull-left[
 ```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 5,fig.width=6}
@@ -1318,6 +1282,23 @@ plot(fertility ~ infant_mortality,
 ]
 
 --
+
+.pull-right[
+* The covariance is a measure of __joint variability__ of two variables.
+    $$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$
+```{r, echo=FALSE}
+cov(gapminder_2015$fertility,gapminder_2015$infant_mortality, use = "complete.obs")
+```
+]
+
+---
+
+# How are x and y related? Covariance and Correlation
+
+.pull-left[
+```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 5,fig.width=6}
+```
+]
 
 .pull-right[
 * The covariance is a measure of __joint variability__ of two variables.
@@ -1339,11 +1320,21 @@ class: inverse
 
 # Task 4
 
-`r countdown(minutes = 10, top = 0)`
+`r countdown(minutes = 7, top = 0)`
 
-1. Question on mean, median, unique, variance, standard deviation
+1. Compute the mean of `infant_mortality` in 1960? Read the help for `mean` to remove `NA`s.
 
-1. Question on correlation => remind students correlation measures strength of linear relationship!
+1. Compute the median of `infant_mortality` in 1960. Is it greater or smaller than the average?
+
+1. Create of density plot using `geom_density` of `infant_mortality` in 1960. Add a `geom_stat` contaning the average and another containing the median. What do you observe?
+
+1. Compute the correlation between infant mortality and gdp per capita in 2015.
+
+Optional in your free time, you can do this tutorial:
+```{r, echo = TRUE, eval=FALSE}
+library(ScPoApps)
+runTutorial('chapter2')
+```
 
 ---
 
@@ -1352,7 +1343,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU IN TWO WEEKS!
+# SEE YOU NEXT WEEK!
 
 
 
