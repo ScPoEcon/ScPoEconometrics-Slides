@@ -57,9 +57,13 @@ countdown(
 #   error: The shiny_prerendered_chunk function can only be called from within runtime: shiny_prerendered
 ```
 
-# Quick "Quiz" on Last Week's Material | [<span style="color:blue">click here to start</span>](https://app.wooclap.com/LDIGLJ/questionnaires/5ff5d20d6a02a1111d3915bc)
+# Quick "Quiz" on Last Week's Material
 
-`r countdown(left = 0, right = 0, bottom = 0, top = 0, padding = "50px", margin = "15%", font_size = "8em", minutes = 5, seconds = 0)`
+Connect to [***www.wooclap.com/SCPOINTRO***](www.wooclap.com/SCPOINTRO)
+
+```{r, echo = F, out.width = "400px"}
+knitr::include_graphics("chapter2_files/figure-html/qr_code_quiz.png")
+```
 
 ---
   
@@ -75,63 +79,7 @@ knitr::include_graphics("chapter2_files/figure-html/data_science_pipeline.png")
 
 * According a to [2014 NYTimes article](https://www.nytimes.com/2014/08/18/technology/for-big-data-scientists-hurdle-to-insights-is-janitor-work.html), "data scientists [...] spend from ***50 percent to 80 percent of their time*** mired in this more mundane labor of collecting and preparing unruly digital data, before it can be explored for useful nuggets."
 
-* In the next two lectures you will learn to the basics of ***tidying***, ***visualizing*** and ***summarizing*** data
-
----
-
-# The `gapminder` dataset: Overview
-
-* Let's first load a dataset with these commands:
-    ```{r, echo = TRUE, eval = FALSE}
-    library(dslabs)
-    gapminder <- gapminder
-    ```
-    
-    ```{r, echo = FALSE, eval = TRUE}
-    gapminder <- dslabs::gapminder
-    ```
-
---
-
-* Here are the first 3 rows and last 4 rows.
-    ```{r}
-    head(gapminder, n = 3)
-    tail(gapminder, n = 4)
-    ```
-
----
-
-# The `gapminder` dataset: Overview
-
-* What variables does this dataset contain?
-    ```{r}
-    names(gapminder)
-    ```
-
---
-
-* It's important to know how the data is stored. We can use `str` for that:
-    ```{r}
-    str(gapminder)
-    ```
-
----
-
-class: inverse
-
-# Task 1
-
-`r countdown(minutes = 7, top = 0)`
-
-1. Create a new variable called `gdppercap` corresponding to `gdp` divided by `population`.
-
-1. Which countries had a 2011 GDP per capita greater than 30.000? 
-
-1. Filter the dataset to only keep the year 2015 and assign it to a new object `gapminder_2015`.
-
-1. How many countries have an infant mortality in 2015 greater than 90 (per 1000)?
-
-1. What is the average life expectancy in Africa in 2015?
+* In the next two lectures you will learn the basics of ***tidying***, ***visualizing*** and ***summarizing*** data
 
 ---
 
@@ -149,7 +97,7 @@ layout: true
 
 # Intro to `dplyr`
 
-* [`dplyr`](https://dplyr.tidyverse.org) is part of the [tidyverse](https://www.tidyverse.org) package family.
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [`tidyverse`](https://www.tidyverse.org) package family.
 
 * [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast but a bit more difficult.
 
@@ -175,10 +123,9 @@ $$\text{verb}(\underbrace{\text{data.frame}}_{\text{1st argument}}, \underbrace{
 
 --
 
-* Alternatively you can use the `pipe` operator `%>%`:
+* Alternatively you can (should) use the `pipe` operator `%>%`:
 
 $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}_{\text{"pipe" operator}} \text{verb}(\underbrace{\text{what to do}}_\text{2nd argument})$$
-
 
 ---
 
@@ -200,7 +147,7 @@ $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}
 
 --
 
-1. `summarise()`: Collapse to a single summary
+1. `summarise()`: Collapse data to a single summary
 
 --
 
@@ -226,137 +173,208 @@ What variables does this dataset contain?
 
 ---
 
-# `filter()`: Subset a data.frame
+layout: true
 
-*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
-```{r}
-# not using the pipe
-filter(polls_us_election_2016,
-       grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
+# `dplyr` Verbs
+
+.left-column[
+
+### Filter observations
+
+```r
+filter()
 ```
-    
+
+]
+
+---
+
+.right-column[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
 --
 
+.right-column[
 ```{r}
-# using the pipe
 polls_us_election_2016 %>%
   filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
 ```
-   
----
-
-# Create a Filter: Comparisons and Logical Operators
-
-.pull-left[
-* We have a standard suite of comparison operators:
-  - `>`: greater than,
-  - `<`: smaller than,
-  - `>=`: greater than or equal to,
-  - `<=`: smaller than or equal to,
-  - `!=`: not equal to,
-  - `==`: equal to.
-
-* Construct more complex filters with logical operators
-    1. `x & y`: `x` **and** `y`
-    1. `x | y`: `x` **or** `y`
-    1. `!y`: **not** `y`
-]
-
---
-
-.pull-right[
-* `R` has the convenient `x %in% y` operator (conversely `!(x %in% y)`), `TRUE` if `x` is *a member of* `y`.
-    ```{r, echo = TRUE}
-    3 %in% 1:3
-    c(2,5) %in% 2:10  # also vectorized
-    c("S","Po") %in% c("Sciences","Po")  # also strings
-    ```
 ]
 
 ---
 
-# `mutate()`: Create new variables
+.right-column[
+Standard suite of comparison operators:
+- `>`: greater than,
+- `<`: smaller than,
+- `>=`: greater than or equal to,
+- `<=`: smaller than or equal to,
+- `!=`: not equal to,
+- `==`: equal to.
 
+Logical operators:
+1. `x & y`: `x` **and** `y`
+1. `x | y`: `x` **or** `y`
+1. `!y`: **not** `y`
+]
+
+---
+
+.right-column[
+`R` has the convenient `x %in% y` operator (conversely `!x %in% y`), `TRUE` if `x` is *a member of* `y`.
+```{r, echo = TRUE}
+3 %in% 1:3
+c(2,5) %in% 2:10  # also vectorized
+c("S","Po") %in% c("Sciences","Po")  # also strings
+```
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-column[
+
+### Filter
+
+### Create new variable(s)
+
+```r
+mutate()
+```
+
+]
+
+---
+
+.right-column[
 *Example:* What was
 1. the combined vote share of Trump and Clinton for each poll?
 2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
 
-```{r, echo = TRUE, eval = FALSE}
-mutate(polls_us_election_2016,
-       trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
-       trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
-```
+--
 
-# `select()`: Only keep some variables
-
-*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
-```{r, echo = TRUE, eval = FALSE}
+.right-column[
+```{r, echo = TRUE}
 polls_us_election_2016 %>%
-  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump)
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %>%
+  names()
 ```
+]
 
 ---
 
-# `group_by` + `summarize` = statistic by group
+layout: true
 
-* Often we want to do *some* operation **by** some group in our dataset:
-    * Mean vote share for Clinton by pollster grade.
-    * Maximum vote share for Trump by poll month, etc.
-    
-* For this, we need to 
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
-    1. Split the data **by** group
---
-    2. Apply the operation to each group
---
-    3. Recombine all groups into one table
---
-    
-* This is achieved by using `group_by()` and `summarise`.
+# `dplyr` Verbs
+
+.left-column[
+
+### Filter
+
+### Mutate
+
+### Keep some variable(s)
+
+`select()`
+
+]
 
 ---
 
-# `group_by` + `summarize` = statistic by group
+.right-column[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+```{r, echo = TRUE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %>%
+  names()
+```
+]
 
-* `group_by(polls_us_election_2016, grade)` groups/splits `polls_us_election_2016` by pollster `grade`:
-    ```{r}
-    polls_grade = group_by(polls_us_election_2016, grade)
-    class(polls_grade)
-    ```
-
---
-
-* `summarise` each chunk and re-combine
-  ```{r}
-  head(summarise(polls_grade, mean_vote_clinton = mean(rawpoll_clinton)))
-  ```
-  
 ---
 
-background-image: url("../img/logo/magrittr.svg")
-background-position: 90% 5%
-background-size: 160px
+layout: true
 
-# Chaining `r emo::ji("link")` Commands Together
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
-Can't we combine the `group_by` and `summarize` commands in one command?
+# `dplyr` Verbs
 
---
+.left-column[
 
-Yes! Simple: use the `pipe` operator `%>%`:
+### Filter
 
+### Mutate
+
+### Select
+
+### Compute statistic
+
+`summarise()`
+
+]
+
+---
+
+.right-column[
+*Example:* What is the maximum vote share for Trump?
+```{r}
+polls_us_election_2016 %>%
+  summarise(max_trump = max(rawpoll_trump))
+```
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-column[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Summarise
+
+### Apply function by group
+
+`group_by()`
+
+]
+
+---
+
+.right-column[
+*Example:* What is the average vote share for Clinton by poll grade?
 ```{r}
 polls_us_election_2016 %>%
   group_by(grade) %>%
   summarise(mean_vote_clinton = mean(rawpoll_clinton))
 ```
+]
 
 ---
+layout: true
 
-background-image: url("../img/logo/magrittr.svg")
-background-position: 90% 5%
-background-size: 160px
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
 
 # Chaining `r emo::ji("link")` Commands Together
 
@@ -377,8 +395,7 @@ But also with other `R` commands:
 .pull-left[
 
 ```{r, echo = TRUE}
-polls_us_election_2016$samplesize %>% 
-  mean(na.rm = T)
+polls_us_election_2016$samplesize %>% mean(na.rm = T)
 ```
 ]
 
@@ -387,13 +404,11 @@ polls_us_election_2016$samplesize %>%
 .pull-right[
 
 ```{r,echo = TRUE}
-polls_us_election_2016 %>%
-  count()
+polls_us_election_2016 %>% count()
 ```
 ]
 
 ---
-
 
 # Missing Values: `NA`
 
@@ -407,7 +422,7 @@ polls_us_election_2016 %>%
     NA > 5
     NA + 10
     ```
-* the function `is.na(x)` returns `TRUE` if `x` is an `NA`.
+* `is.na(x)` function returns `TRUE` if `x` is an `NA`.
     ```{r, echo = TRUE}
     is.na(x)
     ```
@@ -440,21 +455,19 @@ polls_us_election_2016 %>%
 
 class: inverse
 
-# Task 2
+# Task 1
 
 `r countdown(minutes = 10, top = 0)`
-
-1. Which polls had more vote intentions for Trump than for Clinton?
 
 1. How many polls have a missing `grade`?
 
 1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
 
-*For the following questions you should use `mutate()` as well as `filter()`.*
-
-1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000.?
+1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000?
 
 1. Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
+
+1. Which state had the highest average Trump vote share for polls which had at least a sample size of 2,000?
 
 ---
 
@@ -474,150 +487,9 @@ layout: true
 
 * Base `R` plotting is fairly good.
 
-* There is an extremely powerful alternative in package `ggplot2` (part of the `tidyverse` suite). We'll see both!
+* There is an extremely powerful alternative: `ggplot2` (part of the `tidyverse` suite) $\rightarrow$ what we'll be using
 
-* Let's take back the `gapminder` dataset to run the examples. 
-
----
-
-# Histograms
-
-A histogram counts how many obserations fall within a certain bin.
-
---
-
-
-```{r,fig.align='center',fig.height=4}
-gapminder_2015 <- gapminder[gapminder$year == 2015,]
-hist(gapminder_2015$life_expectancy)
-```
-
----
-
-# A Nicer Histogram
-
-
-.pull-left[
-* We can give additional arguments to `hist`.
-
-* Look at `?hist` for more.
-
-```{r,fig.height=4.5,eval=FALSE}
-hist(gapminder_2015$life_expectancy, 
-     xlab   = "Life Expectancy", 
-     main   = "Histogram of life expectancy in 2015", 
-     breaks = seq(from = 40, to = 90, by = 5),
-     las = 1, # horizontal y-axis values
-     col  = "#d90502",
-     border = "white")
-```
-
-]
-
-.pull-right[
-```{r,fig.height=4.5,eval=TRUE,echo=FALSE}
-hist(gapminder_2015$life_expectancy, 
-     xlab   = "Life Expectancy", 
-     main   = "Histogram of life expectancy in 2015", 
-     breaks = seq(from = 40, to = 90, by = 5),
-     las = 1, # horizontal y-axis values
-     col  = "#d90502",
-     border = "white")
-```
-]
-
----
-
-# Looking for Outliers: Boxplots
-
-* An *outlier* is a datapoint far removed from the center of a distribution.
-
-* Boxplots are an effective way to visualise the distribution of a variable.
-
-* The *box* typically denotes the __interquartile range__ (observations between 25th pctile and 75th pctile).
-
-* The *thick line* corresponds to the __median__.
-
-* The *dots* are __outliers__ (`r emo::ji("warning")` no universally accepted definition).
-
----
-
-# Looking for Outliers: Boxplots
-
-```{r, echo = F, out.width = "850px"}
-knitr::include_graphics("chapter2_files/figure-html/boxplot_explanation.png")
-```
-
----
-
-# Looking for Outliers: Boxplots
-
-.pull-left[
-```{r, echo = TRUE, eval = FALSE}
-boxplot(life_expectancy ~ continent,
-    data = gapminder_2015,
-    xlab   = "Continent",
-    ylab   = "Life expectancy in 2015",
-    main   = "Life expectancy by continent in 2015",
-    pch = 20, cex = 2, # colour and size of outliers
-    col ="#d90502",border = "black", las = 1)
-```
-
-* see `?boxplot` for more options
-]
-
-.pull-right[
-```{r,fig.align='center',echo=FALSE,fig.height = 7}
-boxplot(life_expectancy ~ continent,
-    data = gapminder_2015,
-    xlab   = "Continent",
-    ylab   = "Life expectancy in 2015",
-    main   = "Life expectancy by continent in 2015",
-    pch = 20, cex = 2, # colour and size of outliers
-    col ="#d90502",border = "black", las = 1)
-```
-]
-
----
-
-# Scatter Plots
-
-* Two variables $x$ and $y$
-
---
-
-* Natural to ask: How often do certain pairs of $(x_i,y_i)$ occur?
-    ```{r}
-    head(gapminder_2015[,c("fertility","infant_mortality")])
-    ```
-* That's what a scatter plots shows.
-
----
-
-# Scatter Plots
-
-.pull-left[
-```{r, echo = TRUE, fig.height=5}
-plot(fertility ~ infant_mortality,
-    data = gapminder_2015,
-    xlab   = "Infant mortality",
-    ylab   = "Fertility rate",
-    main   = "Relationship between fertility and infant mortality in 2015",
-    col = "#d90502",
-    las = 1)
-```
-]
-
-.pull-right[
-<br>
-* Each dot is one pair $(x_i,y_i)$.
-
-* We often call it one *observation*.
-
-* Corresponding to one *row* of the `data.frame`.
-
-* Why do some dots appear *darker* than others here?
-]
+* Let's take back the `gapminder` dataset to run the examples.
 
 ---
 
@@ -625,7 +497,7 @@ background-image: url("../img/logo/ggplot2.svg")
 background-position: 90% 5%
 background-size: 180px
 
-# Quick `ggplot2` Intro
+# `ggplot2`
 
 .pull-left[
 * Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
@@ -635,8 +507,6 @@ background-size: 180px
 * Based on *The __G__rammar of __G__raphics* (hence __gg__plot).
 
 * More powerful than base `R` plotting
-
-* Let's reproduce the previous graphs in ggplot
 ]
 
 .pull-right[
@@ -651,158 +521,580 @@ knitr::include_graphics("chapter2_files/figure-html/ggplot_grammar_graphics.png"
 
 ---
 
-# `ggplot2`: Basic Histogram
+# The `gapminder` dataset: Overview
 
-.pull-left[
-```{r, echo = TRUE, eval = FALSE}
-library(ggplot2)
+* Let's first load a dataset with these commands:
+    ```{r, echo = TRUE, eval = FALSE}
+    library(dslabs)
+    gapminder <- gapminder
+    ```
+    
+    ```{r, echo = FALSE, eval = TRUE}
+    gapminder <- dslabs::gapminder
+    ```
 
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram()
+--
+
+* Here are the first 3 rows and last 2 rows.
+    ```{r}
+    head(gapminder, n = 3)
+    tail(gapminder, n = 2)
+    ```
+
+---
+
+class: inverse
+
+# Task 2
+
+`r countdown(minutes = 5, top = 0)`
+
+1. What variables does this dataset contain?
+
+1. How are the data stored?
+
+1. Create a new variable called `gdppercap` corresponding to `gdp` divided by `population`.
+
+1. Compute the average population per continent per year `mean_pop` removing missing values and assign the output to a new object `gapminder_mean`.
+
+```{r, echo = F}
+gapminder_mean <- gapminder %>%
+  group_by(continent, year) %>%
+  summarise(mean_pop = mean(population, na.rm = T))
+```
+
+---
+
+# gg is for Grammar of Graphics<sup>1</sup>
+
+.footnote[
+[1]: The following slides are taken from [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1)
+]
+
+---
+
+# gg is for Grammar of Graphics
+
+
+.left-column[
+### Data
+
+```r
+data %>%
+  ggplot()
 ```
 ]
 
-.pull-right[
-```{r, echo = FALSE, eval = TRUE, fig.height = 5}
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram()
+--
+
+.right-column[
+
+#### Tidy Data
+
+1. Each variable forms a ***column***
+
+2. Each observation forms a ***row***
+
+3. Each observational unit forms a table
+]
+
+--
+
+.right-wide[
+#### Start by asking
+
+1. What information do I want to use in my visualization?
+
+1. Is that data contained in ***one column/row*** for a given data point?
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+
+```r
++ aes()
+```
+
+]
+---
+
+.right-column[
+Map data to visual elements or parameters
+
+- year
+
+- population
+
+- continent
+]
+
+---
+
+.right-column[
+Map data to visual elements or parameters
+
+- year → **x**
+
+- population → **y**
+
+- continent → *shape*, *color*, etc.
+]
+
+---
+
+.right-column[
+Map data to visual elements or parameters
+
+```r
+aes(
+  x = year,
+  y = population,
+  color = continent
+)
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
 ```
 ]
 
 ---
 
-# `ggplot2`: Fancy Histogram
+.right-column[
+Geometric objects displayed on the plot
 
-.pull-left[
-```{r, echo = TRUE, eval = FALSE}
-library(ggplot2)
-
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram(binwidth = 5,
-                 boundary = 45,
-                 colour = "white",
-                 fill = "#d90502") +
-  labs(x = "Life Expectancy",
-       y = "Frequency",
-       title = "Histogram of life expectancy in 2015") +
-  theme_bw(base_size = 16)
-```
-]
-
-.pull-right[
-```{r, echo = FALSE, eval = TRUE, fig.height = 5}
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram(binwidth = 5, boundary = 45, colour = "white", fill = "#d90502") +
-  labs(x = "Life Expectancy", y = "Frequency", title = "Histogram of life expectancy in 2015") +
-  theme_bw(base_size = 16)
-```
-]
-
----
-
-# `ggplot2`: Fancy Histogram with `facet_grid()`
-
-.pull-left[
-```{r, echo = TRUE, eval = FALSE}
-library(ggplot2)
-
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram(binwidth = 5,
-                 boundary = 45,
-                 colour = "white",
-                 fill = "#d90502") +
-  labs(x = "Life Expectancy",
-       y = "Frequency",
-       title = "Histogram of life expectancy in 2015") +
-  theme_bw(base_size = 16) +
-  facet_grid(rows = vars(continent))
-```
-]
-
-.pull-right[
-```{r, echo = FALSE, eval = TRUE, fig.height = 7}
-ggplot(gapminder_2015,
-       aes(x = life_expectancy)) +
-  geom_histogram(binwidth = 5,
-                 boundary = 45,
-                 colour = "white",
-                 fill = "#d90502") +
-  labs(x = "Life Expectancy",
-       y = "Frequency",
-       title = "Histogram of life expectancy in 2015") +
-  theme_bw(base_size = 16) +
-  facet_grid(rows = vars(continent))
+```{r geom_demo, echo=FALSE, fig.width=6, fig.height=3.5,  out.width="650px"}
+minimal_theme <- theme_bw() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    panel.border = element_blank(),
+    axis.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    text = element_text(family = "Fira Mono"),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
+set.seed(4242)
+df_geom <- data_frame(y = rnorm(10), x = 1:10)
+g_geom <- list()
+g_geom$point <- ggplot(df_geom, aes(x, y)) + geom_point() + ggtitle("geom_point()")
+g_geom$line <- ggplot(df_geom, aes(x, y)) + geom_line() + ggtitle("geom_line()")
+g_geom$bar <- ggplot(df_geom, aes(x, y)) + geom_col() + ggtitle("geom_col()")
+g_geom$boxplot <- ggplot(df_geom, aes(y = y)) + geom_boxplot() + ggtitle("geom_boxplot()")
+g_geom$histogram <- ggplot(df_geom, aes(y)) + geom_histogram(binwidth = 1) + ggtitle("geom_histogram()")
+g_geom$density <- ggplot(df_geom, aes(y)) + geom_density(fill = "grey40", alpha = 0.25) + ggtitle("geom_density()") + xlim(-4, 4)
+g_geom <- map(g_geom, ~ . + minimal_theme)
+cowplot::plot_grid(plotlist = g_geom)
 ```
 ]
 
 ---
 
-# `ggplot2`: Boxplots
+.right-column[
+Here are the [some of the most widely used geoms](https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/)
 
-.pull-left[
-```{r, echo = TRUE, eval = FALSE}
-ggplot(gapminder_2015,
-       aes(x = continent, y = life_expectancy)) +
-  geom_boxplot(colour = "black",
-               fill = "#d90502") +
-  labs(x = "Continent",
-       y = "Life expectancy in 2015", 
-       title = "Life expectancy by continent in 2015") +
-  theme_bw(base_size = 20)
+.small[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+<https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/>
+]
+]
+
+
+---
+
+.right-column[
+
+See <http://ggplot2.tidyverse.org/reference/> for many more options
+
+.small[
+```{r ggplot2-geom-names, echo=FALSE}
+# geom_
+old_width = options(width = 80)
+lsf.str("package:ggplot2") %>% grep("^geom_", ., value = TRUE)
+options(width = old_width$width)
+```
+]
+]
+
+---
+
+.right-column[
+Or just start typing `geom_` in RStudio
+<img src="chapter2_files/figure-html/geom.gif" width="200px" style="float: right; margin-right: 100px; margin-top: -25px;">
+
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# (Y)Our first plot!
+---
+
+.left-column[
+```{r first-plot1a, eval=FALSE}
+gapminder_mean %>%
+  ggplot()
 ```
 ]
 
-.pull-right[
-```{r, echo = FALSE, eval = TRUE, fig.height = 5}
-ggplot(gapminder_2015,
-       aes(x = continent, y = life_expectancy)) +
-  geom_boxplot(colour = "black", fill = "#d90502") +
-  labs(x = "Continent", y = "Life expectancy in 2015", title = "Life expectancy by continent in 2015") +
-  theme_bw(base_size = 20)
+.right-column[
+```{r first-plot1a-out, ref.label='first-plot1a', echo=FALSE, fig.height = 3.5, out.width="100%"}
 ```
 ]
 
 ---
 
-# `ggplot2`: Scatter Plots
-
-
-.pull-left[
-```{r, echo = TRUE, eval = FALSE}
-ggplot(gapminder_2015,
-       aes(x = infant_mortality,
-           y = fertility)) +
-  geom_point(size = 3,
-             alpha = 0.5,
-             colour = "#d90502") +
-  expand_limits(x = 0, y = 0) +
-  labs(x = "Infant mortality",
-       y = "Fertility rate",
-       title = "Relationship between fertility and infant mortality in 2015") +
-  theme_bw(base_size = 16)
+.left-column[
+```{r first-plot1b, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year, #<<
+      y = mean_pop) #<<
 ```
 ]
 
-.pull-right[
-```{r, echo = FALSE, eval = TRUE, fig.height = 5}
-ggplot(gapminder_2015,
-       aes(x = infant_mortality,
-           y = fertility)) +
-  geom_point(size = 3,
-             alpha = 0.5,
-             colour = "#d90502") +
-  expand_limits(x = 0, y = 0) +
-  labs(x = "Infant mortality",
-       y = "Fertility rate",
-       title = "Relationship between fertility and infant mortality in 2015") +
-  theme_bw(base_size = 16)
+.right-column[
+```{r first-plot1b-out, ref.label='first-plot1b', echo=FALSE, fig.height = 3.5, out.width="100%"}
 ```
 ]
+
+---
+
+.left-column[
+```{r first-plot1c, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop) +
+  geom_point() #<<
+```
+]
+
+.right-column[
+```{r first-plot1c-out, ref.label='first-plot1c', echo=FALSE, fig.height = 3.5, out.width="100%"}
+```
+]
+
+---
+
+.left-column[
+```{r first-plot1, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) + #<<
+  geom_point()
+```
+]
+
+.right-column[
+```{r first-plot1-out, ref.label='first-plot1', echo=FALSE, fig.height = 3.5, out.width="100%"}
+```
+]
+
+---
+
+.left-column[
+```{r first-plot2-fake, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  geom_point() +
+  geom_line() #<<
+```
+]
+
+.right-column[
+```{r first-plot2-fake-out, ref.label='first-plot2-fake', fig.height = 3.5, echo=FALSE, out.width="100%"}
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+---
+
+.right-column[
+```r
+geom_*(mapping, data, stat, position)
+```
+
+- `data` Geoms can have their own data
+    - Has to map onto global coordinates
+
+- `map` Geoms can have their own aesthetics
+    - Inherits global aesthetics
+    - Have geom-specific aesthetics
+        - `geom_point` needs `x` and `y`, optional `shape`, `color`, `size`, etc.
+        - `geom_ribbon` requires `x`, `ymin` and `ymax`, optional `fill`
+    - `?geom_ribbon`
+]
+
+---
+
+.right-column[
+```r
+geom_*(mapping, data, stat, position)
+```
+
+- `stat` Some geoms apply further transformations to the data
+    - All respect `stat = 'identity'`
+    - Ex: `geom_histogram` uses `stat_bin()` to group observations
+    
+- `position` Some adjust location of objects
+    - `'dodge'`, `'stack'`, `'jitter'`
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+
+```r
++facet_wrap() 
++facet_grid()
+```
+]
+---
+
+```{r geom_facet_setup, include=FALSE}
+g <- ggplot(gapminder_mean) +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  geom_point() +
+  geom_line()
+```
+
+.right-column[
+```{r geom_facet, echo=TRUE, out.width="90%", fig.height = 3.5, fig.width=6}
+g + facet_wrap(~ continent)
+```
+]
+
+---
+
+.right-column[
+```{r geom_grid, echo=TRUE, out.width="90%", fig.height = 3.5, fig.width=6}
+g + facet_grid(~ continent)
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+
+```r
++ labs()
+```
+]
+---
+
+.right-column[
+```{r labs-ex, echo=TRUE, out.width="90%", fig.height = 3.5, fig.width=6}
+g + labs(x = "Year", y = "Average Population")
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+### Scales
+
+```r
++ scale_*_*()
+```
+]
+---
+
+.right-column[ 
+`scale` + `_` + `<aes>` + `_` + `<type>` + `()`
+
+What parameter do you want to adjust? → `<aes>` <br>
+What type is the parameter? → `<type>`
+
+- I want to change my discrete x-axis<br>`scale_x_discrete()`
+- I want to change range of point sizes from continuous variable<br>`scale_size_continuous()`
+- I want to rescale y-axis as log<br>`scale_y_log10()`
+- I want to use a different color palette<br>`scale_fill_discrete()`<br>`scale_color_manual()`
+]
+
+---
+
+.right-column[
+```{r scale_ex1, out.width="90%", fig.height = 3.5, fig.width=6}
+g + scale_color_viridis_d()
+```
+]
+
+---
+
+.right-column[
+```{r scale_ex2, out.width="90%", fig.height = 3.5, fig.width=6}
+g + scale_y_log10()
+```
+]
+
+---
+
+.right-column[
+```{r scale_ex4, out.width="90%", fig.height = 3.5, fig.width=6}
+g + scale_x_continuous(breaks = seq(1950, 2020, 10))
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+### Scales
+### Theme
+
+```r
++ theme()
+```
+]
+
+---
+
+.right-column[
+Change the appearance of plot decorations<br>
+i.e. things that aren't mapped to data
+
+A few "starter" themes ship with the package
+
+- `g + theme_bw()`
+- `g + theme_dark()`
+- `g + theme_gray()`
+- `g + theme_light()`
+- `g + theme_minimal()`
+
+]
+
+---
+
+layout:true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+--
+
+***Boxplots:*** displays the distribution of a variable.
+
+--
+
+```{r, echo = F, out.width = "850px"}
+knitr::include_graphics("chapter2_files/figure-html/boxplot_explanation.png")
+```
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+***Boxplots:*** displays the distribution of a variable.
+
+***Scatter plots:*** shows the association between two variables.
 
 ---
 
@@ -812,13 +1104,15 @@ class: inverse
 
 `r countdown(minutes = 10, top = 0)`
 
-Using Base R:
+Using the `gapminder` data from 2015, create the following plots using `ggplot2`. Don't forget to label the axes.
 
-1. Question regarding graphs
+1. A histogram of life expectancy. Within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502".
 
-Using `ggplot2`:
+1. Using the previous graph, facet it by continent such that each continent's plot is a new row.
 
-1.
+1. A boxplot of life expectancy by continent. Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502".
+
+1. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis). Within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502".
 
 ---
 
