@@ -1,0 +1,531 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Regression Extensions"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+library(magrittr)
+library(plotly)
+library(reshape2)
+library(haven)
+library(tidyverse)
+library(AER)
+library(gtools)
+library(countdown)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+```
+
+
+# Short quiz on last week material
+
+---
+
+# Today - Regression Extensions
+
+* *Extensions:* standardized regression; log models; interacting variables
+
+* Empirical applications:
+
+  * *Class size* and *student performance*
+  
+  * *Wage*, *education* and *gender* 
+
+---
+
+# Variations from the baseline model 
+
+Depending on the dataset and the relationships between the variables of interest, you may need to move away from the baseline model.  
+
+* We will focus on 3 important variations:
+
+  * ***Standardized regressions***
+
+  * ***Log models***
+
+  * ***Interactions between regressors***
+
+--
+
+* In each case, the way we estimate these coefficients does not change (i.e OLS).
+
+--
+
+* However, the way we interpret our coefficients $(b_1, b_2,..., b_k)$ does change!
+
+---
+
+# Standardized Regression
+
+Let's define what *standardizing* a variable means.
+
+> ***Standardizing*** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
+
+$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
+where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{VAR}(z)}$.
+
+* Why would we do that in the first place?
+
+--
+
+* Intuitively, standardizing **puts variables on the same scale** so we can compare them.
+  
+* In our class size and student performance example, it will help to interpret: 
+
+  * The **magnitude** of the effects,
+  * The **relative importance of each variable**.
+
+---
+
+# Standardizing Regression: Interpretation
+
+* If the dependent variable $y$ is standardized:
+
+--
+
+  * By definition, $b_k$ measures the predicted change in ** $y^{stand}$ **  associated with a one unit increase in $x_k$.
+  
+  * If $y^{stand}$ increases by one, it means that $y$ increases by one standard deviation. So $b_k$ measures the change in $y$ **as a share of $y$'s standard deviation**.
+  
+--
+
+* If the regressor $x_k$ is standardized:
+
+--
+
+  * By definition, $b_k$ measures the predicted change in $y$ associated with a one unit increase in ** $x_k^{stand}$ **. 
+  
+  * If $x_k^{stand}$ increases by one unit, it means that $x_k$ increases by one standard deviation. So $b_k$ measures the predicted change in $y$ **associated with an increase in $x_k$ by one standard deviation**. 
+  
+---
+
+class:inverse
+
+# Task 3: To do at home (7 minutes)
+
+Let's go back our `grades` dataset. These are the estimates we got from regressing the math test score on the full set of regressors.
+
+```{r echo = FALSE}
+reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
+reg_full$coefficients
+```
+
+1. Create a new variable `avgmath_stand` equal to the the standardized math score. You can use the `standardize()` function from the `jtools` package or do it by hand with base `R`.
+
+1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
+
+1. If you were to pick the most influential variable on the math score, what would it be?
+
+1. Add the standardized variables for each *continuous* regressor as `<regressor>_stand`.
+  * Would it make sense to standardize the `religious` variable?
+
+1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
+---
+
+# Log Models
+
+* The models we have seen so far can be called ***level-level*** specifications. Both the dependent and the independent variables have been measured in level.
+
+--
+
+  * This *level* can be: euros, years, number of students,... and even percentage.
+  
+--
+
+* Taking the log of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions:
+
+  * ***Log - level***: $\quad log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i$
+
+  * ***Level - log***: $\quad \textrm{y}_i = b_0 + b_1 log(x_{1,i}) + ... + e_i$
+
+  * ***Log - log***: $\quad log(y_i) = b_0 + b_1 log(x_{1,i}) + ... + e_i$
+
+---
+
+# Log Models: Interpretation
+
+Here is a table that summarise how to interpret regressor coefficients in each case:  
+
+|    Model           | Equation  |  Interpretation of $b_1$            |
+|--------------------|:---------:|:-----------------------------------:|
+| Level - Level | $y = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with ] $b_1$ .small[**unit change** in y]  |
+| Log - Level | $log(y) = b_0 + b_1 x_{1} + e$ | .small[**One unit** increase in ] $x_1$ .small[ is associated,</br> on average, with] $100*b_1$ .small[ **percent change** in y]  |
+| Level - Log | $y = b_0 + b_1 log(x_{1})  + e$ | .small[**One percent** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1/100$ .small[**unit change** in y] |
+| Log - Log  |  $log(y) = b_0 + b_1 log(x_{1}) + e$ | .small[**One percent** increase in ] $x_1$ .small[ is associated,</br> on average, with] $b_1$ .small[**percent change** in y]  |
+
+
+* It looks like cooking recipes but of course it can be derived with some calculus. 
+
+---
+
+# When do we use log models?
+
+There are several reasons why we would want to use log models:
+
+--
+
+* Account for ***non linearity*** in the relationship between $y$ and $x$.
+
+--
+
+* Interpret coefficients as <a href="https://en.wikipedia.org/wiki/Elasticity_(economics)">***elasticities***</a> which play a central role in economic theory.
+
+--
+
+* Limit the influence of ***outliers*** (due to the concavity of the *log* function).
+
+---
+
+# Interacting Regressors
+
+* We interact two regressors when we believe the effect of one depends on the value of the other. 
+
+  * *Example:* The returns to education on wage vary by gender.
+  
+--
+  
+* In practice, if we interact $x_1$ and $x_2$, we would write our model like this : 
+
+$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i}*x_{2,i} + ... + e_i$$
+
+--
+
+* The interpretation of $b_1$, $b_2$, and $b_3$ will depend on the type of $x_1$ and $x_2$.
+
+--
+  
+* Let's focus on the cases where one regressor is a dummy/categorical variable and the other is continuous.
+
+* It will give you the intuition for the other cases:
+
+  * Both regresors are dummies/categorical variables,
+
+  * Both regresors are continuous variables.
+  
+---
+
+# Interacting Regressors
+
+* Let's go back to the *STAR* experiment data.
+
+--
+
+* How does the effect of being in a small vs regular class vary with the experience of the teacher?
+
+--
+
+* Our regression model becomes:
+
+$$ \textrm{score}_i = b_0 + b_1 \textrm{small}_i + b_2 \textrm{experience}_i + b_3 \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+--
+
+Effect of small class with teacher with 10 years of experience?
+
+--
+
+$\mathbb{E}[\textrm{score}_i | \textrm{small}_i = 1 \textrm{ & experience}_i = 10] = b_0 + b_1 + b_2*10 + b_3*10$
+
+--
+
+$\mathbb{E}[\textrm{score}_i | \textrm{small}_i = 0 \textrm{ & experience}_i = 10] = b_0 + b_2*10$
+
+--
+
+$\begin{split} \mathbb{E}[\textrm{score}_i &| \textrm{small}_i = 1 \textrm{ & experience}_i = 10] - \mathbb{E}[\textrm{score}_i | \textrm{small}_i = 0 \textrm{ & experience}_i = 10] \\ &= b_0 + b_1 + b_2*10 + b_3*10 - (b_0 + b_2*10) \\ &= b_1 + b_3*10 \end{split}$
+---
+
+# Interacting Regressors
+
+Running the regression for the `math` score (for all grades), we obtain:
+
+```{r, echo = FALSE}
+star_df = read.csv("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_df = star_df %>%filter(star != "regular+aide")
+star_df$small = star_df$star == "small"
+star_df = star_df[complete.cases(star_df),]
+```
+
+
+```{r}
+lm(math ~ small+ experience + small*experience, star_df)
+```
+
+***Interpretation:***
+
+--
+
+* The interaction term allows the impact of being in a small class to vary with the experience of the teacher. 
+  
+--
+  
+* In particular, we still observe a positive impact of being in a small class on math score,
+  
+* but this effect is decreasing in the experience of the teacher.
+  
+---
+
+# Interacting Regressors: Visually
+
+```{r,echo=F, fig.height=4.75, fig.width = 8}
+ggplot(star_df, aes(x = experience, y = math, group = small, color = small)) +
+  geom_smooth(method = "lm", se = F) +
+  theme_bw(base_size = 14) +
+  labs(
+    x = "Teacher experience",
+    y = "Total math score",
+    title = "Predicted mathematics score",
+    color = "Small class") +
+  theme(legend.position="top")
+```
+
+---
+
+# Interacting Regressors: Visually by grade
+
+```{r,echo=F, fig.height=4.75, fig.width = 8}
+star_df %>%
+  mutate(grade = factor(grade, levels = c("k","1","2","3"))) %>%
+  ggplot(aes(x = experience, y = math, group = small, color = small)) +
+    geom_smooth(method = "lm", se = F) +
+    theme_bw(base_size = 14) +
+    theme(legend.position="top") +
+    labs(
+      x = "Teacher experience",
+      y = "Total math score",
+      title = "Predicted mathematics score",
+      color = "Small class") +
+    facet_wrap(~ grade, nrow = 2, labeller = as_labeller(
+          c(`k` = "Kindergarten",
+            `1` = "First grade",
+            `2` = "Second grade",
+            `3` = "Third grade")
+      ))
+    
+```
+
+---
+
+# Wages, Education and Gender
+
+* Let's use these new *tools* to investigate the relationship between wages, education and gender.
+
+--
+
+* We will use data from the [**C**urrent **P**opulation **S**urvey (CPS)](https://www.census.gov/programs-surveys/cps.html), the U.S. government's monthly survey of unemployment and labor force participation.
+
+* We'll use a sample of 534 individuals from the May 1985 CPS available in the `AER` package.
+
+--
+
+.pull-left[
+```{r, echo = FALSE, fig.height=2.9,fig.width=4.5}
+data("CPS1985")
+cps = CPS1985
+cps <- cps %>%
+  mutate(
+    education_gp = case_when(
+      education <= 12 ~ "High school or below",
+      education %in% 13:15 ~ "Some college",
+      education >= 16 ~ "College degree"
+    ),
+    log_wage = log(wage))
+  
+ggplot(cps, aes(x = gender, y = wage, fill = gender)) + 
+    geom_boxplot() + 
+    theme_bw() + 
+    labs(
+      x = "Gender",
+      y = "Hourly wage ($)",
+      title = "Wage distribution by gender") +
+    guides(fill=FALSE)
+```
+]
+
+--
+
+.pull-right[
+```{r, echo = FALSE, fig.height=2.9,fig.width=4.5}
+cps %>%
+  mutate(
+    education_gp = factor(education_gp, levels = c("High school or below", "Some college", "College degree"))
+  ) %>%
+  ggplot(aes(x = education_gp, y = wage, fill = education_gp)) + 
+      geom_boxplot() + 
+      theme_bw() + 
+      labs(
+        x = "Education group",
+        y = "Hourly wage ($)",
+        title = "Wage distribution by education group") +
+      guides(fill=FALSE)
+```
+
+]
+
+---
+
+# Wages, Education and Gender
+
+* So, wages are higher for men and higher for educated people, well, nothing really new.
+
+--
+
+* But, are the returns to education the same for women and men? 
+
+* In other words, how does the gender gap evolve for different levels of education?  
+
+--
+
+.pull-left[
+```{r, echo = FALSE, fig.height=3.5,fig.width=5}
+cps %>%
+  mutate(
+    education_gp = factor(education_gp, levels = c("High school or below", "Some college", "College degree"))
+  ) %>%
+  ggplot(aes(x = gender, y = wage, fill = gender)) + 
+      geom_boxplot() + 
+      facet_wrap(~education_gp) +
+      theme_bw() + 
+      labs(x = "Gender", y = "Hourly wage ($)")+
+      guides(fill=FALSE)
+```
+]
+
+--
+
+.pull-right[
+<br/>
+
+* We do observe a gender gap for each education group
+
+* But it's not really clear if/how it varies with education
+
+* Let's test it with a regression!  
+
+]
+
+---
+
+class:inverse
+
+# Task 4 (10 minutes)
+
+1. Load the data `CPS1985` from the `AER` package.
+
+1. Look at the `help` to get the definition of each variable: `?CPS1985`
+
+1. We don't know if people are working part-time or full-time, does it matter here? 
+
+1. Create the`log_wage` variable equal to the log of `wage`.
+
+1. Regress `log_wage` on `gender` and `education`, and save it as `reg1`. Interpret each coefficient.
+
+1. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`. Interpret each coefficient. Does the gender wage gap decrease with education?
+
+1. Add all of other regressors to `reg2` and save it as `reg3`. Do our coefficients of interest change?
+
+---
+
+# Wage, Gender and Education - Visually (Simple Model)
+
+```{r, echo=FALSE, fig.height=4.75, fig.width = 8}
+ggplot(cps, aes(x = education, y = log_wage, group = gender, color = gender)) +
+  geom_point(alpha = 0.2) +
+  theme_bw(base_size = 14) +
+  theme(legend.position="top") +
+  geom_smooth(method = "lm", se = F) +
+  ylim(0,4) +
+  xlim(0,20) +
+  labs(
+    x = "Years of education",
+    y = "Hourly wage ($)",
+    color = "Gender")
+
+```
+
+---
+
+# Teaser for the Next 3 Lectures
+
+* You may have noticed that since the beginning we always work with **samples** drawn from the overall population.
+
+--
+
+* Each time, imagine we could draw another sample from population:
+
+  * Would we obtain the same results? 
+  
+  * In other words, how confident can we be that our estimates (sign, magnitude) are not just driven by hazard?
+  
+--
+
+* The next chapters will answwer those kind of questions:
+
+  * We'll present the notion of **sampling**, and
+  
+  * Understand what **statistical inference** is and how to do it. 
+
+---
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU NEXT WEEK!
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
