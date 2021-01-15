@@ -375,9 +375,11 @@ $$
 
 .pull-right[
 
-***Treatment group***: all the individuals such that $D_i = 1$.
+***Treatment group***  
+all the individuals such that $D_i = 1$.
 
-***Control group***: all the individuals such that $D_i = 0$.
+***Control group***  
+all the individuals such that $D_i = 0$.
 ]
 
 ---
@@ -417,6 +419,9 @@ $$Y_i = D_i * Y_i^1 + (1- D_i)*Y_i^0$$
 knitr::include_graphics("../img/photos/fundamental_pb_inference.png")
 ```
 
+.footnote[
+This table is from Morgan and Winship (2015, p.46).
+]
 
 * The potential outcome that is not observed exists in principle, it is called the ***counterfactual outcome***.
 
@@ -426,9 +431,6 @@ knitr::include_graphics("../img/photos/fundamental_pb_inference.png")
 
 * Since the treatment effect *cannot* be observed at the individual level, we estimate population averages.
 
-.footnote[
-This table is from Morgan and Winship (2015, p.46).
-]
 ---
 
 # Average Treatment Effect (ATE)
@@ -567,7 +569,9 @@ So there is a novel source of bias that comes from the potential ***heterogeneit
 
 class:inverse
 
-# Task 2 (10 minutes)
+# Task 2
+
+`r countdown(minutes = 10, top = 0)`
 
 Let's compute these various quantities and biases with some toy data (i.e. data we generated ourselves).
 
@@ -715,7 +719,9 @@ Tennessee **S**tudent/**T**eacher **A**chievement **R**atio Experiment (see [Kru
 
 class:inverse
 
-# Task 3 (10 minutes)
+# Task 3
+
+`r countdown(minutes = 10, top = 0)`
 
 1. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1) and assign it to an object called `star_df`.
 
@@ -868,13 +874,13 @@ lm(math ~ small, star_df_k_small)
 ```
 
 ```{r, echo = TRUE, eval = TRUE}
-mean(star_df_k_small[
-    star_df_k_small$small == 1, "math"]) - 
-  mean(star_df_k_small[
-    star_df_k_small$small == 0, "math"])
+mean(star_df_k_small$math[
+    star_df_k_small$small == TRUE]) - 
+  mean(star_df_k_small$math[
+    star_df_k_small$small == FALSE])
 
-mean(star_df_k_small[
-    star_df_k_small$small == 0, "math"])
+mean(star_df_k_small$math[
+    star_df_k_small$small == FALSE])
 ```
 ]
 
@@ -902,7 +908,9 @@ We knew this already but we now understand why this is true `r emo::ji("v")`
 
 class:inverse
 
-# Task 4 (10 minutes)
+# Task 4
+
+`r countdown(minutes = 10, top = 0)`
 
 1. Filter the dataset to only keep first graders and the small class and regular class groups.
 
@@ -959,7 +967,7 @@ However, they have some shortcomings:
 
 * ***selection occurs on observable characteristics***: *multiple regression* (next week!)
 
-* ***selection occurs on unobservable characteristics***: *regression discontinuity design* or  *difference-in-differences* (lectures 10 and 11!)
+* ***selection occurs on unobservable characteristics***: *regression discontinuity design* (lecture 10) or  *difference-in-differences* (not covered but set of slides online!)
 
 ---
 
