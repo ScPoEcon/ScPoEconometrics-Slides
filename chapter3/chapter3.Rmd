@@ -43,23 +43,26 @@ library("gridExtra")
 library("haven")
 library("ggpubr")
 library("huxtable")
+library(countdown)
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
 ```
 
-# Recap from past weeks
+# Quiz on last week's material
 
-* `R` basics, importing data
+---
 
-* Exploratory data analysis:
+# Today - Real 'metrics finally `r emo::ji("v")`
 
-    * Summary statistics: *mean*, *median*, *variance*, *standard deviation*
-    * Data visualization: base `R` and `ggplot2`
-    * Data wrangling: `dplyr`
-
---
-
-## Today - Real 'metrics finally `r emo::ji("v")`
-
-* Introduction to the __Simple Linear Regression Model__ and __Ordinary Least Squares__ *estimation*.
+* Introduction to the __Simple Linear Regression Model__ and __Ordinary Least Squares (OLS)__ *estimation*.
 
 * Empirical application: *class size* and *student performance*
 
@@ -85,7 +88,9 @@ library("huxtable")
 
 class:: inverse
 
-# Task 1: Getting to know the data (7 minutes)
+# Task 1: Getting to know the data
+
+`r countdown(minutes = 7, top = 0)`
  
 1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1). You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
 
@@ -185,7 +190,9 @@ g_verb
 
 class:: inverse
 
-# Task 2: Binned scatter plot (7 minutes)
+# Task 2: Binned scatter plot
+
+`r countdown(minutes = 7, top = 0)`
 
 1. Create a new dataset (`grades_avg_cs`) where math and verbal scores are averaged by class size. Let's call these new average scores `avgmath_cs` and `avgverb_cs`.  
 *N.B.: the "raw" scores are already averages at the class level. Here we average these averages by class size.*
@@ -289,8 +296,6 @@ g_math_cs +
 ```
 ]
 
---
-
 .right-thin[
 <br>
 
@@ -392,13 +397,6 @@ This __error__ is called the __error term__.
   y_i = \widehat y_i + e_i = b_0 + b_1 x_i + e_i
   $$
 
---
-
-* **Goals**
-  * Find the values for $b_0$ and $b_1$ that **make the errors as small as possible**,
-  * Check whether these values **give a reasonable description of the data**.
-
-
 ---
 
 # Simple Linear Regression: Graphically
@@ -471,77 +469,11 @@ g_math_cs +
 
 ---
 
-class: inverse
-
-# App Time! (5 minutes)
-
-Intuitively one might want to simply minimize the absolute value of the sum of all the errors
-$\mid \sum^n_{i=1}{e_i} \mid$, that is one might want the sum of errors as close to 0 as possible.
-
-Let's try to find the best line by minimizing the absolute value of the sum of errors. The line *won't* turn green so don't spend all day waiting for it.
-
-```{r,eval=FALSE}
-library(ScPoEconometrics) # load our library
-launchApp('reg_simple_arrows')
-aboutApp('reg_simple_arrows') # explainer about app
-```
-
----
-
-# Minimizing the Absolute Value of the Sum of Errors
-
-```{r, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
-data = data.frame(y = c(3,2,4,6,8,7),
-                  x = c(1,2,3,7,8,9))
-
-data_plot = ggplot(data,
-       aes(x = x, y = y)) +
-  geom_point() +
-  xlim(0,10) +
-  ylim(0,10) +
-  labs(x = "x",
-       y = "y",
-       title = "Extreme case") +
-  theme_bw(base_size = 16)
-data_plot
-```
-
----
-
-# Minimizing the Absolute Value of the Sum of Errors
-
-```{r, echo = FALSE, eval = TRUE, fig.width = 10, fig.height = 5}
-data_plot +
-  geom_hline(yintercept = 5, col = "#d90502")
-```
-
----
-
-# Minimizing the Absolute Value of the Sum of Errors
-
-.pull-left[
-```{r, echo = FALSE, eval = TRUE, fig.height = 7}
-data_plot +
-  geom_hline(yintercept = 5, col = "#d90502") +
-  theme_bw(base_size = 20)
-```
-]
-
-.pull-right[
-<br>
-<br>
-
-* This line minimizes the absolute value of the sum of errors since the data points are symmetric around $y = 5$.
-
-* Yet it clearly does not fit the data well!
-
-* Note also that many other lines would also yield a sum of errors of 0 since the data are symmetric. A unique solution is not guaranteed!
-]
----
-
 # **O**rdinary **L**east **S**quares (OLS) Estimation
 
-* Errors of different sign $(+/-)$ cancel out, so let's consider **squared residuals** 
+--
+
+* Errors of different sign $(+/-)$ cancel out, so we consider **squared residuals** 
 $$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$
 
 * Choose $(b_0,b_1)$ such that $\sum_{i = 1}^N e_1^2 + \dots + e_N^2$ is **as small as possible**.
@@ -561,7 +493,7 @@ g_math_cs +
 
 # **O**rdinary **L**east **S**quares (OLS) Estimation
 
-* Errors of different sign $(+/-)$ cancel out, so let's consider **squared residuals** 
+* Errors of different sign $(+/-)$ cancel out, so we consider **squared residuals** 
 $$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$
 
 * Choose $(b_0,b_1)$ such that $\sum_{i = 1}^N e_1^2 + \dots + e_N^2$ is **as small as possible**.
@@ -581,19 +513,6 @@ g_math_cs +
               fill = "darkgreen",
               alpha = 0.3) +
   coord_fixed(ratio = 0.65)
-```
-
----
-
-
-class: inverse
-
-# App Time! #2 (3 minutes)
-
-Let's minimize some squared errors! 
-```{r,eval=FALSE}
-launchApp('reg_simple')
-aboutApp('reg_simple')
 ```
 
 ---
@@ -622,13 +541,12 @@ aboutApp('reg_simple')
 
 ---
 
-class: inverse
-
-# App Time! #3 (3 minutes)
+# Intuition behind OLS
 
 How does OLS actually perform the minimization problem? Some intuition without maths.
 
 ```{r,eval=FALSE}
+library(ScPoApps)
 launchApp('SSR_cone')
 aboutApp('SSR_cone')  # after
 ```
@@ -655,6 +573,10 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
  
 * Also notice that the units of $x$ will matter for the interpretation (and magnitude!) of $b_1$.
 
+--
+
+* You need to be explicit about what the unit of $x$ is!
+
 ---
 
 # OLS with `R`
@@ -669,7 +591,7 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
 
 --
 
-## Class size and student performance
+## Class size and student performance => create quick zoom poll about interpretation
 
 Let's estimate the following model by OLS: $\textrm{avgmath_cs}_i = b_0 + b_1 \textrm{classsize}_i + e_i$
 
@@ -715,11 +637,13 @@ $$
 
 class: inverse
 
-# Task 3: OLS Regression (7 minutes)
+# Task 3: OLS Regression
 
-1. Compute the OLS coefficients using the formulas on slide 28.
+`r countdown(minutes = 10, top = 0)`
 
-1. Regress class size (independant variable) on average verbal score (dependent variable).
+1. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 24. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
+
+1. Regress average verbal score (dependent variable) on class size (independant variable). Interpret the coefficients.
 
 2. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
 
@@ -730,9 +654,9 @@ class: inverse
 
 ---
 
-# OLS variations / restrictions
+# OLS Variations / Restrictions
 
-* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`.
+* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`
 
 * There is an app for each of them:
 <br>
@@ -914,15 +838,17 @@ $$
 
 class: inverse
 
-# Task 4: $R^2$ and goodness of fit (10 minutes)
+# Task 4: $R^2$ and goodness of fit
 
-1. Regress `classize` on `avgmath_cs`. Assign to an object `math_reg`.
+`r countdown(minutes = 10, top = 0)`
+
+1. Regress `avgmath_cs` on `classize`. Assign to an object `math_reg`.
 
 1. Pass `math_reg` in the `summary()` function. What is the (multiple) $R^2$ for this regression? How can you interpret it?
 
-1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you of the relationship between $R^2$ and the correlation in a regression with only one regressor?
+1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you about the relationship between $R^2$ and the correlation in a regression with only one regressor?
 
-1. Install and load the `broom` package. Pass `math_reg` in the `broom::augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula in the previous slide.
+1. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula in the previous slide.
 
 1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
 
@@ -934,7 +860,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK!
+# SEE YOU IN TWO WEEKS!
 
 
 |                                                                                                            |                                   |
