@@ -49,6 +49,18 @@ library(dplyr)
 library(png)
 library(grid)
 library(pander)
+library(countdown)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
 ```
 
 layout: true
@@ -57,16 +69,11 @@ layout: true
 
 ---
 
-# Recap from last week
+# Quiz last week
 
-* *Simple Linear Regression Model*: $y_i = b_0 + b_1 x_i + e_i$
+---
 
-* *Ordinary Least Squares* (OLS) estimation: minimize the sum of squared errors
-
-* R command to estimate a linear model: `lm(dependent variable ~ independent variable, data)`
-
-
-## Today - Introduction to causal inference
+# Today - Introduction to causal inference
 
 * Causality versus correlation
 
@@ -178,7 +185,7 @@ But not all correlations are so easy to rule out
 
   - We are at the start of a big increase in deaths from lung cancer...
   
-  - ... which is happening after a fast growth of cigarette consumption
+  - ... which is happening after a fast growth in cigarette consumption
 ]
 
 --
@@ -239,11 +246,13 @@ Smokers and non-smokers may be different in the first place:
 
 --
 
-- The following table gives the death rates per 1000 persons-years among these people. 
+- The following table gives the death rates per 1000 persons-years among these people.
 
-```{r, echo = FALSE, out.width = "500px"}
-knitr::include_graphics("../img/photos/raw_death_rates.png")
-```
+| Smoking group &nbsp; &nbsp; | &nbsp; &nbsp; Canada &nbsp; &nbsp; | &nbsp; &nbsp; U.K. &nbsp; &nbsp; | &nbsp; &nbsp; U.S. &nbsp; &nbsp;
+| -| :-: | :-: | :-:
+| Non-smokers | 20.2 | 11.3 | 13.5
+| Cigarettes | 20.5 | 14.1 | 13.5
+| Cigars/pipes | 35.5 | 20.7 | 17.4
 
 - Cigar/pipe smokers are 30% (U.S.) to 75% (Canada) more likely to die from lung cancer than non-smokers.
 
@@ -255,9 +264,11 @@ knitr::include_graphics("../img/photos/raw_death_rates.png")
 
 * The following table gives the mean age by smoking status
 
-```{r, echo = FALSE, out.width = "600px"}
-knitr::include_graphics("../img/photos/age_by_smoking_status.png")
-```
+| Smoking group &nbsp; &nbsp; | &nbsp; &nbsp; Canada &nbsp; &nbsp; | &nbsp; &nbsp; U.K. &nbsp; &nbsp; | &nbsp; &nbsp; U.S. &nbsp; &nbsp;
+| -| :-: | :-: | :-:
+| Non-smokers | 54.9 | 49.1 | 57.0
+| Cigarettes | 50.5 | 49.8 | 53.2
+| Cigars/pipes | 65.9 | 55.7 | 59.7
 
 * Because health is likely to deteriorate with age the previous table could be far from giving causal estimates. 
 
@@ -265,7 +276,9 @@ knitr::include_graphics("../img/photos/age_by_smoking_status.png")
 
 class:inverse
 
-# Task 1 (5 minutes)
+# Task 1
+
+`r countdown(minutes = 5, top = 0)`
 
 Let's adjust our Canadian statistics **taking the age distribution into account **.
 
@@ -289,9 +302,11 @@ Let's adjust our Canadian statistics **taking the age distribution into account 
 
 Here is the age-adjusted death rates table found by [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents).
 
-```{r, echo = FALSE, out.width = "600px"}
-knitr::include_graphics("../img/photos/adjusted_death_rates.png")
-```
+| Smoking group &nbsp; &nbsp; | &nbsp; &nbsp; Canada &nbsp; &nbsp; | &nbsp; &nbsp; U.K. &nbsp; &nbsp; | &nbsp; &nbsp; U.S. &nbsp; &nbsp;
+| -| :-: | :-: | :-:
+| Non-smokers | 20.2 | 11.3 | 13.5
+| Cigarettes | 28.3 | 12.8 | 17.7
+| Cigars/pipes | 21.2 | 12.0 | 14.2
 
 - Cigars/pipes seem much less dangerous than in the previous table...
 
