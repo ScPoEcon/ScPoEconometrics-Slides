@@ -1010,7 +1010,7 @@ layout:true
 
 --
 
-* [Garrick Aden-Buie](https://www.garrickadenbuie.com/'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken from.
+* [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken from.
 
 ---
 
