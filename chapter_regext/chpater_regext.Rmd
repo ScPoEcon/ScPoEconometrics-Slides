@@ -151,6 +151,8 @@ class:inverse
 Let's go back our `grades` dataset. These are the estimates we got from regressing the math test score on the full set of regressors.
 
 ```{r echo = FALSE}
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+
 reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
 reg_full$coefficients
 ```

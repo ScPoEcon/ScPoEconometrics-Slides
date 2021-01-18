@@ -68,9 +68,15 @@ countdown(
 
 # Today - Multiple Regression Model
 
-* **Multiple Regression Model**
+* Multiple independent variables in our model
 
-* *Extensions:* standardized regression; log models; interacting variables
+* Interpretation for continuous and dummy variables
+
+* Dummy variable trap
+
+* Adjusted $R_2$
+
+* Ommitted variable bias
 
 * Empirical applications:
 
@@ -156,6 +162,8 @@ ggplot(aes(x = classize, y = avgmath)) +
 ```{r}
 lm(avgmath ~ classize, grades)
 ```
+
+* Zoom poll on interpretation?
 
 * *Interpretation:* ***On average***, a 1-student increase in class size is ***associated*** to a `r round(lm(avgmath~classize, grades)$coefficients[2],2)` points increase in average math score.
 ]
@@ -316,6 +324,32 @@ For now assume both the dependent variable $(y_i)$ and the independent variables
 
 ---
 
+# Ommitted variable bias (OVB)
+
+* ***ommitted variable bias***: Omitting important control variables from the regression model
+
+* This renders the coefficient for your regressor of interest unreliable.
+
+--
+
+* Recall our previous example of class size and disadvantaged students. Not taking into account the `disadvantaged` variable led to a OVB for our class size estimate.
+
+--
+
+* The formula for OVB is:
+
+$$\textrm{OVB} = \{ \textrm{Relationship between } disadvantaged_i \textrm{ and } classize_i \} \\ * \{ \textrm{Effect of } disadvantaged_i \textrm{ in multiple regression} \}$$
+
+--
+
+* From this formula you obtain both the *mangitude* of OVB and its *sign* (positive/negative).
+
+--
+
+* The relationship between `disadvantaged` and `classize` is negative, and the effect of `disadvantaged` in the multiple regression is negative, therefore the OVB is positive. In other words, ommitting `disadvantaged` from the regression leads to an inflated coefficient for class size.
+
+---
+
 # Multiple Regression with `R`
 
 * Very similar to simple linear regression:
@@ -344,7 +378,7 @@ lm(avgmath ~ classize + disadvantaged, grades)
 lm(avgmath ~ classize + disadvantaged, grades)
 ```
 
-***Questions***
+***Questions*** => zoom or wooclap poll!
 
 1. How do you interpret each of these coefficients?
 1. How do you explain the change in the `classize` coefficient compared to the SLM case?
@@ -387,7 +421,7 @@ lm(avgmath ~ classize + disadvantaged, grades)
   
 ---
 
-# Multiple Regression in 3D
+# Multiple Regression in 3D => Useful?
 
 
 ```{r plane3D-reg, echo=FALSE, message=FALSE, warning=FALSE}
@@ -425,7 +459,9 @@ grades %>%
 
 class:inverse
 
-# Task 1 (10 minutes)
+# Task 1
+
+`r countdown(minutes = 10, top = 0)`
 
 Let's analyse the regression results using **reading** score as the dependent variable.
 
@@ -464,9 +500,19 @@ Note that this implies that the number of observations has to be greater than th
 
 ---
 
+# Dummy Variable Trap
+
+add stuff on dummy variable
+
+explain interpretation of categorical variables
+
+---
+
 class: inverse
 
-# Task 2 (7 minutes)
+# Task 2
+
+`r countdown(minutes = 7, top = 0)`
 
 Still need to think about this perfect collinearity issue? Let's run a regression where there is perfect linear dependence between regressors.
 
@@ -495,32 +541,6 @@ Keep only second graders and small and regular class groups.
 --
 
 * The *adjusted $R^2$* imposes a penalty for adding regressors to the model. The details are not crucial as in the vast majority of cases the $R^2$ and the adjusted $R^2$ are pretty similar.
-
----
-
-# Ommitted variable bias (OVB)
-
-* ***ommitted variable bias***: Omitting important control variables from the regression model
-
-* This renders the coefficient for your regressor of interest unreliable.
-
---
-
-* Recall our previous example of class size and disadvantaged students. Not taking into account the `disadvantaged` variable led to a OVB for our class size estimate.
-
---
-
-* The formula for OVB is:
-
-$$\textrm{OVB} = \{ \textrm{Relationship between } disadvantaged_i \textrm{ and } classize_i \} \\ * \{ \textrm{Effect of } disadvantaged_i \textrm{ in multiple regression} \}$$
-
---
-
-* From this formula you obtain both the *mangitude* of OVB and its *sign* (positive/negative).
-
---
-
-* The relationship between `disadvantaged` and `classize` is negative, and the effect of `disadvantaged` in the multiple regression is negative, therefore the OVB is positive. In other words, ommitting `disadvantaged` from the regression leads to an inflated coefficient for class size.
 
 ---
 
