@@ -13,14 +13,12 @@
 | Lecture 4: Simple Linear Regression | [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html) | [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.pdf) | [HTML]() [.Rmd]() |
 | Lecture 5: Introduction to Causality | [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.html) | [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_causality/causality.pdf) | [HTML]() [.Rmd]() |
 | Lecture 6: Multiple Linear Regression | [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter4/chapter4.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter4/chapter4.pdf)  | [HTML]() [.Rmd]() |
-| Lecture 7: Linear Regression Extensions |
-[HTML]() | [PDF]()  | [HTML]() [.Rmd]() |
+| Lecture 7: Linear Regression Extensions | [HTML]() | [PDF]()  | [HTML]() [.Rmd]() |
 | Lecture 8: Sampling [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter6/chapter6.html) [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter6/chapter6.pdf) | [HTML]() [.Rmd]() |
 | Lecture 9: Confidence Intervals and Hypothesis Testing | [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_CI_hypothesis/CI_and_hypothesis_test.html) | [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_CI_hypothesis/CI_and_hypothesis_test.pdf) | [HTML]() [.Rmd]() |
 | Lecture 10: Regression Inference | [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.html) | [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_reginference/reg_inference.pdf) | [HTML]() [.Rmd]() |
 | Lecture 11: Regression Discontinuity | [HTML](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter-RDD/RDD.html) | [PDF](https://rawcdn.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter-RDD/RDD.pdf)  | [HTML]() [.Rmd]() |
-| Lecture 12: Recap (*coming soon!*) |
-[HTML]() | [PDF]()  | [HTML]() [.Rmd]() |
+| Lecture 12: Recap (*coming soon!*) | [HTML]() | [PDF]()  | [HTML]() [.Rmd]() |
 
 The suggested reading list can be found [here](https://github.com/ScPoEcon/ScPoEconometrics-Slides/blob/master/syllabus.md).
 
