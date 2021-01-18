@@ -103,7 +103,7 @@ str(gapminder)
 
 ```{r}
 gapminder <- gapminder %>%
-    muatet(gdppercap = gdp / population)
+    mutate(gdppercap = gdp / population)
 names(gapminder)
 ```
 
@@ -140,7 +140,7 @@ life_exp_hist
 
 ```{r}
 life_exp_hist +
-    facet_wrap(row = vars(continent))
+    facet_grid(rows = vars(continent))
 ```
 
 3\. A boxplot of average life expectancy per year by continent. Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
