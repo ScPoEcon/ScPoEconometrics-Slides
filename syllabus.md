@@ -10,9 +10,9 @@ The material below is a complement to the lecture slides and should be used as r
 [**Angrist and Pischke (2010 JEP), *The Credibility Revolution in Empirical Economics***](https://www.aeaweb.org/articles?id=10.1257/jep.24.2.3)  
 
 
-### Lecture 2/3: Summarizing, Visualizing and Tidying Data
+### Lecture 2/3: Tidying, Visualising and Summarising Data
 
-[**Chapter 2, Introduction to Econometrics with R**](https://scpoecon.github.io/ScPoEconometrics/sum.html)
+[**Data transformation, R for Data Science**](https://r4ds.had.co.nz/transform.html)
 
 [**Schwabish (2014 JEP), An Economist's Guide to Visualizing Data**](https://www.aeaweb.org/articles?id=10.1257/jep.28.1.209)
 

@@ -1,0 +1,123 @@
+---
+title: "Summarising, Visualizing and Tidying Data - Tasks"
+author: "Gustave"
+date: "2/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+```{r}
+library(dslabs)
+
+gapminder <- gapminder
+```
+
+1\. Create a new variable called `gdppercap` corresponding to `gdp` divided by `population`
+
+```{r}
+gapminder$gdppercap = gapminder$gdp / gapminder$population
+names(gapminder)
+```
+
+2\. Which countries had a 2011 GDP per capita greater than 30.000? 
+
+```{r}
+subset(gapminder, gdppercap > 30000 & year == 2011, "country")
+```
+
+3\. Filter the dataset to only keep the year 2015: `gapminder_2015`
+
+```{r}
+gapminder_2015 <- subset(gapminder, year == 2015)
+```
+
+4\. How many countries have an infant mortality in 2015 greater than 90 (per 1000)?
+
+```{r}
+subset(gapminder_2015, infant_mortality > 90, country)
+```
+
+5\. What is the average life expectancy in Africa in 2015?
+
+```{r}
+mean(gapminder_2015[gapminder_2015$continent == "Africa", "life_expectancy"])
+```
+
+
+## Task 2
+
+```{r}
+library(tidyverse) # load tidyverse to get dplyr and magrittr among others
+library(rmarkdown) # to have nice tables in questions 4 and 5
+library(dslabs)
+
+polls_us_election_2016 <- polls_us_election_2016
+```
+
+1\. Which polls had more vote intentions for Trump than for Clinton.
+
+```{r, layout="l-body-outset"}
+q1 <- polls_us_election_2016 %>%
+    filter(rawpoll_trump > rawpoll_clinton)
+paged_table(q1, options = list(rows.print = 10))
+```
+
+**Note that the `paged_table()` code is simply so that the output table looks nice in the html file. In practice, you would simply run `q1`. This applies to all the other questions with `paged_table()` code.**
+
+2\. How many polls have a missing `grade`?
+
+```{r}
+# base R solution
+sum(is.na(polls_us_election_2016$grade))
+
+# dplyr solution
+polls_us_election_2016 %>%
+    filter(is.na(grade)) %>%
+    count()
+```
+
+3\. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, _and_ (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
+
+```{r, layout="l-body-outset"}
+q2 <- polls_us_election_2016 %>%
+    filter(
+        pollster %in% c("American Strategies","GfK Group","Merrill Poll") &
+        samplesize > 1000 &
+        startdate == "2016-10-20"
+        )
+paged_table(q2, options = list(rows.print = 10))
+```
+
+
+*For the following questions you should use `filter` and `mutate`.*
+
+4\. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000.?
+
+```{r, layout="l-body-outset"}
+q4 <- polls_us_election_2016 %>%
+    mutate(rawpoll_clintontrump = rawpoll_clinton + rawpoll_trump) %>%
+    filter(
+        !is.na(rawpoll_johnson) &
+        rawpoll_clintontrump > 95 &
+        samplesize > 1000
+        )
+paged_table(q4, options = list(rows.print = 10))
+```
+
+5\. Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
+
+```{r, layout="l-body-outset"}
+q5 <- polls_us_election_2016 %>%
+    mutate(diff_clintontrump = rawpoll_trump - rawpoll_clinton) %>%
+    filter(
+        is.na(rawpoll_johnson) &
+        diff_clintontrump > 5 &
+        state == "Iowa"
+        )
+paged_table(q5, options = list(rows.print = 10))
+```
