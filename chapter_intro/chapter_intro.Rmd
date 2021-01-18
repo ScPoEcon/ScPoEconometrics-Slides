@@ -99,13 +99,13 @@ Does immigration *cause* lower wages and higher unemployment for locals?
 --
 
 [<ru-blockquote>
-Does increasing the minimum wage *cause* greater unemployment?
+Does raising the minimum wage *cause* reduced employment for the low-skilled?
 </ru-blockquote>](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)
 
 --
 
 [<ru-blockquote>
-Does more education *cause* higher wages?
+Does more education *cause* higher wages and better jobs?
 </ru-blockquote>](http://davidcard.berkeley.edu/papers/causal_educ_earnings.pdf)
 
 --
@@ -117,18 +117,20 @@ Does higher public debt levels *cause* lower economic growth?
 --
 
 [<ru-blockquote>
-Does birth order *cause* differing education trajectories?
+Does birth order *cause* differing education and employment oucomes?
 </ru-blockquote>](https://academic.oup.com/qje/article/120/2/669/1933962)
 
 ---
 
 # Causality
 
-* Notice the keyword **cause** in all of the above.
+* Notice the keyword ***cause*** in all of the above.
 
-* Notice also that *many other factors could have caused* each of those outcomes.
+* Notice also that ***many other factors could have caused*** each of those outcomes.
 
-* Econometrics is often about spelling out conditions under which we can claim to measure causal relationships.
+--
+
+* Econometrics is often about spelling out ***conditions*** under which we can ***claim to measure causal relationships***.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
 
@@ -170,7 +172,7 @@ layout: true
 
 --
 
-1. `R` has a vibrant, thriving online community that will (almost) always have a solution to your problem. ([stack overflow](https://stackoverflow.com/questions/tagged/r))
+1. `R` has a vibrant, [thriving online community](https://stackoverflow.com/questions/tagged/r) that will (almost) always have a solution to your problem.
 
 --
 
@@ -178,7 +180,7 @@ layout: true
 
 .footnote[
 <span style="visibility:hidden">[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).</span>  
-[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`.
+[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`
 ]
 
 ---
@@ -189,23 +191,23 @@ Many reasons but here are just a few:
 
 --
 
-- Not reproducible.
+- Not ***reproducible***.
 
 --
 
-- Not straightforward to merge datasets together.
+- Not straightforward to ***merge*** datasets together.
 
 --
 
-- Very fastidious to clean data.
+- Very fastidious to ***clean*** data.
 
 --
 
-- Limited to small datasets
+- Limited to ***small datasets***.
 
 --
 
-- Not designed for proper econometric analyses, maps, complex visualisations, etc.
+- Not designed for proper ***econometric analyses***, maps, complex visualisations, etc.
 
 ---
 
@@ -234,7 +236,7 @@ layout: true
 ```{r, eval = FALSE}
 library(sf)
 library(tmap)
-iris_shfl <- read_sf("chapter1_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %>%
+iris_shfl <- read_sf("chapter_intro_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %>%
   mutate(dep = substr(INSEE_COM,1,2)) %>%
   select(CODE_IRIS, dep, geometry) %>%
   filter(dep == "75")
@@ -273,7 +275,7 @@ tm_shape(iris_map) +
 
 ---
 
-# Showcase #2: Interactive web applications
+# Showcase #2: Interactive Web Applications
 
 --
 
@@ -293,33 +295,29 @@ tm_shape(iris_map) +
 
 * The `gapminder` dataset contains data on life expectancy, GDP per capita and population by country between 1952 and 2007.
 
-* Suppose we want to know the average life expectancy and average GDP per capita for each continent in each year. 
+* Suppose we want to know the average life expectancy and average GDP per capita for each continent in each year.
+
+--
 
 * We need to group the data by continent *and* year, then compute the average life expectancy and average GDP per capita
 
+--
+
 .left-column[
-```{r,eval=F}
-  # load gapminder package
+```{r, gapminder, echo = T, eval = F}
+# load gapminder package
 library(gapminder)
-  # load the dataset in object gapminder
+# load the dataset in object gapminder
 gapminder = gapminder::gapminder
-  # display variables in the dataset
+# display variables in the dataset
 names(gapminder)
-  # show first 4 lines of this dataframe
+# show first 4 lines of this dataframe
 head(gapminder,n = 4)
 ```
 ]
 
 .right-column[
-```{r,echo=F}
-  # load gapminder package
-library(gapminder)
-  # load the dataset in object gapminder
-gapminder = gapminder::gapminder
-  # display variables in the dataset
-names(gapminder)
-  # show first 4 lines of this dataframe
-head(gapminder,n = 4)
+```{r, gapminder, echo = F, eval = T}
 ```
 ]
 
@@ -335,11 +333,9 @@ head(gapminder,n = 4)
   # compute the required statistics
 gapminder_dplyr <- gapminder %>% 
   group_by(continent, year) %>% 
-  summarise(
-    count = n(),
-    mean_lifeexp = mean(lifeExp, na.rm = TRUE),
-    mean_gdppercap = mean(gdpPercap, na.rm = TRUE)
-  )
+  summarise(count = n(),
+            mean_lifeexp = mean(lifeExp, na.rm = TRUE),
+            mean_gdppercap = mean(gdpPercap, na.rm = TRUE))
 ```
 
 ```{r}
@@ -422,7 +418,7 @@ library(gganimate)
 # )
 ```
 
-.center[![Gapminder](chapter1_files/figure-html/ex_gganimate.gif)]
+.center[![Gapminder](chapter_intro_files/figure-html/ex_gganimate.gif)]
 
 .footnote[
 [1]: This animation is taken from [Ed Rubin](https://raw.githack.com/edrubin/EC421S19/master/LectureNotes/01Intro/01_intro.html#40).
@@ -466,7 +462,7 @@ layout: true
 # `RStudio` Layout
 
 ```{r, echo = F, out.width = "600px"}
-knitr::include_graphics("chapter1_files/figure-html/rstudio.png")
+knitr::include_graphics("chapter_intro_files/figure-html/rstudio.png")
 ```
 
 ---
@@ -538,8 +534,14 @@ help(lm)   # help() is equivalent
 
 .pull-right[
 In practice:
-![Learning R](chapter1_files/figure-html/learning_path.png)
+![Learning R](chapter_intro_files/figure-html/learning_path.png)
 ]
+
+---
+
+# Collaborate!
+
+<img src="chapter_intro_files/figure-html/gator_error.jpg" alt="Gator collaboration" width="900" style="display: block; margin-left: auto; margin-right: auto"/>
 
 ---
 
@@ -547,12 +549,12 @@ In practice:
 
 * `R` users contribute add-on data and functions as *packages*
 
-* Installing packages is easy!
+* Installing packages is easy! Just use the `install.packages` function:
     ```{r, eval = FALSE}
-    install.packages("ggplot2")
+    install.packages("ggplot2") # do NOT run this code on your end
     ```
 
-* To *use* the contents of a packge, we must load it from our library:
+* To *use* the contents of a packge, we must load it from our library using `library`:
     ```{r, message = FALSE, warning = FALSE,eval=FALSE}
     library(ggplot2)
     ```
@@ -611,14 +613,14 @@ murders <- murders
 
 1. Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=`).
 
-1. Ensure that `murders` is a data.frame by running: `class(murders)`
+1. Ensure that `murders` is a data.frame by running:
     ```{r,eval=F}
     class(murder) # check class
     ```
 
 1. Find out what variables are contained in `murders` by running:
     ```{r, eval = F}
-    names(murders) # obain variable names
+    names(murders) # obtain variable names
     ```
 
 1. View the contents of `murders` by clicking on `murders` in your workspace. What does the `total` variable correspond to?
@@ -634,24 +636,36 @@ murders <- murders
 Useful functions to describe a dataframe:
 ```{r}
 str(murders) # describes the data.frame
+```
+
+--
+
+```{r}
 names(murders) # column names
+```
+
+--
+
+```{r}
 nrow(murders) # number of rows
+```
+
+--
+
+```{r}
 ncol(murders) # number of columns
 ```
 
 ---
 
 # Data on Gun Murders in the US
-
-* Let's look at the first rows of `murders`.
-    ```{r}
-    head(murders, n = 3)  # show first 3 rows
-    ```
     
 * To access one of the variables **as a vector**, we use the `$` operator as in `murders$state`. We can check the type of `murders$state` with
     ```{r}
     class(murders$state)  # type of the state variable in the murders data.frame
     ```
+
+--
 
 * Or we use the column name or index: `murders[,"state"]` or `murders[,1]`
     ```{r}
@@ -698,12 +712,6 @@ Congratulations, you've created your first variable!
 
 ---
 
-# Collaborate!
-
-<img src="chapter1_files/figure-html/gator_error.jpg" alt="Gator collaboration" width="900" style="display: block; margin-left: auto; margin-right: auto"/>
-
----
-
 layout: false
 class: title-slide-section-red, middle
 
@@ -723,7 +731,7 @@ layout: true
 
 --
 
-- Equip you with a framework to think more deeply about causality.
+- Equip you with a framework to think more deeply about ***causality***.
 
 --
 
@@ -752,41 +760,41 @@ layout: true
 # Syllabus `r emo::ji("crossed_fingers")`
 
 .pull-left[
-Lecture 1: **Introduction**
+Lecture 1 (today): ***Introduction***
 
 *Quiz 1 (after lecture 2)*
 
-Lectures 2 and 3: **Tidying, Visualizing and Summarizing Data**
+Lectures 2 and 3: ***Tidying, Visualising and Summarising Data***
 
 *Quiz 2*
 
-Lecture 4: **Simple Linear Regression**
+Lecture 4: ***Simple Linear Regression***
 
-Lecture 5: **Introduction to Causality**
+Lecture 5: ***Introduction to Causality***
 
 *Midterm Project*
 
-Lecture 6: **Multiple Linear Regression**
+Lecture 6: ***Multiple Linear Regression***
 
-Lecture 7: **Linear Regression Extensions**
+Lecture 7: ***Linear Regression Extensions***
 ]
 
 .pull-right[
 *Quiz 3*
 
-Lecture 8: **Sampling**
+Lecture 8: ***Sampling***
 
-Lecture 9: **Confidence Intervals and Hypothesis Testing**
+Lecture 9: ***Confidence Intervals and Hypothesis Testing***
 
 *Quiz 4*
 
-Lecture 10: **Statistical Inference**
+Lecture 10: ***Statistical Inference***
 
-Lecture 11: **Regression Discontinuity**
+Lecture 11: ***Regression Discontinuity***
 
 *Quiz 5*
 
-Lecture 12: **Recap**
+Lecture 12: ***Recap***
 
 *Final Project*
 ]
@@ -837,11 +845,11 @@ Lecture 12: **Recap**
 .pull-left[
 ***Slack***
 
-I will ***exclusively*** use Slack for our interactions.
+We will ***exclusively*** use Slack for our interactions.
 
 Please ***DO NOT*** contact me by email (unless there's a legitimate reason to).
 
-I will be checking Slack once around 14h and once around 18h.
+I will be checking Slack sparingly so please help one another!
 ]
 
 --
@@ -849,11 +857,11 @@ I will be checking Slack once around 14h and once around 18h.
 .pull-right[
 ***Class conduct and expectations***
 
-*Late work:* 3 points deducted for every late day.
+*Late work:* Won't be accepted unless you have a very good reason.
 
 *Cheating:* I will have a chat with you. Just don't cheat, it's honestly not worth it.
 
-*Work in groups:* You can work in groups of 2 (3 max) on the quizzes.
+*Work in groups:* You can/should work in groups of 2 (3 max) on the quizzes.
 ]
 
 ---
@@ -876,7 +884,7 @@ Don't hesitate to ***reach out*** to your friends, family, a professor or me if 
 
 --
 
-To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/app) every Friday at 17h `r emo::ji("hugs")`
+To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/app) `r emo::ji("hugs")` (details on Slack)
 
 ---
 
