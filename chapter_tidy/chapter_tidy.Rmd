@@ -59,7 +59,7 @@ countdown(
 
 # Quick "Quiz" on Last Week's Material
 
-1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOINTRO***](www.wooclap.com/SCPOINTRO)
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOINTRO***](https://app.wooclap.com/SCPOINTRO)
 
 &nbsp; &nbsp; &nbsp; ***OR***
 
