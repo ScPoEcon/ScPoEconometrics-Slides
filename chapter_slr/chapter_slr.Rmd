@@ -164,6 +164,11 @@ g_verb
 
 .pull-left[
 ```{r, echo=FALSE,fig.height=6}
+grades_avg_cs <- grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+
 g_math_cs = ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
     geom_point(size = 2) +
     xlim(0,45) +
@@ -293,6 +298,54 @@ Let's formalise a bit what we are doing so far.
 
 ---
 
+# What's A Line: A Refresher
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+b_0 = 32
+b_1 = 4.1
+space = .5
+
+base_plot <- ggplot() +
+    geom_abline(slope = b_1, intercept = b_0) +
+    scale_x_continuous(limits = c(-5,10), expand = c(0,0)) +
+    scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
+    theme_bw(base_size = 16) +
+    annotate(geom = "text", x = -4.3, y = 94, label = "hat(y)", parse = TRUE, size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + space, y = 94, label = "=", size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 2*space, y = 94, label = "b[0]", color = "#DE9854", parse = TRUE, size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 2*space + .6, y = 94, label = "+", size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 3*space + .6, y = 94, label = "b[1]", parse = TRUE, color = "#d90502", size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 4*space + .6, y = 94, label = "x", parse = TRUE, size = 8, hjust = 0)
+base_plot
+```
+
+---
+
+# What's A Line: A Refresher
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+plot_b_0 <- base_plot +
+    annotate(geom = "segment", x = 0, xend = 0, y = 0, yend = b_0, arrow = arrow(angle = 12, type = "closed"), color = "#DE9854") +
+    annotate(geom = "text", x = .5, y = 20, label = "b[0]", color = "#DE9854", parse = TRUE, size = 6) +
+    geom_line(data = data.frame(x = c(-15:0), y = rep(b_0, length(-15:0))), aes(x = x, y = y), color = "#DE9854", linetype = 2) +
+    scale_y_continuous(limits = c(0,100), expand = c(0,0), minor_breaks = seq(0,100,12.5))
+plot_b_0
+```
+
+---
+
+# What's A Line: A Refresher
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+plot_b_0 +
+    annotate(geom = "segment", x = 5, xend = 6, y = b_0+5*b_1, yend = b_0+5*b_1, arrow = arrow(angle = 12, type = "closed", length = unit(.4, "cm")), color = "#d90502") +
+    annotate(geom = "text", x = 5.5, y = 49, label = "1", size = 5, color = "#d90502") +
+    annotate(geom = "segment", x = 6, xend = 6, y = b_0+5*b_1, yend = b_0+6*b_1, arrow = arrow(angle = 12, type = "closed", length = unit(.2, "cm")), color = "#d90502") +
+    annotate(geom = "text", x = 6.5, y = (b_0+6*b_1 + b_0+5*b_1)/2, label = "b[1]", parse = TRUE, size = 6, color = "#d90502")
+```
+
+---
+
 # Simple Linear Regression: Residual
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
@@ -352,9 +405,10 @@ This __error__ is called the __residual__.
 # Simple Linear Regression: Graphically
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-g_math_cs +
+plot_1 <- g_math_cs +
     ylim(50, 80) +
     theme_bw(base_size = 14)
+plot_1
 ```
 
 ---
@@ -362,11 +416,10 @@ g_math_cs +
 # Simple Linear Regression: Graphically
 
 ```{r, echo = F, fig.width = 10, fig.height = 5}
-g_math_cs +
-    ylim(50, 80) +
-    theme_bw(base_size = 14) +
-  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+plot_2 <- plot_1 +
+  stat_smooth(data = grades_avg_cs, method = "lm", se = FALSE, colour = "#d90502") +
   annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6)
+plot_2
 ```
 
 ---
@@ -546,7 +599,7 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
 
 --
 
-* You need to be explicit about what the unit of $x$ is!
+* **You need to be explicit about what the unit of $x$ is!**
 
 ---
 
@@ -562,14 +615,23 @@ For now assume both the dependent variable $(y)$ and the independent variable $(
 
 --
 
-## Class size and student performance => create quick zoom poll about interpretation
+## Class size and student performance
 
-Let's estimate the following model by OLS: $\textrm{avgmath_cs}_i = b_0 + b_1 \textrm{classsize}_i + e_i$
+Let's estimate the following model by OLS: $\textrm{average math score}_i = b_0 + b_1 \textrm{class size}_i + e_i$
 
-```{r echo=T, eval = TRUE}
+.pull-left[
+```{r echo=T, eval = FALSE}
 # OLS regression of class size on average maths score
 lm(avgmath_cs ~ classize, grades_avg_cs) 
 ```
+]
+
+.pull-right[
+```{r echo=F, eval = TRUE}
+# OLS regression of class size on average maths score
+lm(avgmath_cs ~ classize, grades_avg_cs) 
+```
+]
 
 ---
 
@@ -588,8 +650,8 @@ This implies (abstracting the $_i$ subscript for simplicity):
 $$
 \begin{aligned}
 \widehat y &= b_0 + b_1 x \\
-\widehat {\text{avgmath_cs}} &= b_0 + b_1 \cdot \text{classize} \\
-\widehat {\text{avgmath_cs}} &= 61.11 + 0.19 \cdot \text{classize}
+\widehat {\text{average math score}} &= b_0 + b_1 \cdot \text{class size} \\
+\widehat {\text{average math score}} &= 61.11 + 0.19 \cdot \text{class size}
 \end{aligned}
 $$
 
@@ -599,8 +661,8 @@ What's the predicted average score for a class of 26 students? (Using the *exact
 
 $$
 \begin{aligned}
-\widehat {\text{avgmath_cs}} &= 61.11 + 0.19 \cdot 26 \\
-\widehat {\text{avgmath_cs}} &= 66.08
+\widehat {\text{average math score}} &= 61.11 + 0.19 \cdot 26 \\
+\widehat {\text{average math score}} &= 66.08
 \end{aligned}
 $$
 
@@ -608,20 +670,28 @@ $$
 
 class: inverse
 
-# Task 3: OLS Regression
+# Task 2: OLS Regression
 
 `r countdown(minutes = 10, top = 0)`
 
-1. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 24. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
+Run the following code to aggregate the data at the class size level:
+
+```{r, eval = F}
+grades_avg_cs <- grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+```
+
+1. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 25. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
 
 1. Regress average verbal score (dependent variable) on class size (independant variable). Interpret the coefficients.
 
-2. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
+1. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
 
-3. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
+1. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
 
-3. What is the predicted average verbal score when the class size is equal to 30 students?
-
+1. What is the predicted average verbal score when the class size is equal to 30 students?
 
 ---
 
@@ -648,19 +718,19 @@ Standardized Regression | `launchApp('reg_standardized')`
 * __The average of $\widehat{y}_i$ is equal to $\bar{y}$.__  
     $$\begin{align} \frac{1}{N} \sum_{i=1}^N \widehat{y}_i &= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$
 
-* __The average (or sum) of errors is 0.__
+* __The average (or sum) of residuals is 0.__
   $$\begin{align} \frac{1}{N} \sum_{i=1}^N e_i &= \frac{1}{N} \sum_{i=1}^N (y_i - \widehat y_i) \\ &= \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i \\\ &= 0 \end{align}$$
 ]
 
 --
 
 .pull-right[
-* __ Regressor and errors are uncorelated (by definition).__
+* __ Regressor and residuals are uncorrelated (by definition).__
 
   $$Cov(x_i, e_i) = 0$$
 
 
-* __Prediction and errors are uncorrelated.__
+* __Prediction and residuals are uncorrelated.__
 
   $$\begin{align} Cov(\widehat y_i, e_i) &= Cov(b_0 + b_1x_i, e_i) \\ &= b_1Cov(x_i,e_i) \\ &= 0 \end{align}$$
   
@@ -707,9 +777,9 @@ for(i in 1:4) {
 op <- par(mfrow = c(2, 2), mar = 0.1+c(4,4,1,1), oma =  c(0, 0, 0, 0))
 for(i in 1:4) {
   ff[2:3] <- lapply(paste0(c("y","x"), i), as.name)
-  plot(ff, data = anscombe, col = "red", pch = 21, bg = "orange", cex = 1.2,
+  plot(ff, data = anscombe, col = "black", pch = 21, bg = "#d90502", cex = 1.2,
        xlim = c(3, 19), ylim = c(3, 13),main=paste("dataset",i))
-  abline(mods[[i]], col = "green")
+  abline(mods[[i]], col = "#DE9854")
 }
 par(op)
 ```
@@ -809,7 +879,7 @@ $$
 
 class: inverse
 
-# Task 4: $R^2$ and goodness of fit
+# Task 3: $R^2$ and goodness of fit
 
 `r countdown(minutes = 10, top = 0)`
 
@@ -819,7 +889,7 @@ class: inverse
 
 1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you about the relationship between $R^2$ and the correlation in a regression with only one regressor?
 
-1. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula in the previous slide.
+1. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula on the previous slide.
 
 1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
 
