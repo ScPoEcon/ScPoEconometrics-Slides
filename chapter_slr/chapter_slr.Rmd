@@ -160,28 +160,6 @@ g_verb
 
 ---
 
-class:: inverse
-
-# Task 2: Binned scatter plot => Get rid of?
-
-`r countdown(minutes = 7, top = 0)`
-
-1. Create a new dataset (`grades_avg_cs`) where math and verbal scores are averaged by class size. Let's call these new average scores `avgmath_cs` and `avgverb_cs`.  
-*N.B.: the "raw" scores are already averages at the class level. Here we average these averages by class size.*
-
-1. Redo the same plots as before. Is the sign of the relationship more apparent?
-
-1. Compute the correlation between class size and the new aggreagated math and verbal scores variables. Why is the (linear) association so much stronger?
-
-```{r, echo = FALSE}
-grades_avg_cs = grades %>%
-  group_by(classize) %>%
-  summarise(avgmath_cs = mean(avgmath),
-            avgverb_cs = mean(avgverb))
-```
-
----
-
 # Class size and student performance: Binned scatter plot 
 
 .pull-left[
@@ -441,6 +419,27 @@ g_math_cs +
 
 ---
 
+# Simple Linear Regression: Graphically
+
+.left-wide[
+```{r, echo = F, out.width = "100%", fig.height = 4.5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_segment(data = math_class_reg,
+               aes(xend = classize, yend = .fitted), color = "#d90502", size = 0.5)
+```
+]
+
+.right-thin[
+<br>
+<br>
+<p style="text-align: center; font-weight: bold; font-size: 35px; color: #d90502;">Which "minimisation" criterion should (can) be used?</strong>
+]
+---
+
 # **O**rdinary **L**east **S**quares (OLS) Estimation
 
 --
@@ -489,6 +488,18 @@ g_math_cs +
 
 ---
 
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+<iframe src="https://gustavek.shinyapps.io/reg_simple/" width="100%" height="90%" frameBorder="0"></iframe>
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+<iframe src="https://gustavek.shinyapps.io/SSR_cone/" width="100%" height="90%" frameBorder="0"></iframe>
+
+---
+
 # **O**rdinary **L**east **S**quares (OLS): Coefficient Formulas
 
 * **OLS**: *estimation* method consisting in minimizing the sum of squared residuals.
@@ -510,18 +521,6 @@ g_math_cs +
 --
 
 * These formulas do not appear from magic. They can be found by solving the minimisation of squared errors. The maths can be found [here](https://www.youtube.com/watch?v=Hi5EJnBHFB4) for those who are interested.
-
----
-
-# Intuition behind OLS
-
-How does OLS actually perform the minimization problem? Some intuition without maths.
-
-```{r,eval=FALSE}
-library(ScPoApps)
-launchApp('SSR_cone')
-aboutApp('SSR_cone')  # after
-```
 
 ---
 
