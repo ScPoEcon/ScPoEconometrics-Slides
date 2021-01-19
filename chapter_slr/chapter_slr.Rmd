@@ -381,7 +381,7 @@ plot_ex + geom_line(color = "#d90502")
 
 ---
 
-# Simple Linear Regression: Error term
+# Simple Linear Regression: Residual
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
