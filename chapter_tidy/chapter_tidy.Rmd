@@ -1218,8 +1218,8 @@ Note that `count` will display `NA`s only if there are some.
 
 # How are x and y related? Covariance and Correlation
 
-.pull-left[
-```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 5,fig.width=6}
+
+```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 4,fig.width=8}
 plot(fertility ~ infant_mortality,
     data = gapminder_new,
     xlab   = "Infant mortality",
@@ -1227,40 +1227,66 @@ plot(fertility ~ infant_mortality,
     main   = "Relationship between fertility and infant mortality in 2015",
     col = "#d90502")
 ```
-]
+
+Two main statistics to characterise the relationship between $x$ and $y$:
+1. Covariance
+2. Correlation
+
+---
+
+# Covariance
+
+* The covariance is a measure of __joint variability__ of two variables.
+    $$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$
 
 --
 
-.pull-right[
-* The covariance is a measure of __joint variability__ of two variables.
-    $$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$
-```{r, echo=FALSE}
+* The `cov` function computes the covariance:
+
+```{r}
 cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
 ```
+
+--
+
+* Difficult to interpret because sensitive to the variables' dispersions from the mean
+
+---
+
+# Correlation
+
+* The correlation is a measure of the strength of the __linear association__ between two variables.
+    $$Cor(x,y) = \frac{Cov(x,y)}{\sqrt(Var(x))\sqrt(Var(y))}$$
+
+--
+
+* The `cor` function computes the correlation:
+
+```{r}
+cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+---
+
+# Correlation
+
+* **Correlation is always between -1 and 1!**
+
+--
+
+```{r, echo = F, out.width = "100%"}
+knitr::include_graphics("chapter_tidy_files/figure-html/correlation.svg")
+```
+
+.footnote[
+*Source: [mathisfun](https://www.mathsisfun.com/data/correlation.html)*
 ]
 
 ---
 
-# How are x and y related? Covariance and Correlation
+# Correlation
 
-.pull-left[
-```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 5,fig.width=6}
-```
-]
-
-.pull-right[
-* The covariance is a measure of __joint variability__ of two variables.
-    $$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$
-```{r, echo=FALSE}
-cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
-```
-
-* The correlation is a measure of the strength of the __linear association__ between two variables.
-    $$Cor(x,y) = \frac{Cov(x,y)}{\sqrt(Var(x))\sqrt(Var(y))}$$
-```{r, echo=FALSE}
-cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
-```
-]
+<iframe src="https://gustavek.shinyapps.io/corr_continuous/" width="100%" height="90%" frameBorder="0"></iframe>
 
 ---
 
