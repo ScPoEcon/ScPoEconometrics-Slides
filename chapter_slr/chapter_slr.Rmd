@@ -56,13 +56,23 @@ countdown(
 )
 ```
 
-# Quiz on last week's material
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOTIDY2***](https://app.wooclap.com/SCPOTIDY2)
+
+&nbsp; &nbsp; &nbsp; ***OR***
+
+2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
+
+```{r, echo = F, out.width = "300px"}
+knitr::include_graphics("chapter_slr_files/figure-html/qr_code_quiz.png")
+```
 
 ---
 
 # Today - Real 'metrics finally `r emo::ji("v")`
 
-* Introduction to the __Simple Linear Regression Model__ and __Ordinary Least Squares (OLS)__ *estimation*.
+* Introduction to the ***Simple Linear Regression Model*** and ***Ordinary Least Squares (OLS)*** *estimation*.
 
 * Empirical application: *class size* and *student performance*
 
@@ -92,7 +102,7 @@ class:: inverse
 
 `r countdown(minutes = 7, top = 0)`
  
-1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1). You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) as `grades`. You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
 
 1. Describe the dataset:
 
@@ -100,8 +110,7 @@ class:: inverse
   * How many observations are there?
   * What variables do we have? View the dataset to see what the variables correspond to.
   * What do the variables `avgmath` and `avgverb` correspond to?
-  * Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`.  
-  Hint: use `dplyr` to `select` the variables and then simply pipe (`%>%`) `skim()`.
+  * Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`. (*Hint: use `dplyr` to `select` the variables and then simply pipe (`%>%`) `skim()`.*)
 
 1. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
 
@@ -147,50 +156,13 @@ g_verb
 
 --
 
-* Hard to see much because all the data points are aligned vertically. Let's add a bit of `jitter` to disperse the data slightly.
-
----
-
-# Class size and student performance: `jitter` scatter plot 
-
-.pull-left[
-```{r, echo=FALSE,fig.height=6}
-g_math = ggplot(grades, aes(x = classize, y = avgmath)) + 
-    geom_point(size = 2, alpha = 0.5, position = "jitter") +
-    xlim(0,45) +
-    ylim(0, 100) +
-    labs(
-      x = "Class size",
-      y = "Average score",
-      title = "Mathematics") +
-    theme_bw(base_size = 20)
-g_math
-```
-]
-
-.pull-right[
-```{r, echo=FALSE,fig.height=6}
-g_verb = ggplot(grades, aes(x = classize, y = avgverb)) + 
-    geom_point(size = 2, alpha = 0.5, position = "jitter") +
-    xlim(0,45) +
-    ylim(0, 100) +
-    labs(x = "Class size",
-         y = "Average score",
-         title = "Reading") +
-    theme_bw(base_size = 20)
-g_verb
-```
-]
-
---
-
-* Somewhat positive association as suggested by correlations. Let's compute the average score by class size to see things more clearly!
+* Somewhat positive association as suggested by the correlations. Let's compute the average score by class size to see things more clearly!
 
 ---
 
 class:: inverse
 
-# Task 2: Binned scatter plot
+# Task 2: Binned scatter plot => Get rid of?
 
 `r countdown(minutes = 7, top = 0)`
 
@@ -343,7 +315,7 @@ Let's formalise a bit what we are doing so far.
 
 ---
 
-# Simple Linear Regression: Error term
+# Simple Linear Regression: Residual
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
@@ -368,7 +340,7 @@ plot_ex
 
 ---
 
-# Simple Linear Regression: Error term
+# Simple Linear Regression: Residual
 
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
@@ -383,15 +355,15 @@ plot_ex + geom_line(color = "#d90502")
 * If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
 
 * However, since in most cases the *dependent variable* $(y)$ is not *only* explained by the chosen *independent variable* $(x)$, $\widehat{y}_i \neq y_i$, i.e. we make an __error__.  
-This __error__ is called the __error term__.
+This __error__ is called the __residual__.
 
 --
 
-* At point $(x_i,y_i)$, we note this error $e_i$.
+* At point $(x_i,y_i)$, we note this residual $e_i$.
 
 --
 
-* The *actual data* $(x_i,y_i)$ can thus be written as *prediction + error*:
+* The *actual data* $(x_i,y_i)$ can thus be written as *prediction + residual*:
 
   $$
   y_i = \widehat y_i + e_i = b_0 + b_1 x_i + e_i
