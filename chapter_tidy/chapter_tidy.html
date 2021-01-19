@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Tidying, Visualising and Summarising Data
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-01-18
+### SciencesPo Paris </br> 2021-01-19
 
 ---
 
@@ -574,7 +574,7 @@ class: inverse
 
 # Task 1
 
-<div class="countdown" id="timer_6005d49a" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_600716ba" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -664,7 +664,7 @@ class: inverse
 
 # Task 2
 
-<div class="countdown" id="timer_6005d566" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_600715ec" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1153,7 +1153,7 @@ class: inverse
 
 # Task 3
 
-<div class="countdown" id="timer_6005d571" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6007175d" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1377,44 +1377,76 @@ Note that `count` will display `NA`s only if there are some.
 
 # How are x and y related? Covariance and Correlation
 
-.pull-left[
+
 &lt;img src="chapter_tidy_files/figure-html/x-y-corr-1.svg" style="display: block; margin: auto;" /&gt;
-]
 
---
-
-.pull-right[
-* The covariance is a measure of __joint variability__ of two variables.
-    `$$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$`
-
-```
-## [1] 24.21146
-```
-]
+Two main statistics to characterise the relationship between `\(x\)` and `\(y\)`:
+1. Covariance
+2. Correlation
 
 ---
 
-# How are x and y related? Covariance and Correlation
+# Covariance
 
-.pull-left[
-&lt;img src="chapter_tidy_files/figure-html/x-y-corr-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-.pull-right[
 * The covariance is a measure of __joint variability__ of two variables.
     `$$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$`
+
+--
+
+* The `cov` function computes the covariance:
+
+
+```r
+cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
 
 ```
 ## [1] 24.21146
 ```
+
+--
+
+* Difficult to interpret because sensitive to the variables' dispersions from the mean
+
+---
+
+# Correlation
 
 * The correlation is a measure of the strength of the __linear association__ between two variables.
     `$$Cor(x,y) = \frac{Cov(x,y)}{\sqrt(Var(x))\sqrt(Var(y))}$$`
 
+--
+
+* The `cor` function computes the correlation:
+
+
+```r
+cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
 ```
 ## [1] 0.8286402
 ```
+
+---
+
+# Correlation
+
+* **Correlation is always between -1 and 1!**
+
+--
+
+&lt;img src="chapter_tidy_files/figure-html/correlation.svg" width="100%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+*Source: [mathisfun](https://www.mathsisfun.com/data/correlation.html)*
 ]
+
+---
+
+# Correlation
+
+&lt;iframe src="https://gustavek.shinyapps.io/corr_continuous/" width="100%" height="90%" frameBorder="0"&gt;&lt;/iframe&gt;
 
 ---
 
@@ -1422,7 +1454,7 @@ class: inverse
 
 # Task 4
 
-<div class="countdown" id="timer_6005d71e" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_600716ec" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
