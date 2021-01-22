@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ScPoEconometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ScPoEconometrics
+## Tidying, Visualising and Summarising Data
+### Florian Oswald, Gustave Kenedi and Pierre Villedieu
+### SciencesPo Paris </br> 2021-01-19
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOINTRO***](https://app.wooclap.com/SCPOINTRO)
+
+&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
+
+2\. From your ***phone*** 👉 flash QR code below
+
+&lt;img src="chapter_tidy_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
+
+---
+  
+# Working With Data
+
+* Econometrics is about `data`.
+
+&lt;img src="chapter_tidy_files/figure-html/data_science_pipeline.png" width="400px" style="display: block; margin: auto;" /&gt;
+
+--
+
+* According a to [2014 NYTimes article](https://www.nytimes.com/2014/08/18/technology/for-big-data-scientists-hurdle-to-insights-is-janitor-work.html), "data scientists [...] spend from ***50 percent to 80 percent of their time*** mired in this more mundane labor of collecting and preparing unruly digital data, before it can be explored for useful nuggets."
+
+* In the next two lectures you will learn the basics of ***tidying***, ***visualising*** and ***summarising*** data
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Tidying Data
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Intro to `dplyr`
+
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [`tidyverse`](https://www.tidyverse.org) package family.
+
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast but a bit more difficult.
+
+* Both have pros and cons. We'll start you off with `dplyr`.
+
+---
+
+# `dplyr` Overview
+
+* You *must* read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's clear and concise.
+
+--
+
+* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
+
+* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
+
+--
+
+* All *verbs* work as follows:
+
+`$$\text{verb}(\underbrace{\text{data.frame}}_{\text{1st argument}}, \underbrace{\text{what to do}}_\text{2nd argument})$$`
+
+--
+
+* Alternatively you can (should) use the `pipe` operator `%&gt;%`:
+
+`$$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %&gt;% }}_{\text{"pipe" operator}} \text{verb}(\underbrace{\text{what to do}}_\text{2nd argument})$$`
+
+---
+
+# Main `dplyr` Verbs
+
+1. `filter()`: Choose observations based on a certain value (i.e. subset)
+
+--
+
+1. `arrange()`: Reorder rows 
+
+--
+
+1. `select()`: Select variables by name
+
+--
+
+1. `mutate()`: Create new variables out of existing ones
+
+--
+
+1. `summarise()`: Collapse data to a single summary
+
+--
+
+1. `group_by()`: All the above can be used in conjunction with `group_by()` to use function on groups rather than entire data
+
+---
+
+# Data on 2016 US election polls from the `dslabs` package
+
+* This dataset contains __real__ data on polls made during the 2016 US Presidential elections and compiled by [fivethirtyeight](fivethirtyeight.com)
+
+
+```r
+library(dslabs)
+library(tidyverse)
+data(polls_us_election_2016) # this data is from fivethirtyeight.com
+polls_us_election_2016 &lt;- as_tibble(polls_us_election_2016)
+head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
+```
+
+```
+## # A tibble: 6 x 6
+##   state startdate  enddate    pollster                                                 grade samplesize
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                                    &lt;fct&gt;      &lt;int&gt;
+## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post                                 A+          2220
+## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys                                  B          26574
+## 3 U.S.  2016-11-02 2016-11-06 Ipsos                                                    A-          2195
+## 4 U.S.  2016-11-04 2016-11-07 YouGov                                                   B           3677
+## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                                         B-         16639
+## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Research/Shaw &amp; Company Resea… A           1295
+```
+
+🚨 This is a `tibble` (more informative than `data.frame`)
+
+What variables does this dataset contain?
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter observations
+
+```r
+filter()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+--
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+  filter(grade == "A" &amp; samplesize &gt; 2000 &amp; rawpoll_trump &gt; 45)
+```
+
+```
+## # A tibble: 1 x 15
+##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton rawpoll_trump
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;         &lt;dbl&gt;
+## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41            48
+## # … with 6 more variables: rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
+## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+```
+]
+
+---
+
+.right-wide[
+Standard suite of comparison operators:
+- `&gt;`: greater than,
+- `&lt;`: smaller than,
+- `&gt;=`: greater than or equal to,
+- `&lt;=`: smaller than or equal to,
+- `!=`: not equal to,
+- `==`: equal to.
+
+Logical operators:
+1. `x &amp; y`: `x` **and** `y`
+1. `x | y`: `x` **or** `y`
+1. `!y`: **not** `y`
+]
+
+---
+
+.right-wide[
+`R` has the convenient `x %in% y` operator (conversely `!x %in% y`), `TRUE` if `x` is *a member of* `y`.
+
+```r
+3 %in% 1:3
+```
+
+```
+## [1] TRUE
+```
+
+```r
+c(2,5) %in% 2:10  # also vectorized
+```
+
+```
+## [1] TRUE TRUE
+```
+
+```r
+c("S","Po") %in% c("Sciences","Po")  # also strings
+```
+
+```
+## [1] FALSE  TRUE
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Create new variable(s)
+
+```r
+mutate()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+--
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %&gt;%
+  names()
+```
+
+```
+##  [1] "state"              "startdate"          "enddate"            "pollster"          
+##  [5] "grade"              "samplesize"         "population"         "rawpoll_clinton"   
+##  [9] "rawpoll_trump"      "rawpoll_johnson"    "rawpoll_mcmullin"   "adjpoll_clinton"   
+## [13] "adjpoll_trump"      "adjpoll_johnson"    "adjpoll_mcmullin"   "trump_clinton_tot" 
+## [17] "trump_raw_adj_diff"
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Keep some variable(s)
+
+```r
+select()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+
+```r
+polls_us_election_2016 %&gt;%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %&gt;%
+  names()
+```
+
+```
+## [1] "state"           "startdate"       "enddate"         "pollster"        "rawpoll_clinton"
+## [6] "rawpoll_trump"
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Compute statistic
+
+```r
+summarise()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+
+```r
+polls_us_election_2016 %&gt;%
+  summarise(max_trump = max(rawpoll_trump))
+```
+
+```
+## # A tibble: 1 x 1
+##   max_trump
+##       &lt;dbl&gt;
+## 1        68
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Summarise
+
+### Apply function by group
+
+```r
+group_by()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+
+```r
+polls_us_election_2016 %&gt;%
+  group_by(grade) %&gt;%
+  summarise(mean_vote_clinton = mean(rawpoll_clinton))
+```
+
+```
+## # A tibble: 11 x 2
+##    grade mean_vote_clinton
+##    &lt;fct&gt;             &lt;dbl&gt;
+##  1 D                  46.7
+##  2 C-                 43.2
+##  3 C                  41.8
+##  4 C+                 44.2
+##  5 B-                 43.9
+##  6 B                  37.3
+##  7 B+                 44.1
+##  8 A-                 43.0
+##  9 A                  45.3
+## 10 A+                 45.8
+## 11 &lt;NA&gt;               43.2
+```
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Chaining 🔗 Commands Together
+
+Works for all `dplyr` verbs:
+
+```r
+polls_us_election_2016 %&gt;%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %&gt;%
+  filter(trump_clinton_diff&gt;5 &amp;
+        state == "Iowa" &amp;
+        is.na(rawpoll_johnson)) %&gt;%
+  select(pollster)
+```
+
+```
+## # A tibble: 3 x 1
+##   pollster
+##   &lt;fct&gt;   
+## 1 Ipsos   
+## 2 Ipsos   
+## 3 Ipsos
+```
+
+--
+
+But also with other `R` commands:
+
+.pull-left[
+
+
+```r
+polls_us_election_2016$samplesize %&gt;% mean(na.rm = T)
+```
+
+```
+## [1] 1148.216
+```
+]
+
+--
+
+.pull-right[
+
+
+```r
+polls_us_election_2016 %&gt;% count()
+```
+
+```
+## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1  4208
+```
+]
+
+---
+
+# Missing Values: `NA`
+
+.pull-left[
+* Whenever a value is *missing*, we code it as `NA`.
+    
+    ```r
+    x &lt;- NA
+    ```
+* `R` propagates `NA` through operations:
+    
+    ```r
+    NA &gt; 5
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+    
+    ```r
+    NA + 10
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+* `is.na(x)` function returns `TRUE` if `x` is an `NA`.
+    
+    ```r
+    is.na(x)
+    ```
+    
+    ```
+    ## [1] TRUE
+    ```
+]
+
+--
+
+.pull-right[
+* What is confusing is that 
+    
+    ```r
+    NA == NA
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+
+* It's easy to illustrate like that:
+    
+    ```r
+    # Let x be Mary's age. We don't know how old she is.
+    x &lt;- NA
+    
+    # Let y be John's age. We don't know how old he is.
+    y &lt;- NA
+    
+    # Are John and Mary the same age?
+    x == y
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+    
+    ```r
+    #&gt; [1] NA
+    # We don't know!
+    ```
+]
+
+---
+
+class: inverse
+
+# Task 1
+
+<div class="countdown" id="timer_600716ba" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Load the data as explained on slide 8.
+
+1. How many polls have a missing `grade`?
+
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
+
+1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000?
+
+1. Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
+
+1. Which state had the highest average Trump vote share for polls which had at least a sample size of 2,000? (*Hint: you'll have to use `filter`, `group_by`, `summarise` and `arrange`. To obtain ranking in descending order check `arrange`'s help page.*)
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Visualising Data
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+background-image: url("../img/logo/ggplot2.svg")
+background-position: 90% 5%
+background-size: 150px
+
+# Base `R` and `ggplot2`
+
+* Base `R` plotting is fairly good.
+
+* There is an extremely powerful alternative: `ggplot2` (part of the `tidyverse` suite) `\(\rightarrow\)` what we'll be using
+
+* Let's go back to the `gapminder` dataset to run the examples.
+
+---
+
+# The `gapminder` dataset: Overview
+
+* Let's first load a dataset with these commands:
+    
+    ```r
+    library(dslabs)
+    gapminder &lt;- gapminder
+    ```
+    
+    
+
+--
+
+* Here are the first 3 rows and last 2 rows.
+    
+    ```r
+    head(gapminder, n = 3)
+    ```
+    
+    ```
+    ##   country year infant_mortality life_expectancy fertility population         gdp continent
+    ## 1 Albania 1960            115.4           62.87      6.19    1636054          NA    Europe
+    ## 2 Algeria 1960            148.2           47.50      7.65   11124892 13828152297    Africa
+    ## 3  Angola 1960            208.0           35.98      7.32    5270844          NA    Africa
+    ##            region
+    ## 1 Southern Europe
+    ## 2 Northern Africa
+    ## 3   Middle Africa
+    ```
+    
+    ```r
+    tail(gapminder, n = 2)
+    ```
+    
+    ```
+    ##        country year infant_mortality life_expectancy fertility population gdp continent         region
+    ## 10544   Zambia 2016               NA           57.10        NA         NA  NA    Africa Eastern Africa
+    ## 10545 Zimbabwe 2016               NA           61.69        NA         NA  NA    Africa Eastern Africa
+    ```
+
+---
+
+class: inverse
+
+# Task 2
+
+<div class="countdown" id="timer_600715ec" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. What variables does this dataset contain?
+
+1. How are the data stored?
+
+1. Create a new variable called `gdppercap` corresponding to `gdp` divided by `population`.
+
+1. Compute the average population per continent per year, `mean_pop`, removing missing values and assign the output to a new object `gapminder_new`.
+
+
+
+---
+
+# gg is for Grammar of Graphics&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[1]: The following slides are taken from [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1)
+]
+
+---
+
+# gg is for Grammar of Graphics
+
+
+.left-thin[
+### Data
+
+```r
+data %&gt;%
+  ggplot()
+```
+
+or 
+
+```r
+ggplot(data)
+```
+]
+
+--
+
+.right-wide[
+
+#### Tidy Data
+
+1. Each variable forms a ***column***
+
+2. Each observation forms a ***row***
+
+3. Each observational unit forms a table
+]
+
+--
+
+.right-wide[
+#### Start by asking
+
+1. What information do I want to use in my visualization?
+
+1. Is that data contained in ***one column/row*** for a given data point?
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+
+```r
++ aes()
+```
+
+]
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+- year
+
+- population
+
+- country
+]
+
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+- year → **x**
+
+- population → **y**
+
+- country → *shape*, *color*, etc.
+]
+
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+```r
+aes(
+  x = year,
+  y = population,
+  color = country
+)
+```
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+
+---
+
+.right-wide[
+Geometric objects displayed on the plot
+
+&lt;img src="chapter_tidy_files/figure-html/geom_demo-1.svg" width="650px" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+Here are the [some of the most widely used geoms](https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/)
+
+.small[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+&lt;https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/&gt;
+]
+]
+
+
+---
+
+.right-wide[
+Just start typing `geom_` in `RStudio` to see all the options
+
+&lt;img src="chapter_tidy_files/figure-html/geom.gif" width="300px" style="float: center;"&gt;
+
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# (Y)Our first plot!
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1a-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+* aes(x = year,
+*     y = mean_pop)
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1b-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop) +
+* geom_point()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1c-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+*     color = continent) +
+  geom_point()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  geom_point() +
+* geom_line()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot2-fake-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+* # geom_point() +
+  geom_line()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot2-line-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+
+```r
++ facet_wrap() 
++ facet_grid()
+```
+]
+---
+
+
+
+.right-wide[
+
+```r
+g + facet_wrap(~ continent)
+```
+
+&lt;img src="chapter_tidy_files/figure-html/geom_facet-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+
+```r
+g + facet_grid(~ continent)
+```
+
+&lt;img src="chapter_tidy_files/figure-html/geom_grid-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+
+```r
++ labs()
+```
+]
+---
+
+.right-wide[
+
+```r
+g + labs(x = "Year", y = "Average Population", color = "Continent")
+```
+
+&lt;img src="chapter_tidy_files/figure-html/labs-ex-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Scales
+
+```r
++ scale_*_*()
+```
+]
+---
+
+.right-wide[ 
+`scale` + `_` + `&lt;aes&gt;` + `_` + `&lt;type&gt;` + `()`
+
+What parameter do you want to adjust? → `&lt;aes&gt;` &lt;br&gt;
+What type is the parameter? → `&lt;type&gt;`
+
+- I want to change my discrete x-axis&lt;br&gt;`scale_x_discrete()`
+- I want to change range of point sizes from continuous variable&lt;br&gt;`scale_size_continuous()`
+- I want to rescale y-axis as log&lt;br&gt;`scale_y_log10()`
+- I want to use a different color palette&lt;br&gt;`scale_fill_discrete()`&lt;br&gt;`scale_color_manual()`
+]
+
+---
+
+.right-wide[
+
+```r
+g + scale_color_viridis_d()
+```
+
+&lt;img src="chapter_tidy_files/figure-html/scale_ex1-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+
+```r
+g + scale_y_log10()
+```
+
+&lt;img src="chapter_tidy_files/figure-html/scale_ex2-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+
+```r
+g + scale_x_continuous(breaks = seq(1950, 2020, 10))
+```
+
+&lt;img src="chapter_tidy_files/figure-html/scale_ex4-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Scales
+
+---
+
+layout:true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Delving Deeper into ggplot
+
+* Each graph is different and `ggplot2` provides a zillion options to customize your graph to perfection.
+
+--
+
+* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
+
+--
+
+* [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken from.
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+--
+
+***Boxplots:*** displays the distribution of a variable.
+
+--
+
+&lt;img src="chapter_tidy_files/figure-html/boxplot_explanation.png" width="850px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+***Boxplots:*** displays the distribution of a variable.
+
+***Scatter plots:*** shows the association between two variables.
+
+---
+
+class: inverse
+
+# Task 3
+
+<div class="countdown" id="timer_6007175d" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Using the `gapminder` data, create the following plots using `ggplot2`. Don't forget to label the axes.
+
+1. A histogram of life expectancy in 2015. Within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502".
+
+1. Using the previous graph, facet it by continent such that each continent's plot is a new row. (*Hint: check the help for `facet_grid`.*)
+
+1. A boxplot of average life expectancy per year by continent (removing missing values). Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
+
+1. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis) in 2015. Within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502".
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Summarising
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Summarising Data
+
+
+* One can learn only a limited amount from **looking** at a `data.frame`. 🔍
+
+--
+
+* Even if you *could* see all rows of the dataset, you would not know very much **about it**.
+
+--
+
+* We need to **summarise** the data for us to learn from it.
+
+--
+
+* In general, we can compute summary statistics and/or visualise the data with plots.
+
+--
+
+* Let's now turn to summary statistics!
+
+--
+
+* In particular, let's look at two features: *central tendency* and *spread*.
+
+---
+
+# Central Tendency
+
+
+.pull-left[
+`mean(x)`: the average of all values in `x`.
+`$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$`
+
+
+```r
+x &lt;- c(1,2,2,2,2,100)
+mean(x)
+```
+
+```
+## [1] 18.16667
+```
+
+```r
+mean(x) == sum(x) / length(x)
+```
+
+```
+## [1] TRUE
+```
+]
+
+--
+
+.pull-right[
+`median`: the value `\(x_j\)` below and above which 50% of the values in `x` lie. `\(m\)` is the median if
+    `$$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$`
+    
+The median is robust against *outliers*.
+
+
+```r
+median(x)
+```
+
+```
+## [1] 2
+```
+]
+
+---
+
+# Spread
+
+.pull-left[
+Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
+
+The *variance* is such a measure.
+    `$$Var(X) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})^2$$`
+    
+Consider two `normal distributions` with equal mean at `0`:
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_tidy_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+
+Compute with:
+
+```r
+var(x)
+range(x)   # range
+```
+]
+---
+
+# Tabulating Data
+
+`table(x)` is a useful function that counts the occurence of each unique value in `x`:
+
+```r
+table(gapminder$continent)
+```
+
+```
+## 
+##   Africa Americas     Asia   Europe  Oceania 
+##     2907     2052     2679     2223      684
+```
+
+--
+
+The same can be achieved using the `count` function (from `dplyr`)
+
+```r
+gapminder %&gt;% count(continent)
+```
+
+```
+##   continent    n
+## 1    Africa 2907
+## 2  Americas 2052
+## 3      Asia 2679
+## 4    Europe 2223
+## 5   Oceania  684
+```
+
+---
+
+# Tabulating Data
+
+
+Given two variables, `table` produces a contingency table:
+
+```r
+gapminder_new &lt;- gapminder %&gt;%
+  filter(year == 2015) %&gt;%
+  mutate(fertility_above_2 = (gapminder_2015$fertility &gt; 2.1)) # dummy variable for fertility rate above replacement level fertility
+table(gapminder_new$fertility_above_2,gapminder_new$continent)
+```
+
+```
+##        
+##         Africa Americas Asia Europe Oceania
+##   FALSE      2       15   20     39       4
+##   TRUE      49       20   27      0       8
+```
+
+--
+
+With `prop.table`, we can get proportions:
+
+```r
+# proportions by row
+prop.table(table(gapminder_new$fertility_above_2,gapminder_new$continent), margin = 1)
+# proportions by column
+prop.table(table(gapminder_new$fertility_above_2,gapminder_new$continent), margin = 2) 
+```
+
+* ⚠️ To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
+
+---
+
+# Tabulating Data
+
+Again the `count` function can get you there as well:
+
+
+```r
+gapminder_new %&gt;%
+  count(continent, fertility_above_2)
+```
+
+```
+##    continent fertility_above_2  n
+## 1     Africa             FALSE  2
+## 2     Africa              TRUE 49
+## 3   Americas             FALSE 15
+## 4   Americas              TRUE 20
+## 5   Americas                NA  1
+## 6       Asia             FALSE 20
+## 7       Asia              TRUE 27
+## 8     Europe             FALSE 39
+## 9    Oceania             FALSE  4
+## 10   Oceania              TRUE  8
+```
+
+Note that `count` will display `NA`s only if there are some.
+
+---
+
+# How are x and y related? Covariance and Correlation
+
+
+&lt;img src="chapter_tidy_files/figure-html/x-y-corr-1.svg" style="display: block; margin: auto;" /&gt;
+
+Two main statistics to characterise the relationship between `\(x\)` and `\(y\)`:
+1. Covariance
+2. Correlation
+
+---
+
+# Covariance
+
+* The covariance is a measure of __joint variability__ of two variables.
+    `$$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$`
+
+--
+
+* The `cov` function computes the covariance:
+
+
+```r
+cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+```
+## [1] 24.21146
+```
+
+--
+
+* Difficult to interpret because sensitive to the variables' dispersions from the mean
+
+---
+
+# Correlation
+
+* The correlation is a measure of the strength of the __linear association__ between two variables.
+    `$$Cor(x,y) = \frac{Cov(x,y)}{\sqrt(Var(x))\sqrt(Var(y))}$$`
+
+--
+
+* The `cor` function computes the correlation:
+
+
+```r
+cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+```
+## [1] 0.8286402
+```
+
+---
+
+# Correlation
+
+* **Correlation is always between -1 and 1!**
+
+--
+
+&lt;img src="chapter_tidy_files/figure-html/correlation.svg" width="100%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+*Source: [mathisfun](https://www.mathsisfun.com/data/correlation.html)*
+]
+
+---
+
+# Correlation
+
+&lt;iframe src="https://gustavek.shinyapps.io/corr_continuous/" width="100%" height="90%" frameBorder="0"&gt;&lt;/iframe&gt;
+
+---
+
+class: inverse
+
+# Task 4
+
+<div class="countdown" id="timer_600716ec" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Compute the mean of population in 1960 and assign to object `mean`. Read the help for `mean` to remove `NA`s.
+
+1. Compute the median of population in 1960 and assign to object `median`. Is it greater or smaller than the average?
+
+1. Create of density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
+
+1. Compute the correlation between fertility rate and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
+
+In your free time, you can do this tutorial:
+
+```r
+library(ScPoApps)
+runTutorial('chapter2')
+```
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU NEXT WEEK!
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
