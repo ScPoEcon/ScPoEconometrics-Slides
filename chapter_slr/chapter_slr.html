@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ScPoEconometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ScPoEconometrics
+## Simple Linear Regression
+### Florian Oswald, Gustave Kenedi and Pierre Villedieu
+### SciencesPo Paris </br> 2021-01-19
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOTIDY2***](https://app.wooclap.com/SCPOTIDY2)
+
+&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
+
+2\. From your ***phone*** 👉 flash QR code below
+
+&lt;img src="chapter_slr_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Today - Real 'metrics finally ✌️
+
+* Introduction to the ***Simple Linear Regression Model*** and ***Ordinary Least Squares (OLS)*** *estimation*.
+
+* Empirical application: *class size* and *student performance*
+
+* Keep in mind that we are interested in uncovering **causal** relationships
+
+---
+
+# Class size and student performance
+
+* What policies *lead* to improved student learning?
+
+* Class size reduction has been at the heart of policy debates for *decades*.
+
+--
+
+* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273), obtained from [Raj Chetty and Greg Bruich's course](https://opportunityinsights.org/course/).
+
+* Consists of test scores and class/school characteristics for fifth graders (10-11 years old) in Jewish public elementary schools in Israel in 1991.
+
+* National tests measured *mathematics* and (Hebrew) *reading* skills. The raw scores were scaled from 1-100.
+
+---
+
+class:: inverse
+
+# Task 1: Getting to know the data
+
+<div class="countdown" id="timer_60072754" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+ 
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) as `grades`. You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+
+1. Describe the dataset:
+
+  * What is the unit of observations, i.e. what does each row correspond to?
+  * How many observations are there?
+  * What variables do we have? View the dataset to see what the variables correspond to.
+  * What do the variables `avgmath` and `avgverb` correspond to?
+  * Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`. (*Hint: use `dplyr` to `select` the variables and then simply pipe (`%&gt;%`) `skim()`.*)
+
+1. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
+
+1. Compute the correlation between class size and math and verbal scores. Is the relationship positive/negative, strong/weak?
+
+
+
+---
+
+# Class size and student performance: Scatter plot
+
+.pull-left[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+* Somewhat positive association as suggested by the correlations. Let's compute the average score by class size to see things more clearly!
+
+---
+
+# Class size and student performance: Binned scatter plot 
+
+.pull-left[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Class size and student performance: Binned scatter plot
+
+* We'll first focus on the mathematics scores and for visual simplicity we'll zoom in
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Class size and student performance: Regression line
+
+How to visually summarize the relationship: **a line through the scatter plot**
+
+--
+
+.left-wide[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto auto auto 0;" /&gt;
+]
+
+--
+
+.right-thin[
+&lt;br&gt;
+
+* A *line*! Great. But **which** line? This one?
+
+* That's a *flat* line. But average mathematics score is somewhat *increasing* with class size 😩
+
+]
+
+---
+
+# Class size and student performance: Regression line
+
+How to visually summarize the relationship: **a line through the scatter plot**
+
+.left-wide[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto auto auto 0;" /&gt;
+]
+
+.right-thin[
+&lt;br&gt;
+
+* **That** one?
+
+* Slightly better! Has a **slope** and an **intercept** 😐
+
+* We need a rule to decide! 
+
+]
+
+
+---
+
+# Simple Linear Regression
+
+Let's formalise a bit what we are doing so far. 
+
+* We are interested in the relationship between two variables:
+
+--
+
+  * an __outcome variable__ (also called __dependent variable__):  
+  *average mathematics score* `\((y)\)`
+  
+--
+  
+  * an __explanatory variable__ (also called __independent variable__ or __regressor__):  
+  *class size* `\((x)\)`
+  
+--
+
+* For each class `\(i\)` we observe both `\(x_i\)` and `\(y_i\)`, and therefore we can plot the *joint distribution* of class size and average mathematics score.
+
+--
+
+* We summarise this relationship with a line (for now). The equation for such a line with an intercept `\(b_0\)` and a slope `\(b_1\)` is:
+    $$
+    \widehat{y}_i = b\_0 + b\_1 x\_i
+    $$
+
+--
+
+* `\(\widehat{y}_i\)` is our *prediction* for `\(y\)` at observation `\(i\)` `\((y_i)\)` given our model (i.e. the line).
+
+---
+
+# What's A Line: A Refresher
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What's A Line: A Refresher
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What's A Line: A Refresher
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Residual
+
+* If all the data points were __on__ the line then `\(\widehat{y}_i = y_i\)`.
+
+--
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Residual
+
+* If all the data points were __on__ the line then `\(\widehat{y}_i = y_i\)`.
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Residual
+
+* If all the data points were __on__ the line then `\(\widehat{y}_i = y_i\)`.
+
+* However, since in most cases the *dependent variable* `\((y)\)` is not *only* explained by the chosen *independent variable* `\((x)\)`, `\(\widehat{y}_i \neq y_i\)`, i.e. we make an __error__.  
+This __error__ is called the __residual__.
+
+--
+
+* At point `\((x_i,y_i)\)`, we note this residual `\(e_i\)`.
+
+--
+
+* The *actual data* `\((x_i,y_i)\)` can thus be written as *prediction + residual*:
+
+  $$
+  y_i = \widehat y_i + e_i = b_0 + b_1 x_i + e_i
+  $$
+
+---
+
+# Simple Linear Regression: Graphically
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Graphically
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Graphically
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Graphically
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Graphically
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple Linear Regression: Graphically
+
+.left-wide[
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-20-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.right-thin[
+&lt;br&gt;
+&lt;br&gt;
+&lt;p style="text-align: center; font-weight: bold; font-size: 35px; color: #d90502;"&gt;Which "minimisation" criterion should (can) be used?&lt;/strong&gt;
+]
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+--
+
+* Errors of different sign `\((+/-)\)` cancel out, so we consider **squared residuals** 
+`$$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$`
+
+* Choose `\((b_0,b_1)\)` such that `\(\sum_{i = 1}^N e_1^2 + \dots + e_N^2\)` is **as small as possible**.
+
+--
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+* Errors of different sign `\((+/-)\)` cancel out, so we consider **squared residuals** 
+`$$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$`
+
+* Choose `\((b_0,b_1)\)` such that `\(\sum_{i = 1}^N e_1^2 + \dots + e_N^2\)` is **as small as possible**.
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+&lt;iframe src="https://gustavek.shinyapps.io/reg_simple/" width="100%" height="90%" frameBorder="0"&gt;&lt;/iframe&gt;
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+&lt;iframe src="https://gustavek.shinyapps.io/SSR_cone/" width="100%" height="90%" frameBorder="0"&gt;&lt;/iframe&gt;
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Coefficient Formulas
+
+* **OLS**: *estimation* method consisting in minimizing the sum of squared residuals.
+
+* Yields __unique__ solutions to this minization problem.
+
+* So what are the formulas for `\(b_0\)` (intercept) and `\(b_1\)` (slope)?
+
+--
+
+* In our single independent variable case:
+
+&gt;   ### __Slope: `\(b_1^{OLS} = \frac{cov(x,y)}{var(x)}\)` `\(\hspace{2cm}\)` Intercept: `\(b_0^{OLS} = \bar{y} - b_1\bar{x}\)`__
+
+--
+
+* ❗ You should know these formulas, especially the one for `\(b_1^{OLS}\)` ❗
+   
+--
+
+* These formulas do not appear from magic. They can be found by solving the minimisation of squared errors. The maths can be found [here](https://www.youtube.com/watch?v=Hi5EJnBHFB4) for those who are interested.
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Interpretation
+
+For now assume both the dependent variable `\((y)\)` and the independent variable `\((x)\)` are numeric.
+
+--
+
+&gt; Intercept `\((b_0)\)`: **The predicted value of `\(y\)` `\((\widehat{y})\)` if `\(x = 0\)`.**
+
+--
+
+&gt; Slope `\((b_1)\)`: **The predicted change, on average, in the value of `\(y\)` *associated* to a one-unit increase in `\(x\)`.**
+
+--
+
+* ⚠️ Note that we use the term *associated*, **clearly avoiding interpreting `\(b_1\)` as the causal impact of `\(x\)` on `\(y\)`**. To make such a claim, we need some specific conditions to be met. (Next week!)
+
+--
+ 
+* Also notice that the units of `\(x\)` will matter for the interpretation (and magnitude!) of `\(b_1\)`.
+
+--
+
+* **You need to be explicit about what the unit of `\(x\)` is!**
+
+---
+
+# OLS with `R`
+
+* In `R`, OLS regressions are estimated using the `lm` function.
+
+* This is how it works:
+
+  
+  ```r
+  lm(formula = dependent variable ~  independent variable, data = data.frame containing the data)
+  ```
+
+--
+
+## Class size and student performance
+
+Let's estimate the following model by OLS: `\(\textrm{average math score}_i = b_0 + b_1 \textrm{class size}_i + e_i\)`
+
+.pull-left[
+
+```r
+# OLS regression of class size on average maths score
+lm(avgmath_cs ~ classize, grades_avg_cs) 
+```
+]
+
+.pull-right[
+
+```
+## 
+## Call:
+## lm(formula = avgmath_cs ~ classize, data = grades_avg_cs)
+## 
+## Coefficients:
+## (Intercept)     classize  
+##     61.1092       0.1913
+```
+]
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Prediction
+
+
+```
+## 
+## Call:
+## lm(formula = avgmath_cs ~ classize, data = grades_avg_cs)
+## 
+## Coefficients:
+## (Intercept)     classize  
+##     61.1092       0.1913
+```
+
+--
+
+This implies (abstracting the `\(_i\)` subscript for simplicity):
+
+
+$$
+`\begin{aligned}
+\widehat y &amp;= b_0 + b_1 x \\
+\widehat {\text{average math score}} &amp;= b_0 + b_1 \cdot \text{class size} \\
+\widehat {\text{average math score}} &amp;= 61.11 + 0.19 \cdot \text{class size}
+\end{aligned}`
+$$
+
+--
+
+What's the predicted average score for a class of 26 students? (Using the *exact* coefficients.)
+
+$$
+`\begin{aligned}
+\widehat {\text{average math score}} &amp;= 61.11 + 0.19 \cdot 26 \\
+\widehat {\text{average math score}} &amp;= 66.08
+\end{aligned}`
+$$
+
+---
+
+class: inverse
+
+# Task 2: OLS Regression
+
+<div class="countdown" id="timer_6007261f" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Run the following code to aggregate the data at the class size level:
+
+
+```r
+grades_avg_cs &lt;- grades %&gt;%
+  group_by(classize) %&gt;%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+```
+
+1. Compute the OLS coefficients `\(b_0\)` and `\(b_1\)` of the previous regression using the formulas on slide 25. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
+
+1. Regress average verbal score (dependent variable) on class size (independant variable). Interpret the coefficients.
+
+1. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
+
+1. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
+
+1. What is the predicted average verbal score when the class size is equal to 30 students?
+
+---
+
+# OLS Variations / Restrictions
+
+* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional 🤓
+
+* There is an app for each of them:
+&lt;br&gt;
+&lt;br&gt;
+
+type | App  
+-------- | --------
+No Intercept, No regressors | `launchApp('reg_constrained')` 
+Centered Regression | `launchApp('demeaned_reg')` 
+Standardized Regression | `launchApp('reg_standardized')`
+
+
+---
+
+# Predictions and Residuals: Properties
+
+.pull-left[
+* __The average of `\(\widehat{y}_i\)` is equal to `\(\bar{y}\)`.__  
+    `$$\begin{align} \frac{1}{N} \sum_{i=1}^N \widehat{y}_i &amp;= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &amp;= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$`
+
+* __The average (or sum) of residuals is 0.__
+  `$$\begin{align} \frac{1}{N} \sum_{i=1}^N e_i &amp;= \frac{1}{N} \sum_{i=1}^N (y_i - \widehat y_i) \\ &amp;= \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i \\\ &amp;= 0 \end{align}$$`
+]
+
+--
+
+.pull-right[
+* __ Regressor and residuals are uncorrelated (by definition).__
+
+  `$$Cov(x_i, e_i) = 0$$`
+
+
+* __Prediction and residuals are uncorrelated.__
+
+  `$$\begin{align} Cov(\widehat y_i, e_i) &amp;= Cov(b_0 + b_1x_i, e_i) \\ &amp;= b_1Cov(x_i,e_i) \\ &amp;= 0 \end{align}$$`
+  
+  Since `\(Cov(a + bx, y) = bCov(x,y)\)`.
+
+]
+
+---
+
+# Linearity Assumption: Visualize your Data!
+
+* It's important to keep in mind that covariance, correlation and simple OLS regression only measure **linear relationships** between two variables.
+
+* Two datasets with *identical* correlations and regression lines could look *vastly* different.
+
+--
+
+* Is that even possible?
+&lt;img src="https://media.giphy.com/media/5aLrlDiJPMPFS/giphy.gif" height = "400" align = "middle" /&gt;
+
+---
+
+# Linearity Assumption: Anscombe
+
+* Francis Anscombe (1973) came up with 4 datasets with identical stats. But look!
+
+.left-wide[
+
+&lt;img src="chapter_slr_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.right-thin[
+&lt;/br&gt;
+&lt;/br&gt;
+
+&lt;table class="table table-striped" style="font-size: 20px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; dataset &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; cov &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; var(y) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; var(x) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.501 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.127 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.128 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.497 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.123 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.499 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.123 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+---
+
+# Nonlinear Relationships in Data?
+
+.pull-left[
+* We can accomodate non-linear relationships in regressions.
+
+* Just add a *higher order* term like this:
+    $$
+    y_i = b_0 + b_1 x_i + b_2 x_i^2 + e_i
+    $$
+    
+* This is __multiple regression__ (in 2 weeks!)
+]
+
+--
+
+.pull-right[
+* For example, suppose we had this data and fit the previous regression model:
+    &lt;img src="chapter_slr_files/figure-html/non-line-cars-ols2-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Analysis of Variance
+
+* Remember that `\(y_i = \widehat{y}_i + e_i\)`.
+
+* We have the following decomposition:
+    `$$\begin{align} Var(y) &amp;= Var(\widehat{y} + e)\\&amp;= Var(\widehat{y}) + Var(e) + 2 Cov(\widehat{y},e)\\&amp;= Var(\widehat{y}) + Var(e)\end{align}$$`
+    
+* Because:
+  * `\(Var(x+y) = Var(x) + Var(y) + 2Cov(x,y)\)`
+  * `\(Cov(\hat{y},e)=0\)`
+
+* __Total variation (SST) = Model explained (SSE) + Unexplained (SSR)__
+
+---
+
+# Goodness of Fit
+
+* The __ `\(R^2\)` __ measures how well the __model fits the data__.
+
+--
+
+$$
+R^2 = \frac{\text{variance explained}}{\text{total variance}} =     \frac{SSE}{SST} = 1 - \frac{SSR}{SST}\in[0,1]
+$$
+
+--
+    
+* `\(R^2\)` close to `\(1\)` indicates a __very ***high*** explanatory power__ of the model.
+
+* `\(R^2\)` close to `\(0\)` indicates a __very ***low*** explanatory power__ of the model.
+
+--
+
+* *Interpretation:* an `\(R^2\)` of 0.5, for example, means that the variation in `\(x\)` "explains" 50% of the variation in `\(y\)`.
+
+--
+    
+* ⚠️ Low `\(R^2\)` does __NOT__ mean it's a useless model! Remember that econometrics is interested in causal mechanisms, not prediction!
+
+---
+
+class: inverse
+
+# Task 3: `\(R^2\)` and goodness of fit
+
+<div class="countdown" id="timer_60072732" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Regress `avgmath_cs` on `classize`. Assign to an object `math_reg`.
+
+1. Pass `math_reg` in the `summary()` function. What is the (multiple) `\(R^2\)` for this regression? How can you interpret it?
+
+1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you about the relationship between `\(R^2\)` and the correlation in a regression with only one regressor?
+
+1. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the `\(R^2\)` using the formula on the previous slide.
+
+1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
+
+---
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU IN TWO WEEKS!
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
