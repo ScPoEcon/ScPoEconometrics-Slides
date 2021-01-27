@@ -281,7 +281,10 @@ tm_shape(iris_map) +
 
 [France Stratégie](https://strategie.gouv.fr/) has created a [simple web application](http://segregationresidentielle.strategie.gouv.fr/app_seg) to visualize the evolution of residential segregation in France between 1968 and 2015.
 
-<iframe src="https://francestrategie.shinyapps.io/app_seg/" width="100%" height="60%" frameBorder="0"></iframe>
+
+```{r, echo = F, out.extra = 'style="border: none;"', out.height = "100%"}
+knitr::include_url("https://francestrategie.shinyapps.io/app_seg/")
+```
 
 ---
 
