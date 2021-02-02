@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Tidying, Visualising and Summarising Data
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-01-19
+### SciencesPo Paris </br> 2021-02-02
 
 ---
 
@@ -574,7 +574,7 @@ class: inverse
 
 # Task 1
 
-<div class="countdown" id="timer_600716ba" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60196ba1" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -664,7 +664,7 @@ class: inverse
 
 # Task 2
 
-<div class="countdown" id="timer_600715ec" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60196b5c" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1153,7 +1153,7 @@ class: inverse
 
 # Task 3
 
-<div class="countdown" id="timer_6007175d" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60196c6f" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1446,7 +1446,7 @@ cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs"
 
 # Correlation
 
-&lt;iframe src="https://gustavek.shinyapps.io/corr_continuous/" width="100%" height="90%" frameBorder="0"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://gustavek.shinyapps.io/corr_continuous/" width="100%" height="400px" style="border: none;"&gt;&lt;/iframe&gt;
 
 ---
 
@@ -1454,7 +1454,7 @@ class: inverse
 
 # Task 4
 
-<div class="countdown" id="timer_600716ec" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60196bfd" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1462,14 +1462,14 @@ class: inverse
 
 1. Compute the median of population in 1960 and assign to object `median`. Is it greater or smaller than the average?
 
-1. Create of density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
+1. Create a density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
 
 1. Compute the correlation between fertility rate and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
 
 In your free time, you can do this tutorial:
 
 ```r
-library(ScPoApps)
+library(ScPoApps) # this may take a while to install
 runTutorial('chapter2')
 ```
 
