@@ -1286,7 +1286,9 @@ knitr::include_graphics("chapter_tidy_files/figure-html/correlation.svg")
 
 # Correlation
 
-<iframe src="https://gustavek.shinyapps.io/corr_continuous/" width="100%" height="90%" frameBorder="0"></iframe>
+```{r, echo = F, out.extra = 'style="border: none;"'}
+knitr::include_url("https://gustavek.shinyapps.io/corr_continuous/")
+```
 
 ---
 
@@ -1300,13 +1302,13 @@ class: inverse
 
 1. Compute the median of population in 1960 and assign to object `median`. Is it greater or smaller than the average?
 
-1. Create of density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
+1. Create a density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
 
 1. Compute the correlation between fertility rate and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
 
 In your free time, you can do this tutorial:
 ```{r, echo = TRUE, eval=FALSE}
-library(ScPoApps)
+library(ScPoApps) # this may take a while to install
 runTutorial('chapter2')
 ```
 
