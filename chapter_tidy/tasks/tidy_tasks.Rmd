@@ -182,7 +182,7 @@ mean <- gapminder %>%
 mean
 ```
     
-2\. 1. Compute the median of population in 1960. Is it greater or smaller than the average?
+2\. Compute the median of population in 1960 and assign to object `median`. Is it greater or smaller than the average?
 
 ```{r}
 median <- gapminder %>%
@@ -191,7 +191,9 @@ median <- gapminder %>%
 median
 ```
 
-3\. Create of density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
+**The median is much smaller than the average.**
+
+3\. Create a density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
 
 ```{r}
 pop_density <- gapminder %>%
@@ -204,7 +206,7 @@ pop_density <- gapminder %>%
 pop_density
 ```
 
-**The distribution of population is highly ***skewed***: there are many countries with small populations and very few with huge populations (China, India, U.S.). In such cases, the average will be (significantly) greater than the median. To see this more clearly, here's a graph where I've transformed the x-axis such that each tick is 10 times larger than the previous one (the scale is therefore not linear, i.e. the first tick is 10,000, the second is 100,000, ther third is 1 million, etc.).**
+**The distribution of population is highly ***skewed***: there are many countries with small populations and very few with huge populations (China, India, U.S.). In such cases, the average will be (significantly) greater than the median. To see this more clearly, here's a graph where I've transformed the x-axis such that each tick is 10 times larger than the previous one (the scale is therefore not linear, i.e. the first tick is 100,000, the second is 1 million, the third is 10 million, etc.).**
 
 ```{r}
 pop_density +
