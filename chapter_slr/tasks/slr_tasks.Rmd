@@ -1,0 +1,192 @@
+---
+title: "Simple Linear Regression - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1: Getting to know the data
+
+1\. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) as `grades`. You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+
+```{r}
+library(haven)
+link <- "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1"
+
+grades <- read_dta(link)
+```
+
+2\. Describe the dataset:
+
+* What is the unit of observations, i.e. what does each row correspond to?
+  
+**The unit of observation is the class.**
+  
+* How many observations are there?
+  
+```{r}
+nrow(grades)
+```
+
+* What variables do we have? View the dataset to see what the variables correspond to.
+
+```{r}
+names(grades)
+```
+
+**Note that if you view the data, under each column name you have the variable's label, which is very convenient.**
+
+* What do the variables `avgmath` and `avgverb` correspond to?
+
+**The `avgmath` and `avgverb` variables correspond to the class' average math and average verb scores.**
+
+* Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`. (*Hint: use `dplyr` to `select` the variables and then simply pipe (`%>%`) `skim()`.*)
+
+```{r}
+library(skimr)
+library(tidyverse)
+
+grades %>%
+    select(classize, avgmath, avgverb) %>%
+    skim()
+```
+
+**The `skim` function provides some useful statistics about a variable. There are no missing values for the class size and average scores variables. Class sizes range from 5 students to 44 students, with the average class around 30 students. There are relatively few small classes (25th percentile is 26 students). Also note that average math scores were slightly lower than average verb scores and that the former's distribution is more dispersed than the latter's.**
+
+3\. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
+
+**On the one hand, smaller classes may offer the opportunity for more individualised learning and teachers may more easily monitor low-performing students. On the other hand, if teachers are not trained to properly take advantage of smaller groups then perhaps smaller classes might not be that beneficial. Moreover, depending on the country, smaller classes may be more prevalent in poorer areas, which would yield a positive relationship between class size and student achievement. Conversely, more conscientious parents may choose to locate in areas with smaller class sizes, thinking their children would benefit from them, in which case a negative relationship is likely to be found between class size and student performance.**  
+**A scatter plot would provide a first insight into the relationship between class size and student achievement.**
+
+```{r}
+library(cowplot)
+
+scatter_verb <- grades %>%
+    ggplot() +
+    aes(x = classize, y = avgverb) +
+    geom_point() +
+    scale_x_continuous(limits = c(0, 45), breaks = seq(0,45,5)) +
+    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 20)) +
+    labs(x = "Class size",
+         y = "Average reading score")
+scatter_math <- grades %>%
+    ggplot() +
+    aes(x = classize, y = avgmath) +
+    geom_point() +
+    scale_x_continuous(limits = c(0, 45), breaks = seq(0,45,5)) +
+    scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 20)) +
+    labs(x = "Class size",
+         y = "Average math score")
+plot_grid(scatter_verb, scatter_math, labels = c("Reading", "Mathematics"))
+```
+
+4\. Compute the correlation between class size and math and verbal scores. Is the relationship positive/negative, strong/weak?
+
+```{r}
+grades %>%
+    summarise(cor_verb = cor(classize, avgverb),
+             cor_math = cor(classize, avgmath))
+```
+
+**Both correlations are positive, consistent with the positive association suggested by the previous scatter plots. However, they are quite weak, around 0.2, suggesting the relationship isn't very strong. Recall that a correlation of 1 implies a perfect positive *linear* relationship, i.e. all points are on the same line, while a correlation of -1 implies a perfect negative *linear* relationship. A correlation of 0 implies no linear association whatsoever.**
+
+
+## Task 2: OLS Regression
+
+Run the following code to aggregate the data at the class size level:
+
+```{r}
+grades_avg_cs <- grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+```
+
+1\. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 25. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
+
+```{r}
+cov_x_y = grades_avg_cs %>%
+    summarise(cov(classize, avgmath_cs))
+var_x = var(grades_avg_cs$classize)
+b_1 = cov_x_y / var_x
+b_1
+
+y_bar = mean(grades_avg_cs$avgmath_cs)
+x_bar = mean(grades_avg_cs$classize)
+b_0 = y_bar - b_1 * x_bar
+b_0
+```
+
+2\. Regress average verbal score (dependent variable) on class size (independant variable). Interpret the coefficients.
+
+```{r}
+lm(avgverb_cs ~ classize, grades_avg_cs)
+```
+
+*Interpretation for $b_0$:* **The predicted verbal score when class size has no students is 69.19. Note that this makes little sense because if a class has no students then there cannot be any scores! You should be warry of *out-of-sample* predictions, i.e. predictions for values that are outside the range of values in the data sample.**
+
+*Interpretation for $b_1$:* **On average, a class size increase of one student is associated with a 0.13 increase in average verbal score.**
+
+3\. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
+
+**The slope coefficient, $b_1$, is very similar to the one found for average math sore. This was expected considering the scatter plots were pretty close for both scores.**
+
+4\. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
+
+**As noted above, the predicted average verbal score when class size is equal to 0 is 69.19, and that makes no sense!**
+
+5\. What is the predicted average verbal score when the class size is equal to 30 students?
+
+**The predicted average verbal score when the class size is equal to 30 students is: 69.19 + 0.13 x 30 = `r 69.19 + 0.13 * 30`.**
+
+
+# Task 3: $R^2$ and goodness of fit
+
+1\. Regress `avgmath_cs` on `classize`. Assign to an object `math_reg`.
+
+```{r}
+math_reg <- lm(avgmath_cs ~ classize, grades_avg_cs)
+```
+
+2\. Pass `math_reg` in the `summary()` function. What is the (multiple) $R^2$ for this regression? How can you interpret it?
+
+```{r}
+summary(math_reg)
+```
+
+**The $R^2$ is equal to approx. 0.28, which implies that around 28% of the variation in average math score is explained by class size.**
+
+3\. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you about the relationship between $R^2$ and the correlation in a regression with only one regressor?
+
+```{r}
+grades_avg_cs %>%
+  summarise(cor_sq = cor(classize, avgmath_cs)^2)
+```
+
+**In a regression with only one regressor the $R^2$ is equal to the square of the correlation between the dependent and independent variables.**
+
+4\. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula on the previous slide.
+
+```{r}
+library(broom)
+
+math_reg_aug <- augment(math_reg)
+SST = var(grades_avg_cs$avgmath_cs)
+SSE = var(math_reg_aug$.fitted)
+SSE/SST
+```
+
+
+5\. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
+
+```{r}
+verb_reg <- lm(avgverb_cs ~ classize, grades_avg_cs)
+summary(verb_reg)
+```
+
+**The $R^2$ is greater for maths than for reading, therefore class size explains more of the variation in math scores than in reading scores.**
+
