@@ -344,9 +344,9 @@ $$Y_i = D_i * Y_i^1 + (1- D_i)*Y_i^0$$
 --
 
 Group | $Y_i^1$ | $Y_i^0$
---------|---------|---------
-Treatment group $(D_i = 1)$ | Observable as $Y_i$ | Counterfactual
-Control group $(D_i = 0)$ | Counterfactual | Observable as $Y_i$
+--------|:---------:|:---------:
+Treatment group $(D_i = 1)$ &nbsp; &nbsp; | &nbsp; &nbsp; Observable as $Y_i$ &nbsp; &nbsp; | Counterfactual
+Control group $(D_i = 0)$ | Counterfactual | &nbsp; &nbsp; Observable as $Y_i$ &nbsp; &nbsp;
 
 --
 
@@ -411,7 +411,7 @@ Other ***conditional*** average treatment effects may be of interest:
 
 ---
 
-# The Problem of Causal Inference
+# Example
 
 *Example:* Potential outcomes for 10 students of being in a class of 7 students $(Y^1)$ or 15 students $(Y^0)$ on GPA (0-10)
 
@@ -444,15 +444,17 @@ $$
 
 $\rightarrow$ the ***average*** causal effect of being in small relative to large class on GPA is 0.7 points.
 
-`r emo::ji("warning")` not all students benefitted equally from the treatment!
+`r emo::ji("warning")` not all students benefited equally from the treatment!
 
 ]
 
 ---
 
-# The Problem of Causal Inference
+# Example
 
 Now, imagine a benevolent and omniscient school director assigns students to the treatment that maximizes their GPA
+
+--
 
 .pull-left[
 Student | &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$&nbsp; &nbsp;
@@ -469,18 +471,20 @@ Student | &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &n
 10 | 8 | 1 | 6
 ]
 
+--
+
 .pull-right[
 
 $$
 \begin{align}
-\color{red}{\text{ATT}} &= \mathbb{E}(\delta_i | D_i = 1) \\
+\color{red}{\text{ATT}} &= \mathbb{E}(\delta | D = 1) \\
 &\approx 2.71
 \end{align}
 $$
 
 $$
 \begin{align}
-\color{red}{\text{ATT}} &= \mathbb{E}(\delta_i | D_i = 0) \\
+\color{red}{\text{ATT}} &= \mathbb{E}(\delta | D = 0) \\
 &= -4
 \end{align}
 $$
@@ -500,7 +504,7 @@ $$
 
 # The Problem of Causal Inference
 
-* We have the same **missing data problem** for computing the ATE, ATT or ATU as we did for $\delta_i$. Either $Y_i^1$ or $Y_i^0$ is missing for each $i$.
+* In practice, we have the same **missing data problem** for computing the ATE, ATT or ATU as we did for $\delta_i$. Either $Y_i^1$ or $Y_i^0$ is missing for each $i$.
 
 --
 
@@ -509,22 +513,25 @@ $$
 $$
 \begin{align}
 SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
-&= \frac{1}{N_T}\sum_{i=1}^{N_T}(Y_i|D_i=1) - \frac{1}{N_C}\sum_{i=1}^{N_C}(Y_i|D_i=0) \\
-&\approx 6.43 - 6.33 \approx 0.1
+&= \frac{1}{N_T}\sum_{i=1}^{N_T}(Y_i|D_i=1) - \frac{1}{N_C}\sum_{i=1}^{N_C}(Y_i|D_i=0)
 \end{align}
 $$ 
 
 --
 
-* Most of the time, such a difference **will fail to capture the causal effect** of the treatment.
+* From our example, we obtain:  $SDO \approx 6.43 - 6.33 \approx 0.1$ (much smaller than the 0.7 ATE)
 
 --
 
-* Notice that this kind raw comparison is often done by journalists, politicians, badly trained scientists (but not you now! `r emo::ji("wink")`).
+* Almost always, such a difference **will fail to capture the causal treatment effect**.
+
+--
+
+* Notice that this kind "naive" comparison is often done by journalists, politicians, badly trained scientists (but not you now! `r emo::ji("wink")`).
 
 ---
 
-# The Problem of Causal Inference
+# Problems with Naive Comparisons
 
 Let's rewrite the SDO to make the individual treatment effect $(\delta_i)$ appear in the equation. 
 
@@ -553,7 +560,7 @@ And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) =
 
 ---
 
-# The Problem of Causal Inference
+# Problems with Naive Comparisons
 
 Let's now relax the assumption that the treatment effect is constant among all individuals.
 
@@ -579,7 +586,7 @@ So there is a novel source of bias that comes from the potential ***heterogeneit
 
 class:inverse
 
-# Task 2
+# Task 1: SDO, ATE and Randomization
 
 `r countdown(minutes = 10, top = 0)`
 
@@ -736,7 +743,7 @@ Tennessee **S**tudent/**T**eacher **A**chievement **R**atio Experiment (see [Kru
 
 class:inverse
 
-# Task 3
+# Task 2: STAR data
 
 `r countdown(minutes = 10, top = 0)`
 
@@ -881,11 +888,9 @@ star_df_k_small <- star_df %>%
 ```
 
 ```{r, eval = F}
-star_df_k_small %>%
-  count(star, grade)
+star_df_k_small %>% count(star, grade)
 
-star_df_k_small %>%
-  count(small)
+star_df_k_small %>% count(small)
 ```
 
 ]
@@ -993,7 +998,7 @@ star_df_k_small %>%
     annotate("text", x = 0.06, y = b_0 - 1, hjust = 0, label = "E(Y | small = 0)", col = "#d90502", size = 5) +
     annotate("text", x = 0.5, y = b_0 + delta + .5, hjust = 0, label = "E(Y | small = 1)", col = "#DE9854", size = 5) +
     annotate("text", x = 1.28, y = b_0 + (delta/2), hjust = 0, parse = TRUE, label = "delta", col = "black", size = 8) +
-    labs(x = "Assigned to a small class", y = "Math score", size = "Number of students:") +
+    labs(x = "Assigned to a small class", y = "Math score", size = "Number of students") +
     scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("FALSE","TRUE")) +
     theme_bw(base_size = 20) +
     theme(legend.position = c(0,1),
@@ -1008,7 +1013,7 @@ star_df_k_small %>%
 
 # Regression with a Dummy Variable: Formally
 
-From the estimation output we get the following:
+Recall the regression model: $\text{math score}_i = b_0 + \delta \text{small}_i + e_i$
 
 $\begin{align} \mathbb{E}[\textrm{math score} | \text{small}_i = 0]&= \mathbb{E}[b_0 + \delta \text{small}_i + e_i | \text{small}_i = 0] \\ &= b_0 + \delta \mathbb{E}[\text{small}_i| \text{small}_i = 0] + \mathbb{E}[e_i|\text{small}_i = 0] \\ &= b_0 \end{align}$
 
@@ -1028,7 +1033,7 @@ We knew this already but we now understand why this is true `r emo::ji("v")`
 
 class:inverse
 
-# Task 4
+# Task 3: Your Turn!
 
 `r countdown(minutes = 10, top = 0)`
 
@@ -1038,7 +1043,7 @@ class:inverse
 
 1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
 
-1. Regress math score on the treatment dummy variable. Are the results in line with the previous question?
+1. Regress math score on the treatment dummy variable. Are the results in line with question 2?
 
 1. How do you interpret these coefficients?
 
