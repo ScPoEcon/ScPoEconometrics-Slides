@@ -239,7 +239,7 @@ Smokers and non-smokers may be different in the first place:
   
   - __Selection on observable characteristics__: age, education, income, etc.
   
-  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of [Fisher](https://fr.wikipedia.org/wiki/Ronald_Aylmer_Fisher)). 
+  - __Selection on unobservable characteristics__: genes (the hypothetical confounding genome theory of [Fisher](https://en.wikipedia.org/wiki/Ronald_Aylmer_Fisher)). 
 ]
 
 ---
@@ -250,7 +250,7 @@ Smokers and non-smokers may be different in the first place:
 
 --
 
-- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036?origin=crossref&seq=11#metadata_info_tab_contents), we will use death rates in Canada, the U.K. and the U.S.
+- Based on [Cochran (1968)](https://www.jstor.org/stable/2528036), we will use death rates in Canada, the U.K. and the U.S.
 
 - For each country 3 groups of men were studied for 20 months (U.S.) to 5 five years (U.K.).
 
@@ -397,21 +397,23 @@ all the individuals such that $D_i = 0$.
 
 # The Potential Outcomes Framework
 
-* In this framework, each individual has two ***potential outcomes***:
+* In this framework, each individual has two ***potential outcomes***, but only one ***observed outcome*** $Y_i$:
   
-  - $Y_i^1$: *potential outcome in the treatment state* $(D_i = 1)$ for individual $i$,
+  - $Y_i^1$: *potential outcome if individual $i$ receives the treatment* $(D_i = 1)$,
   
-  - $Y_i^0$: *potential outcome in the control state* $(D_i = 0)$ for individual $i$.
+  - $Y_i^0$: *potential outcome if individual $i$ does not receive the treatment* $(D_i = 0)$.
 
 --
 
-* From these we can define the ***individual treatment effect***:
+* From these we can define the ***individual treatment effect*** $\delta_i$:
 
 $$ \delta_i = Y_i^1 - Y_i^0$$
 
-* $\delta_i$ measures the **causal effect of $D_i$ (treatment)** for individual $i$ on outcome $Y$.
+* $\delta_i$ measures the **causal effect of the treatment $(D_i)$** on outcome $Y$ for individual $i$.
 
---
+---
+
+# The Potential Outcomes Framework
 
 * In real life we only observe $Y_i$ which can be written as:
 
@@ -421,21 +423,16 @@ $$Y_i = D_i * Y_i^1 + (1- D_i)*Y_i^0$$
 
 * ***Fundamental Problem of Causal Inference***: for any individual $i$, we only observe one of either potential outcomes, and thus we cannot compute $\delta_i$ [(Holland, 1986)](http://people.umass.edu/~stanek/pdffiles/causal-holland.pdf).
 
----
-
-# The Potential Outcomes Framework
-
-```{r, echo = FALSE, out.width = "700px"}
-knitr::include_graphics("../img/photos/fundamental_pb_inference.png")
-```
-
-.footnote[
-This table is from Morgan and Winship (2015, p.46).
-]
+--
 
 * The potential outcome that is not observed exists in principle, it is called the ***counterfactual outcome***.
 
-  * What your test score would have been if you had been in a big class, knowing that you were in a small one.
+--
+
+Group | $Y_i^1$ | $Y_i^0$
+--------|---------|---------
+Treatment group $(D_i = 1)$ | Observable as $Y_i$ | Counterfactual
+Control group $(D_i = 0)$ | Counterfactual | Observable as $Y_i$
 
 --
 
@@ -502,20 +499,106 @@ Other ***conditional*** average treatment effects may be of interest:
 
 # The Problem of Causal Inference
 
+*Example:* Potential outcomes for 10 students of being in a class of 7 students $(Y^1)$ or 15 students $(Y^0)$ on GPA (0-10)
+
+.pull-left[
+Student | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$ &nbsp; &nbsp; 
+-----------|:---------:|:---------:|:---------:|
+1 | 5 | 2 | 3
+2 | 6 | 4 | 2
+3 | 3 | 6 | -3
+4 | 5 | 4 | 1
+5 | 10 | 8 | 2
+6 | 2 | 4 | -2
+7 | 5 | 2 | 3
+8 | 6 | 4 | 2
+9 | 2 | 9 | -7
+10 | 8 | 2 | 6
+]
+
+--
+
+.pull-right[
+
+$$
+\begin{align}
+\color{red}{\text{ATE}} &= \mathbb{E}(Y^1) - \mathbb{E}(Y^0) \\
+&= 5.2 - 4.5 \\
+&= 0.7
+\end{align}
+$$
+
+$\rightarrow$ the ***average*** causal effect of being in small relative to large class on GPA is 0.7 points.
+
+`r emo::ji("warning")` not all students benefitted equally from the treatment!
+
+]
+
+---
+
+# The Problem of Causal Inference
+
+Now, imagine a benevolent and omniscient school director assigns students to the treatment that maximizes their GPA
+
+.pull-left[
+Student | &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$&nbsp; &nbsp;
+-----------|:---------:|:---------:|:---------:
+1 | 5 | 1 | 3
+2 | 6 | 1 | 2
+3 | 6 | 0 | -3
+4 | 5 | 1 | 1
+5 | 10 | 1 | 2
+6 | 4 | 0 | -2
+7 | 5 | 1 | 3
+8 | 6 | 1 | 2
+9 | 9 | 0 | -7
+10 | 8 | 1 | 6
+]
+
+.pull-right[
+
+$$
+\begin{align}
+\color{red}{\text{ATT}} &= \mathbb{E}(\delta_i | D_i = 1) \\
+&\approx 2.71
+\end{align}
+$$
+
+$$
+\begin{align}
+\color{red}{\text{ATT}} &= \mathbb{E}(\delta_i | D_i = 0) \\
+&= -4
+\end{align}
+$$
+
+$$
+\begin{align}
+\color{red}{\text{ATE}} &= 7/10 \times \text{ATT} + 3/10 \times \text{ATU} \\
+&= 7/10 \times 2.71 + 3/10 \times (-4) \\
+&= 0.7
+\end{align}
+$$
+
+]
+
+
+---
+
+# The Problem of Causal Inference
+
 * We have the same **missing data problem** for computing the ATE, ATT or ATU as we did for $\delta_i$. Either $Y_i^1$ or $Y_i^0$ is missing for each $i$.
 
 --
 
 * From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
 
-$$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$ 
-
---
-
-* For example, it would consist in taking the difference between:
-  * Death rates for smokers and non-smokers,
-  * GDP growth rates for democratic and non democratic countries,
-  * Unemployment rates for countries with and without a minimum wage.
+$$
+\begin{align}
+SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
+&= \frac{1}{N_T}\sum_{i=1}^{N_T}(Y_i|D_i=1) - \frac{1}{N_C}\sum_{i=1}^{N_C}(Y_i|D_i=0) \\
+&\approx 6.43 - 6.33 \approx 0.1
+\end{align}
+$$ 
 
 --
 
@@ -532,24 +615,27 @@ $$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) $$
 Let's rewrite the SDO to make the individual treatment effect $(\delta_i)$ appear in the equation. 
 
 \begin{align}
-  \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
+  SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\ &= \mathop{\mathbb{E}}(Y_i^0 + \delta_i | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
 \end{align}
 
-For now, suppose **treatment effect is constant** across people: $\forall i, \delta_i = \delta$.
+--
+
+For now, suppose **treatment effect is constant** across people: for all $i, \delta_i = \delta$.
+
+--
 
 Then,
 
-\begin{align}
-  \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) &= \delta + \mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
-\end{align}
+$$
+  SDO = \delta + \mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
+$$
 
 And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) = \delta$ (by assumption), we get: 
 
 
-\begin{align}
-  SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
-  &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias}
-\end{align}
+\begin{equation}
+  SDO = ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias}
+\end{equation}
 
 ---
 
@@ -557,7 +643,7 @@ And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) =
 
 Let's now relax the assumption that the treatment effect is constant among all individuals.
 
-After tedious calculations that we skip, we get that the SDO is now decomposed as: 
+After [some tedious calculations](https://mixtape.scunning.com/potential-outcomes.html#simple-difference-in-means-decomposition) that we skip, the SDO can now be decomposed as: 
 
 \begin{align}
   SDO &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
@@ -587,29 +673,36 @@ Let's compute these various quantities and biases with some toy data (i.e. data 
 
 ```{r, echo = FALSE, eval = FALSE}
 set.seed(1)
-D_i = sample(c(0,1), replace = T, size = 10000)
-Y0_i = sample(c(1:10), replace = T, size = 10000) + D_i
-delta_i = sample(c(1:3), replace = T, size = 10000) + 0.2*D_i
-cor(Y0_i, D_i)
-cor(delta_i, D_i)
-Y1_i = Y0_i + delta_i
+id = 1:10000
+group = sample(c("treatment","control"), replace = T, size = 10000)
+Y0 = sample(c(1:10), replace = T, size = 10000) + ifelse(group == "treatment",1,0)
+delta = sample(c(1:3), replace = T, size = 10000) + 0.2*ifelse(group == "treatment",1,0)
+cor(Y0, ifelse(group == "treatment",1,0))
+cor(delta, ifelse(group == "treatment",1,0))
+Y1 = Y0 + delta
 set.seed(3)
-D_i_random = sample(c(0,1), replace = T, size = 10000)
-cor(Y0_i, D_i_random)
-cor(delta_i, D_i_random)
-toy_data = data.frame(D_i, Y0_i, Y1_i, D_i_random)
-# fwrite(toy_data, "../../../../../Dropbox/ScPoEconometrics/pierre_gustave/toy_data.csv")
-# toy_data = read.csv("https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1")
+group_random = sample(c("treatment","control"), replace = T, size = 10000)
+cor(Y0, ifelse(group_random == "treatment",1,0))
+cor(delta, ifelse(group_random == "treatment",1,0))
+
+toy_data = data.frame(id, group, Y0, Y1)
+toy_data <- toy_data %>%
+  mutate(group_dummy = ifelse(group == "treatment", 1, 0)) %>%
+  select(id, group, group_dummy, Y0, Y1)
+toy_data_random = data.frame(id, group_random, Y0, Y1)
+toy_data_random <- toy_data_random %>%
+  mutate(group_random_dummy = ifelse(group_random == "treatment", 1, 0)) %>%
+  select(id, group_random, group_random_dummy, Y0, Y1)
+
+# fwrite(toy_data, here::here("../ScPoEconometrics/introduction/pierre_gustave/toy_data_2.csv"))
+# fwrite(toy_data_random, here::here("../ScPoEconometrics/introduction/pierre_gustave/toy_data_random.csv"))
 ```
 
-1. Load the data [here](https://www.dropbox.com/s/a4u67nmu9gnl94y/toy_data.csv?dl=1). Notice that `Di_random` is a treatment status we would have under random assignment.
+1. Load the data [here](https://www.dropbox.com/s/oqc3vq1m9eyp1d6/toy_data_2.csv?dl=1). The `group` variable corresponds to whether the individual has been treated or not, the `Y0` variable corresponds to the potential outcome if the individual does not receive the treatment $(Y_i^0)$ while `Y1` corresponds to the potential outcome if the individual receives the treatment $(Y_i^1)$. Create a new variable containing the observed outcome $(Y_i)$ and the individual treatment effect $(\delta_i)$. (Recall that $Y_i = D_i * Y_i^1 + (1 - D_i) Y_i^0$ and $\delta_i = Y_i^1 - Y_i^0$.)
 
-1. Create the following variables: $Y_i$ and $\delta_i$. Recall that $Y_i = D_i * Y_i^1 + (1 - D_i) Y_i^0$ and $\delta_i = Y_i^1 - Y_i^0$. 
+1. Compute the ***ATE*** and the ***SDO***. Is there is any *bias*? Is it large in magnitude?
 
-1. Compute the ***ATE*** and the ***SDO***. (Use base `R`.)  Is there is any *bias*? Is it large in magnitude?
-
-1. Using `D_i_random`, compute the ***SDO under randomization***. Remember that you need to recompute $Y_i$ because the assignment is not the same anymore.   
-If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
+1. In this new [dataset](https://www.dropbox.com/s/0qfsonzz1t9gkxi/toy_data_random.csv?dl=1) we've randomly assigned the same individuals to the treatment and control groups. Compute the ***SDO under randomization***. Remember that you need to recompute $Y_i$ because the assignment is not the same anymore. If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
 
 1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treatment effect bias*** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$
 
@@ -620,7 +713,7 @@ If you got it right, the bias should be very close to 0. Why is it not exactly 0
 
 * ***Randomized experiments***: you ***randomly*** assign people to a treatment and a control group.
 
-* In this case, the treatment status **independent** of the potential outcomes.
+* In this case, the treatment assignement is **independent** of the potential outcomes.
 
 --
 
@@ -640,7 +733,7 @@ If you got it right, the bias should be very close to 0. Why is it not exactly 0
 
 With random assignment we have: 
 
-$$ \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) = ATE$$ 
+$$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) = ATE$$ 
 
 `r emo::ji("point_right")` We can directly estimate the ATE from the data!
 
@@ -658,7 +751,7 @@ layout: true
 
 ---
 
-# Randomized experiments
+# Randomized Experiments
 
 - Often called **R**andomized **C**ontrolled **T**rials (RCT).
 
@@ -674,10 +767,10 @@ layout: true
 
 # Back to class size and students' achievement
 
-Last week we regressed average student math and reading scores on class size.
+Last week we regressed average student math or reading scores on class size.
 
 $$\textrm{math score}_i = b_0 + b_1 \textrm{class size}_i + e_i$$
-We briefly discuss why $b_1^{OLS}$ could only establish an ***association*** and not a ***causal relationship***.
+We briefly discussed why $b_1^{OLS}$ could only establish an ***association*** and not a ***causal relationship***.
 
 --
 
@@ -747,10 +840,8 @@ class:inverse
 `star_df <- star_df[complete.cases(star_df),]`
 
 1. Let's check how well the randomization was done by doing ***balancing checks***.  
-Compute the average percentage of girls, african americans, and free lunch qualifiers by grade *and* treatment class.  
-*Hint*: The following computes the percentage of girls (without the relevant `dplyr` verbs)
-`share_female = mean(gender == "female") * 100`.
-
+Compute the average percentage of girls, african americans, and free lunch qualifiers by grade *and* treatment class. (*Hint*: The following computes the percentage of girls (without the relevant `dplyr` verbs):
+`share_female = mean(gender == "female") * 100`.)
 
 ```{r, echo = FALSE}
 # data("STAR", package = "AER")
@@ -768,7 +859,7 @@ star_df <- star_df[complete.cases(star_df),]
 
 # The Project STAR Experiment
 
-We just saw that in an RCT the ATE is obtained by computing the differences in outcomes between the treatment and control groups.
+We just saw that in an RCT the Average Treatment Effect is obtained by computing the differences in outcomes between the treatment and control groups.
 
 Let's only focus on:
 
@@ -812,11 +903,11 @@ diff_table = data.frame(
 ```
 
 grade | test | mean regular | mean small | ATE
---------|---------|---------|---------|---------
+--------|---------|:---------:|:---------:|:---------:
 k | math | `r round(diff_table[1,3], 2)` | `r round(diff_table[1,4], 2)` | `r round(diff_table[1,4] - diff_table[1,3], 2)`
 k | read | `r round(diff_table[2,3], 2)` | `r round(diff_table[2,4], 2)` | `r round(diff_table[2,4] - diff_table[2,3], 2)`
 
-What's the interpretation for these ATEs?
+What's the interpretation for these ATEs? 
 
 --
 
@@ -830,13 +921,13 @@ $$ Y_i = D_i Y_i^1 + (1 - D_i) Y_i^0 $$
 
 --
 
-Rewriting this equation, we get:
+Factoring by $D_i$ and replacing $Y_i^1 - Y_i^0$ by $\delta_i$, we get:
 
 $$\begin{align} Y_i &=Y_i^0 +D_i (Y_i^1 - Y_i^0) \\ &= Y_i^0 +D_i \delta_i \end{align}$$
 
 --
 
-Assuming $\delta_i = \delta, \forall i$,
+Assuming $\delta_i = \delta$, for all $i$,
 
 $$Y_i = Y_i^0 + D_i \delta$$
 
@@ -851,22 +942,22 @@ where $b_0 = \mathbb{E}[Y_i^0]$ and $e_i = Y_i^0 - \mathbb{E}[Y_i^0]$
 
 # The Project STAR Experiment: Regression
 
-The last equation looks exactly like the simple regression model we saw last week!
+The last equation looks exactly like the simple regression model we saw last week! (with $\delta = b_1$)
 
-Let's therefore estimate the ATE of small class size on math scores using a regression.
+Let's therefore estimate the ATE of being assigned to a small class size on math scores.
 
 --
 
-.pull-left[
-We want to estimate the following model: $mathscore_i = b_0 + \delta D_i + e_i$, with
+We want to estimate the following model: $\text{math score}_i = b_0 + \delta \text{small}_i + e_i$, with
 
 $$
-D_i = \begin{cases} 
-                    1 \textrm{  if small class = 1}  \\\\ 
-                    0 \textrm{  if small class = 0} 
+\text{small}_i = \begin{cases} 
+                    1 \textrm{  if assigned to a small class}  \\\\ 
+                    0 \textrm{  if assigned to a regular class} 
       \end{cases}
 $$
 
+.pull-left[
 ```{r, echo = TRUE}
 star_df_k_small <- star_df %>%
   filter(
@@ -874,23 +965,24 @@ star_df_k_small <- star_df %>%
       grade == "k") %>% 
   mutate(small = (star == "small"))
 ```
-]
 
---
+```{r, eval = F}
+star_df_k_small %>%
+  count(star, grade)
 
-.pull-right[
-```{r, echo = TRUE, eval = TRUE}
-lm(math ~ small, star_df_k_small)
+star_df_k_small %>%
+  count(small)
 ```
 
-```{r, echo = TRUE, eval = TRUE}
-mean(star_df_k_small$math[
-    star_df_k_small$small == TRUE]) - 
-  mean(star_df_k_small$math[
-    star_df_k_small$small == FALSE])
+]
 
-mean(star_df_k_small$math[
-    star_df_k_small$small == FALSE])
+.pull-left[
+```{r, echo = FALSE}
+star_df_k_small %>%
+  count(star, grade)
+
+star_df_k_small %>%
+  count(small)
 ```
 ]
 
@@ -898,17 +990,121 @@ mean(star_df_k_small$math[
 
 # The Project STAR Experiment: Regression
 
+Regression model we want to estimate: $\text{math score}_i = b_0 + \delta \text{small}_i + e_i$
+
+```{r, echo = TRUE, eval = TRUE}
+lm(math ~ small, star_df_k_small)
+```
+
+--
+
+Recall that: $b_0 = \mathbb{E}[Y_i^0]$ and $\delta = \mathbb{E}[Y_i | D_i = 1] - \mathbb{E}[Y_i | D_i = 0]$
+
+.pull-left[
+```{r}
+b_0 = mean(star_df_k_small$math[
+    star_df_k_small$small == FALSE])
+b_0
+```
+]
+
+.pull-right[
+```{r}
+delta = mean(star_df_k_small$math[
+    star_df_k_small$small == TRUE]) - 
+  mean(star_df_k_small$math[
+    star_df_k_small$small == FALSE])
+delta
+```
+]
+
+---
+
+# Regression with a Dummy Variable: Graphically
+
+Contrary to last week, the regressor in our regression is a ***dummy variable***, i.e. a variable that takes the values TRUE or FALSE (1 or 0).
+
+```{r, echo = F, fig.height=4.75, fig.width = 8}
+baseline_graph <- star_df_k_small %>%
+    mutate(small = ifelse(small == "TRUE",1,0)) %>%
+    ggplot(aes(x = small, y = math)) +
+    geom_count(alpha = .7) +
+    labs(x = "Assigned to a small class", y = "Math score", size = "Number of students") +
+    scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("FALSE","TRUE")) +
+    theme_bw(base_size = 20) +
+    theme(legend.position = c(0,1),
+          legend.justification = c(0,1),
+          legend.background = element_blank(),
+          legend.key=element_blank(),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12, face = "italic"))
+baseline_graph
+```
+
+---
+
+# Regression with a Dummy Variable: Graphically
+
+Contrary to last week, the regressor in our regression is a ***dummy variable***, i.e. a variable that takes the values TRUE or FALSE (1 or 0).
+
+```{r, echo = F, fig.height=4.75, fig.width = 8}
+baseline_graph +
+    stat_summary(fun = mean, colour = c("#d90502","#DE9854"), size = .75, alpha = 0.9) +
+    geom_abline(slope = delta, intercept = b_0) +
+    annotate("text", x = 0.04, y = b_0 - 12, hjust = 0, label = "E(Y | small = 0)", size = 5, colour = "#d90502") +
+    annotate("text", x = 0.04 + 1, y = b_0 + delta + 16, hjust = 0, label = "E(Y | small = 1)", size = 5, colour = "#DE9854") +
+    geom_curve(aes(x = -0.3, xend = -0.2, y = 425 , yend = b_0 - .5*delta - 5), size = .5, linetype = 1, colour = "black", arrow = arrow(length = unit(0.3, "cm"))) +
+    annotate("text", x = -0.5, y = 415, hjust = 0, label = "Regression line", size = 5)
+```
+
+
+---
+
+# Regression with a Dummy Variable: Graphically
+
+Contrary to last week, the regressor in our regression is a ***dummy variable***, i.e. a variable that takes the values TRUE or FALSE (1 or 0).
+
+```{r, echo = FALSE, fig.height=4.75, fig.width = 8}
+star_df_k_small %>%
+    mutate(small = ifelse(small == "TRUE",1,0)) %>%
+    filter(math >= 475 & math <= 500) %>%
+    ggplot(aes(x = small, y = math)) +
+    geom_segment(aes(x = 0, xend = 1.25, y = b_0, yend = b_0), size = .5, linetype = 2, colour = "grey") +
+    geom_segment(aes(x = 1, xend = 1.25, y = b_0 + delta, yend = b_0 + delta), size = .5, linetype = 2, colour = "grey") +
+    geom_count(alpha = .7) +
+    stat_summary(data = star_df_k_small %>%
+                     mutate(small = ifelse(small == "TRUE",1,0)), fun = mean, colour = c("#d90502","#DE9854"), size = .75, alpha = 0.9) +
+    geom_abline(slope = delta, intercept = b_0) +
+    geom_segment(aes(x = 1.25, xend = 1.25, y = b_0, yend = b_0 + delta), size = .5, linetype = 1, colour = "black", arrow = arrow(length = unit(0.3, "cm"), ends = "both")) +
+    annotate("text", x = 0.06, y = b_0 - 1, hjust = 0, label = "E(Y | small = 0)", col = "#d90502", size = 5) +
+    annotate("text", x = 0.5, y = b_0 + delta + .5, hjust = 0, label = "E(Y | small = 1)", col = "#DE9854", size = 5) +
+    annotate("text", x = 1.28, y = b_0 + (delta/2), hjust = 0, parse = TRUE, label = "delta", col = "black", size = 8) +
+    labs(x = "Assigned to a small class", y = "Math score", size = "Number of students:") +
+    scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("FALSE","TRUE")) +
+    theme_bw(base_size = 20) +
+    theme(legend.position = c(0,1),
+          legend.justification = c(0,1),
+          legend.background = element_blank(),
+          legend.key=element_blank(),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12, face = "italic"))
+```
+
+---
+
+# Regression with a Dummy Variable: Formally
+
 From the estimation output we get the following:
 
-$\begin{align} \mathbb{E}[\textrm{math score} | D_i = 0]&= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 0] \\ &= b_0 + \delta \mathbb{E}[D_i| D_i = 0] + \mathbb{E}[e_i|D_i = 0] \\ &= b_0 \end{align}$
+$\begin{align} \mathbb{E}[\textrm{math score} | \text{small}_i = 0]&= \mathbb{E}[b_0 + \delta \text{small}_i + e_i | \text{small}_i = 0] \\ &= b_0 + \delta \mathbb{E}[\text{small}_i| \text{small}_i = 0] + \mathbb{E}[e_i|\text{small}_i = 0] \\ &= b_0 \end{align}$
 
 --
 
-$\begin{align} \mathbb{E}[\textrm{math score} | D_i = 1]&= \mathbb{E}[b_0 + \delta D_i + e_i | D_i = 1] \\ &= b_0 + \delta \mathbb{E}[D_i| D_i = 1] + \mathbb{E}[e_i|D_i = 1] \\ &= b_0 + \delta \end{align}$
+$\begin{align} \mathbb{E}[\textrm{math score} | \text{small}_i = 1]&= \mathbb{E}[b_0 + \delta \text{small}_i + e_i | \text{small}_i = 1] \\ &= b_0 + \delta \mathbb{E}[\text{small}_i| \text{small}_i = 1] + \mathbb{E}[e_i|\text{small}_i = 1] \\ &= b_0 + \delta \end{align}$
 
 --
 
-$\begin{align} ATE &= \mathbb{E}[\textrm{math score} | D_i = 1] - \mathbb{E}[\textrm{math score} | D_i = 0] \\ &= b_0 + \delta - b_0 \\ &= \delta \end{align}$
+$\begin{align} ATE &= \mathbb{E}[\textrm{math score} | \text{small}_i = 1] - \mathbb{E}[\textrm{math score} | \text{small}_i = 0] \\ &= b_0 + \delta - b_0 \\ &= \delta \end{align}$
 
 --
 
