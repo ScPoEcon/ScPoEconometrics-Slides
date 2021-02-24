@@ -484,7 +484,7 @@ $$
 
 $$
 \begin{align}
-\color{red}{\text{ATT}} &= \mathbb{E}(\delta | D = 0) \\
+\color{red}{\text{ATU}} &= \mathbb{E}(\delta | D = 0) \\
 &= -4
 \end{align}
 $$
@@ -949,14 +949,14 @@ baseline_graph <- star_df_k_small %>%
     ggplot(aes(x = small, y = math)) +
     geom_count(alpha = .7) +
     labs(x = "Assigned to a small class", y = "Math score", size = "Number of students") +
-    scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("FALSE","TRUE")) +
+    scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("0\nFALSE","1\nTRUE")) +
     theme_bw(base_size = 20) +
     theme(legend.position = c(0,1),
           legend.justification = c(0,1),
           legend.background = element_blank(),
           legend.key=element_blank(),
           legend.text = element_text(size = 12),
-          legend.title = element_text(size = 12, face = "italic"))
+          legend.title = element_text(size = 12, face = "italic")) 
 baseline_graph
 ```
 
@@ -967,11 +967,22 @@ baseline_graph
 Contrary to last week, the regressor in our regression is a ***dummy variable***, i.e. a variable that takes the values TRUE or FALSE (1 or 0).
 
 ```{r, echo = F, fig.height=4.75, fig.width = 8}
-baseline_graph +
+baseline_graph_mean = baseline_graph + 
     stat_summary(fun = mean, colour = c("#d90502","#DE9854"), size = .75, alpha = 0.9) +
-    geom_abline(slope = delta, intercept = b_0) +
     annotate("text", x = 0.04, y = b_0 - 12, hjust = 0, label = "E(Y | small = 0)", size = 5, colour = "#d90502") +
-    annotate("text", x = 0.04 + 1, y = b_0 + delta + 16, hjust = 0, label = "E(Y | small = 1)", size = 5, colour = "#DE9854") +
+    annotate("text", x = 0.04 + 1, y = b_0 + delta + 16, hjust = 0, label = "E(Y | small = 1)", size = 5, colour = "#DE9854")
+baseline_graph_mean
+```
+
+---
+
+# Regression with a Dummy Variable: Graphically
+
+Contrary to last week, the regressor in our regression is a ***dummy variable***, i.e. a variable that takes the values TRUE or FALSE (1 or 0).
+
+```{r, echo = F, fig.height=4.75, fig.width = 8}
+baseline_graph_mean + 
+    geom_abline(slope = delta, intercept = b_0) +
     geom_curve(aes(x = -0.3, xend = -0.2, y = 425 , yend = b_0 - .5*delta - 5), size = .5, linetype = 1, colour = "black", arrow = arrow(length = unit(0.3, "cm"))) +
     annotate("text", x = -0.5, y = 415, hjust = 0, label = "Regression line", size = 5)
 ```
@@ -999,7 +1010,7 @@ star_df_k_small %>%
     annotate("text", x = 0.5, y = b_0 + delta + .5, hjust = 0, label = "E(Y | small = 1)", col = "#DE9854", size = 5) +
     annotate("text", x = 1.28, y = b_0 + (delta/2), hjust = 0, parse = TRUE, label = "delta", col = "black", size = 8) +
     labs(x = "Assigned to a small class", y = "Math score", size = "Number of students") +
-    scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("FALSE","TRUE")) +
+    scale_x_continuous(lim = c(-.5,1.5), breaks = c(0,1), labels = c("0\nFALSE","1\nTRUE")) +
     theme_bw(base_size = 20) +
     theme(legend.position = c(0,1),
           legend.justification = c(0,1),
