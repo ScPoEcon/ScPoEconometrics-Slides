@@ -1,0 +1,921 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Simple Linear Regression"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+library("tidyverse")
+library("kableExtra")
+# library("repmis")
+library("gridExtra")
+library("haven")
+library("ggpubr")
+library("huxtable")
+library(countdown)
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+```
+
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOTIDY2***](https://app.wooclap.com/SCPOTIDY2)
+
+&nbsp; &nbsp; &nbsp; ***OR***
+
+2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
+
+```{r, echo = F, out.width = "300px"}
+knitr::include_graphics("chapter_slr_files/figure-html/qr_code_quiz.png")
+```
+
+---
+
+# Today - Real 'metrics finally `r emo::ji("v")`
+
+* Introduction to the ***Simple Linear Regression Model*** and ***Ordinary Least Squares (OLS)*** *estimation*.
+
+* Empirical application: *class size* and *student performance*
+
+* Keep in mind that we are interested in uncovering **causal** relationships
+
+---
+
+# Class size and student performance
+
+* What policies *lead* to improved student learning?
+
+* Class size reduction has been at the heart of policy debates for *decades*.
+
+--
+
+* We will be using data from a famous paper by [Joshua Angrist and Victor Lavy (1999)](https://economics.mit.edu/files/8273), obtained from [Raj Chetty and Greg Bruich's course](https://opportunityinsights.org/course/).
+
+* Consists of test scores and class/school characteristics for fifth graders (10-11 years old) in Jewish public elementary schools in Israel in 1991.
+
+* National tests measured *mathematics* and (Hebrew) *reading* skills. The raw scores were scaled from 1-100.
+
+---
+
+class:: inverse
+
+# Task 1: Getting to know the data
+
+`r countdown(minutes = 7, top = 0)`
+ 
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) as `grades`. You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+
+1. Describe the dataset:
+
+  * What is the unit of observations, i.e. what does each row correspond to?
+  * How many observations are there?
+  * What variables do we have? View the dataset to see what the variables correspond to.
+  * What do the variables `avgmath` and `avgverb` correspond to?
+  * Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`. (*Hint: use `dplyr` to `select` the variables and then simply pipe (`%>%`) `skim()`.*)
+
+1. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
+
+1. Compute the correlation between class size and math and verbal scores. Is the relationship positive/negative, strong/weak?
+
+```{r, echo=FALSE}
+# import data
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+```
+
+---
+
+# Class size and student performance: Scatter plot
+
+.pull-left[
+```{r, echo=FALSE,fig.height=6}
+g_math = ggplot(grades, aes(x = classize, y = avgmath)) + 
+    geom_point(size = 2, alpha = 0.5) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(
+      x = "Class size",
+      y = "Average score",
+      title = "Mathematics") +
+    theme_bw(base_size = 20)
+g_math
+```
+]
+
+.pull-right[
+```{r, echo=FALSE,fig.height=6}
+g_verb = ggplot(grades, aes(x = classize, y = avgverb)) + 
+    geom_point(size = 2, alpha = 0.5) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(x = "Class size",
+         y = "Average score",
+         title = "Reading") +
+    theme_bw(base_size = 20)
+g_verb
+```
+]
+
+--
+
+* Somewhat positive association as suggested by the correlations. Let's compute the average score by class size to see things more clearly!
+
+---
+
+# Class size and student performance: Binned scatter plot 
+
+.pull-left[
+```{r, echo=FALSE,fig.height=6}
+grades_avg_cs <- grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+
+g_math_cs = ggplot(grades_avg_cs, aes(x = classize, y = avgmath_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(
+      x = "Class size",
+      y = "Average score",
+      title = "Mathematics") +
+    theme_bw(base_size = 20)
+g_math_cs
+```
+]
+
+.pull-right[
+```{r, echo=FALSE,fig.height=6}
+g_verb_cs = ggplot(grades_avg_cs, aes(x = classize, y = avgverb_cs)) + 
+    geom_point(size = 2) +
+    xlim(0,45) +
+    ylim(0, 100) +
+    labs(x = "Class size",
+         y = "Average score",
+         title = "Reading") +
+    theme_bw(base_size = 20)
+g_verb_cs
+```
+]
+
+---
+
+# Class size and student performance: Binned scatter plot
+
+* We'll first focus on the mathematics scores and for visual simplicity we'll zoom in
+
+```{r, echo=FALSE,fig.height=4.75, fig.width = 8}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14)
+```
+
+---
+
+# Class size and student performance: Regression line
+
+How to visually summarize the relationship: **a line through the scatter plot**
+
+--
+
+.left-wide[
+```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  geom_hline(yintercept = 65, col = "#d90502")
+```
+]
+
+--
+
+.right-thin[
+<br>
+
+* A *line*! Great. But **which** line? This one?
+
+* That's a *flat* line. But average mathematics score is somewhat *increasing* with class size `r emo::ji("weary")`
+
+]
+
+---
+
+# Class size and student performance: Regression line
+
+How to visually summarize the relationship: **a line through the scatter plot**
+
+.left-wide[
+```{r,echo=FALSE,fig.align='left',fig.height=4,fig.width=7}
+g_math_cs +
+  ylim(50, 80) +
+  theme_bw(base_size = 14) +
+  geom_abline(intercept = 55,slope = 0.6, col = "#d90502")
+```
+]
+
+.right-thin[
+<br>
+
+* **That** one?
+
+* Slightly better! Has a **slope** and an **intercept** `r emo::ji("neutral_face")`
+
+* We need a rule to decide! 
+
+]
+
+
+---
+
+# Simple Linear Regression
+
+Let's formalise a bit what we are doing so far. 
+
+* We are interested in the relationship between two variables:
+
+--
+
+  * an __outcome variable__ (also called __dependent variable__):  
+  *average mathematics score* $(y)$
+  
+--
+  
+  * an __explanatory variable__ (also called __independent variable__ or __regressor__):  
+  *class size* $(x)$
+  
+--
+
+* For each class $i$ we observe both $x_i$ and $y_i$, and therefore we can plot the *joint distribution* of class size and average mathematics score.
+
+--
+
+* We summarise this relationship with a line (for now). The equation for such a line with an intercept $b_0$ and a slope $b_1$ is:
+    $$
+    \widehat{y}_i = b\_0 + b\_1 x\_i
+    $$
+
+--
+
+* $\widehat{y}_i$ is our *prediction* for $y$ at observation $i$ $(y_i)$ given our model (i.e. the line).
+
+---
+
+# What's A Line: A Refresher
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+b_0 = 32
+b_1 = 4.1
+space = .5
+
+base_plot <- ggplot() +
+    geom_abline(slope = b_1, intercept = b_0) +
+    scale_x_continuous(limits = c(-5,10), expand = c(0,0)) +
+    scale_y_continuous(limits = c(0,100), expand = c(0,0)) +
+    theme_bw(base_size = 16) +
+    annotate(geom = "text", x = -4.3, y = 94, label = "y", parse = TRUE, size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + space, y = 94, label = "=", size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 2*space, y = 94, label = "b[0]", color = "#DE9854", parse = TRUE, size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 2*space + .6, y = 94, label = "+", size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 3*space + .6, y = 94, label = "b[1]", parse = TRUE, color = "#d90502", size = 8, hjust = 0) +
+    annotate(geom = "text", x = -4.3 + 4*space + .6, y = 94, label = "x", parse = TRUE, size = 8, hjust = 0)
+base_plot
+```
+
+---
+
+# What's A Line: A Refresher
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+library('latex2exp')
+plot_b_0 <- base_plot + 
+    annotate(geom = "segment", x = 0, xend = 0, y = 0, yend = b_0, arrow = arrow(angle = 12, type = "closed"), color = "#DE9854") +
+    annotate(geom = "segment", x = -5, xend = 0, y = b_0, yend = b_0, arrow = arrow(angle = 12, type = "closed", ends = "first"), color = "#DE9854") +
+    scale_y_continuous(limits = c(0,100), expand = c(0,0), breaks = c(0,25,b_0,50,75,100), labels = c("0","25",parse(text = TeX("$b_0$")),"50","75","100"), minor_breaks = seq(0,100,12.5)) +
+    theme(axis.text.y = element_text(color = c("grey30", "grey30", "#DE9854", "grey30", "grey30", "grey30")),
+          axis.ticks.y = element_line(color = c("grey30", "grey30", "#DE9854", "grey30", "grey30", "grey30")),
+          panel.grid.minor = element_line(color = c("grey92", "grey92", "grey92", "grey92", "grey92", "grey92")),
+          panel.grid.major.y = element_line(color = c("grey92", "grey92", NA, "grey92", "grey92", "grey92")))
+plot_b_0
+```
+
+---
+
+# What's A Line: A Refresher
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+plot_b_0 + 
+    annotate(geom = "segment", x = 5, xend = 6, y = b_0+5*b_1, yend = b_0+5*b_1, arrow = arrow(angle = 12, type = "closed", length = unit(.4, "cm")), color = "#d90502") +
+    annotate(geom = "text", x = 5.5, y = 49, label = "1", size = 5, color = "#d90502") +
+    annotate(geom = "segment", x = 6, xend = 6, y = b_0+5*b_1, yend = b_0+6*b_1, arrow = arrow(angle = 12, type = "closed", length = unit(.2, "cm")), color = "#d90502") +
+    annotate(geom = "text", x = 6.5, y = (b_0+6*b_1 + b_0+5*b_1)/2, label = "b[1]", parse = TRUE, size = 6, color = "#d90502")
+```
+
+---
+
+# Simple Linear Regression: Residual
+
+* If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
+
+--
+
+```{r, echo = FALSE, fig.height = 4,fig.width=7}
+x <- runif(50, min  = 0, max = 1)
+y <- 1 * x
+
+data <- data.frame(y = y,
+                   x = x)
+
+plot_ex <- data %>% ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  xlim(0, 1) +
+  ylim(0, 1) +
+  labs(x = "x",
+       y = "y") +
+  theme_bw(base_size = 14)
+plot_ex
+```
+
+---
+
+# Simple Linear Regression: Residual
+
+* If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
+
+```{r, echo = FALSE, fig.height = 4,fig.width=7}
+plot_ex + geom_line(color = "#d90502")
+```
+
+---
+
+# Simple Linear Regression: Residual
+
+* If all the data points were __on__ the line then $\widehat{y}_i = y_i$.
+
+* However, since in most cases the *dependent variable* $(y)$ is not *only* explained by the chosen *independent variable* $(x)$, $\widehat{y}_i \neq y_i$, i.e. we make an __error__.  
+This __error__ is called the __residual__.
+
+--
+
+* At point $(x_i,y_i)$, we note this residual $e_i$.
+
+--
+
+* The *actual data* $(x_i,y_i)$ can thus be written as *prediction + residual*:
+
+  $$
+  y_i = \widehat y_i + e_i = b_0 + b_1 x_i + e_i
+  $$
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+plot_1 <- g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14)
+plot_1
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+plot_2 <- plot_1 +
+  stat_smooth(data = grades_avg_cs, method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6)
+plot_2
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color = "#d90502", size = 4) +
+  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "#d90502", size = 6)
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+math_class_reg <- lm(avgmath_cs ~ classize, data = grades_avg_cs)
+math_class_reg <- broom::augment(math_class_reg)
+
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_point(data = grades_avg_cs %>% filter(classize == 17), aes(x = classize, y = avgmath_cs), color = "#d90502", size = 4) +
+  annotate("text", x = 17, y = 69, label = "y[x = 17]", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_segment(data = math_class_reg %>% filter(classize == 17),
+               aes(xend = classize, yend = .fitted), color = "#d90502", size = 1) +
+  annotate("text", x = 18, y = 65.55, label = "e[x = 17]", parse = TRUE, colour = "#d90502", size = 6)
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+```{r, echo = F, fig.width = 10, fig.height = 5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_segment(data = math_class_reg,
+               aes(xend = classize, yend = .fitted), color = "#d90502", size = 0.5)
+```
+
+---
+
+# Simple Linear Regression: Graphically
+
+.left-wide[
+```{r, echo = F, out.width = "100%", fig.height = 4.5}
+g_math_cs +
+    ylim(50, 80) +
+    theme_bw(base_size = 14) +
+  stat_smooth(method = "lm", se = FALSE, colour = "#d90502") +
+  annotate("text", x = 6.5, y = 64, label = "hat(y)", parse = TRUE, colour = "#d90502", size = 6) +
+  geom_segment(data = math_class_reg,
+               aes(xend = classize, yend = .fitted), color = "#d90502", size = 0.5)
+```
+]
+
+.right-thin[
+<br>
+<br>
+<p style="text-align: center; font-weight: bold; font-size: 35px; color: #d90502;">Which "minimisation" criterion should (can) be used?</strong>
+]
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+--
+
+* Errors of different sign $(+/-)$ cancel out, so we consider **squared residuals** 
+$$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$
+
+* Choose $(b_0,b_1)$ such that $\sum_{i = 1}^N e_1^2 + \dots + e_N^2$ is **as small as possible**.
+
+--
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE,fig.width=7,fig.height = 3.5}
+g_math_cs +
+    ylim(50, 80) +
+    xlim(0, 50) +
+    theme_bw(base_size = 14) +
+    stat_smooth(method = "lm", se = FALSE, colour = "darkgreen") +
+  coord_fixed(ratio = 0.65)
+```
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+* Errors of different sign $(+/-)$ cancel out, so we consider **squared residuals** 
+$$\forall i \in [1,N], e_i^2 = (y_i - \widehat y_i)^2 = (y_i - b_0 - b_1 x_i)^2$$
+
+* Choose $(b_0,b_1)$ such that $\sum_{i = 1}^N e_1^2 + \dots + e_N^2$ is **as small as possible**.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE,fig.width=7,fig.height = 3.5}
+g_math_cs +
+    ylim(50, 80) +
+    xlim(0, 50) +
+    theme_bw(base_size = 14) +
+    stat_smooth(method = "lm", se = FALSE, colour = "darkgreen") +
+    geom_rect(data = math_class_reg,
+              aes(
+              xmin = classize,
+              xmax = classize + abs(.resid)*0.65,
+              ymin = avgmath_cs,
+              ymax = avgmath_cs - .resid),
+              fill = "darkgreen",
+              alpha = 0.3) +
+  coord_fixed(ratio = 0.65)
+```
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+```{r, echo = F, out.extra = 'style="border: none;"'}
+knitr::include_url("https://gustavek.shinyapps.io/reg_simple/")
+```
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS) Estimation
+
+```{r, echo = F, out.extra = 'style="border: none;"'}
+knitr::include_url("https://gustavek.shinyapps.io/SSR_cone/")
+```
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Coefficient Formulas
+
+* **OLS**: *estimation* method consisting in minimizing the sum of squared residuals.
+
+* Yields __unique__ solutions to this minization problem.
+
+* So what are the formulas for $b_0$ (intercept) and $b_1$ (slope)?
+
+--
+
+* In our single independent variable case:
+
+>   ### __Slope: $b_1^{OLS} = \frac{cov(x,y)}{var(x)}$ $\hspace{2cm}$ Intercept: $b_0^{OLS} = \bar{y} - b_1\bar{x}$__
+
+--
+
+* `r emo::ji("exclamation")` You should know these formulas, especially the one for $b_1^{OLS}$ `r emo::ji("exclamation")`
+   
+--
+
+* These formulas do not appear from magic. They can be found by solving the minimisation of squared errors. The maths can be found [here](https://www.youtube.com/watch?v=Hi5EJnBHFB4) for those who are interested.
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Interpretation
+
+For now assume both the dependent variable $(y)$ and the independent variable $(x)$ are numeric.
+
+--
+
+> Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if $x = 0$.**
+
+--
+
+> Slope $(b_1)$: **The predicted change, on average, in the value of $y$ *associated* to a one-unit increase in $x$.**
+
+--
+
+* `r emo::ji("warning")` Note that we use the term *associated*, **clearly avoiding interpreting $b_1$ as the causal impact of $x$ on $y$**. To make such a claim, we need some specific conditions to be met. (Next week!)
+
+--
+ 
+* Also notice that the units of $x$ will matter for the interpretation (and magnitude!) of $b_1$.
+
+--
+
+* **You need to be explicit about what the unit of $x$ is!**
+
+---
+
+# OLS with `R`
+
+* In `R`, OLS regressions are estimated using the `lm` function.
+
+* This is how it works:
+
+  ```{r, echo = TRUE, eval = FALSE}
+  lm(formula = dependent variable ~  independent variable, data = data.frame containing the data)
+  ```
+
+--
+
+## Class size and student performance
+
+Let's estimate the following model by OLS: $\textrm{average math score}_i = b_0 + b_1 \textrm{class size}_i + e_i$
+
+.pull-left[
+```{r echo=T, eval = FALSE}
+# OLS regression of class size on average maths score
+lm(avgmath_cs ~ classize, grades_avg_cs) 
+```
+]
+
+.pull-right[
+```{r echo=F, eval = TRUE}
+# OLS regression of class size on average maths score
+lm(avgmath_cs ~ classize, grades_avg_cs) 
+```
+]
+
+---
+
+# **O**rdinary **L**east **S**quares (OLS): Prediction
+
+```{r echo=F, eval = TRUE}
+# OLS regression of class size on average maths score
+lm(formula = avgmath_cs~classize, data = grades_avg_cs)
+```
+
+--
+
+This implies (abstracting the $_i$ subscript for simplicity):
+
+
+$$
+\begin{aligned}
+\widehat y &= b_0 + b_1 x \\
+\widehat {\text{average math score}} &= b_0 + b_1 \cdot \text{class size} \\
+\widehat {\text{average math score}} &= 61.11 + 0.19 \cdot \text{class size}
+\end{aligned}
+$$
+
+--
+
+What's the predicted average score for a class of 26 students? (Using the *exact* coefficients.)
+
+$$
+\begin{aligned}
+\widehat {\text{average math score}} &= 61.11 + 0.19 \cdot 26 \\
+\widehat {\text{average math score}} &= 66.08
+\end{aligned}
+$$
+
+---
+
+class: inverse
+
+# Task 2: OLS Regression
+
+`r countdown(minutes = 10, top = 0)`
+
+Run the following code to aggregate the data at the class size level:
+
+```{r, eval = F}
+grades_avg_cs <- grades %>%
+  group_by(classize) %>%
+  summarise(avgmath_cs = mean(avgmath),
+            avgverb_cs = mean(avgverb))
+```
+
+1. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 25. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
+
+1. Regress average verbal score (dependent variable) on class size (independant variable). Interpret the coefficients.
+
+1. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
+
+1. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
+
+1. What is the predicted average verbal score when the class size is equal to 30 students?
+
+---
+
+# OLS Variations / Restrictions
+
+* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`
+
+* There is an app for each of them:
+<br>
+<br>
+
+type | App  
+-------- | --------
+No Intercept, No regressors | `launchApp('reg_constrained')` 
+Centered Regression | `launchApp('demeaned_reg')` 
+Standardized Regression | `launchApp('reg_standardized')`
+
+
+---
+
+# Predictions and Residuals: Properties
+
+.pull-left[
+* __The average of $\widehat{y}_i$ is equal to $\bar{y}$.__  
+    $$\begin{align} \frac{1}{N} \sum_{i=1}^N \widehat{y}_i &= \frac{1}{N} \sum_{i=1}^N b_0 + b_1 x_i \\ &= b_0 + b_1  \bar{x}  = \bar{y} \end{align}$$
+
+* __The average (or sum) of residuals is 0.__
+  $$\begin{align} \frac{1}{N} \sum_{i=1}^N e_i &= \frac{1}{N} \sum_{i=1}^N (y_i - \widehat y_i) \\ &= \bar{y} - \frac{1}{N} \sum_{i=1}^N \widehat{y}_i \\\ &= 0 \end{align}$$
+]
+
+--
+
+.pull-right[
+* __ Regressor and residuals are uncorrelated (by definition).__
+
+  $$Cov(x_i, e_i) = 0$$
+
+
+* __Prediction and residuals are uncorrelated.__
+
+  $$\begin{align} Cov(\widehat y_i, e_i) &= Cov(b_0 + b_1x_i, e_i) \\ &= b_1Cov(x_i,e_i) \\ &= 0 \end{align}$$
+  
+  Since $Cov(a + bx, y) = bCov(x,y)$.
+
+]
+
+---
+
+# Linearity Assumption: Visualize your Data!
+
+* It's important to keep in mind that covariance, correlation and simple OLS regression only measure **linear relationships** between two variables.
+
+* Two datasets with *identical* correlations and regression lines could look *vastly* different.
+
+--
+
+* Is that even possible?
+<img src="https://media.giphy.com/media/5aLrlDiJPMPFS/giphy.gif" height = "400" align = "middle" />
+
+---
+
+# Linearity Assumption: Anscombe
+
+* Francis Anscombe (1973) came up with 4 datasets with identical stats. But look!
+
+.left-wide[
+
+```{r,echo=FALSE,fig.height = 4}
+##-- now some "magic" to do the 4 regressions in a loop:
+ff <- y ~ x
+mods <- setNames(as.list(1:4), paste0("lm", 1:4))
+covs = data.frame(dataset = 1:4, cov = 0.0)
+for(i in 1:4) {
+  ff[2:3] <- lapply(paste0(c("y","x"), i), as.name)
+  ## or   ff[[2]] <- as.name(paste0("y", i))
+  ##      ff[[3]] <- as.name(paste0("x", i))
+  mods[[i]] <- lmi <- lm(ff, data = anscombe)
+  covs[i,"cov"] = eval(parse(text = paste0("cov(anscombe$x",i,",anscombe$y",i,")")))
+  covs[i,"var(y)"] = eval(parse(text = paste0("var(anscombe$y",i,")")))
+  covs[i,"var(x)"] = eval(parse(text = paste0("var(anscombe$x",i,")")))
+}
+
+op <- par(mfrow = c(2, 2), mar = 0.1+c(4,4,1,1), oma =  c(0, 0, 0, 0))
+for(i in 1:4) {
+  ff[2:3] <- lapply(paste0(c("y","x"), i), as.name)
+  plot(ff, data = anscombe, col = "black", pch = 21, bg = "#d90502", cex = 1.2,
+       xlim = c(3, 19), ylim = c(3, 13),main=paste("dataset",i))
+  abline(mods[[i]], col = "#DE9854")
+}
+par(op)
+```
+]
+
+--
+
+.right-thin[
+</br>
+</br>
+
+```{r,echo = FALSE}
+ch = kable(round(covs,3))
+ch %>%
+   kable_styling(bootstrap_options = "striped", font_size = 20)
+```
+
+]
+---
+
+# Nonlinear Relationships in Data?
+
+.pull-left[
+* We can accomodate non-linear relationships in regressions.
+
+* Just add a *higher order* term like this:
+    $$
+    y_i = b_0 + b_1 x_i + b_2 x_i^2 + e_i
+    $$
+    
+* This is __multiple regression__ (in 2 weeks!)
+]
+
+--
+
+.pull-right[
+* For example, suppose we had this data and fit the previous regression model:
+    ```{r non-line-cars-ols2,echo=FALSE,echo=FALSE,fig.height = 6}
+data(mtcars)
+mtcars %>% ggplot(aes(x = hp, y = mpg)) +
+    geom_point() +
+    stat_smooth(method='lm', formula = y~poly(x,2), se = FALSE, aes(colour="Nonlinear")) +
+    stat_smooth(method='lm', se = FALSE, aes(colour="Linear")) +
+    scale_colour_manual(name="legend", values=c("darkgreen", "#d90502")) +
+    labs(x = "x",
+         y = "y",
+         title = "Nonlinear relationship between x and y") +
+    theme_bw(base_size = 20) +
+    theme(legend.position="top") +
+    theme(legend.title = element_blank())
+
+    ```
+]
+
+---
+
+# Analysis of Variance
+
+* Remember that $y_i = \widehat{y}_i + e_i$.
+
+* We have the following decomposition:
+    $$\begin{align} Var(y) &= Var(\widehat{y} + e)\\&= Var(\widehat{y}) + Var(e) + 2 Cov(\widehat{y},e)\\&= Var(\widehat{y}) + Var(e)\end{align}$$
+    
+* Because:
+  * $Var(x+y) = Var(x) + Var(y) + 2Cov(x,y)$
+  * $Cov(\hat{y},e)=0$
+
+* __Total variation (SST) = Model explained (SSE) + Unexplained (SSR)__
+
+---
+
+# Goodness of Fit
+
+* The __ $R^2$ __ measures how well the __model fits the data__.
+
+--
+
+$$
+R^2 = \frac{\text{variance explained}}{\text{total variance}} =     \frac{SSE}{SST} = 1 - \frac{SSR}{SST}\in[0,1]
+$$
+
+--
+    
+* $R^2$ close to $1$ indicates a __very ***high*** explanatory power__ of the model.
+
+* $R^2$ close to $0$ indicates a __very ***low*** explanatory power__ of the model.
+
+--
+
+* *Interpretation:* an $R^2$ of 0.5, for example, means that the variation in $x$ "explains" 50% of the variation in $y$.
+
+--
+    
+* `r emo::ji("warning")` Low $R^2$ does __NOT__ mean it's a useless model! Remember that econometrics is interested in causal mechanisms, not prediction!
+
+---
+
+class: inverse
+
+# Task 3: $R^2$ and goodness of fit
+
+`r countdown(minutes = 10, top = 0)`
+
+1. Regress `avgmath_cs` on `classize`. Assign to an object `math_reg`.
+
+1. Pass `math_reg` in the `summary()` function. What is the (multiple) $R^2$ for this regression? How can you interpret it?
+
+1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you about the relationship between $R^2$ and the correlation in a regression with only one regressor?
+
+1. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula on the previous slide.
+
+1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
+
+---
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU IN TWO WEEKS!
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |

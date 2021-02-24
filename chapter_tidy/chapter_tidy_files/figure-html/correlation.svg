@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Copyright 2017 mathsisfun.com -->
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="139.5" version="1.1" style="font-family:Georgia; font-size:12.5px; fill:#ffff3e; stroke-width:0.78;">
+<defs>
+	<marker id="id1" style="overflow:visible;" orient="auto">
+		<path transform="matrix(-0.4,0,0,-0.4,-4,0)" style="fill:none; stroke:black; stroke-width:1pt;" d="M 0,0 5,-5 -12.5,0 5,5 Z"/>
+	</marker>
+</defs>
+<g transform="matrix(0.241484,0,0,0.241484,874.35,-177.81)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="326.8" cy="61" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="330" cy="87.5" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="366.7" cy="104.2" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="376.9" cy="75.8" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="364.8" cy="61.3" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="348.6" cy="78.6" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="326.6" cy="109" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="366.3" cy="110.7" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="366.1" cy="90.2" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="347.7" cy="98.2" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="323" cy="73.5" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="350.3" cy="62.7" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="376" cy="63.6" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="359.6" cy="82" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<circle cx="334.8" cy="103.7" r="1.26076" style="fill-opacity:0.43; stroke:#ff6600; stroke-linejoin:round;"/>
+<g transform="matrix(0.241484,0,0,0.241484,673.767,-177.893)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="116.9" cy="116.1" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="125.2" cy="102.8" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="126" cy="111.3" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="143.4" cy="96" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="156.5" cy="92.3" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="160" cy="80.6" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="156.4" cy="75.8" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="173.8" cy="68.8" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="179.9" cy="64.4" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="181" cy="57.2" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="145.9" cy="88.4" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="172.5" cy="79.1" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="137.1" cy="104.6" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="183.1" cy="72" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<text x="154.4" y="9.4" style="text-align:center; text-anchor:middle; font-style:italic; fill:#00049d; stroke-width:0.21px;">High</text>
+<g transform="matrix(0.241484,0,0,0.241484,777.463,-177.569)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="224.4" cy="90.4" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="226.5" cy="104.1" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="248.3" cy="107.7" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="240.9" cy="90" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="261.8" cy="91.4" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="267.3" cy="79" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="287.2" cy="69" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="281.7" cy="86.3" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="281.5" cy="58.7" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="248.8" cy="75.1" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="236.7" cy="103.7" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<circle cx="221" cy="113.4" r="1.26076" style="fill-opacity:0.43; stroke:#0084c8; stroke-linejoin:round;"/>
+<text x="257.6" y="9.4" style="text-align:center; text-anchor:middle; font-style:italic; fill:#0084c8; stroke-width:0.21px;">Low</text>
+<g transform="matrix(0.241484,0,0,0.241484,1074.59,-177.897)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="521.3" cy="56.3" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="526.9" cy="63.9" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="520.9" cy="64.8" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="535.1" cy="72.8" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="540.4" cy="82.9" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="555.3" cy="85.7" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="557.1" cy="94.6" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="572.1" cy="98.4" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="570.2" cy="107.7" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="561.5" cy="97.5" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="580.3" cy="108.5" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="547.6" cy="93.3" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="546.7" cy="79.1" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="533.4" cy="77.4" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="534.7" cy="65.2" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<text x="554.9" y="9.4" style="text-align:center; text-anchor:middle; font-style:italic; fill:#b90000; stroke-width:0.21px;">High</text>
+<g transform="matrix(0.241484,0,0,0.241484,977.537,-177.549)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="422.4" cy="55.8" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="441.2" cy="80" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="457.4" cy="71.1" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="440.4" cy="96.4" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="473.2" cy="101.5" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="462.7" cy="113.8" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="461.8" cy="95.3" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="487.5" cy="112.6" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="460" cy="86.9" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="441.2" cy="71.1" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="424.8" cy="85.1" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="457.4" cy="104.2" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="482.7" cy="92.6" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<circle cx="428.4" cy="73.5" r="1.26076" style="fill-opacity:0.43; stroke:#ff4141; stroke-linejoin:round;"/>
+<text x="457.4" y="9.4" style="text-align:center; text-anchor:middle; font-style:italic; fill:#ff4141; stroke-width:0.21px;">Low</text>
+<g transform="matrix(0.241484,0,0,0.241484,566.55,-177.893)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="6.3" cy="102.5" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="20.4" cy="95.8" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="34.3" cy="89.2" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="52.8" cy="80.6" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="56.7" cy="78.7" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="68.6" cy="72.7" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="40" cy="86.8" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="38.4" cy="87.7" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="64.2" cy="75" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="26.3" cy="93.3" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<circle cx="76.9" cy="68.8" r="1.26076" style="fill-opacity:0.43; stroke:#00049d; stroke-linejoin:round;"/>
+<text x="46.3" y="9.4" style="text-align:center; text-anchor:middle; font-style:italic; fill:#00049d; stroke-width:0.21px;">Perfect</text>
+<g transform="matrix(0.241484,0,0,0.241484,1177.65,-177.915)">
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="m -2339.3,1239.3 h 355.4"/>
+	<path style="marker-end:url(#id1); fill:#2e3436; fill-opacity:0.75; stroke:#2e3436; stroke-width:3;" d="M -2338.5,1239 V 913.5"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1164.5 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1089.8 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,1015 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="m -2339.3,940.2 h 333.1"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2255.7,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2172.9,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2090.2,1239 V 941.4"/>
+	<path style="fill:none; stroke:#d8dadc; stroke-width:2; stroke-dasharray:16, 2;" d="M -2007.4,1239 V 941.4"/>
+</g>
+<circle cx="629.2" cy="58.2" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="632.6" cy="61.6" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="634.6" cy="63.8" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="642.6" cy="72.1" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="650.2" cy="80.1" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="660.7" cy="91" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="665.9" cy="96.5" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="678.5" cy="109.6" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="668.7" cy="99.4" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="679.5" cy="110.6" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="657.5" cy="87.7" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<circle cx="637.7" cy="67.1" r="1.26076" style="fill-opacity:0.43; stroke:#dc0000; stroke-linejoin:round;"/>
+<text x="657.7" y="9.4" style="text-align:center; text-anchor:middle; font-style:italic; fill:#b90000; stroke-width:0.21px;">Perfect</text>
+<text x="40.2" y="139.3" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">1</text>
+<text x="139.8" y="139.2" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">0.9</text>
+<text x="244" y="139.2" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">0.5</text>
+<text x="345.8" y="139.2" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">0</text>
+<text x="440.4" y="139.2" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">-0.5</text>
+<text x="540.6" y="139.2" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">-0.9</text>
+<text x="656.2" y="139.3" style="font-family:Verdana; font-size:17.4px; fill:black; stroke-width:0.24px;">-1</text>
+<text x="154.4" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#00049d; stroke-width:0.21px;">Positive</text>
+<text x="257.6" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#0084c8; stroke-width:0.21px;">Positive</text>
+<text x="554.9" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#b90000; stroke-width:0.21px;">Negative</text>
+<text x="457.4" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#ff4141; stroke-width:0.21px;">Negative</text>
+<text x="354.9" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#009100; stroke-width:0.21px;">No</text>
+<text x="46.4" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#00049d; stroke-width:0.21px;">Positive</text>
+<text x="657.7" y="23.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#b90000; stroke-width:0.21px;">Negative</text>
+<text x="154.4" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#00049d; stroke-width:0.21px;">Correlation</text>
+<text x="257.6" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#0084c8; stroke-width:0.21px;">Correlation</text>
+<text x="554.9" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#b90000; stroke-width:0.21px;">Correlation</text>
+<text x="457.4" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#ff4141; stroke-width:0.21px;">Correlation</text>
+<text x="354.9" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#009100; stroke-width:0.21px;">Correlation</text>
+<text x="46.8" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#00049d; stroke-width:0.21px;">Correlation</text>
+<text x="657.7" y="37.9" style="text-align:center; text-anchor:middle; font-style:italic; fill:#b90000; stroke-width:0.21px;">Correlation</text>
+</svg>
