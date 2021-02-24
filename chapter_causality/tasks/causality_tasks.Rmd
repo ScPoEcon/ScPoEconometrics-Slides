@@ -1,0 +1,155 @@
+---
+title: "Introduction - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1: SDO, ATE and Randomization
+
+Let's compute these various quantities and biases with some toy data (i.e. data we generated ourselves).
+
+1\. Load the data [here](https://www.dropbox.com/s/oqc3vq1m9eyp1d6/toy_data_2.csv?dl=1). The `group` variable corresponds to whether the individual has been treated or not, the `Y0` variable corresponds to the potential outcome if the individual does not receive the treatment $(Y_i^0)$ while `Y1` corresponds to the potential outcome if the individual receives the treatment $(Y_i^1)$. Create a new variable containing the observed outcome $(Y_i)$ and the individual treatment effect $(\delta_i)$. (Recall that $Y_i = D_i * Y_i^1 + (1 - D_i) Y_i^0$ and $\delta_i = Y_i^1 - Y_i^0$.)
+
+```{r}
+link <- "https://www.dropbox.com/s/oqc3vq1m9eyp1d6/toy_data_2.csv?dl=1"
+toy_data <- read.csv(link)
+
+library(tidyverse)
+
+toy_data <- toy_data %>%
+    mutate(Y = Y1 * group_dummy + (1 - group_dummy) * Y0,
+           delta = Y1 - Y0)
+```
+
+2\. Compute the ***ATE*** and the ***SDO***. Is there is any *bias*? Is it large in magnitude?
+
+```{r}
+ATE = mean(toy_data$delta)
+ATE
+
+SDO = mean(toy_data$Y[toy_data$group == "treatment"]) - mean(toy_data$Y[toy_data$group == "control"])
+SDO
+```
+
+The SDO is about 50% larger than the ATE, implying that the bias is quite large.
+
+3\. In this new [dataset](https://www.dropbox.com/s/0qfsonzz1t9gkxi/toy_data_random.csv?dl=1) we've randomly assigned the same individuals to the treatment and control groups. Compute the ***SDO under randomization***. Remember that you need to recompute $Y_i$ because the assignment is not the same anymore. If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
+
+```{r}
+link_rand <- "https://www.dropbox.com/s/0qfsonzz1t9gkxi/toy_data_random.csv?dl=1"
+toy_data_random <- read.csv(link_rand)
+
+toy_data_random <- toy_data_random %>%
+    mutate(Y = Y1 * group_random_dummy + (1 - group_random_dummy) * Y0)
+
+SDO_random = mean(toy_data_random$Y[toy_data_random$group_random == "treatment"]) - mean(toy_data_random$Y[toy_data_random$group_random == "control"])
+SDO_random
+
+ATE - SDO_random
+```
+
+The bias is equal to `r round(ATE - SDO_random,3)`. It is not equal to zero because our sample size is not large enough to completely negate random variations in the two group's differences.
+
+4\. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treatment effect bias*** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$
+
+```{r}
+selection_bias = mean(toy_data$Y0[toy_data$group == "treatment"]) - mean(toy_data$Y0[toy_data$group == "control"])
+
+het_trt_effect_bias = (1 - sum(toy_data$group == "treatment") / nrow(toy_data)) * (mean(toy_data$delta[toy_data$group == "treatment"]) - mean(toy_data$delta[toy_data$group == "control"]))
+
+SDO
+ATE + selection_bias + het_trt_effect_bias
+```
+
+
+## Task 2: STAR data
+
+1\. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1) and assign it to an object called `star_df`.
+
+```{r}
+star_df <- read.csv("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+```
+
+2\. Read the help for `AER::STAR` to understand what the variables correspond to. (Note: the data has been *reshaped* so don't mind the "k", "1", etc. in the variable names in the help.)
+
+```{r, eval = FALSE}
+library(AER)
+?AER::STAR
+```
+
+3\. What's the unit of observation? Which variable contains: (i) the (random) class assignment, (ii) the student's class grade, (iii) the outcomes of interest?
+
+**The unit of observation is student-grade. The variable containing the (random) class assignment is `star`, that containing the student's class grade is `grade`, and that containing the outcomes of interest are `read` and `math`.**
+
+4\. How many observations are there? Why so many?
+
+**There are so many observations because the data has been reshaped such that each row corresponds to a student in a grade rather than just to a student.**
+
+5\. Why are there so many `NA`s? What do they correspond to?
+
+**The `NA`s correspond to children who left the experiment for various reasons. This is called attrition.**
+
+6\. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_df),]`
+
+```{r}
+star_df <- star_df[complete.cases(star_df),]
+```
+
+7\. Let's check how well the randomization was done by doing ***balancing checks***.  
+Compute the average percentage of girls, african americans, and free lunch qualifiers by grade *and* treatment class. (*Hint*: The following computes the percentage of girls (without the relevant `dplyr` verbs):
+`share_female = mean(gender == "female") * 100`.)
+
+```{r}
+star_df %>%
+    group_by(grade, star) %>%
+    summarise(
+        share_female = mean(gender == "female") * 100,
+        share_african_american = mean(ethnicity == "afam") * 100,
+        share_free_lunch = mean(lunch == "free") * 100)
+```
+
+## Task 3: Your Turn!
+
+1\. Filter the dataset to only keep first graders and the small class and regular class groups.
+
+```{r}
+star_df_1_small <- star_df %>%
+    filter(star %in% c("small","regular") & grade == "1")
+```
+
+2\. Compute the average math score for both groups, and the difference between the two. (Use base `R`.)
+
+```{r}
+mean_small = mean(star_df_1_small$math[star_df_1_small$star == "small"])
+mean_small
+
+mean_regular = mean(star_df_1_small$math[star_df_1_small$star == "regular"])
+mean_regular
+
+ATE = mean_small - mean_regular
+ATE
+```
+
+3\. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
+
+```{r}
+star_df_1_small <- star_df_1_small %>%
+    mutate(treatment = (star == "small"))
+table(star_df_1_small$treatment)
+```
+
+4\. Regress math score on the treatment dummy variable. Are the results in line with question 2?
+
+```{r}
+lm(math ~ treatment, star_df_1_small)
+```
+
+5. How do you interpret these coefficients?
+
+**The intercept corresponds to the expected math score for first graders in the control group, defined as a regular-sized class. In other words the expected math score of first grades in the control group is 526,44. You can see this by yourself by comparing the coefficient to the same average computed in question 2. The slope coefficient corresponds the difference in expected math scores between first graders in the treatment and in the control group. In other words, first graders in small classes are expected to score 12.65 points higher than students in regular-sized classes. Again, you can compare this coefficient with the difference in averages computed in question 2.**
