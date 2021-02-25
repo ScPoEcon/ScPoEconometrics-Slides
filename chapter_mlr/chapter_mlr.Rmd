@@ -541,27 +541,27 @@ $$
 We have the following equalities:
 
 \begin{align}
-\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \neq 0) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 1 \\
+\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \in \mathbb{N}) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 1 \\
 &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2}
 \end{align}
 
 --
 
 \begin{align}
-\mathbb{E}(\text{average math score} | \text{religious} = 0 \text{ & } \text{class size} \neq 0) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 0 \\
+\mathbb{E}(\text{average math score} | \text{religious} = 0 \text{ & } \text{class size} \in \mathbb{N}) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 0 \\
 &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size}
 \end{align}
 
 --
 
 \begin{multline}
-\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \neq 0) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ & } \text{class size} \neq 0) \\
+\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ & } \text{class size} \in \mathbb{N}) \\
 = \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2}- (\color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size}) = \color{#027D83}{b_2}
 \end{multline}
 
 --
 
-$\rightarrow$ $\color{#027D83}{b_2}$ corresponds to the expected difference in average math score between religious and none religious schools, keeping class size constant
+$\rightarrow$ $\color{#027D83}{b_2}$ corresponds to the expected difference in average math score between religious and none religious schools, keeping class size constant.
 
 ---
 
@@ -584,8 +584,12 @@ We have the following equalities:
 \end{multline}
 
 \begin{multline}
-\color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \neq 0) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ & } \text{class size} \neq 0)
+\color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ & } \text{class size} \in \mathbb{N})
 \end{multline}
+
+\begin{equation}
+\color{#d96502}{b_0} + \color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} = 0)
+\end{equation}
 
 ---
 
@@ -714,7 +718,7 @@ Note that this implies that the number of observations has to be greater than th
 
 # No Perfect Collinearity: Dummy Variable Trap
 
-This condition is particularly for ***categorical variables***, i.e. variables that take a limited of possible "levels" (e.g. gender, seasons, race, education levels, etc.)
+This condition is particularly relevant for ***categorical variables***, i.e. variables that take a limited of possible "levels" (e.g. gender, seasons, race, education levels, etc.)
 
 --
 
@@ -763,19 +767,40 @@ grades %>% count(is_religious == 1 - is_notreligious)
 
 # No Perfect Collinearity: Dummy Variable Trap
 
-$\rightarrow$ `R` will automatically detect perfect collinearity between variables and drop of them
+$\rightarrow$ `R` automatically detects perfect collinearity between variables and drops one of them
 
 --
 
-`r emo::ji("warning")` you have to pay attention to the ***reference category***: the "baseline" category from which the coefficients are interpreted
+`r emo::ji("warning")` you have to pay attention to the ***omitted/reference category***: the "baseline" category from which the coefficients are interpreted
 
 --
 
-This applies to cases when you have more than 2 categories. You don't need to create a dummy variable for each possibility, `R` will detect that the categorical variable and do that for you.
+This applies to cases when you have more than 2 categories. You don't need to create a dummy variable for each possibility, `R` will detect the categorical variable(s) (as long as they are stored as `character` or `factor`) and do that for you.
 
 --
 
-***But*** you have to look which category has been chosen as the ***reference category***.
+***But*** you have to look which category has been chosen as the ***omitted category***.
+
+---
+
+class: inverse
+
+# Task 2: Dummy Variable Trap
+
+`r countdown(minutes = 10, top = 0)`
+
+Let's run a regression where there is perfect linear dependence between regressors.
+
+1. Load the *STAR* data from [here]("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1"), using `read.csv`, and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_df),]` 
+
+1. Create three dummy variables: (i) `small` equal to `TRUE` if students are in a small class and `FALSE` otherwise; (ii) `regular` equal to `TRUE` if students are in a regular class and `FALSE` otherwise; (iii) `regular_plus` equal to `TRUE` if students are in a regular+aide class and `FALSE` otherwise. Create a last variable, `sum`, equal to the sum of `small`, `regular` and `regular_plus`. What is `sum` equal to? What does this mean?
+
+1. Regress `math` on `small`. What is the average predicted `math` score of students in a small class? Do the same for `regular` and `regular_plus`.
+
+1. Regress `math` on `small`, `regular` and `regular_plus`. What do you notice? What's the omitted (reference) category? Does this match the previous questions?
+
+1. Regress `math` on `star`. What do you notice? What's the omitted category? Interpret the coefficient.
 
 ---
 
@@ -783,7 +808,7 @@ This applies to cases when you have more than 2 categories. You don't need to cr
 
 ***Omitted variable bias***: Omitting important control variables from the regression model
 
-This renders the coefficient for your regressor of interest unreliable.
+This renders the coefficient for your regressor of interest unreliable (*biased*).
 
 --
 
@@ -813,33 +838,59 @@ $$\text{OVB} = \color{#d90502}{c_2} \times \color{#d96502}{d_1}$$
 
 --
 
-From this formula you obtain both the ***magnitude*** of the OVB and its ***sign*** (positive/negative).
+In other words, $b_1 = c_1 + OVB$ 
 
 ---
 
-* The relationship between `disadvantaged` and `classize` is negative, and the effect of `disadvantaged` in the multiple regression is negative, therefore the OVB is positive. In other words, ommitting `disadvantaged` from the regression leads to an inflated coefficient for class size.
+# Omitted Variable Bias (OVB)
+
+$$\text{OVB} = \underbrace{\text{multiple regression coefficient on omitted variable}}_{\color{#d90502}{c_2}} \times \underbrace{\frac{Cov(x,z)}{Var(z)}}_{\color{#d96502}{d_1}}$$
+
+From this formula you obtain:
+
+* the OVB's ***magnitude*** (only if you observe $z$),
+* the OVB's ***sign*** (positive/negative): since in practice $z$ is not observed (otherwise you could include it in the regression) this is the most relevant case
+
+--
+
+***Question:***
+
+Imagine you want to uncover the relationship between income and years of education. Why might a simple regression of income on years of education not yield reliable estimates? What could be an omitted variable? What's the expected sign of the OVB?
 
 ---
 
-class: inverse
+# Omitted Variable Bias (OVB): In Practice
 
-# Task 2: OVB?
+Let's go back to our class size and student performance example. We had:
 
-`r countdown(minutes = 7, top = 0)`
+*Simple linear model:*  $\text{average math score} = b_0 + b_1\text{class size} + e$
 
-Still need to think about this perfect collinearity issue? Let's run a regression where there is perfect linear dependence between regressors.
+```{r, echo = FALSE}
+reg1 <- lm(avgmath ~ classize, grades)
+reg1$coefficients
+```
 
-1. Load the *STAR* data from [here]("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1") and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
-`star_df <- star_df[complete.cases(star_df),]`  
-Keep only second graders and small and regular class groups.
+--
 
-1. Create a dummy variable `small` equal to `TRUE` if students are in a small class and `FALSE` if they are in a regular class. In the same way, create a dummy variable `regular` equal to `TRUE` if students are in a regular class and to `FALSE` if they are in a small class. Clearly these two variables are perfectly collinear.
+*Multiple linear model:*  $\text{average math score} = c_0 + c_1\text{class size} + \color{#d90502}{c_2}\text{% disadvantaged} + e$
 
-1. Regress `small` on `math`. What is the average predicted `math` score of students in a small class?
+```{r, echo = FALSE}
+reg2 <- lm(avgmath ~ classize + disadvantaged, grades)
+reg2$coefficients
+```
 
-1. Regress `regular` on `math`. What is the average predicted `math` score of students in a regular class?
+--
 
-1. Regress `small` and `regular` on `math`. What do you notice? Can you explain why?
+*Omitted variable on regressor*:  $\text{% disadvantaged} = d_0 + \color{#d96502}{d_1}\text{class size} + e$
+
+```{r, echo = FALSE}
+reg3 <- lm(disadvantaged ~ classize, grades)
+reg3$coefficients
+```
+
+--
+
+We obtain: $$b_1 = `r round(reg1$coefficients[2],3)` = \underbrace{`r round(reg2$coefficients[2],3)`}_{c_1} + \underbrace{(`r round(reg2$coefficients[3],3)`)}_{\color{#d90502}{c_2}} \times \underbrace{(`r round(reg3$coefficients[2],3)`)}_{\color{#d96502}{d_1}} = c_1 + OVB$$
 
 ---
 
@@ -857,6 +908,25 @@ Keep only second graders and small and regular class groups.
 
 ---
 
+class: inverse
+
+# Task 3: Recap
+
+`r countdown(minutes = 10, top = 0)`
+
+Let's use the *STAR* data (used in the previous task) to review the main concepts covered.
+
+1. Using the filtered data from the previous task, regress `math` on `school` (tabulate the variable to know what it contains). Interpret the coefficients. What's the omitted category? Do you find them surprising? Why? What might be an omitted variable?
+
+1. Compute the share of students qualifying for free lunch (i.e. `lunch` equals "free") by school location category. What do you observe? Add `free` to the previous question's regression. How do the coefficients change?
+
+1. Regress `math` on `gender` and `experience` (the teacher's experience). Interpret the coefficients. How would these regression results look like visually?
+
+1. Regress `math` on `star`. After interpreting the coefficients, regress `math` on `star`, `gender`, `ethnicity`, `lunch`, `degree`, `experience` and `school`. Recalling that this is a randomized experiment, does it look like the randomization was well done?
+
+1. What's the adjusted $R^2$ from the previous multiple regression. How do you interpret it? What might you deduce about the importance of observable individual, teacher and school characteristics in explaining educational outcomes?
+
+---
 
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)
