@@ -80,19 +80,17 @@ knitr::include_graphics("chapter_mlr_files/figure-html/qr_code_quiz.png")
 
 * Multiple independent variables in our model
 
-* Interpretation for continuous and dummy variables
+* Interpretation for continuous and dummy regressors
 
 * Dummy variable trap
 
-* Adjusted $R_2$
-
 * Omitted variable bias
+
+* Adjusted $R_2$
 
 * Empirical applications:
 
   * *Class size* and *student performance*
-  
-  * *Wage*, *education* and *gender* 
 
 ---
 
