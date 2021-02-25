@@ -1,5 +1,5 @@
 ---
-title: "Introduction - Tasks"
+title: "Intro to Causality - Tasks"
 author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
 date: "`r Sys.Date()`"
 output: html_document
