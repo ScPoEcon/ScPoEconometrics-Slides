@@ -559,7 +559,7 @@ We have the following equalities:
 
 --
 
-$\rightarrow$ $\color{#027D83}{b_2}$ corresponds to the expected difference in average math score between religious and none religious schools, keeping class size constant.
+$\rightarrow$ $\color{#027D83}{b_2}$ corresponds to the expected difference in average math score between religious and non-religious schools, keeping class size constant.
 
 ---
 
@@ -603,7 +603,7 @@ base_graph <- grades %>%
     geom_point(size = 3, alpha = .5) +
     scale_color_viridis_d(labels = c("FALSE","TRUE")) +
     scale_x_continuous(lim = c(0,45), expand = c(0,0)) +
-    scale_y_continuous(breaks = seq(30,90,20)) +
+    scale_y_continuous(breaks = seq(30,90,20), minor_breaks = seq(40,80,10)) +
     labs(x = "Class size", y = "Average math score", col = "Religious school") +
     theme_bw(base_size = 20) +
     theme(legend.position = c(0,1),
@@ -624,7 +624,7 @@ $$
 $$
 
 ```{r, echo = FALSE, fig.height=5, fig.width = 10}
-library(broom)
+library(broom)  
 library(viridis)
 reg_dummy <- augment(lm(avgmath ~ classize + religious, grades))
 
@@ -651,7 +651,7 @@ b2 = reg_coefs[3]
 
 graph_reg_b0 <- graph_reg +
     geom_segment(aes(x = 0, xend = 10, y = b0, yend = b0 + b1 * 10), size = .5, linetype = 2, colour = viridis_pal()(2)[1]) +
-    scale_y_continuous(breaks = c(30,50,b0,70,90), labels = c("30","50",parse(text = TeX("$b_0$")),"70","90"), minor_breaks = seq(30,90,20)) +
+    scale_y_continuous(breaks = c(30,50,b0,70,90), labels = c("30","50",parse(text = TeX("$b_0$")),"70","90"), minor_breaks = seq(40,80,10)) +
     theme(axis.text.y = element_text(color = c("grey30", "grey30", "#d96502", "grey30", "grey30")),
           axis.ticks.y = element_line(color = c("grey30", "grey30", "#d96502", "grey30", "grey30")),
           panel.grid.minor = element_line(color = c("grey92", "grey92", "grey92", "grey92", "grey92")),
@@ -668,7 +668,7 @@ $$
 $$
 
 ```{r, echo = FALSE, fig.height=5, fig.width = 10}
-graph_b0_b1 <- graph_reg_b0 +
+graph_b0_b1 <- graph_reg_b0 + 
     annotate("text", x = 3, y = 34, label = "b[1]", color = "#d90502", hjust = 0,  parse = TRUE, size = 6) +
   annotate("text", x = 4.5, y = 34, label = "is equal to the slope of these slines", hjust = 0, size = 6)
 graph_b0_b1
@@ -814,19 +814,19 @@ Let's note $y$ our outcome variable, $x$ our regressor and $z$ our omitted varia
 
 --
 
-We have regression models:
+We have the following regression models:
 
 --
 
-1. Simple linear model: $y = b_0 + b_1x + e$
+1. ***Simple linear model***: $y = b_0 + b_1x + e$
 
 --
 
-1. Multiple linear model: $y = c_0 + c_1x + \color{#d90502}{c_2}z + e$
+1. ***Multiple linear model***: $y = c_0 + c_1x + \color{#d90502}{c_2}z + e$
 
 --
 
-1. Omitted variable on regressor: $z = d_0 + \color{#d96502}{d_1}x + e$
+1. ***Omitted variable on regressor***: $z = d_0 + \color{#d96502}{d_1}x + e$
 
 --
 
@@ -842,7 +842,7 @@ In other words, $b_1 = c_1 + OVB$
 
 # Omitted Variable Bias (OVB)
 
-$$\text{OVB} = \underbrace{\text{multiple regression coefficient on omitted variable}}_{\color{#d90502}{c_2}} \times \underbrace{\frac{Cov(x,z)}{Var(z)}}_{\color{#d96502}{d_1}}$$
+$$\text{OVB} = \underbrace{\text{multiple regression coefficient on omitted variable}}_{\color{#d90502}{c_2}} \times \underbrace{\frac{Cov(x,z)}{Var(x)}}_{\color{#d96502}{d_1}}$$
 
 From this formula you obtain:
 
@@ -861,7 +861,7 @@ Imagine you want to uncover the relationship between income and years of educati
 
 Let's go back to our class size and student performance example. We had:
 
-*Simple linear model:*  $\text{average math score} = b_0 + b_1\text{class size} + e$
+***Simple linear model:***  $\text{average math score} = b_0 + b_1\text{class size} + e$
 
 ```{r, echo = FALSE}
 reg1 <- lm(avgmath ~ classize, grades)
@@ -870,7 +870,7 @@ reg1$coefficients
 
 --
 
-*Multiple linear model:*  $\text{average math score} = c_0 + c_1\text{class size} + \color{#d90502}{c_2}\text{% disadvantaged} + e$
+***Multiple linear model:***  $\text{average math score} = c_0 + c_1\text{class size} + \color{#d90502}{c_2}\text{% disadvantaged} + e$
 
 ```{r, echo = FALSE}
 reg2 <- lm(avgmath ~ classize + disadvantaged, grades)
@@ -879,7 +879,7 @@ reg2$coefficients
 
 --
 
-*Omitted variable on regressor*:  $\text{% disadvantaged} = d_0 + \color{#d96502}{d_1}\text{class size} + e$
+***Omitted variable on regressor***:  $\text{% disadvantaged} = d_0 + \color{#d96502}{d_1}\text{class size} + e$
 
 ```{r, echo = FALSE}
 reg3 <- lm(disadvantaged ~ classize, grades)
