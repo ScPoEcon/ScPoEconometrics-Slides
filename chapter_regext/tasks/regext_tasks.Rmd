@@ -1,0 +1,190 @@
+---
+title: "Linear Regression Extensions - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1: Standardized regression
+
+Let's go back our [grades]("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1") dataset. Remember that to load the data you need to use the `read_dta()` from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
+
+```{r}
+library(haven)
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+
+reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
+reg_full$coefficients
+```
+
+1\. Create a new variable `avgmath_stand` equal to the the standardized math score. You can use the `scale()` function or do it by hand with base `R`.
+
+```{r}
+library(tidyverse)
+
+# using scale()
+grades <- grades %>%
+    mutate(avgmath_stand = scale(avgmath))
+
+# using base R
+grades$avgmath_stand_2 <- (grades$avgmath - mean(grades$avgmath)) / sd(grades$avgmath)
+
+identical(grades$avgmath_stand, grades$avgmath_stand_2)
+```
+
+1\. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
+
+```{r}
+reg_full_stand <- lm(avgmath_stand ~ classize + disadvantaged + school_enrollment + female + religious, grades)
+reg_full_stand$coefficients
+```
+
+
+**Interpretation for the class size coefficient: holding all the other regressors included in the regression constant, on average, a 1-student increase in class size is associated with a 0.003 standard deviation increase in average math scores. This is a very small association: 0.3% of a standard deviation.**
+
+1\. Create the standardized variables for each *continuous* regressor as `<regressor>_stand`. 
+  * Would it make sense to standardize the `religious` variable?
+
+```{r}
+grades <- grades %>%
+    mutate(classize_stand = scale(classize),
+           disadvantaged_stand = scale(disadvantaged),
+           school_enrollment_stand = scale(school_enrollment),
+           female_stand = scale(female))
+```
+
+**It would not make much sense to standardize the `religious` variable because it is a dummy variable, equal to 1 if the school is religious, and 0 otherwise.**
+
+1\. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
+
+```{r}
+reg_full_stand_2 <- lm(avgmath_stand ~ classize_stand + disadvantaged_stand + school_enrollment_stand + female_stand + religious, grades)
+reg_full_stand_2$coefficients
+```
+
+**Interpretation for the class size coefficient: holding all the other regressors included in the regression constant, on average, a 1-standard deviation increase in class size (approx 6.5 students) is associated with a 0.02 standard deviation increase in average math scores. This is quite a small association: 2% of a standard deviation.**
+
+
+# Task 2: Non-linear relationships
+
+1\. Load the data [here](https://www.dropbox.com/s/2v5mb04nzw2u7bd/college_tuition_income.csv?dl=1). This dataset contains information about tuition and estimated incomes of graduates for universities in the US. More details can be found [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-10/readme.md).
+
+```{r}
+college <- read.csv("https://www.dropbox.com/s/2v5mb04nzw2u7bd/college_tuition_income.csv?dl=1")
+```
+
+
+2\. Create a scatter of estimated mid career pay $(y)$ as a function of out of state tuition $(x)$. Would you say the relationship is broadly linear or rather non-linear? Use `geom_smooth(method = "lm", se = F) + geom_smooth(method = "lm", se = F, formula = y ~ poly(x, 2, raw= T))` to fit both a linear and 2nd order line. This time which seems most appropriate?
+
+```{r}
+base_graph <- college %>%
+    ggplot(aes(x = out_of_state_tuition, y = mid_career_pay)) +
+    geom_point() +
+    labs(x = "Tuition for out-of-state residents in USD",
+         y = "Estimated mid career pay in USD",
+         title = "Relationship between out of state tuition and estimate mid career pay") +
+    scale_x_continuous(labels = scales::dollar) +
+    scale_y_continuous(labels = scales::dollar) +
+    theme_bw(base_size = 14)
+base_graph
+```
+
+**The relationship appears to be relatively linear though there is a some non-linearity at the upper end of the out of state tuition distribution, i.e. on the right-hand side of the graph. A 2nd order or 3rd order polynomial regression may be appropriate to capture it.**
+
+```{r}
+base_graph +
+    geom_smooth(method='lm', se = FALSE, formula = y~poly(x,2, raw = T), aes(colour="y = b0 + b1x + b2x^2 + e")) +
+    geom_smooth(method='lm', se = FALSE, aes(colour="y = b0 + b1x + e")) +
+    scale_colour_manual(name = NULL, values=c("#d90502", "#DE9854")) +
+    theme(legend.position = c(0,1),
+          legend.justification = c(0,1))
+```
+
+**Based on my first impressions, the 2nd order polynomial fit seems to be a bit better at capturing non-linearities to the left and right of the graph.**
+
+3\. Create a variable equal to out of state tuition divided by 1000. Regress mid career pay on out of state tuition divided by 1000. Interpret the coefficient.
+
+```{r}
+college <- college %>%
+    mutate(out_state = out_of_state_tuition/1000)
+
+lm(mid_career_pay ~ out_state, college)
+```
+
+**On average, a $1,000 increase in out of state tuition is associated with a $772 increase in estimated mid career pay.**
+
+4\. Regress mid career pay on out of state tuition divided by 1000 and its square. *Hint:* you can use either `poly(x, 2, raw = T)` or `x + I(x^2)`, where x is your regressor. What does the positive sign on the squared term imply?
+
+```{r}
+lm(mid_career_pay ~ poly(out_state, 2, raw = T), college)
+```
+
+**The positive sign on the squared term (`poly(out_state, 2, raw = T)2` implies that as out of state tuition increases the increase in estimated mid career pay increases faster. In other words, the slope of the line is increasing in out of state tuition, it becomes steeper as you move to the right of the graph.**
+
+## Task 3: Wages, education and gender in 1985
+
+1\. Load the data `CPS1985` from the `AER` package.
+
+```{r}
+library(AER)
+data("CPS1985")
+cps = CPS1985
+```
+
+2\. Look at the `help` to get the definition of each variable: `?CPS1985`
+
+```{r}
+?AER::CPS1985
+```
+
+3\. We don't know if people are working part-time or full-time, does it matter here? 
+
+**It doesn't matter much since we are analysing hourly wages.**
+
+4\. Create the`log_wage` variable equal to the log of `wage`.
+
+```{r}
+cps <- cps %>%
+    mutate(log_wage = log(wage))
+```
+
+5\. Regress `log_wage` on `gender` and `education`, and save it as `reg1`. Interpret each coefficient.
+
+```{r}
+reg1 <- lm(log_wage ~ gender + education, cps)
+reg1
+```
+
+**This is a log-level regression so the coefficients are interpreted as unit increase in $x$ associated with percent change in $y$. On average, women earn exp(-0.23207) = `r round(exp(-0.23207),2)` percent of what men earn, holding education constant. That is, controlling for education, women earn on average 21% less than men. Note that since the coefficient is relatively small, you can approximate the interpretation as: on average, women earn 23% less than men with the same level of education.**
+
+**Holding gender constant, a 1-year increase in years of education is associated, on average, with a exp(0.07685) = `r round(exp(0.07685),2)` percent change in hourly earnings. In other words, controlling for gender, on average, 1-year increase in years of education is associated with an 8% increase in hourly wage. Again, since the coefficient is quite small you can use the approximation we saw earlier on.**
+
+6\. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`. Interpret each coefficient. Does the gender wage gap decrease with education?
+
+```{r}
+reg2 <- lm(log_wage ~ gender*education, cps)
+reg2
+```
+
+**On average, men with no education earn exp(1.32352) = `r round(exp(1.32352),2)` dollars an hour. Women with no education, on average, earn about exp(-0.63315) = `r round(exp(-0.63315),2)` 47% less than men with no education. On average, for men, 1-year increase in years of education is associated, on average, with a exp(0.06468) = `r round(exp(0.06468), 2)` percent increase, i.e. a 6.68% increase, in hourly wages. The difference in the return to education between women and men is about exp(0.03080) = `r round(exp(0.03080),2)` percentage points, that is for each additional year of educatio, women's hourly wage increases by about exp(0.06468 + 0.03080) = `r round(exp(0.06468 + 0.03080),2)`, i.e. 10%. Graphically, this means that the slope for women is steeper than that for men. The gender pay gap therefore shrinks with years of education.**
+
+
+7\. Create a plot showing this interaction. (*Hint:* use the `color = gender` argument in `aes` and `geom_smooth(method = "lm", se = F)` to obtain a regression line per gender.)
+
+```{r}
+cps %>%
+    ggplot(aes(x = education, y = log_wage, col = gender)) +
+    geom_point() +
+    geom_smooth(method= "lm", se = F) +
+    scale_color_viridis_d() +
+    labs(x = "Years of education", y = "Log hourly wage", title = "Relationship between hourly wage and years of education by gender", color = NULL) +
+    theme_bw(base_size = 14) +
+    theme(legend.position = c(0,1),
+          legend.justification = c(0,1))
+```
+
+
