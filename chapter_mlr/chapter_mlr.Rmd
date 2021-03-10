@@ -236,6 +236,7 @@ ggplot(grades, aes(x = disadvantaged, y = avgmath)) +
 `r emo::ji("point_right")` On average, the greater the % of students coming from a disadvantaged background, the lower the average math score.
 
 ]
+
 ---
 
 # Class size and student performance: Multiple regression
