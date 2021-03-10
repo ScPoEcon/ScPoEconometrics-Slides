@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ScPoEconometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ScPoEconometrics
+## Linear Regression Extensions
+### Florian Oswald, Gustave Kenedi and Pierre Villedieu
+### SciencesPo Paris </br> 2021-03-10
+
+---
+
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOMLR***](https://app.wooclap.com/SCPOCAUSALITY)
+
+&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
+
+2\. From your ***phone*** 👉 flash QR code below
+
+&lt;img src="chapter_regext_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Today - Linear Regression Extensions
+
+Depending on the data and the relationships between the variables of interest, you may need to move away from the baseline model.
+
+--
+
+We will focus on 3 important variations:
+
+  1. ***Standardized*** regression
+  
+  1. ***Non-linear relationships***: log and polynomial models
+  
+  1. ***Interactions*** between variables
+
+--
+
+In each case, the way we estimate these coefficients does not change (i.e OLS).
+
+--
+
+Empirical applications:
+
+  (i) *class size* and *student performance*,
+  (ii) *college tuition* and *earnings potential*,
+  (iii) *wage*, *education* and *gender* 
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Standardized Regression
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Standardized Regression
+
+Let's define what *standardizing* a variable means.
+
+&gt; ***Standardizing*** a variable `\(z\)`  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
+
+$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
+where `\(\bar z\)` is the mean of `\(z\)` and `\(\sigma(z)\)` is the standard deviation of `\(z\)`, i.e. `\(\sigma(z) = \sqrt{\textrm{VAR}(z)}\)`.
+
+--
+
+`\(z^{stand}\)` now has mean 0 and standard deviation 1, i.e. `\(\overline{z^{stand}} = 0\)` and `\(\sigma(z^{stand}) = 1\)`
+
+--
+
+Intuitively, standardizing ***puts variables on the same scale*** so we can compare them.
+  
+In our class size and student performance example, it will help to interpret: 
+
+  * The **magnitude** of the effects,
+  * The **relative importance of each variable**.
+
+---
+
+# Standardized Regression
+
+
+
+.pull-left[
+&lt;img src="chapter_regext_files/figure-html/graph_before.png" width="3200" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_regext_files/figure-html/graph_after.png" width="3200" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Standardized Regression: Interpretation
+
+If the ***dependent*** variable `\(y\)` is standardized, i.e. the model is `\(\color{#d90502}{y^{stand}} = b_0 + \sum_{k=1}^Kb_kx_k +e\)`:
+
+--
+
+* By definition, `\(b_k\)` measures the predicted change in ** `\(y^{stand}\)` **  associated with a one unit increase in `\(x_k\)`.
+  
+* If `\(y^{stand}\)` increases by one, it means that `\(y\)` increases by one standard deviation. So `\(b_k\)` measures the change in `\(y\)` **as a share of `\(y\)`'s standard deviation**.
+  
+--
+
+If the ***regressor*** `\(x_k\)` is standardized, i.e. the model is `\(y = b_0 + \sum_{k=1}^Kb_k\color{#d90502}{x_k^{stand}} +e\)`:
+
+--
+
+* By definition, `\(b_k\)` measures the predicted change in `\(y\)` associated with a one unit increase in ** `\(x_k^{stand}\)` **. 
+  
+* If `\(x_k^{stand}\)` increases by one unit, it means that `\(x_k\)` increases by one standard deviation. So `\(b_k\)` measures the predicted change in `\(y\)` **associated with an increase in `\(x_k\)` by one standard deviation**. 
+  
+---
+
+class:inverse
+
+# Task 1: Standardized regression
+
+<div class="countdown" id="timer_604891d3" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Let's go back our [grades]("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1") dataset. Remember that to load the data you need to use the `read_dta()` from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
+
+
+```
+##       (Intercept)          classize     disadvantaged school_enrollment            female         religious 
+##      78.560725298       0.003320773      -0.389333008       0.000758258       0.923710499       2.876146701
+```
+
+1. Create a new variable `avgmath_stand` equal to the the standardized math score. You can use the `scale()` function or do it by hand with base `R`.
+
+1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
+
+1. Create the standardized variables for each *continuous* regressor as `&lt;regressor&gt;_stand`.
+  * Would it make sense to standardize the `religious` variable?
+
+1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Non-Linear Relationships
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Accounting for Non-Linear Relationships
+
+There are two main "methods":
+
+1. ***Log*** models
+
+--
+
+1. ***Polynomial*** models
+
+---
+
+
+# Log Models
+
+* The models we have seen so far can be called ***level-level*** specifications. Both the dependent and the independent variables have been measured in level.
+
+--
+
+  * This *level* can be: euros, years, number of students,... and even percentage.
+  
+--
+
+* Taking the *natural* log of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions:
+
+  * ***Log - level***: `\(\quad log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i\)`
+
+  * ***Level - log***: `\(\quad \textrm{y}_i = b_0 + b_1 log(x_{1,i}) + ... + e_i\)`
+
+  * ***Log - log***: `\(\quad log(y_i) = b_0 + b_1 log(x_{1,i}) + ... + e_i\)`
+  
+---
+
+# The (natural) log Function: A Primer 😉
+
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# The (natural) log Function: A Primer 😉
+
+The [natural log function](https://en.wikipedia.org/wiki/Natural_logarithm) is the inverse function of the exponential function. , i.e. `\(log(e^x)=x\)`
+
+--
+
+`\(\rightarrow\)` since for all `\(x\)`, `\(e^x&gt;0 \implies\)` natural log function is only defined for ***strictly positive values***! (It is not defined in 0!)
+
+--
+
+⚠️ You can only log your variables if they don't take 0 or negative values! Always think about this when taking the log of your dependent or independent variable(s)
+
+---
+
+# The (natural) log Function: A Primer 😉
+
+If you have very ***skewed distributions*** taking the log will render it more ***normally distributed***
+
+--
+
+.pull-left[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Log Models: Interpretation
+
+|    Specification           | Model  |  Interpretation of `\(b_1\)`            |
+|--------------------|:---------:|:-----------------------------------:|
+| Level - Level | `\(y = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1\)` .small[**unit change** in y]  |
+| Log - Level | `\(log(y) = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(e^{b_1}\)` .small[ **percent change** in y]  |
+| Level - Log | `\(y = b_0 + b_1 log(x)  + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 \times log(1 + \Delta x)\)`  .small[**unit change** in y] |
+| Log - Log  |  `\(log(y) = b_0 + b_1 log(x) + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\((1 + \Delta x)^{b_1}\)` .small[**percent change** in y]  |
+
+* Note that if `\(\Delta x = 5\% = 0.05 \implies 1 + \Delta x = 1.05\)` 
+
+--
+
+* This may look like cooking recipes but of course it can be [derived with some calculus](https://www.youtube.com/watch?v=aXBFKKh54Es). Also check out [this great explainer](https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faqhow-do-i-interpret-a-regression-model-when-some-variables-are-log-transformed/) for more info.
+
+---
+
+# Log Models: Simplified Interpretations
+
+3 simplifications, which are used extremely often in practice:
+
+--
+
+***Log-Level***
+
+When *** `\(b_1\)` is small*** you can interpret using `\(1+b_1\)` rather than `\(e^{b_1}\)`. This is because, for small `\(b_1\)`, `\(e^{b_1} \approx 1+ b_1\)`
+
+--
+
+`\(\rightarrow\)` for `\(b_1 = 0.04\)`, `\(e^{b_1} = 1.0408\)` 
+
+--
+
+`\(\rightarrow\)` for `\(b_1 = 0.5\)`, `\(e^{b_1} = 1.6487\)`
+
+---
+
+# Log Models: Simplified Interpretations
+
+3 simplifications, which are used extremely often in practice:
+
+***Level-Log***
+
+For ***(relatively) small increases in `\(x\)`, `\(\delta x\)`***, you can interpret using `\(b_1 \times \delta x\)` rather than `\(b_1 \times log(1 + \delta x)\)`, since for small `\(\delta x\)`, `\(log(1 + \delta x) = \delta x\)`
+
+--
+
+`\(\rightarrow\)` for `\(\delta x = 1\%=0.01\)`, `\(log(1+\delta x) = 0.01\)`
+
+--
+
+`\(\rightarrow\)` for `\(\delta x = 20\%=0.20\)`, `\(log(1+\delta x) = 0.18\)`
+
+---
+
+# Log Models: Simplified Interpretations
+
+3 simplifications, which are used extremely often in practice:
+
+***Log-Log***
+
+For ***small increases in `\(x\)`, `\(\delta x\)`, and small `\(|b_1|\)`***, you can interpret using `\(1 + b_1 \times \delta x\)` rather than `\((1 + \delta x)^{b_1}\)`, since for small `\(|b_1|\delta x\)`, `\((1 + \delta x)^{b_1} \approx 1 + b_1 \times \delta x\)`
+
+--
+
+`\(\rightarrow\)` for `\(\delta x = 1\%=0.01\)` and `\(b_1 = 0.5\)`, `\((1+\delta x)^{b_1} = 1\)`
+
+--
+
+`\(\rightarrow\)` for `\(\delta x = 10\%=0.10\)` and `\(b_1 = 10\)`, `\((1+\delta x)^{b_1} = 2.59\)`
+
+---
+
+# Log Models: Simplified Interpretations Recap
+
+For ***(relatively) small increases in `\(x\)`, `\(\delta x\)`***:
+
+|    Specification           | Model  |  Interpretation of `\(b_1\)`            |
+|--------------------|:---------:|:-----------------------------------:|
+| Level - Level | `\(y = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1\)` .small[**unit change** in y]  |
+| Log - Level | `\(log(y) = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(1 + b_1\)` .small[ **percent change** in y]  |
+| Level - Log | `\(y = b_0 + b_1 log(x)  + e\)` | .small[A  ] ** `\(\delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 \times \delta x\)`  .small[**unit change** in y] |
+| Log - Log  |  `\(log(y) = b_0 + b_1 log(x) + e\)` | .small[A  ] ** `\(\delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(1 + b_1 \times \delta x\)` .small[**percent change** in y]  |
+
+---
+
+# When Should You Use log Models?
+
+1. If the relationship betwen `\(x\)` and `\(y\)` looks like a log or exponential function. 
+
+--
+
+.pull-left[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# When Should You Use log Models?
+
+1. If the relationship betwen `\(x\)` and `\(y\)` looks like a log or exponential function. 
+
+.pull-left[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# When Should You Use log Models?
+
+1. If the relationship betwen `\(x\)` and `\(y\)` looks like a log or exponential function. 
+
+1. To easily interpret coefficients as &lt;a href="https://en.wikipedia.org/wiki/Elasticity_(economics)"&gt;***elasticities***&lt;/a&gt; which play a central role in economic theory.
+
+---
+
+# Accounting for Other Types Non-Linear Relationships
+
+What if the relationship between `\(x\)` and `\(y\)` is not exponential/log?
+
+--
+
+`\(\rightarrow\)` ***polynomial*** regressions: just take a polynomial function of the regressor!
+
+---
+
+# Polynomial Wut? 😟
+
+.pull-left[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Polynomial Regressions
+
+What does this mean in practice?
+
+--
+
+`\(\rightarrow\)` add a higher order of the regressor to the regression, depending on the visual (or expected) relationship
+
+--
+
+Several ways of doing this in `R`:
+
+.pull-left[
+
+```r
+lm(y ~ x + I(x^2) + I(x^3), data)
+```
+]
+
+--
+
+.pull-right[
+
+```r
+lm(y ~ poly(x, 3, raw = TRUE), data)
+```
+]
+
+
+---
+
+# Polynomial Regressions
+
+
+.pull-left[
+
+***2nd order:***
+
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-left[
+
+***3rd order:***
+
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+&lt;img src="chapter_regext_files/figure-html/curve_fitting.png" width="378px" height="600px" style="display: block; margin: auto;" /&gt;
+
+---
+
+class:inverse
+
+# Task 2: Non-linear relationships
+
+<div class="countdown" id="timer_60489196" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Load the data [here](https://www.dropbox.com/s/2v5mb04nzw2u7bd/college_tuition_income.csv?dl=1). This dataset contains information about tuition and estimated incomes of graduates for universities in the US. More details can be found [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-10/readme.md).
+
+2. Create a scatter of estimated mid career pay `\((y)\)` as a function of out of state tuition `\((x)\)`. Would you say the relationship is broadly linear or rather non-linear? Use `geom_smooth(method = "lm", se = F) + geom_smooth(method = "lm", se = F, formula = y ~ poly(x, 2, raw= T))` to fit both a linear and 2nd order line. This time which seems most appropriate?
+
+3. Create a variable equal to out of state tuition divided by 1000. Regress mid career pay on out of state tuition divided by 1000. Interpret the coefficient.
+
+4. Regress mid career pay on out of state tuition divided by 1000 and its square. *Hint:* you can use either `poly(x, 2, raw = T)` or `x + I(x^2)`, where x is your regressor. What does the positive sign on the squared term imply?
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Interaction Terms
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Interacting Regressors
+
+* We interact two regressors when we believe ***the effect of one depends on the value of the other***. 
+
+  * *Example:* The returns to education on wage vary by gender.
+  
+--
+  
+* In practice, if we interact `\(x_1\)` and `\(x_2\)`, we would write our model like this : 
+
+`$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i}*x_{2,i} + ... + e_i$$`
+
+--
+
+* The interpretation of `\(b_1\)`, `\(b_2\)`, and `\(b_3\)` will depend on the type of `\(x_1\)` and `\(x_2\)`.
+
+--
+  
+* Let's focus on the cases where one regressor is a ***dummy/categorical*** variable and the other is ***continuous***.
+
+* It will give you the intuition for the other cases:
+
+  * Both regresors are dummies/categorical variables,
+
+  * Both regresors are continuous variables.
+  
+---
+
+# Interacting Regressors
+
+Let's go back to the *STAR* experiment data.
+
+--
+
+How does the effect of being in a small vs regular class vary with the experience of the teacher?
+
+--
+
+Our regression model becomes:
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+--
+
+Effect of small class with teacher with 10 years of experience?
+
+--
+
+`\(\mathbb{E}[\textrm{score}_i | \textrm{small}_i = 1 \textrm{ &amp; experience}_i = 10] = \color{#d96502}{b_0} + \color{#027D83}{b_1} + \color{#02AB0D}{b_2}*10 + \color{#d90502}{b_3}*10\)`
+
+--
+
+`\(\mathbb{E}[\textrm{score}_i | \textrm{small}_i = 0 \textrm{ &amp; experience}_i = 10] = \color{#d96502}{b_0} + \color{#02AB0D}{b_2}*10\)`
+
+--
+
+`\(\begin{split} \mathbb{E}[\textrm{score}_i &amp;| \textrm{small}_i = 1 \textrm{ &amp; experience}_i = 10] - \mathbb{E}[\textrm{score}_i | \textrm{small}_i = 0 \textrm{ &amp; experience}_i = 10] \\ &amp;= \color{#d96502}{b_0} + \color{#027D83}{b_1} + \color{#02AB0D}{b_2}*10 + \color{#d90502}{b_3}*10 - (\color{#d96502}{b_0} + \color{#02AB0D}{b_2}*10) \\ &amp;= \color{#027D83}{b_1} + \color{#d90502}{b_3}*10 \end{split}\)`
+
+---
+
+# Interacting Regressors
+
+Running the regression for the `math` score (for all grades), we obtain:
+
+
+
+
+
+```r
+lm(math ~ small+ experience + small*experience, star_df)
+```
+
+```
+## 
+## Call:
+## lm(formula = math ~ small + experience + small * experience, 
+##     data = star_df)
+## 
+## Coefficients:
+##          (Intercept)             smallTRUE            experience  smallTRUE:experience  
+##             534.1919               15.8906                1.3305               -0.3034
+```
+
+***Interpretation:***
+
+--
+
+* The interaction term allows the impact of being in a small class to vary with the experience of the teacher. 
+  
+--
+  
+* In particular, we still observe a ***positive impact of being in a small class*** on math score,
+  
+* but this ***effect is decreasing in the experience of the teacher***.
+  
+---
+
+# Interacting Regressors: Visually
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+
+
+&lt;img src="chapter_regext_files/figure-html/graph_base.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Interacting Regressors: Visually
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+
+
+&lt;img src="chapter_regext_files/figure-html/graph_reg.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Interacting Regressors: Visually
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+
+
+&lt;img src="chapter_regext_files/figure-html/graph_reg_b0.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Interacting Regressors: Visually
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+
+
+&lt;img src="chapter_regext_files/figure-html/graph_reg_b0_b1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Interacting Regressors: Visually
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+
+
+&lt;img src="chapter_regext_files/figure-html/graph_reg_b0_b1_b2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Interacting Regressors: Visually
+
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+
+
+
+&lt;img src="chapter_regext_files/figure-html/graph_reg_b0_b1_b2_b3.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class:inverse
+
+# Task 3: Wages, education and gender in 1985
+
+<div class="countdown" id="timer_60489067" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Load the data `CPS1985` from the `AER` package.
+
+1. Look at the `help` to get the definition of each variable: `?CPS1985`
+
+1. We don't know if people are working part-time or full-time, does it matter here? 
+
+1. Create the`log_wage` variable equal to the log of `wage`.
+
+1. Regress `log_wage` on `gender` and `education`, and save it as `reg1`. Interpret each coefficient.
+
+1. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2`. Interpret each coefficient. Does the gender wage gap decrease with education?
+
+1. Create a plot showing this interaction. (*Hint:* use the `color = gender` argument in `aes` and `geom_smooth(method = "lm", se = F)` to obtain a regression line per gender.)
+
+
+---
+
+# Teaser for the Next 3 Lectures
+
+* You may have noticed that since the beginning we always work with **samples** drawn from the overall population.
+
+--
+
+* Each time, imagine we could draw another sample from population:
+
+  * Would we obtain the same results? 
+  
+  * In other words, how confident can we be that our estimates (sign, magnitude) are not just driven by randomness?
+  
+--
+
+* We will answer those kind of questions:
+
+  * We'll present the notion of **sampling**, and
+  
+  * Understand what **statistical inference** is and how to do it. 
+
+---
+
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU NEXT WEEK!
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="mailto:florian.oswald@sciencespo.fr"&gt;.ScPored[&lt;i class="fa fa-paper-plane fa-fw"&gt;&lt;/i&gt;]               | florian.oswald@sciencespo.fr       |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

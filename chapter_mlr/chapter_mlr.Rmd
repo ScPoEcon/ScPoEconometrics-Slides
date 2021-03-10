@@ -1,0 +1,945 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Multiple Regression Model"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+library(magrittr)
+library(plotly)
+library(reshape2)
+library(haven)
+library(tidyverse)
+library(AER)
+library(gtools)
+library(countdown)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+```
+
+
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOCAUSALITY***](https://app.wooclap.com/SCPOCAUSALITY)
+
+&nbsp; &nbsp; &nbsp; ***OR***
+
+2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
+
+```{r, echo = F, out.width = "300px"}
+knitr::include_graphics("chapter_mlr_files/figure-html/qr_code_quiz.png")
+```
+
+---
+
+# Today - Multiple Regression Model
+
+* Multiple independent variables in our model
+
+* Interpretation for continuous and dummy regressors
+
+* Dummy variable trap
+
+* Omitted variable bias
+
+* Adjusted $R_2$
+
+* Empirical applications:
+
+  * *Class size* and *student performance*
+
+---
+
+# Class size and student performance
+
+* Let's go back to Angrist and Lavy's (1999)'s analysis of the effect of class size on student performance in Israel.
+
+--
+
+* With a **simple linear regression**, we found that class size was positively ***associated*** with students' scores in maths and reading.
+
+---
+
+# Class size and student performance: Raw relationship
+
+```{r, echo=FALSE, fig.height=4.75, fig.width = 8}
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+
+set.seed(123)
+
+grades %>%
+ggplot(aes(x = classize, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.5) +
+  xlim(0,45) +
+  ylim(0, 100) +
+  labs(
+    x = "Class size",
+    y = "Average score",
+    title = "Mathematics") +
+  theme_bw(base_size = 14)
+```
+
+---
+
+# Class size and student performance: Raw relationship
+
+```{r, echo=FALSE, fig.height=4.75, fig.width = 8}
+set.seed(123)
+
+grades %>%
+ggplot(aes(x = classize, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.5) +
+  xlim(0,45) +
+  ylim(0, 100) +
+  labs(
+    x = "Class size",
+    y = "Average score",
+    title = "Mathematics") +
+  theme_bw(base_size = 14) +
+  geom_smooth(se = FALSE, method = "lm", colour = "#d90502")
+```
+
+---
+
+# Class size and student performance: Raw relationship
+
+.pull-left[
+```{r, echo=FALSE, fig.height=6}
+set.seed(123)
+
+grades %>%
+ggplot(aes(x = classize, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.5, position = "jitter") +
+  xlim(0,45) +
+  ylim(0, 100) +
+  labs(
+    x = "Class size",
+    y = "Average score",
+    title = "Mathematics") +
+  theme_bw(base_size = 20) +
+  geom_smooth(se = FALSE, method = "lm", colour = "#d90502")
+```
+]
+
+.pull-right[
+
+```{r}
+lm(avgmath ~ classize, grades)
+```
+]
+
+---
+
+# Class size and student performance
+
+* Let's go back to Angrist and Lavy's (1999)'s analysis of the effect of class size on student performance in Israel.
+
+* With a **simple linear regression**, we found that class size was positively ***associated*** with students' scores in maths and reading.
+
+* This is intuitively unexpected, and contrasts with the simple results from the *STAR* randomized experiment.
+
+--
+
+* Could it be that some other variable may be related to class size ***as well as*** students' performance?
+
+* In particular, we mentioned the **location effect**: large classes may be more common in wealthier and bigger cities, while small classes may be more likely in poorer rural areas.
+
+--
+
+* Let's investigate this hypothesis.
+
+---
+
+# Class size and student performance: Confounders
+
+.pull-left[
+Link between **class size** and **the share of students who come from `disadvantaged` backgrounds** in the class.
+
+```{r, echo = FALSE, fig.height=4.75, fig.width = 8}
+ggplot(grades, aes(x = disadvantaged, y = classize)) + 
+  geom_point(size = 2, alpha = 0.4, position = "jitter") +
+  xlim(0,100) +
+  ylim(0,45) +
+  labs(
+    x = "% class coming from disadvantaged backgrounds",
+    y = "Class size",
+    title = "Relationship with class size") +
+  theme_bw(base_size = 20) +
+  geom_smooth(se = FALSE, method = "lm", colour = "#d90502")
+```
+
+`r emo::ji("point_right")` On average, there is a greater % of disadvantaged students in smaller classes.
+]
+
+--
+
+.pull-right[
+Link between **average math score** and **the share of students who come from `disadvantaged` backgrounds** in the class.
+
+```{r, echo = FALSE, fig.height=4.75, fig.width = 8}
+ggplot(grades, aes(x = disadvantaged, y = avgmath)) + 
+  geom_point(size = 2, alpha = 0.4, position = "jitter") +
+  xlim(0,100) +
+  ylim(0,100) +
+  labs(
+    x = "% class coming from disadvantaged backgrounds",
+    y = "Average math score",
+    title = "Relationship with average math score") +
+  theme_bw(base_size = 20) +
+  geom_smooth(se = FALSE, method = "lm", colour = "#d90502")
+```
+
+`r emo::ji("point_right")` On average, the greater the % of students coming from a disadvantaged background, the lower the average math score.
+
+]
+
+---
+
+# Class size and student performance: Multiple regression
+
+* Suppose we want to know the effect of class size on average math scores, ***controlling for*** the fact that there is a negative relationship between the % of disadvantaged students and class size **AND** average math score.
+
+--
+
+* To do so, we have to include both `classize` and `disadvantaged` variables as *regressors* in the regression.
+
+--
+
+* As such we can obtain an estimate of the effect of class size on average math score, ** *purged* of the effect of the disadvantaged variable**.
+
+--
+
+* The model we want to estimate becomes:
+
+$$
+ \textrm{average math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{% disadvantaged}_i + e_i
+$$
+--
+
+* This is ***multiple regression***! We will estimate this model in a few slides. Let's formalize what we have seen so far.
+
+---
+
+# Multiple Regression's Purpose
+
+* Recall from two weeks ago, the **Simple Linear Model** can be written as
+
+$$y_i = b_0 + b_1 x_i + e_i,$$
+
+where $y_i$ is the ***dependent variable*** and $x_i$ is the ***independent variable***.
+
+--
+
+`r emo::ji("warning")` Unless all other factors affecting $y_i$ are uncorrelated with $x_i$, $b_1$ **cannot be interpreted as a causal effect**.
+
+--
+
+We need to **enrich the model** and take into account factors that are simultaneously related to $y_i$ **and** $x_i$.
+
+---
+
+# Multiple Regression Model
+
+The expanded model can be written as:
+
+$$y_i = b_0 + b_1 x_{1,i} + b_2 x_{2,i}  + b_3 x_{3,i} + \dots + b_k x_{k,i} + e_i,$$
+
+where $x_1$, $x_2$, ..., $x_k$ are $k$ regressors, and $b_1$, $b_2$, ..., $b_k$ are the associated $k$ coefficients.
+
+--
+
+***Estimation***: We obtain the values for $(b_0, b_1, b_2, ..., b_k)$ in the same way as before, using **OLS**. 
+
+* $(b_0^{OLS}, b_1^{OLS}, b_2^{OLS}, ..., b_k^{OLS})$ are the values that minimize the **Sum of Squared Residuals**. 
+  
+* That is they minimize
+$$
+\begin{align}
+\sum_{i}{e_i^2} &= \sum_{i}{(y_i - \hat{y_i})^2} \\
+&= \sum_{i}{[y_i - (b_0 + b_1 x_{1,i} + b_2 x_{2,i}  + b_3 x_{3,i} + \dots + b_k x_{k,i})]^2}
+\end{align}
+$$
+
+---
+
+# Multiple Regression Model: Interpretation
+
+For now assume both the dependent variable $(y_i)$ and the independent variables $(x_k)$ are numeric.
+
+> Intercept $(b_0)$: **The predicted value of $y$ $(\widehat{y})$ if all the regressors $(x_1, x_2, x_3,...)$ are equal to 0.**
+
+--
+
+> Slope $(b_k)$: **The predicted change, on average, in the value of $y$ *associated* to a one-unit increase in $x_k$...** <br/>
+> $\quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad$ **... keeping all the other regressors constant!**
+
+--
+
+* Notice that the *keeping all the other regressors constant* is the only part that changes compared to SLM.
+
+* In other words, you are considering the individual effect of the variable $x_k$ on $y$ **in isolation** of the effect that the other regressors might have on $y$.
+
+--
+
+* **Link with causal inference**: Only the regressors included in the model are held constant, those that are not in the model can still vary and "bias" your estimates.
+
+---
+
+# Multiple Regression with `R`
+
+* Very similar to simple linear regression:
+
+```{r, echo = TRUE, eval = FALSE}
+lm(formula = dependent variable ~  independent variable 1 + independent variable 2 + ...,
+   data = data.frame containing the data)
+```
+
+--
+
+## Class size and student performance: Multiple regression
+
+Let's estimate the model from earlier on by OLS: $\textrm{average math score}_i = b_0 + b_1 \textrm{class size}_i + b_2 \textrm{% disadvantaged}_i + e_i$
+ 
+```{r}
+lm(avgmath ~ classize + disadvantaged, grades)
+```
+
+---
+
+# Class size and student performance: Multiple regression
+
+```{r, echo = FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)
+```
+
+***Questions***
+
+1. How do you interpret each of these coefficients?
+1. How do you explain the change in the `classize` coefficient compared to the SLM case?
+
+---
+
+# Class size and student performance: Multiple regression
+
+```{r, echo = FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)
+```
+
+***Answers***
+
+1\. How do you interpret each of these coefficients?
+
+* $b_0$ = 69.94: When `class size` and `disadvantaged` are set to 0, the *predicted* value of the average math score is 69.94.
+
+--
+
+* $b_1$ = 0.07: Keeping the percentage of *disadvantaged students* constant in the class, a 1-student increase in class size is ***associated, on average,*** with a 0.07 point increase in average math score.
+
+--
+
+* $b_2$ = - 0.34: Keeping the *class size* constant, a 1-***percentage point*** increase in the share of *disadvantaged students* is ***associated, on average,*** with a 0.34 point decrease in average math score.
+
+---
+
+# Class size and student performance: Multiple regression
+
+```{r, echo = FALSE, eval=TRUE}
+lm(avgmath ~ classize + disadvantaged, grades)
+```
+
+***Answers***
+
+2\. How do you explain the change in the `classize` coefficient compared to the SLM case?
+
+* $b_1$ decreases when the `disadvantaged` variable is taken into account. This was expected since part of the positive effect of class size was partly due to the smaller share of disadvantaged students in bigger classes.
+
+---
+
+# Percentage vs. Percentage Point: A Primer
+
+Example: % of disadvantaged students in class increases from 10 to 25 %?
+
+--
+
+***Questions:***
+
+1. What's the *percentage point* change?
+
+1. What's the *percentage* change?
+
+---
+
+# Percentage vs. Percentage Point: A Primer
+
+Example: % of disadvantaged students in class increases from 10 to 25 %?
+
+***Answers:***
+
+1. This is a $25-10=15$ ***percentage points*** increase.
+
+--
+
+1. This is a $\frac{25-10}{10} \%= 150$ ***percent*** increase.
+
+--
+
+You ***need*** to pay attention to whether you are talking about ***percentage points*** or ***percentage*** changes! They imply drastically different magnitudes!
+
+---
+
+class:inverse
+
+# Task 1
+
+`r countdown(minutes = 10, top = 0)`
+
+Let's analyse the regression results using **reading** score as the dependent variable.
+
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) using the `read_dta()` function from the `haven` package. Assign it to an object `grades`.
+
+1. Regress `avgverb` on `classize` and `disadvantaged` and assign the output to a new object `reg`. Interpret the coefficients. How do they compare to the simple linear regression? How do they compare with the math score regression coefficients?
+
+1. What are the other available variables that we may add in the regression? 
+  * Run the regression with all these variables and assign it to `reg_full`.
+  * Look at the coefficients.
+  * Discuss all coefficients: sign and magnitude.
+
+---
+
+# A Numeric and a Dummy Regressor: Interpretation
+
+You know how to interpret coefficients when the variable is numeric (i.e. continuous).
+
+--
+
+What if the regressor is a ***dummy variable***, that is it takes a value 1 if some condition is `TRUE` and 0 otherwise?
+
+--
+
+*Example:* How do I interpret the coefficients in the following model
+
+$$
+\text{average math score}_i = b_0 + b_1\text{class size}_i + b_2\text{religious}_i +e_i
+$$
+`religious` is a dummy variable equal to 1 if the school is a religious school, 0 if it isn't
+
+--
+
+```{r}
+lm(avgmath ~ classize + religious, grades)
+```
+
+---
+
+# A Numeric and a Dummy Regressor: Formally
+
+Our model is:
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+
+We have the following equalities:
+
+\begin{align}
+\mathbb{E}(\text{average math score} | \text{religious} = 0 \text{ & } \text{class size} = 0) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times 0 + \color{#027D83}{b_2} \times 0 \\
+&= \color{#d96502}{b_0}
+\end{align}
+
+--
+
+$\rightarrow$ $\color{#d96502}{b_0}$ corresponds to the expected average math score when class size is 0 and the school is not religious
+
+---
+
+# A Numeric and a Dummy Regressor: Formally
+
+Our model is:
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+
+We have the following equalities:
+
+\begin{equation}
+\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ & } \text{class size} = n_1) = \color{#d96502}{b_0} + \color{#d90502}{b_1} \times n_1 + \color{#027D83}{b_2} \times \text{religious}
+\end{equation}
+
+--
+
+\begin{multline}
+\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ & } \text{class size} = n_1+1) = \\ \color{#d96502}{b_0} + \color{#d90502}{b_1} \times (n_1+1) + \color{#027D83}{b_2} \times \text{religious}
+\end{multline}
+
+--
+
+\begin{multline}
+\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ & } \text{class size} = n_1+1) - \\ \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ & } \text{class size} = n_1) \\
+= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times (n_1+1) + \color{#027D83}{b_2} \times \text{religious} - (\color{#d96502}{b_0} + \color{#d90502}{b_1} \times n_1 + \color{#027D83}{b_2} \times \text{religious}) = \color{#d90502}{b_1}
+\end{multline}
+
+--
+
+$\rightarrow$ $\color{#d90502}{b_1}$ corresponds to the expected change in average math score associated, on average, with a 1 student increase in class size, controlling for the religious status of the school
+
+---
+
+# A Numeric and a Dummy Regressor: Formally
+
+Our model is:
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+
+We have the following equalities:
+
+\begin{align}
+\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \in \mathbb{N}) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 1 \\
+&= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2}
+\end{align}
+
+--
+
+\begin{align}
+\mathbb{E}(\text{average math score} | \text{religious} = 0 \text{ & } \text{class size} \in \mathbb{N}) &= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 0 \\
+&= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size}
+\end{align}
+
+--
+
+\begin{multline}
+\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ & } \text{class size} \in \mathbb{N}) \\
+= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2}- (\color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size}) = \color{#027D83}{b_2}
+\end{multline}
+
+--
+
+$\rightarrow$ $\color{#027D83}{b_2}$ corresponds to the expected difference in average math score between religious and non-religious schools, keeping class size constant.
+
+---
+
+# A Numeric and a Dummy Regressor: Summary
+
+Our model is:
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+
+We have the following equalities:
+
+\begin{equation}
+\color{#d96502}{b_0} = \mathbb{E}(\text{average math score} | \text{religious} = 0 \text{ & } \text{class size} = 0)
+\end{equation}
+
+\begin{multline}
+\color{#d90502}{b_1} = \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ & } \text{class size} = n_1+1) - \\ \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ & } \text{class size} = n_1)
+\end{multline}
+
+\begin{multline}
+\color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ & } \text{class size} \in \mathbb{N})
+\end{multline}
+
+\begin{equation}
+\color{#d96502}{b_0} + \color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ & } \text{class size} = 0)
+\end{equation}
+
+---
+
+# A Numeric and a Dummy Regressor: Visually
+
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+```{r, echo = FALSE, fig.height=5, fig.width = 10}
+base_graph <- grades %>%
+    ggplot(aes(x = classize, y = avgmath, col = factor(religious))) +
+    geom_point(size = 3, alpha = .5) +
+    scale_color_viridis_d(labels = c("FALSE","TRUE")) +
+    scale_x_continuous(lim = c(0,45), expand = c(0,0)) +
+    scale_y_continuous(breaks = seq(30,90,20), minor_breaks = seq(40,80,10)) +
+    labs(x = "Class size", y = "Average math score", col = "Religious school") +
+    theme_bw(base_size = 20) +
+    theme(legend.position = c(0,1),
+          legend.justification = c(0,1),
+          legend.background = element_blank(),
+          legend.key = element_blank(),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 12, face = "italic"))
+base_graph
+```
+
+---
+
+# A Numeric and a Dummy Regressor: Visually
+
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+```{r, echo = FALSE, fig.height=5, fig.width = 10}
+library(broom)  
+library(viridis)
+reg_dummy <- augment(lm(avgmath ~ classize + religious, grades))
+
+graph_reg <- base_graph +
+    geom_line(data = reg_dummy %>% filter(religious == 0), aes(x = classize, y = .fitted), color = viridis_pal()(2)[1], size = 2) +
+    geom_line(data = reg_dummy %>% filter(religious == 1), aes(x = classize, y = .fitted), color = viridis_pal()(2)[2], size = 2)
+graph_reg
+```
+
+---
+
+# A Numeric and a Dummy Regressor: Visually
+
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+```{r, echo = FALSE, fig.height=5, fig.width = 10}
+library(latex2exp)
+reg_coefs <- lm(avgmath ~ classize + religious, grades)$coefficient
+b0 = reg_coefs[1]
+b1 = reg_coefs[2]
+b2 = reg_coefs[3]
+
+graph_reg_b0 <- graph_reg +
+    geom_segment(aes(x = 0, xend = 10, y = b0, yend = b0 + b1 * 10), size = .5, linetype = 2, colour = viridis_pal()(2)[1]) +
+    scale_y_continuous(breaks = c(30,50,b0,70,90), labels = c("30","50",parse(text = TeX("$b_0$")),"70","90"), minor_breaks = seq(40,80,10)) +
+    theme(axis.text.y = element_text(color = c("grey30", "grey30", "#d96502", "grey30", "grey30")),
+          axis.ticks.y = element_line(color = c("grey30", "grey30", "#d96502", "grey30", "grey30")),
+          panel.grid.minor = element_line(color = c("grey92", "grey92", "grey92", "grey92", "grey92")),
+          panel.grid.major.y = element_line(color = c("grey92", "grey92", NA, "grey92", "grey92")))
+graph_reg_b0
+```
+
+---
+
+# A Numeric and a Dummy Regressor: Visually
+
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+```{r, echo = FALSE, fig.height=5, fig.width = 10}
+graph_b0_b1 <- graph_reg_b0 + 
+    annotate("text", x = 3, y = 34, label = "b[1]", color = "#d90502", hjust = 0,  parse = TRUE, size = 6) +
+  annotate("text", x = 4.5, y = 34, label = "is equal to the slope of these slines", hjust = 0, size = 6)
+graph_b0_b1
+```
+
+---
+
+# A Numeric and a Dummy Regressor: Visually
+
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
+```{r, echo = FALSE, fig.height=5, fig.width = 10}
+graph_b0_b1 +
+    geom_segment(aes(x = 2, xend = 10, y = b0 + 2*b1 + b2, yend = b0 + b2 + b1 * 10), size = .5, linetype = 2, colour = viridis_pal()(2)[2]) +
+    geom_segment(aes(x = 2, xend = 2, y = b0 + 2*b1 + b2, yend = b0 + 2*b1), size = .5, linetype = 1, colour = "#027D83", arrow = arrow(length = unit(0.2, "cm"), ends = "both")) +
+    geom_curve(aes(x = 1.65, xend = 3, y = b0 + 1.7*b1 + b2/2, yend = 50), size = .5, color = "#027D83", linetype = 1, colour = "black", arrow = arrow(length = unit(0.3, "cm"), ends = "first")) +
+    annotate("text", x = 3.3, y = 50, hjust = 0, label = "b[2]", parse = TRUE, color = "#027D83", size = 6)
+```
+
+---
+
+# No Perfect Collinearity
+
+There is one condition to satisfy to add regressors to the model:
+
+> Any additional variable needs to add **at least *some* new information**.
+
+--
+
+In other words, regressors **cannot be perfectly collinear**, i.e. not linear combinations of one another:
+
+  $$ x_2 \neq ax_1 + b $$ 
+
+--
+
+Even if not perfectly correlated, the individual effects of highly correlated regressors are hard to disentangle.
+
+--
+
+Note that this implies that the number of observations has to be greater than the number of independent variables.
+
+---
+
+# No Perfect Collinearity: Dummy Variable Trap
+
+This condition is particularly relevant for ***categorical variables***, i.e. variables that take a limited of possible "levels" (e.g. gender, seasons, race, education levels, etc.)
+
+--
+
+Let's go back to our `religious` school regression:
+
+```{r, echo = FALSE}
+lm(avgmath ~ classize + religious, grades)
+```
+
+--
+
+What if I create a `is_religious` and a `is_notreligious` variable and regress `avgmath` on both (and `classize`)?
+
+---
+
+# No Perfect Collinearity: Dummy Variable Trap
+
+What if I create a `is_religious` and a `is_notreligious` variable and regress `avgmath` on both (and `classize`)?
+
+```{r}
+grades <- grades %>%
+  mutate(is_religious = (religious == 1),
+         is_notreligious = (religious == 0))
+lm(avgmath ~ classize + is_religious + 
+     is_notreligious, grades)
+```
+
+Only one of two has a coefficient! Why?
+
+--
+
+.pull-left[
+```{r, eval = FALSE}
+grades %>% count(is_religious == 1 - is_notreligious)
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+grades %>% count(is_religious == 1 - is_notreligious)
+```
+]
+
+
+---
+
+# No Perfect Collinearity: Dummy Variable Trap
+
+$\rightarrow$ `R` automatically detects perfect collinearity between variables and drops one of them
+
+--
+
+`r emo::ji("warning")` you have to pay attention to the ***omitted/reference category***: the "baseline" category from which the coefficients are interpreted
+
+--
+
+This applies to cases when you have more than 2 categories. You don't need to create a dummy variable for each possibility, `R` will detect the categorical variable(s) (as long as they are stored as `character` or `factor`) and do that for you.
+
+--
+
+***But*** you have to look which category has been chosen as the ***omitted category***.
+
+---
+
+class: inverse
+
+# Task 2: Dummy Variable Trap
+
+`r countdown(minutes = 10, top = 0)`
+
+Let's run a regression where there is perfect linear dependence between regressors.
+
+1. Load the *STAR* data from [here]("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1"), using `read.csv`, and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_df),]` 
+
+1. Create three dummy variables: (i) `small` equal to `TRUE` if students are in a small class and `FALSE` otherwise; (ii) `regular` equal to `TRUE` if students are in a regular class and `FALSE` otherwise; (iii) `regular_plus` equal to `TRUE` if students are in a regular+aide class and `FALSE` otherwise. Create a last variable, `sum`, equal to the sum of `small`, `regular` and `regular_plus`. What is `sum` equal to? What does this mean?
+
+1. Regress `math` on `small`. What is the average predicted `math` score of students in a small class? Do the same for `regular` and `regular_plus`.
+
+1. Regress `math` on `small`, `regular` and `regular_plus`. What do you notice? What's the omitted (reference) category? Does this match the previous questions?
+
+1. Regress `math` on `star`. What do you notice? What's the omitted category? Interpret the coefficient.
+
+---
+
+# Omitted Variable Bias (OVB)
+
+***Omitted variable bias***: Omitting important control variables from the regression model
+
+This renders the coefficient for your regressor of interest unreliable (*biased*).
+
+--
+
+Let's note $y$ our outcome variable, $x$ our regressor and $z$ our omitted variable.
+
+--
+
+We have the following regression models:
+
+--
+
+1. ***Simple linear model***: $y = b_0 + b_1x + e$
+
+--
+
+1. ***Multiple linear model***: $y = c_0 + c_1x + \color{#d90502}{c_2}z + e$
+
+--
+
+1. ***Omitted variable on regressor***: $z = d_0 + \color{#d96502}{d_1}x + e$
+
+--
+
+The [formula for the OVB](https://www.youtube.com/watch?v=9-lPES4e0n8) is:
+
+$$\text{OVB} = \color{#d90502}{c_2} \times \color{#d96502}{d_1}$$
+
+--
+
+In other words, $b_1 = c_1 + OVB$ 
+
+---
+
+# Omitted Variable Bias (OVB)
+
+$$\text{OVB} = \underbrace{\text{multiple regression coefficient on omitted variable}}_{\color{#d90502}{c_2}} \times \underbrace{\frac{Cov(x,z)}{Var(x)}}_{\color{#d96502}{d_1}}$$
+
+From this formula you obtain:
+
+* the OVB's ***magnitude*** (only if you observe $z$),
+* the OVB's ***sign*** (positive/negative): since in practice $z$ is not observed (otherwise you could include it in the regression) this is the most relevant case
+
+--
+
+***Question:***
+
+Imagine you want to uncover the relationship between income and years of education. Why might a simple regression of income on years of education not yield reliable estimates? What could be an omitted variable? What's the expected sign of the OVB?
+
+---
+
+# Omitted Variable Bias (OVB): In Practice
+
+Let's go back to our class size and student performance example. We had:
+
+***Simple linear model:***  $\text{average math score} = b_0 + b_1\text{class size} + e$
+
+```{r, echo = FALSE}
+reg1 <- lm(avgmath ~ classize, grades)
+reg1$coefficients
+```
+
+--
+
+***Multiple linear model:***  $\text{average math score} = c_0 + c_1\text{class size} + \color{#d90502}{c_2}\text{% disadvantaged} + e$
+
+```{r, echo = FALSE}
+reg2 <- lm(avgmath ~ classize + disadvantaged, grades)
+reg2$coefficients
+```
+
+--
+
+***Omitted variable on regressor***:  $\text{% disadvantaged} = d_0 + \color{#d96502}{d_1}\text{class size} + e$
+
+```{r, echo = FALSE}
+reg3 <- lm(disadvantaged ~ classize, grades)
+reg3$coefficients
+```
+
+--
+
+We obtain: $$b_1 = `r round(reg1$coefficients[2],3)` = \underbrace{`r round(reg2$coefficients[2],3)`}_{c_1} + \underbrace{(`r round(reg2$coefficients[3],3)`)}_{\color{#d90502}{c_2}} \times \underbrace{(`r round(reg3$coefficients[2],3)`)}_{\color{#d96502}{d_1}} = c_1 + OVB$$
+
+---
+
+# Adjusted $R^2$
+
+* Not of great importance but because it is so widely reported you just need to know it.
+
+--
+
+* By construction, $R^2$ will always increase when a new regressor is added to the regression.
+
+--
+
+* The *adjusted $R^2$* imposes a penalty for adding regressors to the model. The details are not crucial as in the vast majority of cases the $R^2$ and the adjusted $R^2$ are pretty similar.
+
+---
+
+class: inverse
+
+# Task 3: Recap
+
+`r countdown(minutes = 10, top = 0)`
+
+Let's use the *STAR* data (used in the previous task) to review the main concepts covered.
+
+1. Using the filtered data from the previous task, regress `math` on `school` (tabulate the variable to know what it contains). Interpret the coefficients. What's the omitted category? Do you find them surprising? Why? What might be an omitted variable?
+
+1. Compute the share of students qualifying for free lunch (i.e. `lunch` equals "free") by school location category. What do you observe? Add `free` to the previous question's regression. How do the coefficients change?
+
+1. Regress `math` on `gender` and `experience` (the teacher's experience). Interpret the coefficients. How would these regression results look like visually?
+
+1. Regress `math` on `star`. After interpreting the coefficients, regress `math` on `star`, `gender`, `ethnicity`, `lunch`, `degree`, `experience` and `school`. Recalling that this is a randomized experiment, does it look like the randomization was well done?
+
+1. What's the adjusted $R^2$ from the previous multiple regression. How do you interpret it? What might you deduce about the importance of observable individual, teacher and school characteristics in explaining educational outcomes?
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU NEXT WEEK!
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+

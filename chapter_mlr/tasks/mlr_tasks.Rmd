@@ -1,0 +1,209 @@
+---
+title: "Multiple Linear Regression - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+Let's analyse the regression results using **reading** score as the dependent variable.
+
+1\. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) using the `read_dta()` function from the `haven` package. Assign it to an object `grades`.
+
+```{r}
+library(haven)
+grades <- read_dta("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+```
+
+1\. Regress `avgverb` on `classize` and `disadvantaged` and assign the output to a new object `reg`. Interpret the coefficients. How do they compare with the math score regression coefficients?
+
+```{r}
+reg <- lm(avgverb ~ classize + disadvantaged, grades)
+reg
+```
+
+**The intercept, which measures that expected reading score when class size and the percentage of disadvantaed students in the class are 0, equals 80. This, as we've discussed in class, doesn't make any "real-world" sense because if there are no students then there cannot be a test score. The coefficient on class size is -0.03 which means that a 1 student increase in class size, controlling for the percentage of disadvantaged students, is, on average, associated to a 0.03 point decrease in average reading score. The coefficient is negative while it was positive when analysing math score as the outcome. However, the coefficient is very small considering reading is scored on a scale from 0 to 100. Lastly, the coefficient on disadvantaged is equal to -0.35 which means that keeping class size constrant, a 1 percentage point increase in disadvantaged students is associate, on average, with a 0.35 point decrease in averate reading score. The magnitude of this coefficient is very similar to that when looking at math scores. Again, it is very small: a 10 percentage point increase in disadvantaged students (quite a large increase) would only be associated, on average, with 3.5 points decrease in reading score, keeping class size constant.**
+
+1\. What are the other available variables that we may add in the regression? 
+  * Run the regression with all these variables and assign it to `reg_full`.
+  * Look at the coefficients.
+  * Discuss all coefficients: sign and magnitude.
+  
+```{r}
+reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
+reg_full
+```
+
+
+## Task 2: Dummy Variable Trap
+
+Still need to think about this dummy variable trap? Let's run another regression where there is perfect linear dependence between regressors.
+
+1\. Load the *STAR* data from [here]("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1"), using `read.csv`, and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
+`star_df <- star_df[complete.cases(star_df),]`  
+
+```{r}
+library(tidyverse)
+
+star_df <- read.csv("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_df <- star_df[complete.cases(star_df),]
+
+star_df_2 <- star_df %>%
+    filter(grade == "2")
+```
+
+2\. Create three dummy variables: (i) `small` equal to `TRUE` if students are in a small class and `FALSE` otherwise; (ii) `regular` equal to `TRUE` if students are in a regular class and `FALSE` otherwise; (iii) `regular_plus` equal to `TRUE` if students are in a regular+aide class and `FALSE` otherwise. Create a last variable, `sum`, equal to the sum of `small`, `regular` and `regular_plus`. What is `sum` equal to? What does this mean?
+
+```{r}
+star_df_2 <- star_df_2 %>%
+    mutate(small = (star == "small"),
+           regular = (star == "regular"),
+           regular_plus = (star == "regular+aide"),
+           sum = small + regular + regular_plus)
+
+star_df_2 %>% count(sum)
+```
+
+**The `sum` variable is always equal to 1, which means that `small`, `regular` and `regular_plus` are perfectly collinear. In other words they can be expressed as a linear combination of each one of another, i.e. `small` = 1 - (`regular` + `regular_plus`).**
+
+3\. Regress `math` on `small`. What is the average predicted `math` score of students in a small class? Do the same for `regular` and `regular_plus`.
+
+```{r}
+reg_small <- lm(math ~ small, star_df_2)
+reg_small
+```
+
+**Note that our regressor is a dummy variable. Remember from the lecture on causality that when the regressor is a dummy variable, the intercept corresponds to the conditional mean of outcome variable for the `FALSE` category while the slope coefficient corresponds to the difference in expected outcomes between the `TRUE` and the `FALSE` category. In this case, from the regression, we can get that the expected math score of students not in a small class is around `r round(reg_small$coefficients[1],2)` points , and that the difference in expected math score between students in a small class and those not in a small class is 7.56 points. As such, the expected math score of students in a small class is approximately `r round(reg_small$coefficients[1],2)` + `r round(reg_small$coefficients[2],2)` = `r round(reg_small$coefficients[1] + reg_small$coefficients[2],2)`.**
+
+**For those of you who prefer seeing this formally, this is how you can (should proceed):**
+$$
+\mathbb{E}(\text{math score } | \text{ small} = 0) = b_0 + b_1 \times 0 = b_0 \approx `r round(reg_small$coefficients[1],2)` \\
+\mathbb{E}(\text{math score } | \text{ small} = 1) = b_0 + b_1 \times 1 = b_0 + b_1 \approx `r round(reg_small$coefficients[1] + reg_small$coefficients[2],2)`
+$$
+
+```{r}
+reg_regular <- lm(math ~ regular, star_df_2)
+reg_regular
+
+reg_plus <- lm(math ~ regular_plus, star_df_2)
+reg_plus
+```
+
+**Using the exact same logic as above, we obtain:**
+$$
+\mathbb{E}(\text{math score } | \text{ regular} = 0) = b_0 + b_1 \times 0 = b_0 \approx `r round(reg_regular$coefficients[1],2)` \\
+\mathbb{E}(\text{math score } | \text{ regular} = 1) = b_0 + b_1 \times 1 = b_0 + b_1 \approx `r round(reg_regular$coefficients[1] + reg_regular$coefficients[2],2)` \\
+\mathbb{E}(\text{math score } | \text{ regular+aide} = 0) = b_0 + b_1 \times 0 = b_0 \approx `r round(reg_plus$coefficients[1],2)` \\
+\mathbb{E}(\text{math score } | \text{ regular+aide} = 1) = b_0 + b_1 \times 1 = b_0 + b_1 \approx `r round(reg_plus$coefficients[1] + reg_plus$coefficients[2],2)`
+$$
+
+
+4\. Regress `math` on `small`, `regular` and `regular_plus`. What do you notice? What's the omitted (reference) category? Does this match the previous questions?
+
+```{r}
+reg_full <- lm(math ~ small + regular + regular_plus, star_df_2)
+reg_full
+```
+
+**We notice that the `regular_plus` variable has been dropped, i.e. the coefficient for this variable cannot be estimated because it is collinear to `small` and `regular`. This means that the reference category is regular+aide. In other words, the coefficients on `small` and `regular` are to be interpreted relative to the outcomes of the regular+aide students. To be specific, and using the same formal interpretation as above, denoting the model as $\text{math score} = b_0 + b_1 \text{small} + b_2 \text{regular} + e$, we obtain:**
+
+\begin{align}
+b_0 &= \mathbb{E}(\text{math score } | \text{ small} = 0 \text{ & } \text{ regular} = 0) \\
+&= \mathbb{E}(\text{math score } | \text{ regular + aide} = 1) \\
+&\approx `r round(reg_full$coefficients[1],2)`
+\end{align}
+
+You can compare this resul with the answer to the previous question and see that we obtain exactly the same answer.
+
+In the same way, we get:
+
+\begin{align}
+b_1 &= \mathbb{E}(\text{math score } | \text{ small} = 1 \text{ & } \text{ regular} \in \{0,1\}) - \mathbb{E}(\text{math score } | \text{ small} = 0 \text{ & } \text{ regular} \in \{0,1\}) \\
+&= b_0 + b_1 \times 1 + b_2 \times \text{regular} - (b_0 + b_1 \times 0 + b_2 \times \text{regular}) \\
+&\approx `r round(reg_full$coefficients[2],2)`
+\end{align}
+
+\begin{align}
+b_2 &= \mathbb{E}(\text{math score } | \text{ small} \in \{0,1\} \text{ & } \text{ regular} = 1) - \mathbb{E}(\text{math score } | \text{ small} \in \{0,1\} \text{ & } \text{ regular} = 0) \\
+&= b_0 + b_1 \times \text{small} + b_2 \times 1 - (b_0 + b_1 \times \text{small} + b_2 \times 0) \\
+&\approx `r round(reg_full$coefficients[3],2)`
+\end{align}
+
+In plain English, the interpretation is that relative to the regular+aide group, students in small classes score 6.25 points higher in the math exam, while relative to the regular+aide group, students in regular classes score 2.7 points lower in the math exam.
+
+5\. Regress `math` on `star`. What do you notice? What's the omitted category? Interpret the coefficient.
+
+```{r}
+lm(math ~ star, star_df_2)
+```
+
+**`R` actually creates the dummy variables for me, I don't need to do the tedious work above of creating an individual dummy variable for each category! The omitted category is `regular` therefore the coefficients are to be interpreted as differences in average math scores relative to students in `regular` classes.**
+
+
+## Task 3: Recap
+
+Let's use the *STAR* data (used in the previous task) to review the main concepts covered.
+
+1\. Using the filtered data from the previous task, regress `math` on `school` (tabulate the variable to know what it contains). Interpret the coefficients. What's the omitted category? Do you find them surprising? Why? What might be an omitted variable?
+
+```{r}
+star_df_2 %>% count(school)
+
+lm(math ~ school, star_df_2)
+```
+
+**The `school` variable is a categorical variable indicating the school location type. There are four categories: inner-cyt, suburban, rural and urban.**
+
+**The ommitted category in the regression is inner-city, meaning that the intercept represents the average math score of students in inner-city schools and that the other coefficients should be interpreted relative to the expected math score of students in inner-city schools. In particular, on average, students in rural schools score 30 points higher than those in inner-city schools, those in suburban schools score almost 17 points higher, and those in urban schools score about 20 points higher. Inner-cities tend to be poorer areas which might explain that they score so much lower than students in other locations. An omitted variable might be some student- or school-evel variable of disadvantage.**
+
+2\. Compute the share of students qualifying for free lunch (i.e. `lunch` equals "free") by school location category. What do you observe? Add `lunch` to the previous question's regression. How do the coefficients change?
+
+```{r}
+star_df_2 %>%
+    group_by(school) %>%
+    summarise(mean(lunch == "free"))
+```
+
+**As expected, the share of students qualifying for free lunches, a common indicator of disadvantage, is significantly higher in inner-city schools (almost 90% of such students) while it is between 34% and 44% of students in other locations.**
+
+```{r}
+lm(math ~ school + lunch, star_df_2)
+```
+
+**We observe that the coefficients on the rural, suburban and urban decrease dramatically once the free lunch status of students are taken into account. Note that students not qualifying for free lunch score significantly higher, on average, than those who do, controlling for the school's location category.**
+
+3\. Regress `math` on `gender` and `experience` (the teacher's experience). Interpret the coefficients. How would these regression results look like visually?
+
+```{r}
+lm(math ~ gender + experience, star_df_2)
+```
+
+**The intercept coefficient corresponds to the average math score of female students, keeping teacher experience constant. Recall that because we have both a numeric variable and a dummy variable as regressors, the intercept can be interpreted as the intercept for the line of the omitted category, in this case female. The coefficient on gender represents the expected difference in math scores between male and female students, holding teacher experience constant. The coefficient is negative but small, implying that on average male students score slightly lower than their female peers, holding teacher experience constant. Graphically, this implies that the line for male students lies below that for females. The coefficient on experience corresponds to the expected change in math score associated, on average, to an increase in a teacher's experience by 1 year, accounting for student gender. As such, an additional year of teacher experience is associated, on average, with a 0.03 increase in math scores, keeping gender constant. This is a very small effect, since you would need 100 years of increased experience to expect math scores to increase by 3 points.**
+
+4\. Regress `math` on `star`. After interpreting the coefficients, regress `math` on `star`, `gender`, `ethnicity`, `lunch`, `degree`, `experience` and `school`. Recalling that this is a randomized experiment, does it look like the randomization was well done?
+
+```{r}
+lm(math ~ star, star_df_2)
+```
+
+**The interpretation of the coefficients is as usual a comparison of conditional means. That is, students in small classes score, on average 8.94 points higher than those in regular classes (the omitted category) while students in regular + aide classes score only 2.70 points higher.**
+
+```{r}
+reg_all <- lm(math ~ star + gender + ethnicity + lunch + degree + experience + school, star_df_2)
+reg_all
+```
+
+**The coefficients on the treatment variable `star` decrease very slightly compared to the previous simple regression. This is expected considering this was a randomized experiment and therefore we can suppose that the randomization seems to have worked. If the randomization had been very poor, then accounting for all these factors should alter the coefficients on `star` more substantially.**
+
+5\. What's the adjusted $R^2$ from the previous multiple regression. How do you interpret it? What might you deduce about the importance of observable individual, teacher and school characteristics in explaining educational outcomes?
+
+```{r}
+summary(reg_all)
+```
+
+**The adjusted $R^2$ of the previous regression is about 0.15, which means that that model explains about 15% of the variance in students' math scores. This implies that 85% of the variance in math scores remains unaccounted for. In simple terms, class size, gender, ethnicity, free lunch status, teacher experience and degree, and school location, explain very little of the differences in math scores between the students in this dataset. Extrapolating a bit, one may argue that most of the differences in educational outcomes do not appear to be explained by these factors. This DOES NOT mean that they may not have important causal effects on educational outcomes.**
