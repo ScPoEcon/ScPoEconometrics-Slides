@@ -39,7 +39,6 @@ reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female +
 reg_full
 ```
 
-
 ## Task 2: Dummy Variable Trap
 
 Still need to think about this dummy variable trap? Let's run another regression where there is perfect linear dependence between regressors.

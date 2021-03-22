@@ -64,7 +64,7 @@ countdown(
 
 # Quick "Quiz" on Last Week's Material
 
-1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOMLR***](https://app.wooclap.com/SCPOCAUSALITY)
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOMLR***](https://app.wooclap.com/SCPOMLR)
 
 &nbsp; &nbsp; &nbsp; ***OR***
 
@@ -124,7 +124,7 @@ Let's define what *standardizing* a variable means.
 > ***Standardizing*** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
 
 $$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
-where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{VAR}(z)}$.
+where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{Var}(z)}$.
 
 --
 
@@ -141,7 +141,7 @@ In our class size and student performance example, it will help to interpret:
 
 ---
 
-# Standardized Regression
+# Standardized Regression: Graphically
 
 ```{r, echo = FALSE}
 # nrom = data.frame(x = rnorm(100000, mean = 20, sd = 6))
@@ -226,7 +226,7 @@ class:inverse
 
 `r countdown(minutes = 7, top = 0)`
 
-Let's go back our [grades]("https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1") dataset. Remember that to load the data you need to use the `read_dta()` from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
+Let's go back our [grades](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) dataset. Remember that to load the data you need to use the `read_dta()` function from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
 
 ```{r echo = FALSE}
 grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
@@ -235,7 +235,7 @@ reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female +
 reg_full$coefficients
 ```
 
-1. Create a new variable `avgmath_stand` equal to the the standardized math score. You can use the `scale()` function or do it by hand with base `R`.
+1. Create a new variable `avgmath_stand` equal to the standardized math score. You can use the `scale()` function (combined with `mutate`) or do it by hand with base `R`.
 
 1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
 
@@ -262,6 +262,8 @@ layout: true
 # Accounting for Non-Linear Relationships
 
 There are two main "methods":
+
+--
 
 1. ***Log*** models
 
@@ -295,7 +297,7 @@ There are two main "methods":
 # The (natural) log Function: A Primer `r emo::ji("winking_face")`
 
 ```{r, echo = FALSE, fig.height = 5, fig.width = 10}
-data <- data.frame(x = runif(100000, min = 0, max = 10000))
+data <- data.frame(x = seq(0, 10000, .1))
 
 data %>%
   ggplot(aes(x = x, y = log(x))) +
@@ -351,89 +353,109 @@ data %>%
 
 ---
 
-# Log Models: Interpretation
+# Log Models: Simplified Interpretations
 
 |    Specification           | Model  |  Interpretation of $b_1$            |
 |--------------------|:---------:|:-----------------------------------:|
 | Level - Level | $y = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a ] $b_1$ .small[**unit change** in y]  |
-| Log - Level | $log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $e^{b_1}$ .small[ **percent change** in y]  |
-| Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 \times log(1 + \Delta x)$  .small[**unit change** in y] |
-| Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a] $(1 + \Delta x)^{b_1}$ .small[**percent change** in y]  |
-
-* Note that if $\Delta x = 5\% = 0.05 \implies 1 + \Delta x = 1.05$ 
+| Log - Level | $log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $b_1 \times 100$ .small[ **percent change** in y]  |
+| Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A **one percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 / 100$  .small[**unit change** in y] |
+| Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A **one percent** increase in ] $x$ .small[ is associated, on average, with a] $b_1$ .small[**percent change** in y]  |
 
 --
 
-* This may look like cooking recipes but of course it can be [derived with some calculus](https://www.youtube.com/watch?v=aXBFKKh54Es). Also check out [this great explainer](https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faqhow-do-i-interpret-a-regression-model-when-some-variables-are-log-transformed/) for more info.
+* This may look like cooking recipes but of course it can be [derived with some relatively simple maths](https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faqhow-do-i-interpret-a-regression-model-when-some-variables-are-log-transformed/).
+
+--
+
+* `r emo::ji("warning")` these interpretations are only true for ***small*** changes in $x$ and small/or $b_1$. What happens if we want to know the change in $y$ for big changes in $x$ or when $b_1$ is large?
 
 ---
 
-# Log Models: Simplified Interpretations
+# Log Models: General Interpretations
 
-3 simplifications, which are used extremely often in practice:
+For ***any increase in $x$, $\Delta x,$ and any $b_1$*** $(\Delta x = 5\% = 0.05 \implies 1 + \Delta x = 1.05)$:
+
+|    Specification           | Model  |  Interpretation of $b_1$            |
+|--------------------|:---------:|:-----------------------------------:|
+| Level - Level | $y = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a ] $b_1$ .small[**unit change** in y]  |
+| Log - Level | $log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $(e^{b_1} - 1) \times 100$ .small[ **percent change** in y]  |
+| Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 \times log(1 + \Delta x)$  .small[**unit change** in y] |
+| Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a] $((1 + \Delta x)^{b_1} - 1) \times 100$ .small[**percent change** in y]  |
+
+---
+
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
 
 --
 
 ***Log-Level***
 
-When *** $b_1$ is small*** you can interpret using $1+b_1$ rather than $e^{b_1}$. This is because, for small $b_1$, $e^{b_1} \approx 1+ b_1$
+*General interpretation:* A **one unit** increase in $x$ is associated, on average, with a $(e^{b_1} - 1) \times 100$ **percent change** in y.
+
+*Simplified interpretation:* A **one unit** increase in $x$ is associated, on average, with a $b_1 \times 100$ **percent change** in y.
 
 --
 
-$\rightarrow$ for $b_1 = 0.04$, $e^{b_1} = `r round(exp(0.04),4)`$ 
+This is because, for small $b_1$, $e^{b_1} \approx 1+ b_1 \iff b_1 \approx e^{b_1} - 1$
 
 --
 
-$\rightarrow$ for $b_1 = 0.5$, $e^{b_1} = `r round(exp(0.5),4)`$
+$\rightarrow$ for $b_1 = \color{#d90502}{0.04}$, $e^{b_1} - 1 = e^{0.04} - 1 = `r round(exp(0.04) - 1,4)`$ 
+
+--
+
+$\rightarrow$ for $b_1 = \color{#d90502}{0.5}$, $e^{b_1} - 1 = e^{0.5} - 1 = `r round(exp(0.5) - 1,4)`$
 
 ---
 
-# Log Models: Simplified Interpretations
+# Log Models: Approximations
 
-3 simplifications, which are used extremely often in practice:
+Why are the approximations shown previously true?
 
 ***Level-Log***
 
-For ***(relatively) small increases in $x$, $\delta x$***, you can interpret using $b_1 \times \delta x$ rather than $b_1 \times log(1 + \delta x)$, since for small $\delta x$, $log(1 + \delta x) = \delta x$
+*General interpretation:* A ** $\Delta x$** **percent** increase in $x$ is associated, on average, with a $b_1 \times log(1 + \Delta x)$ **unit change** in y.
+
+*Simplified interpretation:* A **one percent** increase in $x$ is associated, on average, with a $b_1 / 100$ **unit change** in y.
 
 --
 
-$\rightarrow$ for $\delta x = 1\%=0.01$, $log(1+\delta x) = `r round(log(1.01),2)`$
+This is because for small $\Delta x$, $log(1 + \Delta x) \approx \Delta x$
 
 --
 
-$\rightarrow$ for $\delta x = 20\%=0.20$, $log(1+\delta x) = `r round(log(1.20),2)`$
+$\rightarrow$ for $\Delta x = \color{#d90502}{1\%}=0.01$, $log(1+\Delta x) = log(1.01) = `r round(log(1.01),2)`$ (hence the $/100$ in the simplified interpretation)
+
+--
+
+$\rightarrow$ for $\Delta x = \color{#d90502}{20\%}=0.20$, $log(1+\Delta x) = log(1.20) = `r round(log(1.20),2)`$
 
 ---
 
-# Log Models: Simplified Interpretations
+# Log Models: Approximations
 
-3 simplifications, which are used extremely often in practice:
+Why are the approximations shown previously true?
 
 ***Log-Log***
 
-For ***small increases in $x$, $\delta x$, and small $|b_1|$***, you can interpret using $1 + b_1 \times \delta x$ rather than $(1 + \delta x)^{b_1}$, since for small $|b_1|\delta x$, $(1 + \delta x)^{b_1} \approx 1 + b_1 \times \delta x$
+*General interpretation:* A ** $\Delta x$** **percent** increase in $x$ is associated, on average, with a $((1 + \Delta x)^{b_1} - 1) \times 100$ **percent change** in y.
+
+*Simplified interpretation:* A **one percent** increase in $x$ is associated, on average, with a $b_1$ **percent change** in y.
 
 --
 
-$\rightarrow$ for $\delta x = 1\%=0.01$ and $b_1 = 0.5$, $(1+\delta x)^{b_1} = `r round(((1.01)^0.5),2)`$
+This is because for small $|b_1|\times \Delta x$, $(1 + \Delta x)^{b_1} \approx 1 + b_1 \times \Delta x \iff b_1 \times \Delta x \times 100 \approx ((1 + \Delta x)^{b_1} - 1) \times 100$
 
 --
 
-$\rightarrow$ for $\delta x = 10\%=0.10$ and $b_1 = 10$, $(1+\delta x)^{b_1} = `r round(((1.10)^10),2)`$
+$\rightarrow$ for $\Delta x = \color{#d90502}{1\%}=0.01$ and $b_1 = \color{#d90502}{0.5}$, $((1+\Delta x)^{b_1} - 1) \times 100 = (1.01^{0.5} - 1) \times 100 = `r round(((1.01)^0.5 - 1) * 100,2)`$
 
----
+--
 
-# Log Models: Simplified Interpretations Recap
-
-For ***(relatively) small increases in $x$, $\delta x$***:
-
-|    Specification           | Model  |  Interpretation of $b_1$            |
-|--------------------|:---------:|:-----------------------------------:|
-| Level - Level | $y = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a ] $b_1$ .small[**unit change** in y]  |
-| Log - Level | $log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $1 + b_1$ .small[ **percent change** in y]  |
-| Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A  ] ** $\delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 \times \delta x$  .small[**unit change** in y] |
-| Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A  ] ** $\delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a] $1 + b_1 \times \delta x$ .small[**percent change** in y]  |
+$\rightarrow$ for $\Delta x = \color{#d90502}{10\%}=0.10$ and $b_1 = \color{#d90502}{10}$, $((1+\Delta x)^{b_1} - 1) \times 100= (1.1^{10} - 1) \times 100 = `r round(((1.10)^10 -1) * 100,2)`$
 
 ---
 
@@ -532,6 +554,8 @@ gapminder %>%
 1. If the relationship betwen $x$ and $y$ looks like a log or exponential function. 
 
 1. To easily interpret coefficients as <a href="https://en.wikipedia.org/wiki/Elasticity_(economics)">***elasticities***</a> which play a central role in economic theory.
+
+***Elasticity of $y$ with respect to $x$:*** percent change in $y$ following a 1% increase in $x$.
 
 ---
 
@@ -677,7 +701,7 @@ class:inverse
 
 1. Load the data [here](https://www.dropbox.com/s/2v5mb04nzw2u7bd/college_tuition_income.csv?dl=1). This dataset contains information about tuition and estimated incomes of graduates for universities in the US. More details can be found [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-10/readme.md).
 
-2. Create a scatter of estimated mid career pay $(y)$ as a function of out of state tuition $(x)$. Would you say the relationship is broadly linear or rather non-linear? Use `geom_smooth(method = "lm", se = F) + geom_smooth(method = "lm", se = F, formula = y ~ poly(x, 2, raw= T))` to fit both a linear and 2nd order line. This time which seems most appropriate?
+2. Create a scatter plot of estimated mid career pay (`mid_career_pay`) $(y-axis)$ as a function of out of state tuition (`out_of_state_tuition`) $(x-axis)$. Would you say the relationship is broadly linear or rather non-linear? Use `geom_smooth(method = "lm", se = F) + geom_smooth(method = "lm", se = F, formula = y ~ poly(x, 2, raw= T))` to fit both a linear and 2nd order regression line. This time which seems most appropriate?
 
 3. Create a variable equal to out of state tuition divided by 1000. Regress mid career pay on out of state tuition divided by 1000. Interpret the coefficient.
 
