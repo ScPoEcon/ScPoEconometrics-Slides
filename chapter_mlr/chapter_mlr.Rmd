@@ -790,7 +790,7 @@ class: inverse
 
 Let's run a regression where there is perfect linear dependence between regressors.
 
-1. Load the *STAR* data from [here]("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1"), using `read.csv`, and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
+1. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1), using `read.csv`, and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
 `star_df <- star_df[complete.cases(star_df),]` 
 
 1. Create three dummy variables: (i) `small` equal to `TRUE` if students are in a small class and `FALSE` otherwise; (ii) `regular` equal to `TRUE` if students are in a regular class and `FALSE` otherwise; (iii) `regular_plus` equal to `TRUE` if students are in a regular+aide class and `FALSE` otherwise. Create a last variable, `sum`, equal to the sum of `small`, `regular` and `regular_plus`. What is `sum` equal to? What does this mean?

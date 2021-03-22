@@ -11,7 +11,7 @@
 
 <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
 
-<meta name="date" content="2021-03-10" />
+<meta name="date" content="2021-03-22" />
 
 <title>Linear Regression Extensions - Tasks</title>
 
@@ -375,14 +375,14 @@ summary {
 
 <h1 class="title toc-ignore">Linear Regression Extensions - Tasks</h1>
 <h4 class="author">Florian Oswald, Gustave Kenedi and Pierre Villedieu</h4>
-<h4 class="date">2021-03-10</h4>
+<h4 class="date">2021-03-22</h4>
 
 </div>
 
 
 <div id="task-1-standardized-regression" class="section level2">
 <h2>Task 1: Standardized regression</h2>
-<p>Let’s go back our <a href="%22https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1%22">grades</a> dataset. Remember that to load the data you need to use the <code>read_dta()</code> from the <code>haven</code> package. These are the estimates we got from regressing average math test scores on the full set of regressors.</p>
+<p>Let’s go back our <a href="https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1">grades</a> dataset. Remember that to load the data you need to use the <code>read_dta()</code> function from the <code>haven</code> package. These are the estimates we got from regressing average math test scores on the full set of regressors.</p>
 <pre class="r"><code>library(haven)
 grades = read_dta(file = &quot;https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1&quot;)
 
@@ -392,7 +392,7 @@ reg_full$coefficients</code></pre>
 ##      78.560725298       0.003320773      -0.389333008       0.000758258 
 ##            female         religious 
 ##       0.923710499       2.876146701</code></pre>
-<p>1. Create a new variable <code>avgmath_stand</code> equal to the the standardized math score. You can use the <code>scale()</code> function or do it by hand with base <code>R</code>.</p>
+<p>1. Create a new variable <code>avgmath_stand</code> equal to the standardized math score. You can use the <code>scale()</code> function (combined with <code>mutate</code>) or do it by hand with base <code>R</code>.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
@@ -411,7 +411,7 @@ grades$avgmath_stand_2 &lt;- (grades$avgmath - mean(grades$avgmath)) / sd(grades
 
 identical(grades$avgmath_stand, grades$avgmath_stand_2)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<p>1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.</p>
+<p>2. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.</p>
 <pre class="r"><code>reg_full_stand &lt;- lm(avgmath_stand ~ classize + disadvantaged + school_enrollment + female + religious, grades)
 reg_full_stand$coefficients</code></pre>
 <pre><code>##       (Intercept)          classize     disadvantaged school_enrollment 
@@ -419,27 +419,27 @@ reg_full_stand$coefficients</code></pre>
 ##            female         religious 
 ##      -0.125894281       0.120617503</code></pre>
 <p><strong>Interpretation for the class size coefficient: holding all the other regressors included in the regression constant, on average, a 1-student increase in class size is associated with a 0.003 standard deviation increase in average math scores. This is a very small association: 0.3% of a standard deviation.</strong></p>
-<p>1. Create the standardized variables for each <em>continuous</em> regressor as <code>&lt;regressor&gt;_stand</code>. * Would it make sense to standardize the <code>religious</code> variable?</p>
+<p>3. Create the standardized variables for each <em>continuous</em> regressor as <code>&lt;regressor&gt;_stand</code>. * Would it make sense to standardize the <code>religious</code> variable?</p>
 <pre class="r"><code>grades &lt;- grades %&gt;%
     mutate(classize_stand = scale(classize),
            disadvantaged_stand = scale(disadvantaged),
            school_enrollment_stand = scale(school_enrollment),
            female_stand = scale(female))</code></pre>
 <p><strong>It would not make much sense to standardize the <code>religious</code> variable because it is a dummy variable, equal to 1 if the school is religious, and 0 otherwise.</strong></p>
-<p>1. Regress <code>avgmath_stand</code> on the full set of standardized regressors and <code>religious</code>. Discuss the relative influence of the regressors.</p>
+<p>4. Regress <code>avgmath_stand</code> on the full set of standardized regressors and <code>religious</code>. Discuss the relative influence of the regressors.</p>
 <pre class="r"><code>reg_full_stand_2 &lt;- lm(avgmath_stand ~ classize_stand + disadvantaged_stand + school_enrollment_stand + female_stand + religious, grades)
 reg_full_stand_2$coefficients</code></pre>
 <pre><code>##             (Intercept)          classize_stand     disadvantaged_stand 
 ##             -0.02969138              0.01726695             -0.48857857 
 ## school_enrollment_stand            female_stand               religious 
 ##              0.07421537             -0.01236283              0.12061750</code></pre>
-<p><strong>Interpretation for the class size coefficient: holding all the other regressors included in the regression constant, on average, a 1-standard deviation increase in class size (approx 6.5 students) is associated with a 0.02 standard deviation increase in average math scores. This is quite a small association: 2% of a standard deviation.</strong></p>
+<p><strong>Interpretation for the class size coefficient: holding all the other regressors included in the regression constant, on average, a 1-standard deviation increase in class size (approx 6.5 students) is associated with a 0.02 standard deviation increase in average math scores. This is quite a small association: 2% of a standard deviation. Note that this coefficient can be otained by multiplying the class size coefficient from the previous question’s regression by the approx 6.5 (i.e. 1 standard deviation of the class size variable).</strong></p>
 </div>
 <div id="task-2-non-linear-relationships" class="section level1">
 <h1>Task 2: Non-linear relationships</h1>
 <p>1. Load the data <a href="https://www.dropbox.com/s/2v5mb04nzw2u7bd/college_tuition_income.csv?dl=1">here</a>. This dataset contains information about tuition and estimated incomes of graduates for universities in the US. More details can be found <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-03-10/readme.md">here</a>.</p>
 <pre class="r"><code>college &lt;- read.csv(&quot;https://www.dropbox.com/s/2v5mb04nzw2u7bd/college_tuition_income.csv?dl=1&quot;)</code></pre>
-<p>2. Create a scatter of estimated mid career pay <span class="math inline">\((y)\)</span> as a function of out of state tuition <span class="math inline">\((x)\)</span>. Would you say the relationship is broadly linear or rather non-linear? Use <code>geom_smooth(method = &quot;lm&quot;, se = F) + geom_smooth(method = &quot;lm&quot;, se = F, formula = y ~ poly(x, 2, raw= T))</code> to fit both a linear and 2nd order line. This time which seems most appropriate?</p>
+<p>2. Create a scatter plot of estimated mid career pay (<code>mid_career_pay</code>) <span class="math inline">\((y-axis)\)</span> as a function of out of state tuition (<code>out_of_state_tuition</code>) <span class="math inline">\((x-axis)\)</span>. Would you say the relationship is broadly linear or rather non-linear? Use <code>geom_smooth(method = &quot;lm&quot;, se = F) + geom_smooth(method = &quot;lm&quot;, se = F, formula = y ~ poly(x, 2, raw= T))</code> to fit both a linear and 2nd order regression line. This time which seems most appropriate?</p>
 <pre class="r"><code>base_graph &lt;- college %&gt;%
     ggplot(aes(x = out_of_state_tuition, y = mid_career_pay)) +
     geom_point() +
