@@ -1,0 +1,89 @@
+---
+title: "Sampling - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+1/. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
+
+```{r}
+pasta <- data.frame(prop_green = c(0.7,0.7,0.5,0.5,0.3,0.5,0.4,0.45,0.55,0.4,0.35,0.45,0.45,0.7,0.55,0.5,0.35,0.65))
+```
+
+2/. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`.
+
+```{r}
+library(tidyverse)
+pasta %>%
+    ggplot(aes(x = prop_green)) +
+    geom_histogram(boundary = 0.325, binwidth = 0.05, color = "white", fill = "darkgreen")
+```
+
+3/. What do you observe?
+
+**It kind of starts looking a bit like a normal distribution.**
+
+
+## Task 2 
+
+Instead of taking only 33 samples, let's take ***1000***!
+
+1\. Why do we not take 1000 samples "by hand"?
+
+**It would be too time-consuming.**
+
+2\. Load the [data](https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1) into an object `pasta`.
+
+```{r}
+pasta <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
+```
+
+3\. Obtain 1000 samples of size 50 using the `rep_sample_n()` function from the `moderndive` package.
+
+```{r}
+library(moderndive)
+virtual_samples <- pasta %>% 
+    rep_sample_n(size = 50, reps = 1000)
+```
+
+4\. Calculate the proportion of green pasta in each sample.
+
+```{r}
+virtual_prop_green <- virtual_samples %>% 
+    group_by(replicate) %>% 
+    summarize(
+        num_green = sum(color == "green"),
+        sample_n = n()) %>% 
+    mutate(prop_green = num_green / sample_n)
+```
+
+5\. Plot a histogram of the obtained proportion of green pasta in each sample.
+
+```{r}
+virtual_prop_green %>% ggplot(
+    aes(x = prop_green)) +
+    geom_histogram(
+        binwidth = 0.02,
+        boundary = 0.41,
+        color = "white",
+        fill = "darkgreen") +
+    labs(x = "Proportion of green pasta in sample",
+         y = "Frequency",
+         title = "Distribution of 1000 samples of size 50") +
+    theme_bw(base_size = 14)
+```
+
+6\. What do you observe? Which proportions occur most frequently? How does the shape of the histogram compare to when we took only 33 samples?
+
+**The distribution looks very close to a normal distribution. The proportions that occur most frequently are around 0.5. Compared to taking only 33 samples, the distribution looks significantly closer to a normal distribution.**
+
+7\. How likely is it that we sample 50 pasta of which less than 20% are green?
+
+**It is extremely unlikely.**

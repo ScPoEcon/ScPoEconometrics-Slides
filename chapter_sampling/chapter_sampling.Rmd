@@ -39,20 +39,37 @@ library(tidyverse)
 library(tweenr)
 library(ggforce)
 library(gganimate)
+library(countdown)
 
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+
+set.seed(1234)
 ```
 
-# Recap from last week
+# Quick "Quiz" on Last Week's Material
 
-* *Multiple Linear Regression Model*: $y_i = b_0 + b_1 x_{1,i} + \dots + b_k x_{k,i} + e_i$
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOREGEXT***](https://app.wooclap.com/SCPOREGEXT)
 
-* Interpretation: effect holding all other independent variables constant
+&nbsp; &nbsp; &nbsp; ***OR***
 
-* Important extensions: *standardized regression*, *log models*, *interaction terms*
+2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
 
---
+```{r, echo = F, out.width = "300px"}
+knitr::include_graphics("chapter_sampling_files/figure-html/qr_code_quiz.png")
+```
 
-## Today<sup>1</sup>
+---
+
+# Today - Sampling<sup>1</sup>
 
 .footnote[
 [1]: This lecture is very heavily based on the wonderful [sampling chapter](https://moderndive.com/7-sampling.html) of [ModernDive](https://moderndive.com/)]
@@ -177,7 +194,9 @@ Sample # | Count | Proportion
 
 class: inverse
 
-# Task 1 (10 minutes)
+# Task 1
+
+`r countdown(minutes = 10, top = 0)`
 
 1. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
 
@@ -314,7 +333,7 @@ nrow(bowl)
 library(moderndive)
 
 virtual_shovel <- bowl %>% # notice that moderndive functions can be "pipped"
-  rep_sample_n(size = 50) # take a sample of 50 balls
+  rep_sample_n(size = 50) # take a sample of 50 pasta
 ```
 
 .pull-left[
@@ -656,9 +675,9 @@ Sample Size | Standard Deviation
 
 * 2 key concepts relating to sampling for estimation:
 
-  1. The effect of *sampling variation* on our estimates: different samples give different estimates. 
+  1. The effect of ***sampling variation*** on our estimates: different samples give different estimates. 
   
-  1. The effect of sample size on *sampling variation*: the bigger the size of our sample the closer our estimate should be from the true value.
+  1. The effect of sample size on ***sampling variation***: the bigger the size of our sample the closer our estimate should be from the true value.
 
 ---
 

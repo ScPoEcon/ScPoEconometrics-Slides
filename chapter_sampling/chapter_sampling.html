@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
     <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
@@ -16,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Sampling
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-03-31
+### SciencesPo Paris </br> 2021-03-31
 
 ---
 
@@ -29,17 +31,19 @@ layout: true
 
 
 
-# Recap from last week
+# Quick "Quiz" on Last Week's Material
 
-* *Multiple Linear Regression Model*: `\(y_i = b_0 + b_1 x_{1,i} + \dots + b_k x_{k,i} + e_i\)`
+1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOREGEXT***](https://app.wooclap.com/SCPOREGEXT)
 
-* Interpretation: effect holding all other independent variables constant
+&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
 
-* Important extensions: *standardized regression*, *log models*, *interaction terms*
+2\. From your ***phone*** 👉 flash QR code below
 
---
+&lt;img src="chapter_sampling_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
 
-## Today&lt;sup&gt;1&lt;/sup&gt;
+---
+
+# Today - Sampling&lt;sup&gt;1&lt;/sup&gt;
 
 .footnote[
 [1]: This lecture is very heavily based on the wonderful [sampling chapter](https://moderndive.com/7-sampling.html) of [ModernDive](https://moderndive.com/)]
@@ -162,7 +166,11 @@ Sample # | Count | Proportion
 
 class: inverse
 
-# Task 1 (10 minutes)
+# Task 1
+
+<div class="countdown" id="timer_606434fc" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 1. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
 
@@ -181,7 +189,7 @@ class: inverse
 --
 
 .pull-right[
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_sampling_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -273,7 +281,7 @@ nrow(bowl)
 library(moderndive)
 
 virtual_shovel &lt;- bowl %&gt;% # notice that moderndive functions can be "pipped"
-  rep_sample_n(size = 50) # take a sample of 50 balls
+  rep_sample_n(size = 50) # take a sample of 50 pasta
 ```
 
 .pull-left[
@@ -286,14 +294,14 @@ head(virtual_shovel)
 ```
 ## # A tibble: 6 x 3
 ## # Groups:   replicate [1]
-##   replicate pasta_ID color
-##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt;
-## 1         1      176 red  
-## 2         1      198 green
-## 3         1      705 green
-## 4         1      410 green
-## 5         1      215 red  
-## 6         1      398 green
+##   replicate pasta_ID color 
+##       &lt;int&gt;    &lt;int&gt; &lt;chr&gt; 
+## 1         1      327 green 
+## 2         1      158 yellow
+## 3         1       72 green 
+## 4         1      569 red   
+## 5         1      427 yellow
+## 6         1      242 green
 ```
 
 * Column `replicate` tells us the ID of the sample. Here: `1`.
@@ -336,7 +344,7 @@ sample_1
 ## # A tibble: 1 x 4
 ##   replicate num_green sample_n prop_green
 ##       &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-## 1         1        23       50       0.46
+## 1         1        22       50       0.44
 ```
 ]
 
@@ -347,7 +355,7 @@ sample_1
 
 1. Compute proportion of green pasta
 
-👉 0.46 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
+👉 0.44 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
 
 What if we try many times, like, 33 times?
 ]
@@ -372,17 +380,17 @@ virtual_samples
 ## # A tibble: 1,650 x 3
 ## # Groups:   replicate [33]
 ##    replicate pasta_ID color 
-##        &lt;int&gt;    &lt;int&gt; &lt;fct&gt; 
-##  1         1      270 green 
-##  2         1      377 red   
-##  3         1      697 red   
-##  4         1      189 green 
-##  5         1      166 yellow
-##  6         1      313 yellow
-##  7         1      293 yellow
-##  8         1      108 green 
-##  9         1      154 red   
-## 10         1      111 red   
+##        &lt;int&gt;    &lt;int&gt; &lt;chr&gt; 
+##  1         1      304 green 
+##  2         1      624 red   
+##  3         1       69 yellow
+##  4         1      526 red   
+##  5         1      690 green 
+##  6         1      538 red   
+##  7         1      594 yellow
+##  8         1      664 yellow
+##  9         1      682 green 
+## 10         1       44 red   
 ## # … with 1,640 more rows
 ```
 ]
@@ -408,16 +416,16 @@ virtual_prop_green
 ## # A tibble: 33 x 4
 ##    replicate num_green sample_n prop_green
 ##        &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-##  1         1        21       50      0.42 
-##  2         2        27       50      0.54 
+##  1         1        22       50      0.44 
+##  2         2        21       50      0.42 
 ##  3         3        25       50      0.5  
-##  4         4        26       50      0.52 
-##  5         5        20       50      0.4  
-##  6         6        26       50      0.52 
-##  7         7        27       50      0.54 
+##  4         4        24       50      0.48 
+##  5         5        29       50      0.580
+##  6         6        20       50      0.4  
+##  7         7        15       50      0.3  
 ##  8         8        29       50      0.580
-##  9         9        22       50      0.44 
-## 10        10        21       50      0.42 
+##  9         9        20       50      0.4  
+## 10        10        15       50      0.3  
 ## # … with 23 more rows
 ```
 ]
@@ -452,7 +460,7 @@ ggplot(virtual_prop_green, aes(x = prop_green)) +
 --
 
 .pull-right[
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_sampling_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -481,7 +489,7 @@ Instead of taking only 33 samples, let's take ***1000***!
 
 # Sampling Distribution of 1000 Samples
 
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_sampling_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -552,7 +560,7 @@ virtual_prop_green_25 &lt;- virtual_samples_25 %&gt;%
 
 # Role of Sample Size
 
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_sampling_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -601,9 +609,9 @@ Sample Size | Standard Deviation
 
 * 2 key concepts relating to sampling for estimation:
 
-  1. The effect of *sampling variation* on our estimates: different samples give different estimates. 
+  1. The effect of ***sampling variation*** on our estimates: different samples give different estimates. 
   
-  1. The effect of sample size on *sampling variation*: the bigger the size of our sample the closer our estimate should be from the true value.
+  1. The effect of sample size on ***sampling variation***: the bigger the size of our sample the closer our estimate should be from the true value.
 
 ---
 
@@ -700,7 +708,7 @@ sum(bowl$color == "green")/nrow(bowl)
 
 # Visualizing Unbiasedness and Sampling Variation
 
-&lt;img src="chapter6_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_sampling_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Some Sampling Scenarios
@@ -817,6 +825,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -834,17 +868,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
