@@ -465,7 +465,9 @@ ggplot(virtual_prop_green, aes(x = prop_green)) +
 
 class: inverse
 
-# Task 2 (10 minutes)
+# Task 2
+
+`r countdown(minutes = 10, top = 0)`
 
 Instead of taking only 33 samples, let's take ***1000***!
 
