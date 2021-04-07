@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Confidence Intervals and Hypothesis Testing
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-04-08
+### SciencesPo Paris </br> 2021-04-07
 
 ---
 
@@ -29,19 +29,19 @@ layout: true
 
 
 
-# Recap from last week
+# Quick "Quiz" on Last Week's Material
 
-* Sampling: ***sampling variation*** and ***sampling distributions***
+1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOSAMP***](https://app.wooclap.com/SCPOSAMP)
 
-* population, population parameter, sample statistic or point estimate, random sampling
+&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
 
-* ***Unbiased estimator***: `\(\mathop{\mathbb{E}}[\hat{p}] = p\)`
+2\. From your ***phone*** 👉 flash QR code below
 
-* ***Central Limit Theorem***: as sample size increases, sampling distribution of the sample mean is more ***normally distributed*** and has a smaller ***standard error***
+&lt;img src="chapter_ci_hyptest_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
 
---
+---
 
-## Today: Deeper dive into ***statistical inference*** &lt;sup&gt;1&lt;/sup&gt;
+# Today - Deeper dive into ***statistical inference*** &lt;sup&gt;1&lt;/sup&gt;
 
 .footnote[
 [1]: This lecture is based on the wonderful [confidence interval](https://moderndive.com/8-confidence-intervals.html) and [hypothesis testing](https://moderndive.com/9-hypothesis-testing.html) chapters of [ModernDive](https://moderndive.com/)]
@@ -114,15 +114,19 @@ layout: true
 
 There are several approaches to constructing confidence intervals:
     
-  1. *Theory*: use mathematical formulas (***Central Limit Theorem***) to derive the sampling distribution of our point estimate under certain conditions.
+  1. *Theory*: use mathematical formulas (***Central Limit Theorem***) to derive the sampling distribution of our point estimate under certain conditions `\(\rightarrow\)` ***what `R` does under the hood!***
 
 --
 
-  1. *Simulation*: use the ***bootstrapping*** method to *reconstruct* the sampling distribution of our point estimate.
+  1. *Simulation*: use the ***bootstrapping*** method to *reconstruct* the sampling distribution of our point estimate
     
 --
     
 We'll focus on simulation to give you the intuition and come back to the maths approach next week.
+
+--
+
+In practice, you ***don't*** need to compute your confidence intervals using *bootstrap*, `R` uses statistical theory to do it for you.
 
 ---
 
@@ -146,7 +150,7 @@ library(tidyverse)
 bowl &lt;- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
 
 my_sample = bowl %&gt;%
-  mutate(color = as.factor(ifelse(color == "green","green","non-green"))) %&gt;%
+  mutate(color = ifelse(color == "green","green","non-green")) %&gt;%
   rep_sample_n(size = 50) %&gt;%
   ungroup() %&gt;%
   select(pasta_ID, color)
@@ -281,7 +285,7 @@ What if we repeated this resampling procedure many times? Would the proportion b
 
 # Obtaining the Bootstrap Distribution
 
-* Let's repeat the resampling procedure 1000 times: there will be 1000 bootstrap samples and 1000 bootstrap estimates!
+* Let's repeat the resampling procedure 1,000 times: there will be 1,000 bootstrap samples and 1,000 bootstrap estimates!
 
 --
 
@@ -343,7 +347,7 @@ Let's visualize this sampling variation!
 
 # Bootstrap Distribution
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -353,7 +357,7 @@ The ***bootstrap distribution*** is an approximation of the ***sampling distribu
 
 # Bootstrap Distribution with Mean
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -363,7 +367,7 @@ The ***bootstrap distribution*** mean is very close to the original sample propo
 
 # Bootstrap Distribution with Mean
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 
 Let's use this ***bootstrap distribution*** to construct confidence intervals!
 
@@ -444,7 +448,7 @@ quantile(bootstrap_distrib$stat,0.975)
 
 # Percentile Method: 95% Confidence Interval Visually
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -454,7 +458,7 @@ Does the interval contain the true population proportion?
 
 # Percentile Method: 95% Confidence Interval Visually
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -468,7 +472,7 @@ Let's repeatedly draw 100 different samples from our `bowl` and for each sample 
 
 --
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 How many confidence intervals contain the true parameter? Why?
 
@@ -620,7 +624,7 @@ There is a ***29.2 percentage points difference*** in promotions between men and
 --
 
 .pull-right[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
@@ -641,9 +645,10 @@ There is a ***29.2 percentage points difference*** in promotions between men and
 
 
 ```r
-head(bind_cols(promotions, promotions_shuffled)) %&gt;%
-  select(id, decision, gender, gender1) %&gt;%
-  rename(shuffled_gender = gender1)
+promotions %&gt;%
+       left_join(promotions_shuffled %&gt;%
+                   rename(shuffled_gender = gender)) %&gt;%
+  head()
 ```
 
 ```
@@ -699,9 +704,10 @@ The difference is much lower: ***4.2 percentage points***!
 
 
 ```r
-head(bind_cols(promotions, promotions_shuffled)) %&gt;%
-  select(id, decision, gender, gender1) %&gt;%
-  rename(shuffled_gender = gender1)
+promotions %&gt;%
+       left_join(promotions_shuffled %&gt;%
+                   rename(shuffled_gender = gender)) %&gt;%
+  head()
 ```
 
 ```
@@ -721,7 +727,7 @@ How do the promotion rates look like in our reshuffled sample?
 
 .pull-right[
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -737,7 +743,7 @@ How do the promotion rates look like in our reshuffled sample?
 
 * No, we must investigate the role of ***sampling variation***!
 
-  * What if we reshuffle once again, how different from 4.2%p would the difference be?
+  * What if we reshuffle once again, how different from 4.2%p (*percentage points*) would the difference be?
 
 --
   
@@ -759,13 +765,13 @@ How do the promotion rates look like in our reshuffled sample?
 
 # Sampling Distribution with 1000 Reshufflings
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Sampling Distribution with 1000 Reshufflings
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 
 How ***likely*** is it to observe a 0.292 difference in a world with no discrimination?
 
@@ -841,7 +847,7 @@ where `\(p_m =\)` promotion rate of men, and `\(p_f =\)` promotion rate of women
 
 # Null Distribution
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -900,7 +906,7 @@ where `\(p_m =\)` promotion rate of men, and `\(p_f =\)` promotion rate of women
 
 # Visualizing the P-value
 
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -1036,7 +1042,7 @@ visualize(null_distribution,
 ]
 
 .pull-right[
-&lt;img src="CI_and_hypothesis_test_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -1107,6 +1113,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -1124,17 +1156,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
