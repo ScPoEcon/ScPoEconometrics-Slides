@@ -1,0 +1,1131 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Confidence Intervals and Hypothesis Testing"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# define vars
+om = par("mar")
+lowtop = c(om[1],om[2],0.1,om[4])
+
+library(magrittr)
+library(moderndive)
+library(dplyr)
+library(tidyverse)
+library(infer)
+
+overwrite = FALSE
+
+```
+
+# Quick "Quiz" on Last Week's Material
+
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOSAMP***](https://app.wooclap.com/SCPOSAMP)
+
+&nbsp; &nbsp; &nbsp; ***OR***
+
+2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
+
+```{r, echo = F, out.width = "300px"}
+knitr::include_graphics("chapter_ci_hyptest_files/figure-html/qr_code_quiz.png")
+```
+
+---
+
+# Today - Deeper dive into ***statistical inference*** <sup>1</sup>
+
+.footnote[
+[1]: This lecture is based on the wonderful [confidence interval](https://moderndive.com/8-confidence-intervals.html) and [hypothesis testing](https://moderndive.com/9-hypothesis-testing.html) chapters of [ModernDive](https://moderndive.com/)]
+
+* *Confidence intervals*: providing plausible ***range*** of values
+
+* *Hypothesis testing*: comparing statistics between groups
+
+---
+
+background-image: url(https://media.giphy.com/media/hXG93399r19vi/giphy.gif)
+background-position: 18% 45%
+background-size: 450px
+
+# Back to reality (there goes gravity `r emo::ji("wink")`)
+
+.pull-right[
+
+* In real life we only get to take ***one*** sample from the population (not ***1000***!).
+
+* Also, we obviously don't know the true population parameter, that's what we are interested in!
+
+* So what on earth was all of this good for? Fun only?! `r emo::ji("anguished")`
+
+]
+
+--
+
+<br>
+<br>
+
+* Even unobserved, we ***know*** that the sampling distribution does exist, and even better, we know how it behaves!
+
+* Let's see what we can do with this...
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Confidence Intervals
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# From Point Estimates to Confidence Intervals
+
+* Until now, we have only estimated ***point estimates*** from our samples: *sample means*, *sample proportions*, *regression coefficients*, etc.
+
+--
+
+* We know that this ***sample statistic*** differs from the ***true population parameter*** due to ***sampling variation***. 
+
+--
+
+* Rather than a point estimate, we could give a ***range of plausible values*** for the population parameter.
+
+--
+
+* This is precisely what a ***confidence interval*** (CI) provides.
+
+---
+
+# Constructing Confidence Intervals 
+
+There are several approaches to constructing confidence intervals:
+    
+  1. *Theory*: use mathematical formulas (***Central Limit Theorem***) to derive the sampling distribution of our point estimate under certain conditions $\rightarrow$ ***what `R` does under the hood!***
+
+--
+
+  1. *Simulation*: use the ***bootstrapping*** method to *reconstruct* the sampling distribution of our point estimate
+    
+--
+    
+We'll focus on simulation to give you the intuition and come back to the maths approach next week.
+
+--
+
+In practice, you ***don't*** need to compute your confidence intervals using *bootstrap*, `R` uses statistical theory to do it for you.
+
+---
+
+# Back to Pasta
+
+* As in real life, imagine we had access to *only one random sample* from our bowl of past.
+
+--
+
+* How could we study the effect of sampling variation with a single sample? `r emo::ji("point_right")` ***bootstrap resampling with replacement***!
+
+--
+
+* Let's start by drawing one random sample of size $n = 50$ from our bowl.
+
+```{r, echo = FALSE}
+bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
+
+set.seed(1234)
+
+sample_size = 50
+
+my_sample = bowl %>%
+  mutate(color = as.factor(ifelse(color == "green","green","non-green"))) %>%
+  rep_sample_n(size = sample_size) %>%
+  ungroup() %>%
+  select(pasta_ID, color) %>%
+  arrange(pasta_ID)
+```
+
+```{r, eval = FALSE}
+library(tidyverse)
+bowl <- read.csv("https://www.dropbox.com/s/qpjsk0rfgc0gx80/pasta.csv?dl=1")
+
+my_sample = bowl %>%
+  mutate(color = ifelse(color == "green","green","non-green")) %>%
+  rep_sample_n(size = 50) %>%
+  ungroup() %>%
+  select(pasta_ID, color)
+```
+
+.pull-left[
+```{r}
+head(my_sample,3)
+```
+]
+
+--
+
+.pull-right[
+```{r}
+p_hat = mean(my_sample$color == "green")
+p_hat
+```
+
+The proportion of green pasta in this sample is: $\hat{p} = `r p_hat`$.
+]
+
+---
+
+# Resampling our Pasta Sample
+
+How do we obtain a ***bootstrap sample***?
+
+--
+  
+  1. Randomly pick ***one*** pasta from the sample and record the associated color.
+  
+--
+  
+  1. Put this pasta back in the sample.
+  
+--
+  
+  1. Repeat steps 1 and 2 49 times, i.e. ***until the new sample is of the same size as the original sample***.
+
+--
+
+  1. Compute the proportion of green pasta in the bootstrap sample.
+  
+--
+
+This procedure is called ***resampling with replacement***:
+
+  * *resampling*: drawing repeated samples from a sample.
+  * *with replacement*: each time the drawn pasta is put back in the sample.
+
+---
+
+# Resampling our Pasta Sample
+
+.pull-left[
+
+Here is one bootstrap sample: 
+
+```{r}
+one_bootstrap = my_sample %>%
+  rep_sample_n(size = 50, replace = TRUE) %>%
+  arrange(pasta_ID)
+
+head(one_bootstrap, 8)
+
+nrow(one_bootstrap)
+```
+]
+
+--
+
+.pull-right[
+
+Several pasta have been drawn multiple times. How come?
+
+What's the proportion of green pasta in this bootstrap sample?
+
+```{r}
+mean(one_bootstrap$color == "green")
+```
+
+The proportion is different than that in our sample! This is due to resampling ***with replacement***.
+
+What if we repeated this resampling procedure many times? Would the proportion be the same each time?
+]
+
+  
+---
+
+# Obtaining the Bootstrap Distribution
+
+* Let's repeat the resampling procedure 1,000 times: there will be 1,000 bootstrap samples and 1,000 bootstrap estimates!
+
+--
+
+.pull-left[
+We use the `infer` package to ease the bootstrapping procedure.
+
+```{r, echo=FALSE}
+bootstrap_distrib = my_sample %>% # take my random sample
+  specify(response = color, success = "green") %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "prop")
+
+percentile_95ci = get_confidence_interval(bootstrap_distrib, level = 0.95, type = "percentile")
+percentile_95lb = percentile_95ci[[1]]
+percentile_95ub = percentile_95ci[[2]]
+
+```
+
+
+```{r, eval = FALSE}
+library(infer)
+
+bootstrap_distrib = my_sample %>%
+  # specify the variable and level of interest
+  specify(response = color, success = "green") %>% 
+  # generate 1000 bootstrap samples 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  # calculate the proportion of green pasta for each
+  calculate(stat = "prop") 
+```
+]
+
+--
+
+.pull-right[
+Here are the first 6 rows:
+
+```{r}
+head(bootstrap_distrib)
+
+nrow(bootstrap_distrib)
+```
+
+Let's visualize this sampling variation!
+
+]
+
+---
+
+# Bootstrap Distribution
+
+```{r,echo = FALSE,fig.height = 4.75, fig.width = 8}
+boot_distrib_plot = bootstrap_distrib %>%
+  ggplot(aes(x = stat)) +
+  geom_histogram(boundary = 0.39, binwidth = 0.02, col = "white", fill = "darkgreen") +
+  labs(x = "Proportion of green pasta",
+       y = "Frequency") +
+  theme_bw(base_size = 14)
+boot_distrib_plot
+```
+
+--
+
+The ***bootstrap distribution*** is an approximation of the ***sampling distribution***.
+
+---
+
+# Bootstrap Distribution with Mean
+
+```{r,echo = FALSE,fig.height = 4.75, fig.width = 8}
+boot_distrib_plot +
+  geom_vline(xintercept = mean(bootstrap_distrib$stat), linetype = "dashed", size = 1) +
+  annotate("text", x = 0.375, y = 127, label = "bootstrap distribution mean", size = 4)
+```
+
+--
+
+The ***bootstrap distribution*** mean is very close to the original sample proportion.
+
+---
+
+# Bootstrap Distribution with Mean
+
+```{r,echo = FALSE,fig.height = 4.75, fig.width = 8}
+boot_distrib_plot +
+  geom_vline(xintercept = mean(bootstrap_distrib$stat), linetype = "dashed", size = 1) +
+  annotate("text", x = 0.375, y = 127, label = "bootstrap distribution mean", size = 4)
+```
+
+Let's use this ***bootstrap distribution*** to construct confidence intervals!
+
+---
+
+# Understanding Confidence Intervals
+
+* Analogy with fishing:
+
+  * *point estimate*: fishing with a spear.
+  
+--
+  
+  * *confidence interval*: fishing with a net.
+
+--
+
+* In our case the fish is the true proportion of pasta in the bowl that are green $(p)$.
+
+--
+
+* The *point estimate* would be the proportion of green pasta obtained from a random sample $(\hat{p})$.
+
+--
+
+* The *confidence interval*: from the previous bootstrap distribution, ***where do most proportions lie?***
+
+--
+
+* Method for confidence interval construction: ***percentile method***.
+
+--
+
+* Requires specifying a ***confidence level***: 90%, 95%, and 99% are the most common. 
+
+---
+
+# Percentile Method: 95% Confidence Interval
+
+* Construct a confidence interval as the middle 95% of values of the bootstrap distribution.
+
+--
+
+* For that, we compute the 2.5% and 97.5% percentile:
+
+.pull-left[
+```{r}
+quantile(bootstrap_distrib$stat,0.025)
+```
+]
+.pull-right[
+```{r}
+quantile(bootstrap_distrib$stat,0.975)
+```
+]
+
+* Therefore the 95% confidence interval is $[`r round(percentile_95lb,2)` ; `r  round(percentile_95ub,2)`]$.
+
+* It is a ***range*** of values.
+
+--
+
+* Let's see this confidence interval on the sampling distribution.
+
+---
+
+# Percentile Method: 95% Confidence Interval Visually
+
+```{r,echo = FALSE,fig.height = 4.75, fig.width = 8}
+percentile_95lb = quantile(bootstrap_distrib$stat,0.025)
+percentile_95ub = quantile(bootstrap_distrib$stat,0.975)
+
+boot_distrib_plot_ci = boot_distrib_plot +
+  geom_vline(xintercept = percentile_95lb, linetype = "dashed", size = 1.5) +
+  geom_vline(xintercept = percentile_95ub, linetype = "dashed", size = 1.5) +
+  annotate("rect", xmin=percentile_95lb, xmax=percentile_95ub, ymin=0, ymax=Inf, fill = "#d90502", alpha=0.4)
+boot_distrib_plot_ci
+```
+
+--
+
+Does the interval contain the true population proportion?
+
+---
+
+# Percentile Method: 95% Confidence Interval Visually
+
+```{r,echo = FALSE,fig.height = 4.75, fig.width = 8}
+p = mean(bowl$color == "green")
+
+boot_distrib_plot_ci +
+  geom_vline(xintercept = p, col = "black", size = 1.25) +
+  annotate("text", x = 0.56, y = 125, label = "population proportion", size = 4)
+```
+
+--
+
+True population parameter is indeed in our 95% interval! Will it always be?
+
+---
+
+# Interpreting a 95% Confidence Interval
+
+Let's repeatedly draw 100 different samples from our `bowl` and for each sample compute the associated 95% CI using the percentile method.
+
+--
+
+```{r, echo=FALSE, fig.width=10, fig.height = 4}
+library(purrr)
+library(tidyr)
+if(!file.exists("../rds/pasta_percentile_cis.rds")){
+    set.seed(5)
+    
+    # Function to run infer pipeline
+    bootstrap_pipeline <- function(sample_data){
+        sample_data %>% 
+            specify(formula = color ~ NULL, success = "green") %>% 
+            generate(reps = 1000, type = "bootstrap") %>% 
+            calculate(stat = "prop")
+    }
+    
+    # Compute nested data frame with sampled data, sample proportions, all 
+    # bootstrap replicates, and percentile_ci
+    pasta_percentile_cis <- bowl %>% 
+        mutate(color = as.factor(ifelse(color == "green","green","non-green"))) %>%
+        rep_sample_n(size = 40, reps = 100, replace = FALSE) %>% 
+        group_by(replicate) %>% 
+        nest() %>% 
+        mutate(sample_prop = map_dbl(data, ~mean(.x$color == "green"))) %>%
+        # run infer pipeline on each nested tibble to generated bootstrap replicates
+        mutate(bootstraps = map(data, bootstrap_pipeline)) %>% 
+        group_by(replicate) %>% 
+        # Compute 95% percentile CI's for each nested element
+        mutate(percentile_ci = map(bootstraps, get_ci, type = "percentile", level = 0.95))
+    
+    # Save output to rds object
+    saveRDS(object = pasta_percentile_cis, "../rds/pasta_percentile_cis.rds")
+} else {
+    pasta_percentile_cis <- readRDS("../rds/pasta_percentile_cis.rds")
+}
+
+# Identify if confidence interval captured true p
+percentile_cis <- pasta_percentile_cis %>% 
+    unnest(percentile_ci) %>% 
+    mutate(captured = `2.5%` <= p & p <= `97.5%`)
+
+# Plot them!
+ggplot(percentile_cis) +
+    geom_segment(aes(
+        y = replicate, yend = replicate, x = `2.5%`, xend = `97.5%`, 
+        alpha = factor(captured, levels = c("TRUE", "FALSE"))
+    )) +
+    # Removed point estimates since it doesn't necessarily act as center for 
+    # percentile-based CI's
+    # geom_point(aes(x = sample_prop, y = replicate, color = captured)) +
+    labs(x = expression("Proportion of green pasta"), y = "Confidence interval number", 
+         alpha = "Contains Truth") +
+    geom_vline(xintercept = p, color = "#d90502", size = 1, linetype = "dashed") +
+  annotate("text", x = 0.47, y = 5, label = "population proportion", col = "#d90502") +
+    geom_point(aes(y = replicate, x = sample_prop ,alpha = factor(captured, levels = c("TRUE", "FALSE")))) +
+    coord_cartesian(xlim = c(0.2, 0.8)) + 
+  coord_flip() +
+    theme_bw(base_size = 14) +
+    theme(panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(),
+          panel.grid.minor.x = element_blank()) +
+  theme(legend.position = "top")
+```
+
+How many confidence intervals contain the true parameter? Why?
+
+---
+
+# Interpreting a 95% Confidence Interval
+
+> *Precise interpretation:* If we repeated our sampling procedure ***a large number of times***, we ***expect about 95%*** of the resulting confidence intervals to capture the value of the population parameter.
+
+In other words, 95% of the time, the 95% confidence interval will contain the true population parameter.
+
+--
+
+> *Short-hand interpretation:* We are ***95% “confident”*** that a 95% confidence interval captures the value of the population parameter.
+
+--
+
+***Questions:*** 
+
+  * How does the width of the confidence interval change as the ***confidence level*** increases?
+  
+  * How does the width of the confidence interval change as the ***sample size*** increases?
+  
+---
+
+# Interpreting a 95% Confidence Interval
+
+> *Precise interpretation:* If we repeated our sampling procedure ***a large number of times***, we ***expect about 95%*** of the resulting confidence intervals to capture the value of the population parameter.
+
+In other words, 95% of the time, the 95% confidence interval will contain the true population parameter.
+
+> *Short-hand interpretation:* We are ***95% “confident”*** that a 95% confidence interval captures the value of the population parameter.
+
+***Impact of confidence level:*** the greater the confidence level, the wider the confidence intervals.
+
+  * *Intuition*: a greater confidence level means the confidence interval needs to contain the true population parameter more often, and thus needs to be wider to ensure this.
+  
+--
+
+***Impact of sample size:*** the greater the confidence level, the wider the confidence intervals.
+
+  * *Inutuition*: a larger sample size leads to less sampling variation and therefore a narrower boostrap distribution, which in turn leads to thiner confidence intervals.
+  
+---
+
+# From Confidence Intervals to Hypothesis Testing
+
+* *Confidence intervals* can be thought of as an extension of *point estimation*.
+
+--
+
+* What if we want to ***compare*** a sample statistic for two groups?
+  
+  * *Example*: differences in average wages between men and women. Are the observed differences ***significant***?
+  
+--
+
+* These comparisons are the realm of ***hypothesis testing***.
+
+--
+
+* Just like confidence intervals, hypothesis tests are used to make claims about a population based on information from a sample.
+
+* However, we’ll see that the framework for making such inferences is slightly different.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Hypothesis Testing
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Is There Gender Discrimination In Promotions?
+
+* We will use data from an [article](https://pdfs.semanticscholar.org/39f6/d40e907ff08af4ddd3280c2ceee55ee1ddb6.pdf) published in the *Journal of Applied Psychology* in 1974 which investigated whether female employees at banks were discriminated against.
+
+* 48 (male) supervisors were given *identical* candidate CVs, differing only with respect to the first name, which was male or female.
+
+  * Each CV was "*in the form of a memorandum requesting a decision on the promotion of an employee to the position of branch manager.*"
+
+--
+
+* ***Hypothesis*** we want to test: *Is there gender discrimination?*
+
+--
+
+.pull-left[
+* The data from the experiment are provided in the `promotions` dataset from the `moderndive` package.
+]
+
+--
+
+.pull-right[
+```{r}
+library(moderndive)
+head(promotions)
+```
+]
+
+---
+
+# Evidence of Discrimination?
+
+.pull-left[
+How many men and women were offered a promotion (and not)?
+
+```{r}
+promotions %>% 
+  group_by(gender, decision) %>% 
+  tally() %>%
+  mutate(percentage = 100 * n / sum(n))
+```
+
+There is a ***29.2 percentage points difference*** in promotions between men and women!
+]
+
+--
+
+.pull-right[
+```{r,echo= FALSE, fig.height=6}
+ggplot(promotions, aes(x = gender, fill = decision)) +
+  geom_bar(width = 0.75) +
+  labs(x = "Gender of name on resume",
+       y = "Frequency") +
+  labs(title = "Promotion decision") +
+  theme_bw(base_size = 20) +
+  theme(legend.position = "top")
+```
+]
+
+--
+
+***Question***: Is this difference ***conclusive evidence*** of differences in promotion rates between men and women? Could such a difference have been observed ***by chance***?
+
+---
+
+# Imposing A Hypothetical World: No Gender Discrimination
+
+* Suppose we lived in a world without gender discrimination: the promotion decision would be completely ***independent*** from gender.
+
+* Let's randomly reassign `gender` to each row and see how this affects the result.
+
+--
+
+.pull-left[
+
+```{r, echo = TRUE}
+promotions %>%
+       left_join(promotions_shuffled %>%
+                   rename(shuffled_gender = gender)) %>%
+  head()
+```
+
+How do the promotion rates look like in our reshuffled sample?
+]
+
+--
+
+.pull-right[
+
+```{r}
+promotions_shuffled %>% 
+  group_by(gender, decision) %>% 
+  tally() %>%
+  mutate(percentage = 100 * n / sum(n))
+```
+
+The difference is much lower: ***4.2 percentage points***!
+]
+
+---
+
+# Imposing A Hypothetical World: No Gender Discrimination
+
+* Suppose we lived in a world without gender discrimination: the promotion decision would be completely ***independent*** from gender.
+
+* Let's randomly reassign `gender` to each row and see how this affects the result.
+
+.pull-left[
+
+```{r, echo = TRUE}
+promotions %>%
+       left_join(promotions_shuffled %>%
+                   rename(shuffled_gender = gender)) %>%
+  head()
+```
+
+How do the promotion rates look like in our reshuffled sample?
+]
+
+.pull-right[
+
+```{r,echo=FALSE,fig.height = 5.5}
+p1 = ggplot(promotions, aes(x = gender, fill = decision)) +
+  geom_bar(width = 0.75) +
+  theme_bw(base_size = 15) +
+  theme(legend.position = "top") +
+  labs(x = "Gender of resume name", y = "Frequency", title = "Original")
+p2 = ggplot(promotions_shuffled, aes(x = gender, fill = decision)) +
+  geom_bar(width = 0.75) +
+  theme_bw(base_size = 15) +
+  labs(x = "Gender of resume name", y = "Frequency", title = "Reshuffled") +
+  theme(legend.position = "top")
+cowplot::plot_grid(p1,p2,rel_widths = c(1.3,1.3))
+```
+
+]
+
+---
+
+# Sampling Variation
+
+* In our hypothetical world, the difference in promotion rates was only 4.2 percentage points.
+
+* Can we answer our initial question about the existence of gender discrimination now?
+
+--
+
+* No, we must investigate the role of ***sampling variation***!
+
+  * What if we reshuffle once again, how different from 4.2%p (*percentage points*) would the difference be?
+
+--
+  
+  * In other words, how representative of that hypothetical world is 4.2%p?
+  
+--
+  
+  * How likely is a 29%p difference to occur in such a world?
+  
+--
+
+* We need to know about the whole sampling distribution under the *no discrimination* hypothesis.
+
+--
+
+* How? Just by redoing the reshuffling a large number of times, and computing the difference each time.
+
+---
+
+# Sampling Distribution with 1000 Reshufflings
+
+```{r,echo = FALSE, fig.height = 4.75, fig.width = 8}
+set.seed(2)
+null_distribution <- promotions %>% 
+  # takes formula, defines success
+  specify(formula = decision ~ gender,
+          success = "promoted") %>% 
+  # decisions are independent of gender
+  hypothesize(null = "independence") %>% 
+  # generate 1000 reshufflings of data
+  generate(reps = 1000, type = "permute") %>% 
+  # compute p_m - p_f from each reshuffle
+  calculate(stat = "diff in props",
+            order = c("male", "female"))
+
+visualize(null_distribution, bins = 10, fill = "#d90502") + 
+  labs(title = "Sampling distribution", x = "Difference in promotion rates (male - female)", y = "Frequency") +
+  xlim(-0.4, 0.4)+
+  theme_bw(base_size = 14)
+```
+
+---
+
+# Sampling Distribution with 1000 Reshufflings
+
+```{r,echo = FALSE, fig.height = 4.75, fig.width = 8}
+visualize(null_distribution, bins = 10, fill = "#d90502") + 
+  geom_vline(xintercept = 0.292, size =1.25) +
+  labs(x = "Difference in promotion rates (male - female)", y = "Frequency") +
+  xlim(-0.4, 0.4)+
+  theme_bw(base_size = 14) +
+  annotate("text", x = 0.17, y = 485, label = "observed sample difference", size = 4)
+```
+
+How ***likely*** is it to observe a 0.292 difference in a world with no discrimination?
+
+---
+
+# What did we just do?
+
+* We just demonstrated the statistical procedure known as ***hypothesis testing*** using a ***permutation test***.
+
+--
+
+* The question is how likely the observed difference in promotion rates is to occur in a hypothetical universe with no discrimination.
+
+--
+
+* We concluded ***rather not***, i.e. we tended to ***reject*** the no discrimination hypothesis.
+
+--
+
+* Let's introduce the formal framework of hypothesis testing now.
+
+---
+
+# Hypothesis Test Notation and Definitions
+
+* A ***hypothesis test*** consists of a test between ***two competing hypotheses*** about the population parameter:
+
+--
+
+  * The ***null hypothesis*** $(H_0)$: generally hypothesis of no difference;
+--
+  
+  * The ***alternative hypothesis*** $(H_A \textrm{or }H_1)$: the research hypothesis.
+
+--
+
+* In the previous example:
+$$\begin{align}H_0&: p_m - p_f = 0\\H_A&: p_m - p_f > 0,\end{align}$$
+where $p_m =$ promotion rate of men, and $p_f =$ promotion rate of women.
+
+--
+
+  * Here, we considered a *one-sided* alternative, stating that $p_m > p_f$, i.e. women are discriminated against.
+  * The *two-sided* formulation is just $H_A: p_m - p_f \neq 0$.
+
+---
+
+# Hypothesis Test Notation and Definitions
+
+* ***Test statistic***: *point estimate/sample statistic* formula used for hypothesis testing. 
+
+--
+
+  * *In our previous case*: difference in sample proportions $\hat{p}_m - \hat{p}_f$.
+
+--
+
+* ***Observed test statistic***: value of the test statistic that we observed in real life.
+
+--
+
+  * *In our previous case*: observed difference $\hat{p}_m - \hat{p}_f = 0.292 = 29.2$ percentage points.
+  
+--
+
+* ***Null distribution***: sampling distribution of the test statistic *assuming the null hypothesis $H_0$ is true*.
+
+--
+  *  *In our previous case*: All the possible values that $\hat{p}_m - \hat{p}_f$ can take assuming there is no discrimination.
+  * That's the distribution we have seen just before.
+ 
+---
+
+# Null Distribution
+
+```{r,echo = FALSE, fig.height = 4.75, fig.width = 8}
+visualize(null_distribution, bins = 10, fill = "#d90502") + 
+  geom_vline(xintercept = 0.292, size =1.25) +
+  labs(x = "Difference in sample proportions (male - female)", y = "Frequency") +
+  xlim(-0.4, 0.4)+
+  theme_bw(base_size = 14) +
+  annotate("text", x = 0.19, y = 485, label = "observed test statistic", size = 4)
+```
+
+---
+
+# Hypothesis Test Notation and Definitions
+
+> ### ***p-value:*** probability of observing a test statistic *just as or more extreme* than the one we obtained, assuming the null hypothesis $H_0$ is true. `r emo::ji("thinking")`
+
+--
+
+* How *surprised* are we that we observed a difference in promotions rates of 0.292 in our sample assuming $H_0$ is true, that is a world without discrimination? Very surprised? Kind of surprised?
+
+--
+
+* What do we mean by ***more extreme***?
+
+  * Defined in terms of the alternative hypothesis: in this case, men are ***more likely*** to be promoted than women. Therefore, ***more extreme*** in our case means observing a difference in promotion rates ***greater than 0.292***.
+
+--
+
+* ***Interpretation***: the lower the p-value, the *less consistent our null hypothesis is with the observed statistic*.
+
+--
+
+* When do we decide to ***reject*** $H_0$ or not?
+
+---
+
+# Hypothesis Test Notation and Definitions
+
+* To decide wether we reject $H_0$ or not, we set a ***significance level*** for the test.
+
+--
+
+* ***Significance level $(\alpha)$:*** acts as a *cutoff* on the p-value.
+
+  * Common values are $\alpha = 0.01$, $0.05$, or $0.1$.
+
+--
+
+* ***Decision***:
+  * If the p-value falls ***below the cutoff $\alpha$***, we "***reject the null hypothesis at the significance level $\alpha$***."
+
+--
+
+  * Alternatively, if the p-value if ***greater than $\alpha$***, we say that we "***fail to reject the null hypothesis $H_0$ at the significance level $\alpha$***."
+
+--
+
+* ***Interpretation***: If what we observe *is too unlikely to happen* under the null hypothesis, it means that this hypothesis is ***likely to be false***.
+
+--
+
+* Let's illustrate how it works in our example. 
+
+---
+
+# Visualizing the P-value
+
+```{r,fig.height = 4.75, fig.width = 8, echo = FALSE}
+obs_diff_prop <- promotions %>%
+  specify(decision ~ gender, success = "promoted") %>%
+  calculate(stat = "diff in props", order = c("male", "female"))
+
+visualize(null_distribution, bins = 10, fill = "#d90502") + 
+  shade_p_value(obs_stat = obs_diff_prop,
+                size = 0.5,
+                direction = "right", 
+                fill = "black") +
+  labs(x = "Differences in sample proportions (male - female)",
+       y = "Frequency") +
+  xlim(-0.4, 0.4)+
+  theme_bw(base_size = 14) +
+  geom_vline(xintercept = 0.292, size = 1.25) +
+  annotate("text", x = 0.19, y = 485, label = "observed test statistic", size = 4)
+```
+
+--
+
+The shaded area correponds to the p-value!
+
+---
+
+# Obtaining the p-value and Deciding
+
+* Recall the definition of the p-value: ***probability of observing a test statistic *just as or more extreme* than the one we obtained, assuming the null hypothesis $H_0$ is true.***
+
+--
+
+```{r}
+p_value <- mean(null_distribution$stat >= 0.292)
+p_value
+```
+
+* In a world without discrimination, we would get $\hat{p_m} - \hat{p_f}$ superior (or equal) to 0.292 only `r 100*p_value`% of the time. 
+--
+
+* So, we can reject $H_0$, i.e. the absence of discrimination, at the 5% significance level.
+
+  * We also say that $\hat{p_m} - \hat{p_f} = 0.292$ is ***statistically significantly different from 0*** at the 5% level. 
+ 
+--
+
+* ***Question***: Suppose we had set $\alpha = 0.01 = 1\%$, would we have rejected the absence of discrimination at this level? 
+
+---
+
+# Testing Errors
+
+Working with probabilities implies that sometimes, we make **errors**.
+
+--
+
+* A 29%p difference may be *unlikely* under $H_0$, but that **doesn't mean it's *impossible* to occur**.
+
+  * In fact, such a difference (or higher) would occur (approximately) in 0.007% of cases.
+  
+--
+
+* So, it may happen that we sometimes reject $H_0$, when in fact it was true.
+
+  * Setting 5% significance level, you make sure it won't happen more than 5% of the time. 
+
+---
+
+# Testing Errors
+
+In hypothesis testing, there are ***two types of errors***:
+
+.pull-left[
+
+![:scale 100%](../img/photos/gt_error_table_ht.png)
+
+]
+
+.pull-right[
+
+***Type I error***: reject the null hypothesis when in fact it was true. ***false positive***
+  
+***Type II error***: don't reject the null hypothesis when in fact it was false. ***false negative***
+
+]
+
+* In practice, we choose the frequency of a Type I error by setting $\alpha$ and try to minimize the type II error.
+
+---
+
+# How does all of this relate to regression analysis? 
+
+* Now you have all the tools to make ***statistical inference*** for real!
+
+--
+
+* Regression analysis is based on a ***sample*** of data.
+
+--
+
+* So your ***regression coefficient*** is subject to ***sampling variation***, it's not the true population coefficient.
+
+--
+
+* ***Question***: Is the estimated effect statistically significantly different from some value $z$?
+
+--
+
+* The answer in the next episode of *Introduction to Econometrics with R*! `r emo::ji("monkey_face")`
+
+---
+
+class: title-slide-final, middle
+
+# THANKS
+
+To the amazing [moderndive](https://moderndive.com/) team!
+
+---
+
+# Appendix: code to generate the null distribution
+
+.pull-left[
+```{r, eval = FALSE}
+null_distribution <- promotions %>% 
+  # takes formula, defines success
+  specify(formula = decision ~ gender,
+          success = "promoted") %>%
+  # decisions are independent of gender
+  hypothesize(null = "independence") %>% 
+  # generate 1000 reshufflings of data
+  generate(reps = 1000, type = "permute") %>% 
+  # compute p_m - p_f from each reshuffle
+  calculate(stat = "diff in props",
+            order = c("male", "female"))
+
+visualize(null_distribution,
+          bins = 10,
+          fill = "#d90502") + 
+  labs(title = "Sampling distribution",
+       x = "Difference in promotion rates (male - female)",
+       y = "Frequency") +
+  xlim(-0.4, 0.4) +
+  theme_bw(base_size = 14)
+```
+]
+
+.pull-right[
+```{r,echo = FALSE, fig.height=6}
+visualize(null_distribution, bins = 10, fill = "#d90502") + 
+  labs(title = "Sampling distribution", x = "Difference in promotion rates (male - female)", y = "Frequency") +
+  xlim(-0.4, 0.4)+
+  theme_bw(base_size = 14)
+```
+]
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# END
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
