@@ -4,8 +4,9 @@
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
-    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
     <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
     <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
@@ -17,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Regression Inference
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2020-12-07
+### SciencesPo Paris </br> 2021-04-14
 
 ---
 
@@ -36,32 +37,30 @@ layout: true
 
 ---
 
-# Recap from last week
+# Quick "Quiz" on Last Week's Material
 
-* ***Confidence interval***: a plausible range of value for the population parameter
+1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOCIHT***](https://app.wooclap.com/SCPOCIHT)
 
-* ***Hypothesis testing***: null hypothesis `\((H_0)\)` vs alternative hypothesis `\((H_A)\)`, (observed) test statistic, null distribution
+&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
 
-* ***p-value***: probability of observing a test statistic as or more extreme than the observed test statistic assuming the null hypothesis is true.
+2\. From your ***phone*** 👉 flash QR code below
 
---
+&lt;img src="reg_inference_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
 
-## Today: Statistical inference in the regression framework
+---
 
-.pull-left[
-* Fully understand a regression table
+# Today - Statistical inference in the regression framework
 
-* Compare theory-based and simulation-based inference
+* Fully understand a ***regression table***
+
+* Compare ***theory-based*** and ***simulation-based*** inference
 
 * ***Classical Regression Model*** assumptions 
-]
 
-.pull-right[
 * Empirical applications:
 
   * Class size and student performance
   * Returns to education by gender
-]
 
 ---
 
@@ -76,7 +75,7 @@ layout: true
 
 * We consider the following regression model and estimate it by OLS:
 
-$$ \textrm{math_score}_i = b_0 + b_1 \textrm{small}_i + e_i$$ 
+$$ \text{math score}_i = b_0 + b_1 \text{small}_i + e_i$$ 
 
 --
 .pull-left[
@@ -198,9 +197,9 @@ Entry | Meaning
 
 --
 
-Let's imagine we could redo the experiment 1000 times on 1000 different samples:
+Let's imagine we could redo the experiment 1,000 times on 1,000 different samples:
 
-* We'd run 1000 regression and would get 1000 estimates of `\(\beta_k\)`, `\(b_k\)`.
+* We'd run 1,000 regressions and obtain 1,000 estimates of `\(\beta_k\)`, `\(b_k\)`.
 
 --
 
@@ -222,25 +221,31 @@ Let's imagine we could redo the experiment 1000 times on 1000 different samples:
 
 class:inverse
 
-# Task 1 (10 min)
+# Task 1
+
+<div class="countdown" id="timer_6076ad6e" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 As we did for the sampling distribution of the proportion of *green pasta*, we want to generate the bootstrap distribution of `\(b_\textrm{small}\)`. 
 
 1. Copy the loading and cleaning code from slide 3 and run it.
 
-1. Generate the bootstrap distribution of `\(b_\textrm{small}\)` based on 1000 samples drawn from `star_df`. *Hint*: use the appropriate functions and arguments from the `infer` package so use the help pages.
+1. Generate the bootstrap distribution of `\(b_\textrm{small}\)` based on 1,000 samples drawn from `star_df`.  
+*Hint 1*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
+*Hint 2*: in `calculate` set `stat` to `slope` and `order` to `c("TRUE","FALSE")`.
 
-1. Plot this simulated sampling distribution and compute mean and the standard error of `\(b_\textrm{small}\)`.
+1. Plot this simulated sampling distribution and compute the mean and standard error of `\(b_\textrm{small}\)`.
 
 ---
 
 # Bootstrap Distribution
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
-***standard error:*** 1.69 `\(\rightarrow\)` very close to the one in the table (1.68)!
+***standard error:*** 1.68 `\(\rightarrow\)` very close to the one in the table (1.68)!
 
 ---
 
@@ -299,7 +304,7 @@ round(observed_stat,2)
 
 ```
 ## smallTRUE 
-##      5.27
+##       5.3
 ```
 ]
 
@@ -329,7 +334,7 @@ round(observed_stat,2)
 --
 
 .pull-left[
-* Let's generate 1000 permuted samples and compute `\(b_\textrm{small}\)` for each.
+* Let's generate 1,000 permuted samples and compute `\(b_\textrm{small}\)` for each.
 
 
 ```r
@@ -353,7 +358,7 @@ null_distribution &lt;- null_distribution %&gt;%
   mutate(test_stat = stat/sd(bootstrap_distrib$stat))
 ```
 
-* Remember we got `\(\hat{SE}(b_\textrm{small})\)` = 1.69 from our bootstrap distribution.
+* Remember we got `\(\hat{SE}(b_\textrm{small})\)` = 1.68 from our bootstrap distribution.
 ]
 
   
@@ -364,24 +369,7 @@ null_distribution &lt;- null_distribution %&gt;%
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-
-# Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
-
-
 &lt;img src="reg_inference_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
-
---
-
-Very unlikely to obtain `\(b_\textrm{small}\)` = 8.8951932 when `\(H_0\)` is true.
-
----
-
-# Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
-
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.267 **or** superior to 5.267. 
 
 ---
 
@@ -392,13 +380,30 @@ Very unlikely to obtain `\(b_\textrm{small}\)` = 8.8951932 when `\(H_0\)` is tru
 
 --
 
+Very unlikely to obtain `\(b_\textrm{small}\)` = 8.8951932 when `\(H_0\)` is true.
+
+---
+
+# Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
+
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.295 **or** superior to 5.295. 
+
+---
+
+# Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
+
+
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
 What does the p-value correspond to?
 
 ---
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.27 **or** superior to 5.27. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.3 **or** superior to 5.3. 
 
 * Computing the *p-value* we get:
 
@@ -424,7 +429,7 @@ p_value
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.27 **or** superior to 5.27. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.3 **or** superior to 5.3. 
 
 * Computing the *p-value* we get:
 
@@ -473,7 +478,7 @@ layout: true
 --
 
 * Theoretical inference is based on **large sample approximations**.
-  * One can show that sampling distributions *converge* to suitable distributions.
+  * One can show that sampling distributions *converge* to suitable distributions `\(\rightarrow\)` ***Central Limit Theorem***
   
 --
   
@@ -502,7 +507,7 @@ layout: true
 
 ---
 
-# Standard Normal Distribution: A Refresher
+# Normal Distribution: A Refresher
 
 .center[
 &lt;img src="../img/photos/standard_normal_distrib.png" width="850px" style="display: block; margin: auto;" /&gt;
@@ -559,7 +564,7 @@ bootstrap_distrib %&gt;%
 ## # A tibble: 1 x 2
 ##   lower_bound upper_bound
 ##         &lt;dbl&gt;       &lt;dbl&gt;
-## 1        5.58        12.2
+## 1        5.60        12.2
 ```
 ]
 
@@ -571,11 +576,21 @@ bootstrap_distrib %&gt;%
 
 class:inverse
 
-# Task 2 (5 min)
+# Task 2
 
-1. Using the bootstrap distributed you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
+<div class="countdown" id="timer_6076abb8" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Using the bootstrap distribution you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
 
 1. How similar is it to the confidence intervals obtained in the previous slide?
+
+---
+
+# Confidence Intervals: Visually
+
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -617,7 +632,7 @@ class: title-slide-section-red, middle
 
 --
 
-* Before delving into these assumptions, let's see the small but important modifications we apply to our model (back to [*lecture 4*](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html#1)):
+* Before delving into these assumptions, let's see the small but important modifications we apply to our model (back to [*lecture SLR*](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_slr/chapter_slr.html)):
 
 --
 
@@ -625,7 +640,7 @@ class: title-slide-section-red, middle
 
 --
 
-  * In the same way, we distinguish `\(e\)`, the sample error, from `\(\varepsilon\)` the error term from the true population model: 
+  * In the same way, we distinguish `\(e\)`, the sample error (*residual*), from `\(\varepsilon\)`, the error term from the true population model: 
   
   `$$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_k x_{k,i} + \varepsilon_i$$`
   
@@ -657,14 +672,14 @@ class: title-slide-section-red, middle
 
 # Mean Independence of Error: E[u | small] = ?
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 # Mean Independence of Error: E[u | small] = ?
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -678,7 +693,7 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 * For example, imagine you are interested in the effect of education on wage
 
-    `$$\text{wage}_i = \beta_0 + \beta_1 \text{educ}_i + \varepsilon_i$$`
+    `$$\text{wage}_i = \beta_0 + \beta_1 \text{education}_i + \varepsilon_i$$`
   
   * Under the exogeneity assumption `\(\beta_1\)` denotes the causal effect of education in the population.
 
@@ -700,13 +715,13 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 --
 
-* Then regressing the wage on education we will attribute to `educ` part of the effect on wages that is actually *caused* by ability `\(a_i\)`!
+* Then regressing the wage on education we will attribute to `education` part of the effect on wages that is actually *caused* by ability `\(a_i\)`!
 
 --
 
   * Remember the formula of the **omitted variable bias**:
   
-  `$$\textrm{OVB} = \{ \textrm{Relationship between } ability_i \textrm{ and } educ_i \} \\ * \{ \textrm{Effect of } ability_i \textrm{ in multiple regression} \}$$`
+  `$$\text{OVB} = \text{multiple regression coefficient on omitted variable} \times \frac{Cov(x,z)}{Var(x)}$$`
 
 --
 
@@ -728,7 +743,11 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 class:inverse
 
-# Task 3.1 (10 min)
+# Task 3.1
+
+<div class="countdown" id="timer_6076acac" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 Let's go back to our question of returns to education and gender. 
 
@@ -752,7 +771,11 @@ Let's go back to our question of returns to education and gender.
 
 class:inverse
 
-# Task 3.2 (10 min)
+# Task 3.2
+
+<div class="countdown" id="timer_6076ad7d" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
 
 1. Produce a scatterplot of the relationship between the log wage and the level of education.
 
@@ -805,7 +828,7 @@ ggplot(data=cps,aes(y = log_wage, x = education, colour = gender)) +
 
 .pull-right[
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -837,30 +860,6 @@ Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` b
 
 ---
 
-# Teaser for next session (the last one 😢)
-
-* Methods for program evaluation!
-
---
-
-* 2 options:
-
---
-
-  1. Cover ***regression discontinuity design*** in-depth,
-
-  ***OR***
-  
---
-
-  2. Cover both ***regression discontinuity design*** and ***differences-in-differences*** but you will only get the gist of each method.
-
---
-
-Which do you prefer?
-
----
-
 
 
 class: title-slide-final, middle
@@ -878,7 +877,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK!
+# SEE YOU NEXT WEEK! (the last one 😢)
 
 
 
@@ -890,7 +889,6 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
