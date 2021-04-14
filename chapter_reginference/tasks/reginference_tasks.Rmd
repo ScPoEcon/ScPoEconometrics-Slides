@@ -1,0 +1,278 @@
+---
+title: "Regression Inference - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+1\. Copy the loading and cleaning code from slide 3 and run it.
+
+```{r}
+library(tidyverse)
+
+star_df = read.csv("https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1")
+star_df = star_df[complete.cases(star_df),]
+star_df = star_df %>%
+    filter(star %in% c("small","regular") &
+               grade == "k") %>% 
+    mutate(small = (star == "small"))
+```
+
+2\. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1,000 samples drawn from `star_df`.  
+*Hint 1*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
+*Hint 2*: in `calculate` set `stat` to `slope` and `order` to `c("TRUE","FALSE")`.
+
+```{r}
+library(infer)
+bootstrap_distrib <- star_df %>% 
+    specify(response = math, explanatory = small) %>%
+    generate(reps = 1000, type = "bootstrap") %>%
+    calculate(stat = "slope", order = c("TRUE","FALSE"))
+```
+
+3\. Plot this simulated sampling distribution and compute mean and the standard error of $b_small$.
+
+```{r}
+bootstrap_distrib %>%
+    ggplot(aes(x = stat)) +
+    geom_histogram(boundary = 9, binwidth = 0.5, col = "white", fill = "#d90502") +
+    labs(
+        x = "Bootstrap sample slope estimate",
+        y = "Frequency"
+    ) +
+    theme_bw(base_size = 14)
+    
+mean(bootstrap_distrib$stat)
+sd(bootstrap_distrib$stat)
+```
+
+
+## Task 2
+
+1\. Using the bootstrap distribution you generated in Task 1, compute the 95% confidence interval using the percentile method.
+
+```{r}
+ci_pctile = bootstrap_distrib %>%
+    summarise(
+        lower = quantile(stat, 0.025),
+        upper = quantile(stat, 0.975)
+    )
+ci_pctile
+```
+
+2\. How similar is it to the confidence intervals obtained in the previous slide?
+
+```{r}
+# standard error method
+ci_stderror <- bootstrap_distrib %>%
+  summarise(
+    lower = 8.895 - 1.96*sd(stat),
+    upper = 8.895 + 1.96*sd(stat))
+ci_stderror
+
+# theory
+library(broom)
+ci_theory <- tidy(lm(math ~ small, star_df),
+     conf.int = TRUE, conf.level = 0.95) %>%
+  filter(term == "smallTRUE") %>%
+  select(term, conf.low, conf.high)
+ci_theory
+
+bootstrap_distrib %>%
+    ggplot(aes(x = stat)) +
+    geom_histogram(boundary = 9, binwidth = 0.5, col = "white", fill = "#d90502") +
+    labs(
+        x = "Bootstrap sample slope estimate",
+        y = "Frequency",
+        title = "95% confidence interval computed with different methods",
+        subtitle = "percentile (dashed), standard error (longdashed) and theory (solid)"
+    ) +
+  geom_vline(xintercept = c(ci_pctile$lower, ci_pctile$upper), linetype = "dashed", show.legend = TRUE) +
+  geom_vline(xintercept = c(ci_stderror$lower, ci_stderror$upper), linetype = "longdash", show.legend = TRUE) +
+  geom_vline(xintercept = c(ci_theory$conf.low, ci_theory$conf.high)) +
+  theme_bw(base_size = 14)
+```
+
+
+## Task 3.1
+
+1\. Load the data `CPS1985` from the `AER` package and look back at the help to get the definition of each variable: ?`CPS1985`
+
+```{r}
+data(CPS1985, package = "AER")
+cps = CPS1985
+# ?AER::CPS1985
+```
+
+2\. Create the `log_wage` variable equal to the log of `wage.`
+
+```{r}
+cps <- cps %>%
+    mutate(log_wage = log(wage))
+```
+
+3\. Regress `log_wage` on `gender` and `education`, and save it as `reg1.`
+
+```{r}
+reg1 <- lm(log_wage ~ gender + education, cps)
+tidy(reg1)
+```
+
+  - Interpret each coefficient.
+  
+**Intercept: Expected log wage of men without any education.**  
+**`genderfemale`: On average, women earn about 23% less than men controlling for education level.**  
+**`education`: An additional year of education is associated, on average, with a 7.68% increase in wages controlling for gender.**
+  
+**One way to see this regression is as follows:**
+
+```{r}
+reg1_aug <- augment(reg1)
+
+cps %>%
+  ggplot(aes(x = education, y = log_wage, color = gender)) +
+  geom_point() +
+  geom_line(data = reg1_aug %>% filter(gender == "male"), aes(x = education, y = .fitted)) +
+  geom_line(data = reg1_aug %>% filter(gender == "female"), aes(x = education, y = .fitted)) +
+  labs(
+    x = "Years of education",
+    y = "Log wage",
+    color = "",
+    title = "Relationship between income and education, by gender",
+    subtitle = "Lines correspond to fitted values from a regression of log wage on a gender dummy and education level."
+  ) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "top")
+```
+
+**Both lines have the same slope. This slope is equal to the `education` coefficient from the previous regression. The distance between the two lines is equal to the coefficient on `gender`. Given a certain level of education, on average, the difference between men and women's wages will be 23%. The intercept is equal to the value of the y-axis for the red line when years of education is equal to 0.**
+
+  - Are the coefficients statistically significant? At which significance level?
+  
+**All the coefficients are statistically significant at the 1% level since their p-values are all very close to 0.**
+
+4\. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg2.`
+
+```{r}
+reg2 <- lm(log_wage ~ gender*education, cps)
+tidy(reg2)
+```
+
+  - How do you interpret the coefficient associated to `female*education`?
+
+**One additional year of education is associated, on average, with an additional 3% increase in wages for women relative to men. In other words, one additional year of education is associated for women, on average, with a 9.5% increase in wages, while it is *only* 6.5% for men.**
+
+**One way to see this regression is as follows:**
+
+```{r}
+cps %>%
+  ggplot(aes(x = education, y = log_wage, color = gender)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Years of education",
+    y = "Log wage",
+    color = "",
+    title = "Relationship between income and education, by gender",
+    subtitle = "Lines correspond to fitted values from a regression of log wage on a gender dummy, education level and\ntheir interaction"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "top")
+```
+
+**Each gender has its own slope: for men it is equal to the coefficient on `education` while for women it is equal to `education` + `gender*female`. An interaction term precisely allows for different slopes (if one of the two variables is continuous). The intercept is equal to the expected wage for men without any education while the coefficient on `gender` corresponds to the expected difference in incomes between men and women without any education.**
+
+  - Can we reject the nullity of this coefficient at the 5% level? At 10%?
+
+**The interaction term coefficient's p-value is equal to $0.055$ so it just fails to be significant at the 5% level but is significant at the 10% level.**
+
+
+## Task 3.2
+
+1\. Produce a scatterplot of the relationship between the log wage and the level of education, by gender.
+ 
+```{r}
+cps %>%
+  ggplot(aes(x = education, y = log_wage, color = gender)) +
+  geom_point() +
+  labs(
+    x = "Years of education",
+    y = "Log wage",
+    color = "",
+    title = "Relationship between income and education, by gender") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "top")
+```
+ 
+2\. Add the regression line with `geom_smooth.` What does this line represents?
+
+```{r}
+cps %>%
+  ggplot(aes(x = education, y = log_wage, color = gender)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Years of education",
+    y = "Log wage",
+    color = "",
+    title = "Relationship between income and education, by gender") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "top")
+```
+
+**The lines represent the fitted values from the regression of log wage on a gender dummy, education and their interaction (the one we ran in the previous task). The shaded area corresponds to the 95% confident interval for the fitted line itself (not the coefficients).**
+
+3\. Let's illustrate what the shaded area stands for.
+
+  1\. Draw one bootstrap sample from our `cps` data.
+  
+```{r}
+cps_boot <- cps %>%
+  rep_sample_n(reps = 1, size = nrow(cps), replace = TRUE)
+```
+
+  2\. Regress the `log_wage` on `gender`, `education` and their interaction `gender*education`, save it as `reg_bootstrap`.
+  
+```{r}
+reg_bootsrap <- lm(log_wage ~ gender*education, cps_boot)
+tidy(reg_bootsrap)
+```
+
+  3\. From `reg_bootstrap` extract and save the value of the intercept for men as `intercept_men_bootstrap` and the value of the slope for men as `slope_men_bootstrap.` Do the same for women.
+  
+```{r}
+intercept_men_bootstrap = reg_bootsrap$coefficients[1]
+slope_men_bootstrap = reg_bootsrap$coefficients[3]
+
+intercept_women_bootstrap = reg_bootsrap$coefficients[1] + reg_bootsrap$coefficients[2]
+slope_women_bootstrap = reg_bootsrap$coefficients[3] + reg_bootsrap$coefficients[4]
+```
+
+  4\. Add both predicted lines from this bootstrap sample to the previous plot (Hint: use `geom_abline` (x2))
+
+```{r}
+cps %>%
+  ggplot(aes(x = education, y = log_wage, color = gender)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_abline(slope = slope_men_bootstrap, intercept = intercept_men_bootstrap, linetype = "dashed", color = "#F8766D") +
+  geom_abline(slope = slope_women_bootstrap, intercept = intercept_women_bootstrap, linetype = "dashed", color = "#00BFC4") +
+  labs(
+    x = "Years of education",
+    y = "Log wage",
+    color = "",
+    title = "Relationship between income and education, by gender",
+    subtitle = "Sample regression lines (solid), bootstrap sample regression lines (dashed)") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "top")
+```
+
+**If we were the repeat this procedure 100 times, at each location of the shaded area, on average, 95% of the lines would lie within the shaded area and 5% would lie outside.**

@@ -50,6 +50,18 @@ lowtop = c(om[1],om[2],0.1,om[4])
 
 overwrite = FALSE
 
+library(countdown)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
 ```
 
 layout: true
@@ -58,32 +70,32 @@ layout: true
 
 ---
 
-# Recap from last week
+# Quick "Quiz" on Last Week's Material
 
-* ***Confidence interval***: a plausible range of value for the population parameter
+1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOCIHT***](https://app.wooclap.com/SCPOCIHT)
 
-* ***Hypothesis testing***: null hypothesis $(H_0)$ vs alternative hypothesis $(H_A)$, (observed) test statistic, null distribution
+&nbsp; &nbsp; &nbsp; ***OR***
 
-* ***p-value***: probability of observing a test statistic as or more extreme than the observed test statistic assuming the null hypothesis is true.
+2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
 
---
+```{r, echo = F, out.width = "300px"}
+knitr::include_graphics("reg_inference_files/figure-html/qr_code_quiz.png")
+```
 
-## Today: Statistical inference in the regression framework
+---
 
-.pull-left[
-* Fully understand a regression table
+# Today - Statistical inference in the regression framework
 
-* Compare theory-based and simulation-based inference
+* Fully understand a ***regression table***
+
+* Compare ***theory-based*** and ***simulation-based*** inference
 
 * ***Classical Regression Model*** assumptions 
-]
 
-.pull-right[
 * Empirical applications:
 
   * Class size and student performance
   * Returns to education by gender
-]
 
 ---
 
@@ -98,7 +110,7 @@ layout: true
 
 * We consider the following regression model and estimate it by OLS:
 
-$$ \textrm{math_score}_i = b_0 + b_1 \textrm{small}_i + e_i$$ 
+$$ \text{math score}_i = b_0 + b_1 \text{small}_i + e_i$$ 
 
 --
 .pull-left[
@@ -202,9 +214,9 @@ Entry | Meaning
 
 --
 
-Let's imagine we could redo the experiment 1000 times on 1000 different samples:
+Let's imagine we could redo the experiment 1,000 times on 1,000 different samples:
 
-* We'd run 1000 regression and would get 1000 estimates of $\beta_k$, $b_k$.
+* We'd run 1,000 regressions and obtain 1,000 estimates of $\beta_k$, $b_k$.
 
 --
 
@@ -226,15 +238,19 @@ Let's imagine we could redo the experiment 1000 times on 1000 different samples:
 
 class:inverse
 
-# Task 1 (10 min)
+# Task 1
+
+`r countdown(minutes = 10, top = 0)`
 
 As we did for the sampling distribution of the proportion of *green pasta*, we want to generate the bootstrap distribution of $b_\textrm{small}$. 
 
 1. Copy the loading and cleaning code from slide 3 and run it.
 
-1. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1000 samples drawn from `star_df`. *Hint*: use the appropriate functions and arguments from the `infer` package so use the help pages.
+1. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1,000 samples drawn from `star_df`.  
+*Hint 1*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
+*Hint 2*: in `calculate` set `stat` to `slope` and `order` to `c("TRUE","FALSE")`.
 
-1. Plot this simulated sampling distribution and compute mean and the standard error of $b_\textrm{small}$.
+1. Plot this simulated sampling distribution and compute the mean and standard error of $b_\textrm{small}$.
 
 ---
 
@@ -343,7 +359,7 @@ round(observed_stat,2)
 --
 
 .pull-left[
-* Let's generate 1000 permuted samples and compute $b_\textrm{small}$ for each.
+* Let's generate 1,000 permuted samples and compute $b_\textrm{small}$ for each.
 
 ```{r}
 null_distribution <- star_df %>% 
@@ -494,7 +510,7 @@ layout: true
 --
 
 * Theoretical inference is based on **large sample approximations**.
-  * One can show that sampling distributions *converge* to suitable distributions.
+  * One can show that sampling distributions *converge* to suitable distributions $\rightarrow$ ***Central Limit Theorem***
   
 --
   
@@ -523,7 +539,7 @@ layout: true
 
 ---
 
-# Standard Normal Distribution: A Refresher
+# Normal Distribution: A Refresher
 
 .center[
 ```{r, echo = FALSE, out.width = "850px"}
@@ -578,11 +594,49 @@ bootstrap_distrib %>%
 
 class:inverse
 
-# Task 2 (5 min)
+# Task 2
 
-1. Using the bootstrap distributed you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
+`r countdown(minutes = 5, top = 0)`
+
+1. Using the bootstrap distribution you generated in Task 1, compute the 95% confidence interval using the *percentile method*.
 
 1. How similar is it to the confidence intervals obtained in the previous slide?
+
+---
+
+# Confidence Intervals: Visually
+
+```{r, echo = FALSE, fig.width = 10, fig.height = 5.5}
+ci_pctile = bootstrap_distrib %>%
+    summarise(
+        lower = quantile(stat, 0.025),
+        upper = quantile(stat, 0.975)
+    )
+
+ci_stderror <- bootstrap_distrib %>%
+  summarise(
+    lower = 8.895 - 1.96*sd(stat),
+    upper = 8.895 + 1.96*sd(stat))
+
+ci_theory <- tidy(lm(math ~ small, star_df),
+     conf.int = TRUE, conf.level = 0.95) %>%
+  filter(term == "smallTRUE") %>%
+  select(term, conf.low, conf.high)
+
+bootstrap_distrib %>%
+    ggplot(aes(x = stat)) +
+    geom_histogram(boundary = 9, binwidth = 0.5, col = "white", fill = "#d90502") +
+    labs(
+        x = "Bootstrap sample slope estimate",
+        y = "Frequency",
+        title = "95% confidence interval computed with different methods",
+        subtitle = "percentile (dashed), standard error (longdashed) and theory (solid)"
+    ) +
+  geom_vline(xintercept = c(ci_pctile$lower, ci_pctile$upper), linetype = "dashed", show.legend = TRUE) +
+  geom_vline(xintercept = c(ci_stderror$lower, ci_stderror$upper), linetype = "longdash", show.legend = TRUE) +
+  geom_vline(xintercept = c(ci_theory$conf.low, ci_theory$conf.high)) +
+  theme_bw(base_size = 14)
+```
 
 ---
 
@@ -624,7 +678,7 @@ class: title-slide-section-red, middle
 
 --
 
-* Before delving into these assumptions, let's see the small but important modifications we apply to our model (back to [*lecture 4*](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter3/chapter3.html#1)):
+* Before delving into these assumptions, let's see the small but important modifications we apply to our model (back to [*lecture SLR*](https://raw.githack.com/ScPoEcon/ScPoEconometrics-Slides/master/chapter_slr/chapter_slr.html)):
 
 --
 
@@ -632,7 +686,7 @@ class: title-slide-section-red, middle
 
 --
 
-  * In the same way, we distinguish $e$, the sample error, from $\varepsilon$ the error term from the true population model: 
+  * In the same way, we distinguish $e$, the sample error (*residual*), from $\varepsilon$, the error term from the true population model: 
   
   $$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_k x_{k,i} + \varepsilon_i$$
   
@@ -755,7 +809,7 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 * For example, imagine you are interested in the effect of education on wage
 
-    $$\text{wage}_i = \beta_0 + \beta_1 \text{educ}_i + \varepsilon_i$$
+    $$\text{wage}_i = \beta_0 + \beta_1 \text{education}_i + \varepsilon_i$$
   
   * Under the exogeneity assumption $\beta_1$ denotes the causal effect of education in the population.
 
@@ -777,13 +831,13 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 --
 
-* Then regressing the wage on education we will attribute to `educ` part of the effect on wages that is actually *caused* by ability $a_i$!
+* Then regressing the wage on education we will attribute to `education` part of the effect on wages that is actually *caused* by ability $a_i$!
 
 --
 
   * Remember the formula of the **omitted variable bias**:
   
-  $$\textrm{OVB} = \{ \textrm{Relationship between } ability_i \textrm{ and } educ_i \} \\ * \{ \textrm{Effect of } ability_i \textrm{ in multiple regression} \}$$
+  $$\text{OVB} = \text{multiple regression coefficient on omitted variable} \times \frac{Cov(x,z)}{Var(x)}$$
 
 --
 
@@ -805,7 +859,9 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 class:inverse
 
-# Task 3.1 (10 min)
+# Task 3.1
+
+`r countdown(minutes = 10, top = 0)`
 
 Let's go back to our question of returns to education and gender. 
 
@@ -829,7 +885,9 @@ Let's go back to our question of returns to education and gender.
 
 class:inverse
 
-# Task 3.2 (10 min)
+# Task 3.2
+
+`r countdown(minutes = 10, top = 0)`
 
 1. Produce a scatterplot of the relationship between the log wage and the level of education.
 
@@ -934,30 +992,6 @@ Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` b
 
 ---
 
-# Teaser for next session (the last one `r emo::ji("cry")`)
-
-* Methods for program evaluation!
-
---
-
-* 2 options:
-
---
-
-  1. Cover ***regression discontinuity design*** in-depth,
-
-  ***OR***
-  
---
-
-  2. Cover both ***regression discontinuity design*** and ***differences-in-differences*** but you will only get the gist of each method.
-
---
-
-Which do you prefer?
-
----
-
 
 
 class: title-slide-final, middle
@@ -975,7 +1009,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK!
+# SEE YOU NEXT WEEK! (the last one `r emo::ji("cry")`)
 
 
 
