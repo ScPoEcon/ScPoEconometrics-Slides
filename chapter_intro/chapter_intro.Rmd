@@ -813,10 +813,10 @@ Lecture 12: ***Recap***
 
 .pull-left[
 ## Econometrics
-- [*Mastering Metrics* by Angrist and Pischke](http://catalogue.sciencespo.fr/ark:/46513/sc0001290364)
-- [*Modern Introduction to Econometrics* by Wooldridge](http://catalogue.sciencespo.fr/ark:/46513/sc0001336459)
-- [*Introduction to Econometrics* by Stock and Watson](http://catalogue.sciencespo.fr/ark:/46513/sc0001334932)
-- [*Causal Inference: The Mixtape* by Cunningham](https://scunning.com/causalinference_norap.pdf)
+- [*Mastering Metrics* by Angrist and Pischke](https://uspc-spo.primo.exlibrisgroup.com/permalink/33USPC_SPO/1d4eftp/alma991003947949705808)
+- [*Introductory Econometrics: A Modern Approach* by Wooldridge](https://uspc-spo.primo.exlibrisgroup.com/permalink/33USPC_SPO/mgsi7h/alma991003442469705808)
+- [*Introduction to Econometrics* by Stock and Watson](https://uspc-spo.primo.exlibrisgroup.com/permalink/33USPC_SPO/mgsi7h/alma991003436429705808)
+- [*Causal Inference: The Mixtape* by Cunningham](https://mixtape.scunning.com/)
 - [Ben Lambert's youtube channel](https://www.youtube.com/user/SpartacanUsuals)
 ]
 
@@ -862,7 +862,7 @@ I will be checking Slack sparingly so please help one another!
 
 *Late work:* Won't be accepted unless you have a very good reason.
 
-*Cheating:* I will have a chat with you. Just don't cheat, it's honestly not worth it.
+*Cheating:* You will get 0. Just don't cheat, it's honestly not worth it.
 
 *Work in groups:* You can/should work in groups of 2 (3 max) on the quizzes.
 ]
@@ -871,7 +871,7 @@ I will be checking Slack sparingly so please help one another!
 
 # Mental Health
 
-> ***Pay attention to your mental health in the same way you would your physical health!***
+> ***Pay attention to your mental health in the same way you would your physical health.***
 
 --
 
@@ -885,9 +885,11 @@ Don't hesitate to ***reach out*** to your friends, family, a professor or me if 
 
 ***Sciences Po*** offers free and confidential [psychological support services](https://www.sciencespo.fr/students/en/living/health/health-centre) with professionals.
 
---
+---
 
-To combat everyone's social isolation (mine included!), I propose we meet weekly on [gather.town](https://gather.town/app) `r emo::ji("hugs")` (details on Slack)
+# Last But Not Least: Class Rep `r emo::ji("man_raising_hand")` `r emo::ji("woman_raising_hand")`
+
+.center[![:scale 60%](chapter_intro_files/figure-html/notme.gif)]
 
 ---
 
@@ -903,7 +905,6 @@ background-position: 9% 19%
 
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
-| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
 | <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
