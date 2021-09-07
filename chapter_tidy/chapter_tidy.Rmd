@@ -111,9 +111,14 @@ layout: true
 
 # `dplyr` Overview
 
-* You *must* read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's clear and concise.
+* You are ***highly encouraged*** to read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's clear and concise.
 
 --
+
+* Also check out this great "cheatsheet" [here](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf)
+
+--
+
 
 * The package is organized around a set of **verbs**, i.e. *actions* to be taken.
 
@@ -199,10 +204,35 @@ filter()
 *Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
 ]
 
---
+---
 
 .right-wide[
-```{r}
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 %>%
+  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45) #<<
+```
+
+```{r, echo=FALSE}
 polls_us_election_2016 %>%
   filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
 ```
@@ -264,10 +294,63 @@ mutate()
 2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
 ]
 
---
+---
 
 .right-wide[
-```{r, echo = TRUE}
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton, #<<
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
+```
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %>%
+  names() #<<
+```
+
+```{r, echo = FALSE}
 polls_us_election_2016 %>%
   mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
          trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %>%
@@ -301,7 +384,56 @@ select()
 
 .right-wide[
 *Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
-```{r, echo = TRUE}
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump)
+```
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %>%
+  names() #<<
+```
+
+```{r, echo = FALSE}
 polls_us_election_2016 %>%
   select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %>%
   names()
@@ -336,7 +468,37 @@ summarise()
 
 .right-wide[
 *Example:* What is the maximum vote share for Trump?
-```{r}
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  summarise(max_trump = max(rawpoll_trump)) #<<
+```
+
+```{r, echo = FALSE}
 polls_us_election_2016 %>%
   summarise(max_trump = max(rawpoll_trump))
 ```
@@ -372,7 +534,94 @@ group_by()
 
 .right-wide[
 *Example:* What is the average vote share for Clinton by poll grade?
-```{r}
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade)
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  class() #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  class()
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade)
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  summarise(mean_vote_clinton = mean(rawpoll_clinton)) #<<
+```
+
+```{r, echo = FALSE}
 polls_us_election_2016 %>%
   group_by(grade) %>%
   summarise(mean_vote_clinton = mean(rawpoll_clinton))
@@ -384,21 +633,93 @@ layout: true
 
 <div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
----
-
 # Chaining `r emo::ji("link")` Commands Together
 
+---
+
 Works for all `dplyr` verbs:
-```{r, echo = TRUE, eval = TRUE}
+
+.pull-left[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.pull-left[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) #<<
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.pull-left[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+  filter(trump_clinton_diff>5 & #<<
+        state == "Iowa" & #<<
+        is.na(rawpoll_johnson)) #<<
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)%>%
+  filter(trump_clinton_diff>5 &
+        state == "Iowa" &
+        is.na(rawpoll_johnson))
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.pull-left[
+```{r, eval = FALSE}
 polls_us_election_2016 %>%
   mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
   filter(trump_clinton_diff>5 &
         state == "Iowa" &
         is.na(rawpoll_johnson)) %>%
+  select(pollster) #<<
+```
+]
+
+.pull-right[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)%>%
+  filter(trump_clinton_diff>5 &
+        state == "Iowa" &
+        is.na(rawpoll_johnson)) %>%
   select(pollster)
 ```
+]
 
---
+---
 
 But also with other `R` commands:
 
@@ -417,6 +738,12 @@ polls_us_election_2016$samplesize %>% mean(na.rm = T)
 polls_us_election_2016 %>% count()
 ```
 ]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
 
 ---
 
@@ -1326,7 +1653,6 @@ background-position: 9% 19%
 
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
-| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
 | <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
