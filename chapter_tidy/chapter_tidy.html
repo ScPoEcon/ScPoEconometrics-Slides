@@ -8,8 +8,8 @@
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
-    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
-    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="C:/Users/mylen/Dropbox/Teaching/Metrics/ScPoEconometrics-Slides/css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="C:/Users/mylen/Dropbox/Teaching/Metrics/ScPoEconometrics-Slides/css/scpo-fonts.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Tidying, Visualising and Summarising Data
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-09-07
+### SciencesPo Paris </br> 2021-09-15
 
 ---
 
@@ -149,14 +149,14 @@ head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
 
 ```
 ## # A tibble: 6 x 6
-##   state startdate  enddate    pollster                                                 grade samplesize
-##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                                    &lt;fct&gt;      &lt;int&gt;
-## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post                                 A+          2220
-## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys                                  B          26574
-## 3 U.S.  2016-11-02 2016-11-06 Ipsos                                                    A-          2195
-## 4 U.S.  2016-11-04 2016-11-07 YouGov                                                   B           3677
-## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                                         B-         16639
-## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Research/Shaw &amp; Company Resea… A           1295
+##   state startdate  enddate    pollster                          grade samplesize
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                             &lt;fct&gt;      &lt;int&gt;
+## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post          A+          2220
+## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys           B          26574
+## 3 U.S.  2016-11-02 2016-11-06 Ipsos                             A-          2195
+## 4 U.S.  2016-11-04 2016-11-07 YouGov                            B           3677
+## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                  B-         16639
+## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Resear~ A           1295
 ```
 
 🚨 This is a `tibble` (more informative than `data.frame`)
@@ -202,21 +202,22 @@ polls_us_election_2016
 
 ```
 ## # A tibble: 4,208 x 15
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -236,12 +237,12 @@ polls_us_election_2016 %&gt;%
 
 ```
 ## # A tibble: 1 x 15
-##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-## 1 Indi… 2016-04-26 2016-04-28 Marist … A           2149 rv                      41
-## # … with 7 more variables: rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;,
-## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
-## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##   state   startdate  enddate    pollster       grade samplesize population
+##   &lt;fct&gt;   &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;          &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+## 1 Indiana 2016-04-26 2016-04-28 Marist College A           2149 rv        
+## # ... with 8 more variables: rawpoll_clinton &lt;dbl&gt;, rawpoll_trump &lt;dbl&gt;,
+## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
+## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -337,21 +338,22 @@ polls_us_election_2016
 
 ```
 ## # A tibble: 4,208 x 15
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -374,22 +376,22 @@ polls_us_election_2016 %&gt;%
 
 ```
 ## # A tibble: 4,208 x 17
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 9 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;,
-## #   trump_clinton_tot &lt;dbl&gt;, trump_raw_adj_diff &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 10 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;, trump_clinton_tot &lt;dbl&gt;, trump_raw_adj_diff &lt;dbl&gt;
 ```
 ]
 
@@ -412,11 +414,12 @@ polls_us_election_2016 %&gt;%
 
 
 ```
-##  [1] "state"              "startdate"          "enddate"            "pollster"          
-##  [5] "grade"              "samplesize"         "population"         "rawpoll_clinton"   
-##  [9] "rawpoll_trump"      "rawpoll_johnson"    "rawpoll_mcmullin"   "adjpoll_clinton"   
-## [13] "adjpoll_trump"      "adjpoll_johnson"    "adjpoll_mcmullin"   "trump_clinton_tot" 
-## [17] "trump_raw_adj_diff"
+##  [1] "state"              "startdate"          "enddate"           
+##  [4] "pollster"           "grade"              "samplesize"        
+##  [7] "population"         "rawpoll_clinton"    "rawpoll_trump"     
+## [10] "rawpoll_johnson"    "rawpoll_mcmullin"   "adjpoll_clinton"   
+## [13] "adjpoll_trump"      "adjpoll_johnson"    "adjpoll_mcmullin"  
+## [16] "trump_clinton_tot"  "trump_raw_adj_diff"
 ```
 ]
 
@@ -463,21 +466,22 @@ polls_us_election_2016
 
 ```
 ## # A tibble: 4,208 x 15
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -497,19 +501,19 @@ polls_us_election_2016 %&gt;%
 
 ```
 ## # A tibble: 4,208 x 6
-##    state   startdate  enddate    pollster                   rawpoll_clinton rawpoll_trump
-##    &lt;fct&gt;   &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                &lt;dbl&gt;         &lt;dbl&gt;
-##  1 U.S.    2016-11-03 2016-11-06 ABC News/Washington Post              47            43  
-##  2 U.S.    2016-11-01 2016-11-07 Google Consumer Surveys               38.0          35.7
-##  3 U.S.    2016-11-02 2016-11-06 Ipsos                                 42            39  
-##  4 U.S.    2016-11-04 2016-11-07 YouGov                                45            41  
-##  5 U.S.    2016-11-03 2016-11-06 Gravis Marketing                      47            43  
-##  6 U.S.    2016-11-03 2016-11-06 Fox News/Anderson Robbins…            48            44  
-##  7 U.S.    2016-11-02 2016-11-06 CBS News/New York Times               45            41  
-##  8 U.S.    2016-11-03 2016-11-05 NBC News/Wall Street Jour…            44            40  
-##  9 New Me… 2016-11-06 2016-11-06 Zia Poll                              46            44  
-## 10 U.S.    2016-11-04 2016-11-07 IBD/TIPP                              41.2          42.7
-## # … with 4,198 more rows
+##    state      startdate  enddate    pollster       rawpoll_clinton rawpoll_trump
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                    &lt;dbl&gt;         &lt;dbl&gt;
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Wash~            47            43  
+##  2 U.S.       2016-11-01 2016-11-07 Google Consum~            38.0          35.7
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos                     42            39  
+##  4 U.S.       2016-11-04 2016-11-07 YouGov                    45            41  
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Market~            47            43  
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Ande~            48            44  
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New ~            45            41  
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall~            44            40  
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll                  46            44  
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP                  41.2          42.7
+## # ... with 4,198 more rows
 ```
 ]
 
@@ -579,21 +583,22 @@ polls_us_election_2016
 
 ```
 ## # A tibble: 4,208 x 15
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -666,21 +671,22 @@ polls_us_election_2016
 
 ```
 ## # A tibble: 4,208 x 15
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -701,21 +707,22 @@ polls_us_election_2016 %&gt;%
 ```
 ## # A tibble: 4,208 x 15
 ## # Groups:   grade [11]
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -756,21 +763,22 @@ polls_us_election_2016 %&gt;%
 ```
 ## # A tibble: 4,208 x 15
 ## # Groups:   grade [11]
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -829,21 +837,22 @@ polls_us_election_2016
 
 ```
 ## # A tibble: 4,208 x 15
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 7 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 8 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;
 ```
 ]
 
@@ -863,22 +872,22 @@ polls_us_election_2016 %&gt;%
 
 ```
 ## # A tibble: 4,208 x 16
-##    state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##    &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-##  1 U.S.  2016-11-03 2016-11-06 ABC New… A+          2220 lv                    47  
-##  2 U.S.  2016-11-01 2016-11-07 Google … B          26574 lv                    38.0
-##  3 U.S.  2016-11-02 2016-11-06 Ipsos    A-          2195 lv                    42  
-##  4 U.S.  2016-11-04 2016-11-07 YouGov   B           3677 lv                    45  
-##  5 U.S.  2016-11-03 2016-11-06 Gravis … B-         16639 rv                    47  
-##  6 U.S.  2016-11-03 2016-11-06 Fox New… A           1295 lv                    48  
-##  7 U.S.  2016-11-02 2016-11-06 CBS New… A-          1426 lv                    45  
-##  8 U.S.  2016-11-03 2016-11-05 NBC New… A-          1282 lv                    44  
-##  9 New … 2016-11-06 2016-11-06 Zia Poll &lt;NA&gt;        8439 lv                    46  
-## 10 U.S.  2016-11-04 2016-11-07 IBD/TIPP A-          1107 lv                    41.2
-## # … with 4,198 more rows, and 8 more variables: rawpoll_trump &lt;dbl&gt;,
-## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
-## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;,
-## #   trump_clinton_diff &lt;dbl&gt;
+##    state      startdate  enddate    pollster         grade samplesize population
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;            &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washin~ A+          2220 lv        
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer~ B          26574 lv        
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos            A-          2195 lv        
+##  4 U.S.       2016-11-04 2016-11-07 YouGov           B           3677 lv        
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing B-         16639 rv        
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anders~ A           1295 lv        
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New Yo~ A-          1426 lv        
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall S~ A-          1282 lv        
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll         &lt;NA&gt;        8439 lv        
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP         A-          1107 lv        
+## # ... with 4,198 more rows, and 9 more variables: rawpoll_clinton &lt;dbl&gt;,
+## #   rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;, trump_clinton_diff &lt;dbl&gt;
 ```
 ]
 
@@ -901,14 +910,15 @@ polls_us_election_2016 %&gt;%
 
 ```
 ## # A tibble: 3 x 16
-##   state startdate  enddate    pollster grade samplesize population rawpoll_clinton
-##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;                &lt;dbl&gt;
-## 1 Iowa  2016-09-09 2016-09-29 Ipsos    A-           343 lv                    42.2
-## 2 Iowa  2016-09-02 2016-09-22 Ipsos    A-           344 lv                    40.5
-## 3 Iowa  2016-08-26 2016-09-15 Ipsos    A-           347 lv                    40.6
-## # … with 8 more variables: rawpoll_trump &lt;dbl&gt;, rawpoll_johnson &lt;dbl&gt;,
-## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
-## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, trump_clinton_diff &lt;dbl&gt;
+##   state startdate  enddate    pollster grade samplesize population
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;     
+## 1 Iowa  2016-09-09 2016-09-29 Ipsos    A-           343 lv        
+## 2 Iowa  2016-09-02 2016-09-22 Ipsos    A-           344 lv        
+## 3 Iowa  2016-08-26 2016-09-15 Ipsos    A-           347 lv        
+## # ... with 9 more variables: rawpoll_clinton &lt;dbl&gt;, rawpoll_trump &lt;dbl&gt;,
+## #   rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;,
+## #   adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;,
+## #   trump_clinton_diff &lt;dbl&gt;
 ```
 ]
 
@@ -1059,7 +1069,7 @@ class: inverse
 
 # Task 1
 
-<div class="countdown" id="timer_613794e9" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6141c2ad" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1123,14 +1133,14 @@ background-size: 150px
     ```
     
     ```
-    ##   country year infant_mortality life_expectancy fertility population         gdp
-    ## 1 Albania 1960            115.4           62.87      6.19    1636054          NA
-    ## 2 Algeria 1960            148.2           47.50      7.65   11124892 13828152297
-    ## 3  Angola 1960            208.0           35.98      7.32    5270844          NA
-    ##   continent          region
-    ## 1    Europe Southern Europe
-    ## 2    Africa Northern Africa
-    ## 3    Africa   Middle Africa
+    ##   country year infant_mortality life_expectancy fertility population
+    ## 1 Albania 1960            115.4           62.87      6.19    1636054
+    ## 2 Algeria 1960            148.2           47.50      7.65   11124892
+    ## 3  Angola 1960            208.0           35.98      7.32    5270844
+    ##           gdp continent          region
+    ## 1          NA    Europe Southern Europe
+    ## 2 13828152297    Africa Northern Africa
+    ## 3          NA    Africa   Middle Africa
     ```
     
     ```r
@@ -1138,12 +1148,12 @@ background-size: 150px
     ```
     
     ```
-    ##        country year infant_mortality life_expectancy fertility population gdp continent
-    ## 10544   Zambia 2016               NA           57.10        NA         NA  NA    Africa
-    ## 10545 Zimbabwe 2016               NA           61.69        NA         NA  NA    Africa
-    ##               region
-    ## 10544 Eastern Africa
-    ## 10545 Eastern Africa
+    ##        country year infant_mortality life_expectancy fertility population gdp
+    ## 10544   Zambia 2016               NA           57.10        NA         NA  NA
+    ## 10545 Zimbabwe 2016               NA           61.69        NA         NA  NA
+    ##       continent         region
+    ## 10544    Africa Eastern Africa
+    ## 10545    Africa Eastern Africa
     ```
 
 ---
@@ -1152,7 +1162,7 @@ class: inverse
 
 # Task 2
 
-<div class="countdown" id="timer_613794cb" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6141c356" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1641,7 +1651,7 @@ class: inverse
 
 # Task 3
 
-<div class="countdown" id="timer_61379626" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6141c117" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1809,7 +1819,7 @@ Given two variables, `table` produces a contingency table:
 ```r
 gapminder_new &lt;- gapminder %&gt;%
   filter(year == 2015) %&gt;%
-  mutate(fertility_above_2 = (gapminder_2015$fertility &gt; 2.1)) # dummy variable for fertility rate above replacement level fertility
+  mutate(fertility_above_2 = (fertility &gt; 2.1)) # dummy variable for fertility rate above replacement level fertility
 table(gapminder_new$fertility_above_2,gapminder_new$continent)
 ```
 
@@ -1942,7 +1952,7 @@ class: inverse
 
 # Task 4
 
-<div class="countdown" id="timer_61379763" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6141c389" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
