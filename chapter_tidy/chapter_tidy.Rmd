@@ -1512,7 +1512,7 @@ Given two variables, `table` produces a contingency table:
 ```{r}
 gapminder_new <- gapminder %>%
   filter(year == 2015) %>%
-  mutate(fertility_above_2 = (gapminder_2015$fertility > 2.1)) # dummy variable for fertility rate above replacement level fertility
+  mutate(fertility_above_2 = (fertility > 2.1)) # dummy variable for fertility rate above replacement level fertility
 table(gapminder_new$fertility_above_2,gapminder_new$continent)
 ```
 
