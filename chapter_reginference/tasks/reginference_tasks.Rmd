@@ -27,15 +27,17 @@ star_df = star_df %>%
 ```
 
 2\. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1,000 samples drawn from `star_df`.  
-*Hint 1*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
-*Hint 2*: in `calculate` set `stat` to `slope` and `order` to `c("TRUE","FALSE")`.
+*Hint 1*: Use mutate to change the type of the `small` variable, and make it numeric.  
+*Hint 2*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
+*Hint 3*: in `calculate` set `stat` to `slope`.
 
 ```{r}
 library(infer)
 bootstrap_distrib <- star_df %>% 
+    mutate(small=as.numeric(small)) %>% 
     specify(response = math, explanatory = small) %>%
     generate(reps = 1000, type = "bootstrap") %>%
-    calculate(stat = "slope", order = c("TRUE","FALSE"))
+    calculate(stat = "slope")
 ```
 
 3\. Plot this simulated sampling distribution and compute mean and the standard error of $b_small$.
