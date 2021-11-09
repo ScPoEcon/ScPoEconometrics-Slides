@@ -693,7 +693,7 @@ class: title-slide-section-red, middle
   $$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_k x_{k,i} + \varepsilon_i$$
 --
 
-  * The classical regression model applies to **correctly specified linear regressions**: your model needs to be linear in parameters, include all relevant variables, and your variables cannot be colinear.
+  * The classical regression model applies to **correctly specified linear regressions**: the model needs to be linear in parameters, include all relevant variables, and variables cannot be collinear.
 
 
 ---
