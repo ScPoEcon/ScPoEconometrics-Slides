@@ -259,9 +259,10 @@ As we did for the sampling distribution of the proportion of *green pasta*, we w
 ```{r, echo=FALSE, fig.height = 4.75, fig.width = 8}
 library(infer)
 bootstrap_distrib = star_df %>% 
+    mutate(small=as.numeric(small)) %>% 
     specify(formula = math ~ small) %>%
     generate(reps = 1000, type = "bootstrap") %>%
-    calculate(stat = "slope", order = c("TRUE","FALSE"))
+    calculate(stat = "slope")
 se_simul = round(sd(bootstrap_distrib$stat),3)
 
 bootstrap_distrib %>%
@@ -363,10 +364,11 @@ round(observed_stat,2)
 
 ```{r}
 null_distribution <- star_df %>% 
+  mutate(small=as.numeric(small)) %>% 
   specify(formula = math ~ small) %>%
   hypothesize(null = "independence") %>% 
   generate(reps = 1000, type = "permute") %>% 
-  calculate(stat = "slope", order = c("TRUE","FALSE"))
+  calculate(stat = "slope")
 ```
 ]
 
@@ -689,30 +691,22 @@ class: title-slide-section-red, middle
   * In the same way, we distinguish $e$, the sample error (*residual*), from $\varepsilon$, the error term from the true population model: 
   
   $$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_k x_{k,i} + \varepsilon_i$$
-  
+--
+
+  * The classical regression model applies to **correctly specified linear regressions**: your model needs to be linear in parameters, include all relevant variables, and your variables cannot be colinear.
+
+
 ---
 
 
 # CRM Assumptions
 
-1. ***No perfect collinearity:*** the data are **not linearly dependent**, that is each variable provides new information on the outcome, and it is not a linear combination of the other variables.
+1. ***Mean Independence:*** the mean of the residuals conditional on $x$ should be zero, $E[\varepsilon|x] = 0$. Notice that this also means that $Cov(\varepsilon,x) = 0$, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
 
 --
 
-2. ***Mean Independence:*** the mean of the residuals conditional on $x$ should be zero, $E[\varepsilon|x] = 0$. Notice that this also means that $Cov(\varepsilon,x) = 0$, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
+* Violating this assumption will lead to **biased** estimates of $\beta_k$.
 
---
-
-3. ***Independently and identically distributed:*** the data are drawn from a **random sample** of size $n$: observation $(x_i,y_i)$ comes from the exact same distribution, and is independent of observation $(x_j,y_j)$, for all $i\neq j$.
-
---
-
-4. ***Homoskedasticity:*** the variance of the error term $\varepsilon$ is the same for each value of $x$: $Var(\varepsilon|x) = \sigma^2$.
-
---
-
-5. ***Normally distributed errors:*** the error term is normally distributed, i.e. $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ 
-  * This last assumption allows avoiding large sample approximations, but it is never used in practice since samples are sufficiently large $(n \ge 30)$.
 
 ---
 
@@ -801,7 +795,7 @@ cond_bad
 
 # Exogeneity Assumption
 
-The CRM assumption #2 is also know as the (strict) **exogeneity assumption**. 
+The CRM assumption #1 is also know as the (strict) **exogeneity assumption**. 
 
 * When this assumption is violated our estimate $b$ will be a ***biased*** estimate of $\beta$, i.e. $\mathop{\mathbb{E}}[b] \neq \beta$
 
@@ -847,13 +841,46 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 * *Interpretation*: taking repeated sample from the population and computing $b_1$ each time, we would **systematically overestimate** the effect of education on wage.
 
+
 ---
 
-# Breaking the other assumptions
+# CRM Assumptions
 
-* You can find examples associated to the other assumptions in our [book](https://scpoecon.github.io/ScPoEconometrics/std-errors.html#class-reg)! 
+1\. ***Mean Independence:*** the mean of the residuals conditional on $x$ should be zero, $E[\varepsilon|x] = 0$. Notice that this also means that $Cov(\varepsilon,x) = 0$, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
 
-* Takeaway: if assumptions violated, inference is invalid!
+
+* Violating this assumption will lead to **biased** estimates of $\beta_k$.
+
+--
+
+2\. ***Independently and identically distributed:*** the data are drawn from a **random sample** of size $n$: observation $(x_i,y_i)$ comes from the exact same distribution, and is **independent** of observation $(x_j,y_j)$, for all $i\neq j$.
+
+--
+
+* Violating this assumption would make your sample less representative of the underlying population. It will lead to **biased** estimates of $\beta_k$.
+
+---
+
+# CRM Assumptions
+
+3\. ***Homoskedasticity:*** the variance of the error term $\varepsilon$ is the same for each value of $x$: $Var(\varepsilon|x) = \sigma^2$.
+
+--
+
+* If this assumption is violated, you can still obtain unbiased estimates of $\beta_k$. However your estimate of $\hat{\textrm{SE}}(b_k)$ will be biased, which will affect your test statistic and p-value.
+
+--
+
+4\. ***Normally distributed errors:*** the error term is normally distributed, i.e. $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ 
+
+--
+
+* Not strictly necessary, but makes inference possible even with small sample sizes.
+ 
+--
+
+
+`r emo::ji("point_right")` Takeaway: **if assumptions violated, inference is invalid!**
 
 ---
 
@@ -1009,7 +1036,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK! (the last one `r emo::ji("cry")`)
+# SEE YOU NEXT WEEK!
 
 
 

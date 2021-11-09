@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Regression Inference
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-04-14
+### SciencesPo Paris </br> 2021-11-09
 
 ---
 
@@ -223,7 +223,7 @@ class:inverse
 
 # Task 1
 
-<div class="countdown" id="timer_6076ad6e" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_618aadca" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -245,7 +245,7 @@ As we did for the sampling distribution of the proportion of *green pasta*, we w
 
 --
 
-***standard error:*** 1.68 `\(\rightarrow\)` very close to the one in the table (1.68)!
+***standard error:*** 1.66 `\(\rightarrow\)` very close to the one in the table (1.68)!
 
 ---
 
@@ -304,7 +304,7 @@ round(observed_stat,2)
 
 ```
 ## smallTRUE 
-##       5.3
+##      5.35
 ```
 ]
 
@@ -339,10 +339,11 @@ round(observed_stat,2)
 
 ```r
 null_distribution &lt;- star_df %&gt;% 
+  mutate(small=as.numeric(small)) %&gt;% 
   specify(formula = math ~ small) %&gt;%
   hypothesize(null = "independence") %&gt;% 
   generate(reps = 1000, type = "permute") %&gt;% 
-  calculate(stat = "slope", order = c("TRUE","FALSE"))
+  calculate(stat = "slope")
 ```
 ]
 
@@ -358,7 +359,7 @@ null_distribution &lt;- null_distribution %&gt;%
   mutate(test_stat = stat/sd(bootstrap_distrib$stat))
 ```
 
-* Remember we got `\(\hat{SE}(b_\textrm{small})\)` = 1.68 from our bootstrap distribution.
+* Remember we got `\(\hat{SE}(b_\textrm{small})\)` = 1.66 from our bootstrap distribution.
 ]
 
   
@@ -386,7 +387,7 @@ Very unlikely to obtain `\(b_\textrm{small}\)` = 8.8951932 when `\(H_0\)` is tru
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.295 **or** superior to 5.295. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.351 **or** superior to 5.351. 
 
 ---
 
@@ -403,7 +404,7 @@ What does the p-value correspond to?
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.3 **or** superior to 5.3. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.35 **or** superior to 5.35. 
 
 * Computing the *p-value* we get:
 
@@ -429,7 +430,7 @@ p_value
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
-* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.3 **or** superior to 5.3. 
+* To decide if we reject `\(H_0\)`, recall we are considering a **two-sided test** here: *more extreme* means inferior to -5.35 **or** superior to 5.35. 
 
 * Computing the *p-value* we get:
 
@@ -564,7 +565,7 @@ bootstrap_distrib %&gt;%
 ## # A tibble: 1 x 2
 ##   lower_bound upper_bound
 ##         &lt;dbl&gt;       &lt;dbl&gt;
-## 1        5.60        12.2
+## 1        5.64        12.2
 ```
 ]
 
@@ -578,7 +579,7 @@ class:inverse
 
 # Task 2
 
-<div class="countdown" id="timer_6076abb8" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_618aad86" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -643,30 +644,22 @@ class: title-slide-section-red, middle
   * In the same way, we distinguish `\(e\)`, the sample error (*residual*), from `\(\varepsilon\)`, the error term from the true population model: 
   
   `$$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_k x_{k,i} + \varepsilon_i$$`
-  
+--
+
+  * The classical regression model applies to **correctly specified linear regressions**: your model needs to be linear in parameters, include all relevant variables, and your variables cannot be colinear.
+
+
 ---
 
 
 # CRM Assumptions
 
-1. ***No perfect collinearity:*** the data are **not linearly dependent**, that is each variable provides new information on the outcome, and it is not a linear combination of the other variables.
+1. ***Mean Independence:*** the mean of the residuals conditional on `\(x\)` should be zero, `\(E[\varepsilon|x] = 0\)`. Notice that this also means that `\(Cov(\varepsilon,x) = 0\)`, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
 
 --
 
-2. ***Mean Independence:*** the mean of the residuals conditional on `\(x\)` should be zero, `\(E[\varepsilon|x] = 0\)`. Notice that this also means that `\(Cov(\varepsilon,x) = 0\)`, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
+* Violating this assumption will lead to **biased** estimates of `\(\beta_k\)`.
 
---
-
-3. ***Independently and identically distributed:*** the data are drawn from a **random sample** of size `\(n\)`: observation `\((x_i,y_i)\)` comes from the exact same distribution, and is independent of observation `\((x_j,y_j)\)`, for all `\(i\neq j\)`.
-
---
-
-4. ***Homoskedasticity:*** the variance of the error term `\(\varepsilon\)` is the same for each value of `\(x\)`: `\(Var(\varepsilon|x) = \sigma^2\)`.
-
---
-
-5. ***Normally distributed errors:*** the error term is normally distributed, i.e. `\(\varepsilon \sim \mathcal{N}(0,\sigma^2)\)` 
-  * This last assumption allows avoiding large sample approximations, but it is never used in practice since samples are sufficiently large `\((n \ge 30)\)`.
 
 ---
 
@@ -685,7 +678,7 @@ class: title-slide-section-red, middle
 
 # Exogeneity Assumption
 
-The CRM assumption #2 is also know as the (strict) **exogeneity assumption**. 
+The CRM assumption #1 is also know as the (strict) **exogeneity assumption**. 
 
 * When this assumption is violated our estimate `\(b\)` will be a ***biased*** estimate of `\(\beta\)`, i.e. `\(\mathop{\mathbb{E}}[b] \neq \beta\)`
 
@@ -731,13 +724,46 @@ The CRM assumption #2 is also know as the (strict) **exogeneity assumption**.
 
 * *Interpretation*: taking repeated sample from the population and computing `\(b_1\)` each time, we would **systematically overestimate** the effect of education on wage.
 
+
 ---
 
-# Breaking the other assumptions
+# CRM Assumptions
 
-* You can find examples associated to the other assumptions in our [book](https://scpoecon.github.io/ScPoEconometrics/std-errors.html#class-reg)! 
+1\. ***Mean Independence:*** the mean of the residuals conditional on `\(x\)` should be zero, `\(E[\varepsilon|x] = 0\)`. Notice that this also means that `\(Cov(\varepsilon,x) = 0\)`, i.e. that the errors and our explanatory variable(s) should be *uncorrelated*.
 
-* Takeaway: if assumptions violated, inference is invalid!
+
+* Violating this assumption will lead to **biased** estimates of `\(\beta_k\)`.
+
+--
+
+2\. ***Independently and identically distributed:*** the data are drawn from a **random sample** of size `\(n\)`: observation `\((x_i,y_i)\)` comes from the exact same distribution, and is **independent** of observation `\((x_j,y_j)\)`, for all `\(i\neq j\)`.
+
+--
+
+* Violating this assumption would make your sample less representative of the underlying population. It will lead to **biased** estimates of `\(\beta_k\)`.
+
+---
+
+# CRM Assumptions
+
+3\. ***Homoskedasticity:*** the variance of the error term `\(\varepsilon\)` is the same for each value of `\(x\)`: `\(Var(\varepsilon|x) = \sigma^2\)`.
+
+--
+
+* If this assumption is violated, you can still obtain unbiased estimates of `\(\beta_k\)`. However your estimate of `\(\hat{\textrm{SE}}(b_k)\)` will be biased, which will affect your test statistic and p-value.
+
+--
+
+4\. ***Normally distributed errors:*** the error term is normally distributed, i.e. `\(\varepsilon \sim \mathcal{N}(0,\sigma^2)\)` 
+
+--
+
+* Not strictly necessary, but makes inference possible even with small sample sizes.
+ 
+--
+
+
+👉 Takeaway: **if assumptions violated, inference is invalid!**
 
 ---
 
@@ -745,7 +771,7 @@ class:inverse
 
 # Task 3.1
 
-<div class="countdown" id="timer_6076acac" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_618aac6b" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -773,7 +799,7 @@ class:inverse
 
 # Task 3.2
 
-<div class="countdown" id="timer_6076ad7d" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_618aacbe" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -877,7 +903,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK! (the last one 😢)
+# SEE YOU NEXT WEEK!
 
 
 
