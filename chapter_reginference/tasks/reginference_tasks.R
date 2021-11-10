@@ -13,9 +13,10 @@ star_df = star_df %>%
 # Q2
 library(infer)
 bootstrap_distrib <- star_df %>% 
+    mutate(small=as.numeric(small)) %>% 
     specify(response = math, explanatory = small) %>%
     generate(reps = 1000, type = "bootstrap") %>%
-    calculate(stat = "slope", order = c("TRUE","FALSE"))
+    calculate(stat = "slope")
  
 # Q3
 bootstrap_distrib %>%
@@ -98,11 +99,11 @@ intercept_men_bootstrap
 slope_men_bootstrap <- tidy(reg_bootsrap) %>% filter(term == "education") %>% select(estimate) %>% pull()
 slope_men_bootstrap
 
-intercept_men_bootstrap = reg_bootstrap_sample$coefficients[1]
-slope_men_bootstrap = reg_bootstrap_sample$coefficients[3]
+intercept_men_bootstrap = reg_bootsrap$coefficients[1]
+slope_men_bootstrap = reg_bootsrap$coefficients[3]
 
-intercept_women_bootstrap = reg_bootstrap_sample$coefficients[1] + reg_bootstrap_sample$coefficients[2]
-slope_women_bootstrap = reg_bootstrap_sample$coefficients[3] + reg_bootstrap_sample$coefficients[4]
+intercept_women_bootstrap = reg_bootsrap$coefficients[1] + reg_bootsrap$coefficients[2]
+slope_women_bootstrap = reg_bootsrap$coefficients[3] + reg_bootsrap$coefficients[4]
 
 # Q3.4
 cps %>%
