@@ -572,7 +572,7 @@ In other words, 95% of the time, the 95% confidence interval will contain the tr
   
 --
 
-***Impact of sample size:*** the greater the confidence level, the wider the confidence intervals.
+***Impact of sample size:*** the greater the sample size, the narrower the confidence intervals.
 
   * *Inutuition*: a larger sample size leads to less sampling variation and therefore a narrower boostrap distribution, which in turn leads to thiner confidence intervals.
   

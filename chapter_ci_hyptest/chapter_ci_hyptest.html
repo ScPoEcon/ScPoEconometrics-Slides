@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Confidence Intervals and Hypothesis Testing
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-04-07
+### SciencesPo Paris </br> 2021-10-26
 
 ---
 
@@ -320,6 +320,7 @@ head(bootstrap_distrib)
 ```
 
 ```
+## Response: color (factor)
 ## # A tibble: 6 x 2
 ##   replicate  stat
 ##       &lt;int&gt; &lt;dbl&gt;
@@ -512,7 +513,7 @@ In other words, 95% of the time, the 95% confidence interval will contain the tr
   
 --
 
-***Impact of sample size:*** the greater the confidence level, the wider the confidence intervals.
+***Impact of sample size:*** the greater the sample size, the narrower the confidence intervals.
 
   * *Inutuition*: a larger sample size leads to less sampling variation and therefore a narrower boostrap distribution, which in turn leads to thiner confidence intervals.
   
