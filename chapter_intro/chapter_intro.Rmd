@@ -1,11 +1,11 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Introduction"
-author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
 date: "Sciences Po Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
-    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
+    # chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
@@ -37,16 +37,13 @@ knitr::opts_chunk$set(
 )
 
 # Load packages
-library(dplyr)
-library(magrittr)
 library(tidyverse)
 library(pander)
 library(ggthemes)
-library(maptools)
-library(knitr)
-library(xaringan)
+library(gapminder)
 library(emo)
 library(countdown)
+library(xaringanExtra)
 
 # countdown style
 countdown(
@@ -76,15 +73,7 @@ countdown(
 
 ## What is *econometrics*?
 
-<blockquote>
-<span style = "font-style: italic; font-weight: bold; color: #d90502">
-The method of econometric research aims, essentially, at a conjunction of economic theory and actual measurements, using the theory and technique of statistical inference as a bridge pier.</span>
-.right[<span style="font-style:italic; font-size: 18px">Haavelmo (1944). The Probability Approach to Econometrics.</span>]
-</blockquote>
-
---
-
-- A set of ***techniques and methods*** to answer (generally) economic questions with ***data***.
+- A set of ***techniques and methods*** to answer (economic) questions with ***data***.
 
 - Some examples!
 
@@ -93,46 +82,50 @@ The method of econometric research aims, essentially, at a conjunction of econom
 # Answering Important Questions with Econometrics
 
 [<ru-blockquote>
-Does immigration *cause* lower wages and higher unemployment for locals?
+Does immigration *lead to* lower wages and/or higher unemployment for locals?
 </ru-blockquote>](http://davidcard.berkeley.edu/papers/mariel-impact.pdf)
 
 --
 
 [<ru-blockquote>
-Does raising the minimum wage *cause* reduced employment for the low-skilled?
+Does raising the minimum wage *reduce* employment for the low-skilled?
 </ru-blockquote>](http://davidcard.berkeley.edu/papers/njmin-aer.pdf)
 
 --
 
 [<ru-blockquote>
-Does more education *cause* higher wages and better jobs?
+Does getting a college degree *afford* higher wages?
 </ru-blockquote>](http://davidcard.berkeley.edu/papers/causal_educ_earnings.pdf)
 
 --
 
 [<ru-blockquote>
-Does higher public debt levels *cause* lower economic growth?
+Does higher public debt levels *lead to* lower economic growth?
 </ru-blockquote>](https://www.imf.org/external/pubs/ft/wp/2014/wp1434.pdf)
 
 --
 
 [<ru-blockquote>
-Does birth order *cause* differing education and employment oucomes?
-</ru-blockquote>](https://academic.oup.com/qje/article/120/2/669/1933962)
+Does the neighborhood you grew up in have an *impact* on your life outcomes?
+</ru-blockquote>](https://academic.oup.com/qje/article/133/3/1107/4850660)
 
 ---
 
 # Causality
 
-* Notice the keyword ***cause*** in all of the above.
+* Notice that ***many other factors could have caused*** each of the outcomes mentioned.
 
-* Notice also that ***many other factors could have caused*** each of those outcomes.
+--
+
+* Want to focus on ***causal impact*** of just one of these factors (immigration, minimum wage, education ,etc.)
 
 --
 
 * Econometrics is often about spelling out ***conditions*** under which we can ***claim to measure causal relationships***.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
+
+* ["Credibility Revolution"](https://www.aeaweb.org/articles?id=10.1257/jep.24.2.3) in econometrics over the past 30 years ([2022 Economics Nobel](https://www.nobelprize.org/prizes/economic-sciences/2021/press-release/) awarded to some of the main protagonists of this "revolution")
 
 ---
 
@@ -176,38 +169,38 @@ layout: true
 
 --
 
-1. If you put in the work<sup>2</sup>, you will come away with a __very valuable and marketable__ tool.
+1. If you put in the work<sup>2</sup>, you will come away with a __very valuable and useful__ tool.
 
 .footnote[
 <span style="visibility:hidden">[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).</span>  
 [2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`
 ]
 
----
+<!-- --- -->
 
-# Why can't we just use Excel?
+<!-- # Why can't we just use Excel? -->
 
-Many reasons but here are just a few:
+<!-- Many reasons but here are just a few: -->
 
---
+<!-- -- -->
 
-- Not ***reproducible***.
+<!-- - Not ***reproducible***. -->
 
---
+<!-- -- -->
 
-- Not straightforward to ***merge*** datasets together.
+<!-- - Not straightforward to ***merge*** datasets together. -->
 
---
+<!-- -- -->
 
-- Very fastidious to ***clean*** data.
+<!-- - Very fastidious to ***clean*** data. -->
 
---
+<!-- -- -->
 
-- Limited to ***small datasets***.
+<!-- - Limited to ***small datasets***. -->
 
---
+<!-- -- -->
 
-- Not designed for proper ***econometric analyses***, maps, complex visualisations, etc.
+<!-- - Not designed for proper ***econometric analyses***, maps, complex visualisations, etc. -->
 
 ---
 
@@ -220,34 +213,35 @@ class: title-slide-section-red, middle
 
 layout: true
 
-<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div>
 
 ---
 
 # Showcase #1: Spatial Data
 
+* You can (relatively) easily produce nice looking maps! You will create your own in the midterm `r emo::ji("ok_hand")`
+
 .pull-left[
 
-* `R` is very strong with spatial data. In particular via the [`sf`](https://cran.r-project.org/web/packages/sf/index.html) package.
-
-* We can represent _any_ shape or geometry.
-
-* Maps are the most obvious example:
-```{r, eval = FALSE}
+```{r iris_map, eval = FALSE}
 library(sf)
-library(tmap)
-iris_shfl <- read_sf("chapter_intro_files/figure-html/contours_iris_2015/CONTOURS-IRIS.shp") %>%
-  mutate(dep = substr(INSEE_COM,1,2)) %>%
-  select(CODE_IRIS, dep, geometry) %>%
-  filter(dep == "75")
-iris_income <- readRDS("../rds/iris_inc.rds") %>%
-  mutate(CODE_IRIS = IRIS) %>%
-  select(CODE_IRIS, DISP_MED15)
-iris_map <- left_join(iris_shfl, iris_income, by = "CODE_IRIS")
-tmap_mode("plot")
-tm_shape(iris_map) +
-  tm_borders() +
-  tm_fill(col = "DISP_MED15", title = "Median household income (euros)")
+library(tidyverse)
+
+iris_2021 <- read_sf("code/contours_iris_2021/CONTOURS-IRIS.shp")
+median_inc_paris <- read.csv("code/median_inc_paris.csv", colClasses = ("IRIS" = "character"))
+
+iris_2021_paris <- iris_2021 %>%
+    mutate(dep = substr(INSEE_COM, 1, 2)) %>%
+    filter(dep == "75")
+iris_map <- left_join(iris_2021_paris, median_inc_paris)
+
+iris_map %>%
+    ggplot(aes(fill = median_inc_bins)) +
+    geom_sf(size = .25) +
+    scale_fill_manual(values = c("#FFFFCC", "#F6D868", "#E79652", "#CD524C", "#70372D", "#191900", "grey")) +
+    labs(fill = "Median household income (euros)") +
+    theme_void() +
+    theme(legend.position = "top")
 ```
 ]
 
@@ -255,21 +249,7 @@ tm_shape(iris_map) +
 
 .pull-right[
 
-* Can be improved but you get this with only __13 lines of code!__
-
-```{r, echo = FALSE}
-library(sf)
-library(tmap)
-iris_shfl <- read_sf("../rds/iris_shapefile_2015.shp")
-iris_income <- readRDS("../rds/iris_inc.rds") %>%
-  mutate(CODE_IRIS = IRIS) %>%
-  select(CODE_IRIS, DISP_MED15)
-iris_map <- left_join(iris_shfl, iris_income, by = "CODE_IRIS")
-tmap_mode("plot")
-tm_shape(iris_map) +
-  tm_borders() +
-  tm_fill(col = "DISP_MED15",
-          title = "Median household income (euros)")
+```{r iris_map_out, ref.label = "iris_map", echo = FALSE}
 ```
 ]
 
@@ -311,7 +291,7 @@ knitr::include_url("https://francestrategie.shinyapps.io/app_seg/")
 # load gapminder package
 library(gapminder)
 # load the dataset in object gapminder
-gapminder = gapminder::gapminder
+gapminder = gapminder
 # display variables in the dataset
 names(gapminder)
 # show first 4 lines of this dataframe
@@ -333,16 +313,16 @@ head(gapminder,n = 4)
 * Here we will only focus on the `dplyr` way:
 
 ```{r}
-  # compute the required statistics
+# compute the required statistics
 gapminder_dplyr <- gapminder %>% 
   group_by(continent, year) %>% 
   summarise(count = n(),
-            mean_lifeexp = mean(lifeExp, na.rm = TRUE),
-            mean_gdppercap = mean(gdpPercap, na.rm = TRUE))
+            mean_lifeexp = mean(lifeExp),
+            mean_gdppercap = mean(gdpPercap))
 ```
 
 ```{r}
-  # show first 5 lines of this dataframe
+# show first 5 lines of the new data
 head(gapminder_dplyr, n = 5)
 ```
 
@@ -355,7 +335,7 @@ head(gapminder_dplyr, n = 5)
 
 * Nothing beats a picture, though:
 
-```{r,eval = FALSE}
+```{r gampminder_plot, eval = FALSE}
 ggplot(data = gapminder_dplyr, 
        mapping = aes(x = mean_lifeexp,
                      y = mean_gdppercap,
@@ -370,17 +350,7 @@ ggplot(data = gapminder_dplyr,
 ]
 
 .pull-right[
-```{r, echo = FALSE, fig.h}
-ggplot(data = gapminder_dplyr, 
-       mapping = aes(x = mean_lifeexp,
-                     y = mean_gdppercap,
-                     color = continent,
-                     size = count)) +
-  geom_point(alpha = 1/3) +
-  labs(x = "Average life expectancy",
-       y = "Average GDP per capita",
-       color = "Continent",
-       size = "Nb of countries")
+```{r gampminder_plot, echo = FALSE}
 ```
 ]
 
@@ -472,30 +442,25 @@ knitr::include_graphics("chapter_intro_files/figure-html/rstudio.png")
 
 # R as a Calculator
 
-.pull-left[
-
 * You can use the `R` console like a calculator
 
 * Just type an arithmetic operation after `>` and hit `Enter`!
 
-]
-
 --
 
-.pull-right[
 * Some basic arithmetic first:
-    ```{r}
-    4 + 1
-    8 / 2
-    ```
+```{r}
+4 + 1
+8 / 2
+```
 
 
 * Great! What about this?
-    ```{r}
-    log(exp(1))
-    # by the way: this is a comment! (R disregards it)
-    ```
-]
+```{r}
+2^3
+# by the way: this is a comment! R therefore disregards it
+```
+
 ---
 
 class: inverse
@@ -506,19 +471,19 @@ class: inverse
 
 1. Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
 
-1. Write in your script and run the following code: (`Ctrl` or `Cmd` + `Enter`)
+1. Type the following code in your script and run it. To run the code press `Ctrl` or `Cmd` + `Enter` (you can either highlight the code or just put your cursor at the end of the line)
     ```{r, eval = F}
     4 * 8
     ```
 
-1. Write in your script and run the following code. What happens if you only run the first line of the code?
+1. Type the following code in your script and run it. What happens if you only run the first line of the code?
     ```{r, eval = F}
     x = 5 # equivalently x <- 5
     x
     ```
 Congratulations, you have created your first `R` "object"! Everything is an object in R! Objects are assigned using `=` or `<-`.
 
-1. Lastly, find the cube of `x` and assign that value to `x_3`.
+1. Create a new object named `x_3` to which you assign the cube of `x`. Note that to assign you need to use `=` or `<-`. Use code to compute the cube, not a calculator.
 
 ---
 
@@ -566,17 +531,19 @@ In practice:
 
 # Vectors
 
-* What *is* a **vector**?
-
-* The `c` function creates vectors.
+* The `c` function creates vectors, i.e. an array of elements.
     ```{r}
     c(1, 3, 5, 7, 8, 9)
     ```
+    
+--
 
 * Coercion to unique types:
     ```{r}
     c(42, "Statistics", TRUE)
     ```
+
+--
 
 * Creating a *range*
     ```{r}
@@ -592,7 +559,7 @@ In practice:
 ```{r}
 example_data = data.frame(x = c(1, 3, 5, 7),
                           y = c(rep("Hello", 3), "Goodbye"),
-                          z = sample(c(TRUE,FALSE),size=4,replace=TRUE))
+                          z = c("one", 2, "three", 4))
 example_data
 ```
 
@@ -607,14 +574,12 @@ class: inverse
 `r countdown(minutes = 7, top = 0)`
 
 ```{r, echo=F}
-library(dslabs)
-data("murders")
-murders <- murders
+murders <- read.csv("https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1")
 ```
 
-1. Find out (using `help()` or google) how to import a .csv file.
+1. Find out (using `help()` or google) how to import a .csv file. Do NOT use the "Import Dataset" button, nor install a package.
 
-1. Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=`).
+1. Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=` or `<-`).
 
 1. Ensure that `murders` is a data.frame by running:
     ```{r,eval=F}
@@ -663,17 +628,28 @@ ncol(murders) # number of columns
 
 # Data on Gun Murders in the US
     
-* To access one of the variables **as a vector**, we use the `$` operator as in `murders$state`. We can check the type of `murders$state` with
+* To access one of the variables **as a vector** we use the `$` operator as in `murders$state`.
     ```{r}
-    class(murders$state)  # type of the state variable in the murders data.frame
+    murders$state
     ```
 
 --
 
+.pull-left[
+* We can check the type of `murders$state` with
+    ```{r}
+    class(murders$state)
+    ```
+]
+
+--
+
+.pull-right[
 * Or we use the column name or index: `murders[,"state"]` or `murders[,1]`
     ```{r}
-    class(murders[,"state"])  # type of the state variable in the murders data.frame
+    class(murders[,"state"])
     ```
+]
 
 ---
 
@@ -700,18 +676,16 @@ class: inverse
 
 1. How many variables? What are the data types of each variable?
 
-1. Remember that the colon operator `a:b` is just short for *construct a sequence from `a` to `b`*. Create a new object `murders_2` containing the rows 10 to 25 of `murders`.
+1. Remember that the colon operator `1:10` is just short for *construct a sequence from `1` to `10`* (i.e. 1, 2, 3, etc). Create a new object `murders_2` containing the rows 10 to 25 of `murders`.
 
 1. Create a new object `murders_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
 
-1. What is the average value of `total` for state's in the "South", i.e. with `region == "South"`?
-
-1. Create a `total_percap` variable equal to the number of murders per 10,000 inhabitants:
+1. Create a `total_percap` variable equal to the number of murders per 10,000 inhabitants by running the follwoing code.
     ```{r}
     murders$total_percap = (murders$total / murders$population) * 10000
     ```
 
-Congratulations, you've created your first variable!
+Congratulations, you've created your first variable! Click on the `murders` object to see the new variable.
 
 ---
 
