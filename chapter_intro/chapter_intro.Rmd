@@ -680,7 +680,7 @@ class: inverse
 
 1. Create a new object `murders_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
 
-1. Create a `total_percap` variable equal to the number of murders per 10,000 inhabitants by running the follwoing code.
+1. Create a `total_percap` variable equal to the number of murders per 10,000 inhabitants by running the following code.
     ```{r}
     murders$total_percap = (murders$total / murders$population) * 10000
     ```
