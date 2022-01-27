@@ -19,7 +19,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Introduction
 ### Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu
-### Sciences Po Paris </br> 2022-01-20
+### Sciences Po Paris </br> 2022-01-27
 
 ---
 
@@ -136,7 +136,7 @@ layout: true
 
 --
 
-1. `R` is very __flexible and powerful__—adaptable to nearly any task, _e.g._, data cleaning, data visualization, econometrics, spatial data analysis, machine learning, web scraping, ...
+1. `R` is very __flexible and powerful__—adaptable to nearly any task, (data cleaning, data visualization, econometrics, spatial data analysis, machine learning, web scraping, etc.)
 
 --
 
@@ -182,62 +182,13 @@ layout: true
 layout: false
 class: title-slide-section-red, middle
 
-# R SHOWCASE
+# First Taste of R 
 
 ---
 
 layout: true
 
 &lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt;
-
----
-
-# Showcase #1: Spatial Data
-
-* You can (relatively) easily produce nice looking maps! You will create your own in the midterm 👌
-
-.pull-left[
-
-
-```r
-library(sf)
-library(tidyverse)
-
-iris_2021 &lt;- read_sf("code/contours_iris_2021/CONTOURS-IRIS.shp")
-median_inc_paris &lt;- read.csv("code/median_inc_paris.csv", colClasses = ("IRIS" = "character"))
-
-iris_2021_paris &lt;- iris_2021 %&gt;%
-    mutate(dep = substr(INSEE_COM, 1, 2)) %&gt;%
-    filter(dep == "75")
-iris_map &lt;- left_join(iris_2021_paris, median_inc_paris)
-
-iris_map %&gt;%
-    ggplot(aes(fill = median_inc_bins)) +
-    geom_sf(size = .25) +
-    scale_fill_manual(values = c("#FFFFCC", "#F6D868", "#E79652", "#CD524C", "#70372D", "#191900", "grey")) +
-    labs(fill = "Median household income (euros)") +
-    theme_void() +
-    theme(legend.position = "top")
-```
-]
-
---
-
-.pull-right[
-
-&lt;img src="chapter_intro_files/figure-html/iris_map_out-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-# Showcase #2: Interactive Web Applications
-
---
-
-[France Stratégie](https://strategie.gouv.fr/) has created a [simple web application](http://segregationresidentielle.strategie.gouv.fr/app_seg) to visualize the evolution of residential segregation in France between 1968 and 2015.
-
-
-&lt;iframe src="https://francestrategie.shinyapps.io/app_seg/" width="100%" height="400px" data-external="1" style="border: none;"&gt;&lt;/iframe&gt;
 
 ---
 
@@ -264,8 +215,8 @@ iris_map %&gt;%
 ```r
 # load gapminder package
 library(gapminder)
-# load the dataset in object gapminder
-gapminder = gapminder
+# load the dataset from the gapminder package
+data(gapminder, package = "gapminder") 
 # display variables in the dataset
 names(gapminder)
 # show first 4 lines of this dataframe
@@ -454,7 +405,7 @@ class: inverse
 
 # Task 1
 
-<div class="countdown" id="timer_61e97885" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_61f2e432" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -589,7 +540,7 @@ class: inverse
 
 # Task 2
 
-<div class="countdown" id="timer_61e97723" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_61f2e61b" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -757,7 +708,7 @@ class: inverse
 
 # Task 3
 
-<div class="countdown" id="timer_61e9771f" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_61f2e403" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 

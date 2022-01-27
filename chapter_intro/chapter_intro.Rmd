@@ -161,7 +161,7 @@ layout: true
 
 --
 
-1. `R` is very __flexible and powerful__—adaptable to nearly any task, _e.g._, data cleaning, data visualization, econometrics, spatial data analysis, machine learning, web scraping, ...
+1. `R` is very __flexible and powerful__—adaptable to nearly any task, (data cleaning, data visualization, econometrics, spatial data analysis, machine learning, web scraping, etc.)
 
 --
 
@@ -207,64 +207,13 @@ layout: true
 layout: false
 class: title-slide-section-red, middle
 
-# R SHOWCASE
+# First Taste of R 
 
 ---
 
 layout: true
 
 <div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div>
-
----
-
-# Showcase #1: Spatial Data
-
-* You can (relatively) easily produce nice looking maps! You will create your own in the midterm `r emo::ji("ok_hand")`
-
-.pull-left[
-
-```{r iris_map, eval = FALSE}
-library(sf)
-library(tidyverse)
-
-iris_2021 <- read_sf("code/contours_iris_2021/CONTOURS-IRIS.shp")
-median_inc_paris <- read.csv("code/median_inc_paris.csv", colClasses = ("IRIS" = "character"))
-
-iris_2021_paris <- iris_2021 %>%
-    mutate(dep = substr(INSEE_COM, 1, 2)) %>%
-    filter(dep == "75")
-iris_map <- left_join(iris_2021_paris, median_inc_paris)
-
-iris_map %>%
-    ggplot(aes(fill = median_inc_bins)) +
-    geom_sf(size = .25) +
-    scale_fill_manual(values = c("#FFFFCC", "#F6D868", "#E79652", "#CD524C", "#70372D", "#191900", "grey")) +
-    labs(fill = "Median household income (euros)") +
-    theme_void() +
-    theme(legend.position = "top")
-```
-]
-
---
-
-.pull-right[
-
-```{r iris_map_out, ref.label = "iris_map", echo = FALSE}
-```
-]
-
----
-
-# Showcase #2: Interactive Web Applications
-
---
-
-[France Stratégie](https://strategie.gouv.fr/) has created a [simple web application](http://segregationresidentielle.strategie.gouv.fr/app_seg) to visualize the evolution of residential segregation in France between 1968 and 2015.
-
-
-```{r, echo = F, out.extra = 'style="border: none;"', out.height = "100%"}
-knitr::include_url("https://francestrategie.shinyapps.io/app_seg/")
-```
 
 ---
 
@@ -290,8 +239,8 @@ knitr::include_url("https://francestrategie.shinyapps.io/app_seg/")
 ```{r, gapminder, echo = T, eval = F}
 # load gapminder package
 library(gapminder)
-# load the dataset in object gapminder
-gapminder = gapminder
+# load the dataset from the gapminder package
+data(gapminder, package = "gapminder") 
 # display variables in the dataset
 names(gapminder)
 # show first 4 lines of this dataframe
