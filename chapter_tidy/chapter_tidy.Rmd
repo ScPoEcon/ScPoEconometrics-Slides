@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Tidying, Visualising and Summarising Data"
-author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -115,7 +115,7 @@ layout: true
 
 --
 
-* Also check out this great "cheatsheet" [here](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf)
+* Also check out this great "cheatsheet" [here](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf).
 
 --
 
@@ -140,7 +140,7 @@ $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}
 
 # Main `dplyr` Verbs
 
-1. `filter()`: Choose observations based on a certain value (i.e. subset)
+1. `filter()`: Choose observations based on a certain condition (i.e. subset)
 
 --
 
@@ -164,21 +164,31 @@ $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}
 
 ---
 
-# Data on 2016 US election polls from the `dslabs` package
+# Data: 2016 US election polls from the `dslabs` package
 
 * This dataset contains __real__ data on polls made during the 2016 US Presidential elections and compiled by [fivethirtyeight](fivethirtyeight.com)
 
 ```{r dslabs, echo = TRUE}
 library(dslabs)
 library(tidyverse)
-data(polls_us_election_2016) # this data is from fivethirtyeight.com
-polls_us_election_2016 <- as_tibble(polls_us_election_2016)
+data(polls_us_election_2016, package = "dslabs") # load data from package
+polls_us_election_2016 <- as_tibble(polls_us_election_2016) # convert to a tibble
 head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
 ```
 
 `r emo::ji("rotating_light")` This is a `tibble` (more informative than `data.frame`)
 
+---
+
+# Data: 2016 US election polls from the `dslabs` package
+
 What variables does this dataset contain?
+
+```{r}
+str(polls_us_election_2016)
+```
+
+
 
 ---
 
@@ -201,40 +211,40 @@ filter()
 ---
 
 .right-wide[
-*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+*Example:* Which polls had a sample size of at least 2,000 people?
 ]
 
 ---
 
 .right-wide[
-*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+*Example:* Which polls had a sample size of at least 2,000 people?
 ]
 
 .right-wide[
 ```{r, eval=FALSE}
-polls_us_election_2016
+polls_us_election_2016 #<<
 ```
 
 ```{r, echo=FALSE}
-polls_us_election_2016
+polls_us_election_2016 #<<
 ```
 ]
 
 ---
 
 .right-wide[
-*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+*Example:* Which polls had a sample size of at least 2,000 people?
 ]
 
 .right-wide[
 ```{r, eval=FALSE}
 polls_us_election_2016 %>%
-  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45) #<<
+  filter(samplesize > 2000) #<<
 ```
 
 ```{r, echo=FALSE}
 polls_us_election_2016 %>%
-  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
+  filter(samplesize > 2000)
 ```
 ]
 
@@ -263,6 +273,46 @@ Logical operators:
 3 %in% 1:3
 c(2,5) %in% 2:10  # also vectorized
 c("S","Po") %in% c("Sciences","Po")  # also strings
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 #<<
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016 #<<
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 %>%
+  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45) #<<
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016 %>%
+  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
 ```
 ]
 
@@ -658,14 +708,14 @@ Works for all `dplyr` verbs:
 .pull-left[
 ```{r, eval = FALSE}
 polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) #<<
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) #<<
 ```
 ]
 
 .pull-right[
 ```{r, echo = FALSE}
 polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)
 ```
 ]
 
@@ -676,20 +726,20 @@ Works for all `dplyr` verbs:
 .pull-left[
 ```{r, eval = FALSE}
 polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
-  filter(trump_clinton_diff>5 & #<<
-        state == "Iowa" & #<<
-        is.na(rawpoll_johnson)) #<<
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 & #<<
+           state == "Iowa" & #<<
+           is.na(rawpoll_johnson)) #<<
 ```
 ]
 
 .pull-right[
 ```{r, echo = FALSE}
 polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)%>%
-  filter(trump_clinton_diff>5 &
-        state == "Iowa" &
-        is.na(rawpoll_johnson))
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson))
 ```
 ]
 
@@ -700,22 +750,22 @@ Works for all `dplyr` verbs:
 .pull-left[
 ```{r, eval = FALSE}
 polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
-  filter(trump_clinton_diff>5 &
-        state == "Iowa" &
-        is.na(rawpoll_johnson)) %>%
-  select(pollster) #<<
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    select(pollster) #<<
 ```
 ]
 
 .pull-right[
 ```{r, echo = FALSE}
 polls_us_election_2016 %>%
-  mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)%>%
-  filter(trump_clinton_diff>5 &
-        state == "Iowa" &
-        is.na(rawpoll_johnson)) %>%
-  select(pollster)
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    select(pollster) #<<
 ```
 ]
 
@@ -792,19 +842,22 @@ layout: true
 
 class: inverse
 
-# Task 1
+# Task 1: Data wrangling
 
 `r countdown(minutes = 10, top = 0)`
 
-Load the data as explained on slide 8.
+Load the data by running the following code:
 
-1. How many polls have a missing `grade`?
+```{r, echo = T, eval = F}
+library(dslabs)
+data(polls_us_election_2016)
+```
 
-1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016?
+1. Which polls had a missing `grade`?
 
-1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) had a sample size greater than 1,000?
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016? (*Hint: for (i) `%in%` might come in handy. Recall that vectors are created using the `c()` function. For (iii) make sure to check the format of the variable containing the poll's start date.*)
 
-1. Which polls (i) did not poll for vote intentions for Johnson, (ii) had a difference in raw poll vote shares between Trump and Clinton greater than 5, and (iii) were done in the state of Iowa?
+1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) were done in the state of Ohio?  (*Hint: it might be practical to first create a variable containing the combined raw poll vote share for Trump and Clinton and then filter.*)
 
 1. Which state had the highest average Trump vote share for polls which had at least a sample size of 2,000? (*Hint: you'll have to use `filter`, `group_by`, `summarise` and `arrange`. To obtain ranking in descending order check `arrange`'s help page.*)
 
@@ -838,10 +891,10 @@ background-size: 150px
 
 # The `gapminder` dataset: Overview
 
-* Let's first load a dataset with these commands:
+* Let's first load the `gapminder` dataset with these commands:
     ```{r, echo = TRUE, eval = FALSE}
     library(dslabs)
-    gapminder <- gapminder
+    data(gapminder, package = "dslabs")
     ```
     
     ```{r, echo = FALSE, eval = TRUE}
@@ -860,22 +913,23 @@ background-size: 150px
 
 class: inverse
 
-# Task 2
+# Task 2: Understanding the data
 
 `r countdown(minutes = 5, top = 0)`
 
-1. What variables does this dataset contain?
+Load the data by running the following code:
 
-1. How are the data stored?
+```{r, echo = T, eval = F}
+library(dslabs)
+data(gapminder, package = "dslabs")
+```
 
-1. Create a new variable called `gdppercap` corresponding to `gdp` divided by `population`.
-
-1. Compute the average population per continent per year, `mean_pop`, removing missing values and assign the output to a new object `gapminder_new`.
+1. Compute the average population per continent per year, `mean_pop`, and assign the output to a new object `gapminder_mean`. (*Hint: you should have one observation (row) per continent for each year. You'll have to use `group_by` and `summarise`.*)
 
 ```{r, echo = F}
 gapminder_mean <- gapminder %>%
   group_by(continent, year) %>%
-  summarise(mean_pop = mean(population, na.rm = T))
+  summarise(mean_pop = mean(population))
 
 gapminder_2015 <- gapminder %>%
   filter(year == "2015")
@@ -1078,9 +1132,22 @@ layout: true
 ---
 
 .left-thin[
+```{r first-plot0a, eval=FALSE}
+gapminder_mean
+```
+]
+
+.right-wide[
+```{r first-plot0a-out, ref.label='first-plot0a', echo=FALSE}
+```
+]
+
+---
+
+.left-thin[
 ```{r first-plot1a, eval=FALSE}
 gapminder_mean %>%
-  ggplot()
+  ggplot() #<<
 ```
 ]
 
@@ -1175,6 +1242,28 @@ gapminder_mean %>%
 
 .right-wide[
 ```{r first-plot2-line-out, ref.label='first-plot2-line', fig.height = 3.5, echo=FALSE, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r save-plot, eval=FALSE}
+g = gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  # geom_point() + #<<
+  geom_line()
+g
+# graphs can be saved as
+# objects!
+```
+]
+
+.right-wide[
+```{r save-plot-out, ref.label='save-plot', fig.height = 3.5, echo=FALSE, out.width="100%"}
 ```
 ]
 
@@ -1276,7 +1365,7 @@ What type is the parameter? → `<type>`
 
 - I want to change my discrete x-axis<br>`scale_x_discrete()`
 - I want to change range of point sizes from continuous variable<br>`scale_size_continuous()`
-- I want to rescale y-axis as log<br>`scale_y_log10()`
+- I want to rescale y-axis as log10<br>`scale_y_log10()`
 - I want to use a different color palette<br>`scale_fill_discrete()`<br>`scale_color_manual()`
 ]
 
@@ -1369,19 +1458,17 @@ knitr::include_graphics("chapter_tidy_files/figure-html/boxplot_explanation.png"
 
 class: inverse
 
-# Task 3
+# Task 3: Visualising data
 
 `r countdown(minutes = 10, top = 0)`
 
-Using the `gapminder` data, create the following plots using `ggplot2`. Don't forget to label the axes.
+Using the `gapminder` data, create the following plots using `ggplot2`.
 
-1. A histogram of life expectancy in 2015. Within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502".
+1. A histogram of life expectancy in 2015. (*Hint: do you need to specify a `y` in `aes()` for a histogram?*) Once you've created the histogram, within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502". What does each of these options do? <br> *Optional:* Using the previous graph, facet it by continent such that each continent's plot is a new row. (*Hint: check the help for `facet_grid`.*)
 
-1. Using the previous graph, facet it by continent such that each continent's plot is a new row. (*Hint: check the help for `facet_grid`.*)
+1. A boxplot of average life expectancy per year by continent. Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
 
-1. A boxplot of average life expectancy per year by continent (removing missing values). Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
-
-1. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis) in 2015. Within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502".
+1. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis) in 2015. Once you've created the scatter plot, within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502". Add labels (`labs`) to the plot so that it is cleaner.
 
 ---
 
@@ -1401,19 +1488,7 @@ layout: true
 # Summarising Data
 
 
-* One can learn only a limited amount from **looking** at a `data.frame`. `r emo::ji("mag")`
-
---
-
-* Even if you *could* see all rows of the dataset, you would not know very much **about it**.
-
---
-
-* We need to **summarise** the data for us to learn from it.
-
---
-
-* In general, we can compute summary statistics and/or visualise the data with plots.
+* In general, we can learn from the data by visualising it and/or computing summary statistics
 
 --
 
@@ -1484,7 +1559,6 @@ ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
 Compute with:
 ```{r,eval = FALSE}
 var(x)
-range(x)   # range
 ```
 ]
 ---
@@ -1512,9 +1586,22 @@ Given two variables, `table` produces a contingency table:
 ```{r}
 gapminder_new <- gapminder %>%
   filter(year == 2015) %>%
-  mutate(fertility_above_2 = (fertility > 2.1)) # dummy variable for fertility rate above replacement level fertility
+  mutate(fertility_above_2 = (fertility > 2.1)) # dummy variable for fertility rate above replacement rate
+```
+
+.pull-left[
+```{r}
+table(gapminder_new$fertility_above_2)
+```
+]
+
+--
+
+.pull-right[
+```{r}
 table(gapminder_new$fertility_above_2,gapminder_new$continent)
 ```
+]
 
 --
 
@@ -1621,17 +1708,19 @@ knitr::include_url("https://gustavek.shinyapps.io/corr_continuous/")
 
 class: inverse
 
-# Task 4
+# Task 4: Summarising data
 
 `r countdown(minutes = 10, top = 0)`
 
-1. Compute the mean of population in 1960 and assign to object `mean`. Read the help for `mean` to remove `NA`s.
+1. Compute the mean of GDP in 2011 and assign to object `mean`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
 
-1. Compute the median of population in 1960 and assign to object `median`. Is it greater or smaller than the average?
+1. Compute the median of GDP in 2011 and assign to object `median`. Again, you should exclude missing values. Is it greater or smaller than the average?
 
-1. Create a density plot using `geom_density` of population in 1960. A density plot is a way of representing the distribution of a numeric variable. Add a vertical line containing the value of `mean` and another one containing the value of `median`. Use `geom_vline` to do so and use `as.numeric` around `mean` and `median`. What do you observe?
+1. Create a density plot of GDP in 2011 using `geom_density`. A density plot is a way of representing the distribution of a numeric variable. Add the following code to your plot to show the median and mean as vertical lines. What do you observe?
+`geom_vline(xintercept = as.numeric(mean), colour = "red") +` <br>
+    `geom_vline(xintercept = as.numeric(median), colour = "orange")`
 
-1. Compute the correlation between fertility rate and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
+1. Compute the correlation between fertility and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
 
 In your free time, you can do this tutorial:
 ```{r, echo = TRUE, eval=FALSE}
