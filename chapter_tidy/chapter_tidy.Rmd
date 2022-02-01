@@ -1729,6 +1729,22 @@ runTutorial('chapter2')
 ```
 
 ---
+# On the way to causality
+
+`r emo::ji("white heavy check mark")` **How to manage data?** Read it, tidy it, visualise it...
+
+`r emo::ji("cross mark")`  How to summarise relationships between variables?
+
+`r emo::ji("cross mark")` What is causality?
+
+`r emo::ji("cross mark")` What if we don't observe an entire population?
+
+`r emo::ji("cross mark")`  Are our findings just due to randomness?
+
+`r emo::ji("cross mark")` How to find exogeneity in practice?
+
+
+---
 
 class: title-slide-final, middle
 background-image: url(../img/logo/ScPo-econ.png)
