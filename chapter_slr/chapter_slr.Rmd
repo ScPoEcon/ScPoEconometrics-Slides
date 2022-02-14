@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Simple Linear Regression"
-author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+author: "Gustave Kenedi, Mylène Feuillade, Florian Oswald and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -102,14 +102,13 @@ class:: inverse
 
 `r countdown(minutes = 7, top = 0)`
  
-1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) as `grades`. You need to find the function that enables importing *.dta* files. (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
+1. Load the data from [here](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) as `grades`. *Hint: Use the `read_dta` from the `haven` library to import the file, which has a format .dta.* (FYI: *.dta* is the extension for data files used in [*Stata*](https://www.stata.com/))
 
 1. Describe the dataset:
 
   * What is the unit of observations, i.e. what does each row correspond to?
   * How many observations are there?
-  * What variables do we have? View the dataset to see what the variables correspond to.
-  * What do the variables `avgmath` and `avgverb` correspond to?
+  * View the dataset. What variables do we have? What do the variables `avgmath` and `avgverb` correspond to?
   * Use the `skim` function from the `skimr` package to obtain common summary statistics for the variables `classize`, `avgmath` and `avgverb`. (*Hint: use `dplyr` to `select` the variables and then simply pipe (`%>%`) `skim()`.*)
 
 1. Do you have any priors about the actual (linear) relationship between class size and student achievement? What would you do to get a first insight?
@@ -577,9 +576,6 @@ knitr::include_url("https://gustavek.shinyapps.io/SSR_cone/")
 
 --
 
-* `r emo::ji("exclamation")` You should know these formulas, especially the one for $b_1^{OLS}$ `r emo::ji("exclamation")`
-   
---
 
 * These formulas do not appear from magic. They can be found by solving the minimisation of squared errors. The maths can be found [here](https://www.youtube.com/watch?v=Hi5EJnBHFB4) for those who are interested.
 
@@ -691,32 +687,13 @@ grades_avg_cs <- grades %>%
             avgverb_cs = mean(avgverb))
 ```
 
-1. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 25. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
-
 1. Regress average verbal score (dependent variable) on class size (independant variable). Interpret the coefficients.
 
-1. Is the slope coefficient similar to the one found for average math score? Was it expected based on the graphical evidence?
+1. Compute the OLS coefficients $b_0$ and $b_1$ of the previous regression using the formulas on slide 25. (*Hint:* you need to use the `cov`, `var`, and `mean` functions.)
 
 1. What is the predicted average verbal score when class size is equal to 0? (Does that even make sense?!)
 
 1. What is the predicted average verbal score when the class size is equal to 30 students?
-
----
-
-# OLS Variations / Restrictions
-
-* All are described [in the book](https://scpoecon.github.io/ScPoEconometrics/linreg.html#OLS). Optional `r emo::ji("nerd_face")`
-
-* There is an app for each of them:
-<br>
-<br>
-
-type | App  
--------- | --------
-No Intercept, No regressors | `launchApp('reg_constrained')` 
-Centered Regression | `launchApp('demeaned_reg')` 
-Standardized Regression | `launchApp('reg_standardized')`
-
 
 ---
 
@@ -883,6 +860,10 @@ $$
     
 * `r emo::ji("warning")` Low $R^2$ does __NOT__ mean it's a useless model! Remember that econometrics is interested in causal mechanisms, not prediction!
 
+--
+    
+* `r emo::ji("warning")` The $R^2$ is __NOT__ an indicator of whether a relationship is causal!
+
 ---
 
 class: inverse
@@ -897,9 +878,26 @@ class: inverse
 
 1. Compute the squared correlation between `classize` and `avgmath_cs`. What does this tell you about the relationship between $R^2$ and the correlation in a regression with only one regressor?
 
-1. Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula on the previous slide.
-
 1. Repeat steps 1 and 2 for `avgverb_cs`. For which exam does the variance in class size explain more of the variance in students' scores?
+
+1. (Optional) Install and load the `broom` package. Pass `math_reg` in the `augment()` function and assign it to a new object. Use the variance in `avgmath_cs` (SST) and the variance in `.fitted` (predicted values; SSE) to find the $R^2$ using the formula on the previous slide.
+
+---
+
+# On the way to causality
+
+`r emo::ji("white heavy check mark")` How to manage data? Read it, tidy it, visualise it...
+
+`r emo::ji("construction")`  **How to summarise relationships between variables?** Simple linear regression... to be continued
+
+`r emo::ji("cross mark")` What is causality?
+
+`r emo::ji("cross mark")` What if we don't observe an entire population?
+
+`r emo::ji("cross mark")`  Are our findings just due to randomness?
+
+`r emo::ji("cross mark")` How to find exogeneity in practice?
+
 
 ---
 
@@ -909,7 +907,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU IN TWO WEEKS!
+# SEE YOU NEXT WEEK!
 
 
 |                                                                                                            |                                   |
