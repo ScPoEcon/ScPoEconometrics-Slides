@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Intro To Causality"
-author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
