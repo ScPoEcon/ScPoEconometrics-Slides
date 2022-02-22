@@ -87,38 +87,11 @@ knitr::include_graphics("chapter_causality_files/figure-html/qr_code_quiz.png")
 
 * ***Causality*** versus ***correlation***
 
-* The ***Potential Outcome Framework*** a.k.a. Rubin's Causal Model
+* The ***Potential Outcomes Framework*** a.k.a. Rubin's Causal Model
 
 * ***Randomized controlled trials*** (RCTs)
 
 * Follow up on the empirical application of *class size* and *student performance*
-
----
-
-# Why do we care about causality?
-
-Many of the *interesting questions* we might want to answer with data are causal
-
---
-
-- ***Understanding*** the world
-
-  - *Social sciences*: Why do people behave in the way they do?
-  - *Health sciences*: Why do people get sick? Which medicine can cure them?
-
---
-
-- Causal understanding is also of first interest to **policymakers**
-
-  - How to lower unemployment?
-  - How to improve student learning?
-  - Whether governments should care about the level of public debt?
-
---
-
-- Note that some questions we might want to answer are not causal 
-  - Most *Artificial Intelligence* tasks only care about **prediction**
-  - *Example*: predicting whether a photo is of a dog or a cat is vital to how Google Images works, but it doesn't care what *caused* the photo to be of a dog or a cat.
 
 ---
 
@@ -244,15 +217,43 @@ Smokers and non-smokers may be different in the first place:
 
 ---
 
-# How Can We Tell?
+# Correlation vs Causation: Other Examples
 
-- Sometimes correlations are just pure *artefacts*: there is no causal relationship between the variables of interest.
-
-- In some other cases, there are both correlation and causality but not of the same **magnitude**, or even the same **direction**.
+> Why might the observed correlation between ***years of education*** and ***income*** not reflect the causal effect of education?
 
 --
 
-- So how can we make causal inference then? 
+*Individuals who choose to get more education likely differ from those who don't: maybe they have higher innate ability, they enjoy schooling and are good at it* $\rightarrow$ ***self-selection***
+
+--
+
+> Why might the observed correlation between the ***employment rate*** and the ***minimum wage*** level not reflect the causal effect of the minimum wage?
+
+--
+
+*Policymakers may increase the minimum wage in times when the employment rate is high* $\rightarrow$ ***reverse causality / simultaneity***
+
+--
+
+> Why might the observed correlation between ***economic growth*** and ***financial development*** not reflect the causal effect of the financial sector?
+
+--
+
+*Again, maybe economic growth leads to financial development and not the other way around* $\rightarrow$ ***reverse causality / simultaneity***
+
+---
+
+# Link with Economic Theory
+
+* Economic theory tells us individuals' behave in order to ***maximise their utility***
+
+* Thus they don't choose to act in ***random ways*** $\rightarrow$ we say that individual's behavior is ***endogenous***
+
+* We should be ***suspicious*** of any correlation found in data
+
+--
+
+- How can we make ***causal claims*** then? 
 
 - The ***Potential Outcomes Framework*** will be our guide.
 
@@ -273,7 +274,7 @@ layout: true
 
 # The Potential Outcomes Framework
 
-Often called the **Rubin Causal Model** in memory of the statistician **Donald Rubin** who generalised and formalized this model in the 1970's.
+Often called the **Rubin Causal Model** in honor of statistician **Donald Rubin** who generalised and formalized this model in the 1970's.
 
 --
 
@@ -319,25 +320,17 @@ all the individuals such that $D_i = 0$.
 
 --
 
-* From these we can define the ***individual treatment effect*** $\delta_i$:
+* In real life we only observe $Y_i$ which can be written as:
 
-$$ \delta_i = Y_i^1 - Y_i^0$$
+$$Y_i = D_i \times Y_i^1 + (1- D_i) \times Y_i^0$$
 
-* $\delta_i$ measures the **causal effect of the treatment $(D_i)$** on outcome $Y$ for individual $i$.
+--
+
+* ***Fundamental Problem of Causal Inference***: for any individual $i$, we only observe one of either potential outcomes [(Holland, 1986)](http://people.umass.edu/~stanek/pdffiles/causal-holland.pdf).
 
 ---
 
 # The Potential Outcomes Framework
-
-* In real life we only observe $Y_i$ which can be written as:
-
-$$Y_i = D_i * Y_i^1 + (1- D_i)*Y_i^0$$
-
---
-
-* ***Fundamental Problem of Causal Inference***: for any individual $i$, we only observe one of either potential outcomes, and thus we cannot compute $\delta_i$ [(Holland, 1986)](http://people.umass.edu/~stanek/pdffiles/causal-holland.pdf).
-
---
 
 * The potential outcome that is not observed exists in principle, it is called the ***counterfactual outcome***.
 
@@ -350,13 +343,58 @@ Control group $(D_i = 0)$ | Counterfactual | &nbsp; &nbsp; Observable as $Y_i$ &
 
 --
 
+* From these we can define the ***individual treatment effect*** $\delta_i$:
+
+$$ \delta_i = Y_i^1 - Y_i^0$$
+
+* $\delta_i$ measures the **causal effect of the treatment $(D_i)$** on outcome $Y$ for individual $i$.
+
+--
+
 * Since the treatment effect *cannot* be observed at the individual level, we estimate population averages.
 
 ---
 
+# Sidenote: Expectation and Conditional Expectation
+
+Let's say you have a fair die and you roll it an infinite number of times. What is the average number rolled?
+
+* If $X$ is a random variable containing the number rolled, we write:
+
+$$
+\mathop{\mathbb{E}}(X) = \frac{1}{6} \times 1 + \frac{1}{6} \times 2 + \frac{1}{6} \times 3 + \frac{1}{6} \times 4 + \frac{1}{6} \times 5 + \frac{1}{6} \times 6 = 3.5
+$$
+
+* The $\mathop{\mathbb{E}}(.)$ operator stands for **expectation** or *population mean*.
+
+* The $\mathop{\mathbb{E}}(.)$ operator is linear, in other words, $\mathop{\mathbb{E}}(X+Y) = \mathop{\mathbb{E}}(X) + \mathop{\mathbb{E}}(Y)$ with $X$ and $Y$ being two random variables.
+
+---
+
+# Sidenote: Expectation and Conditional Expectation
+
+Now, let's say you have two fair dice and you roll them an infinite number of times. What is the average sum of numbers rolled, conditional on one of them being always equal to 5?
+
+* If $X$ is a random variable containing the number rolled of die 1 and $Y$ a random variable containing the number rolled of die 2, we write:
+
+$$
+\begin{align}
+\mathop{\mathbb{E}}(X+Y|Y = 5) &= \mathop{\mathbb{E}}(X|Y = 5) + \mathop{\mathbb{E}}(Y|Y = 5) \\
+&= \mathop{\mathbb{E}}(X) + 5 \\
+&= 3.5 + 5 \\
+&= 8.5
+\end{align}
+$$
+
+* The $\mathop{\mathbb{E}}(.|D = x)$ operator stands for **conditional expectation**. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition $D = x$.
+
+---
+
+name: ate
+
 # Average Treatment Effect (ATE)
 
-Broadest possible average effect: **A**verage **T**reatment **E**ffect (***ATE***)
+Broadest possible average effect:
 
 \begin{align}
 ATE &= \mathop{\mathbb{E}}(\delta_i) \\
@@ -364,56 +402,15 @@ ATE &= \mathop{\mathbb{E}}(\delta_i) \\
     &= \mathop{\mathbb{E}}(Y_i^1) - \mathop{\mathbb{E}}(Y_i^0)
 \end{align}
   
-* The ATE simply measures the ***average of individual treatment effects over the whole population***. 
-  
-  * The $\mathop{\mathbb{E}}(.)$ operator stands for **expectation** or *population mean*.
-  
-  * The $\mathop{\mathbb{E}}(.)$ operator is linear, in other words, $\mathop{\mathbb{E}}(X+Y) = \mathop{\mathbb{E}}(X) + \mathop{\mathbb{E}}(Y)$ with $X$ and $Y$ being two random variables.
+* The ATE simply measures the ***average of individual treatment effects over the whole population***.
+
+([*Appendix:*](#attandatu) Average Treatment on the Treated and Average Treatment on the Untreated)
 
 ---
 
-# Average Treatment on the Treated (ATT)
+# Example: Small vs. Large Class
 
-Other ***conditional*** average treatment effects may be of interest:
-
-* The **A**verage **T**reatment Effect on the **T**reated (***ATT***)
-
-\begin{align}
- ATT &= \mathop{\mathbb{E}}(\delta_i | D_i = 1) \\
-     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 1) \\
-     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 1)
-\end{align}
-
-* The ATT measures the ***average treatment effect conditional on being in the treatment group***.
-
-    * The $\mathop{\mathbb{E}}(.|D = x)$ operator stands for **conditional expectation**. It refers to the expectation over a subcategory of the entire population, namely people who satisfy the condition $D = x$.
-  * The $\mathop{\mathbb{E}}(.|D = x)$ operator is also linear.
-
----
-
-# Average Treatment on the Untreated (ATU)
-
-Other ***conditional*** average treatment effects may be of interest:
-
-* The **A**verage **T**reatment Effect on the **U**ntreated (***ATU***)
-
-\begin{align}
- ATU &= \mathop{\mathbb{E}}(\delta_i | D_i = 0) \\
-     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 0) \\
-     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 0) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
-\end{align}
-
-* The ATU measures the ***average treatment effect conditional on being in the control group***.
-
---
-
-* In the majority of cases, ATE $\neq$ ATT $\neq$ ATU!
-
----
-
-# Example
-
-*Example:* Potential outcomes for 10 students of being in a class of 7 students $(Y^1)$ or 15 students $(Y^0)$ on GPA (0-10)
+Potential outcomes for students of being in a small $(Y^1)$ or large class $(Y^0)$ on GPA (0-10):
 
 .pull-left[
 Student | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$ &nbsp; &nbsp; 
@@ -428,6 +425,8 @@ Student | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; 
 8 | 6 | 4 | 2
 9 | 2 | 9 | -7
 10 | 8 | 2 | 6
+Average | 5.2 | 4.5 | 0.7
+
 ]
 
 --
@@ -436,7 +435,8 @@ Student | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; 
 
 $$
 \begin{align}
-\color{red}{\text{ATE}} &= \mathbb{E}(Y^1) - \mathbb{E}(Y^0) \\
+\color{#d90502}{\text{ATE}} &= \mathbb{E}(\delta) \\
+&=\mathbb{E}(Y^1) - \mathbb{E}(Y^0) \\
 &= 5.2 - 4.5 \\
 &= 0.7
 \end{align}
@@ -450,11 +450,64 @@ $\rightarrow$ the ***average*** causal effect of being in small relative to larg
 
 ---
 
-# Example
+# The Problem of Causal Inference
+
+* In practice, we have the same **missing data problem** for computing the ATE as we did for $\delta_i$. Either $Y_i^1$ or $Y_i^0$ is missing for each $i$.
+
+--
+
+* From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
+
+$$
+\begin{align}
+SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
+&= \underbrace{\frac{1}{N_T}\sum_{i=1}^{N_T}(Y_i|D_i=1)}_{\text{average outcome of treatment group}} - \underbrace{\frac{1}{N_C}\sum_{i=1}^{N_C}(Y_i|D_i=0)}_{\text{average outcome of control group}}
+\end{align}
+$$ 
+
+---
+
+# Simple Difference in Mean Outcomes: With An Example
 
 Now, imagine a benevolent and omniscient school director assigns students to the treatment that maximizes their GPA
 
 --
+
+Student | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$ &nbsp; | &nbsp; &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp;
+-----------|:---------:|:---------:|:---------:|:-----------:|:---------:|:---------:
+1 | 5 | 2 | 3 |  | 
+2 | 6 | 4 | 2 |  | 
+3 | 3 | 6 | -3 |  | 
+4 | 5 | 4 | 1 |  | 
+5 | 10 | 8 | 2 |  | 
+6 | 2 | 4 | -2 |  |
+7 | 5 | 2 | 3 |  | 
+8 | 6 | 4 | 2 |  | 
+9 | 2 | 9 | -7 |  | 
+10 | 8 | 2 | 6 |  | 
+
+---
+
+# Simple Difference in Mean Outcomes: With An Example
+
+Now, imagine a benevolent and omniscient school director assigns students to the treatment that maximizes their GPA
+
+Student | &nbsp; &nbsp; $Y^1$ &nbsp; &nbsp; | &nbsp; &nbsp; $Y^0$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$ &nbsp; | &nbsp; &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp;
+-----------|:---------:|:---------:|:---------:|:-----------:|:---------:|:---------:
+1 | 5 | 2 | 3 | 5 | 1
+2 | 6 | 4 | 2 | 6 | 1
+3 | 3 | 6 | -3 | 6 | 0
+4 | 5 | 4 | 1 | 5 | 1
+5 | 10 | 8 | 2 | 10 | 1
+6 | 2 | 4 | -2 | 4 | 0
+7 | 5 | 2 | 3 | 5 | 1
+8 | 6 | 4 | 2 | 6 | 1
+9 | 2 | 9 | -7 | 9 | 0
+10 | 8 | 2 | 6 | 8 | 1
+
+---
+
+# Simple Difference in Mean Outcomes: With An Example
 
 .pull-left[
 Student | &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &nbsp; &nbsp; $\delta$&nbsp; &nbsp;
@@ -469,67 +522,29 @@ Student | &nbsp; &nbsp; $Y$ &nbsp; &nbsp; | &nbsp; &nbsp; $D$ &nbsp; &nbsp; | &n
 8 | 6 | 1 | 2
 9 | 9 | 0 | -7
 10 | 8 | 1 | 6
+Average |  |  | 0.7
 ]
-
---
 
 .pull-right[
+The simple difference in mean outcomes:
 
 $$
 \begin{align}
-\color{red}{\text{ATT}} &= \mathbb{E}(\delta | D = 1) \\
-&\approx 2.71
+SDO &= \frac{5+6+5+10+5+6+8}{7} - \frac{6+4+9}{3} \\
+&\approx 6.43 - 6.33 \approx 0.1
 \end{align}
 $$
 
-$$
-\begin{align}
-\color{red}{\text{ATU}} &= \mathbb{E}(\delta | D = 0) \\
-&= -4
-\end{align}
-$$
+* The SDO is much smaller than the ATE!
 
-$$
-\begin{align}
-\color{red}{\text{ATE}} &= 7/10 \times \text{ATT} + 3/10 \times \text{ATU} \\
-&= 7/10 \times 2.71 + 3/10 \times (-4) \\
-&= 0.7
-\end{align}
-$$
+* Such a difference **will (almost always) fail to capture the causal treatment effect**
 
+* Notice that this kind "naive" comparison is often done by journalists, politicians, badly trained scientists (but not you now! `r emo::ji("wink")`)
 ]
 
-
 ---
 
-# The Problem of Causal Inference
-
-* In practice, we have the same **missing data problem** for computing the ATE, ATT or ATU as we did for $\delta_i$. Either $Y_i^1$ or $Y_i^0$ is missing for each $i$.
-
---
-
-* From the data, we can compute the **S**imple **D**ifference in mean **O**utcomes (***SDO***) for both groups:
-
-$$
-\begin{align}
-SDO &= \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) \\
-&= \frac{1}{N_T}\sum_{i=1}^{N_T}(Y_i|D_i=1) - \frac{1}{N_C}\sum_{i=1}^{N_C}(Y_i|D_i=0)
-\end{align}
-$$ 
-
---
-
-* From our example, we obtain:  $SDO \approx 6.43 - 6.33 \approx 0.1$ (much smaller than the 0.7 ATE)
-
---
-
-* Almost always, such a difference **will fail to capture the causal treatment effect**.
-
---
-
-* Notice that this kind "naive" comparison is often done by journalists, politicians, badly trained scientists (but not you now! `r emo::ji("wink")`).
-
----
+name: naive_comp
 
 # Problems with Naive Comparisons
 
@@ -541,7 +556,7 @@ Let's rewrite the SDO to make the individual treatment effect $(\delta_i)$ appea
 
 --
 
-For now, suppose **treatment effect is constant** across people: for all $i, \delta_i = \delta$.
+For simplicity, suppose **treatment effect is constant** across people: for all $i, \delta_i = \delta$.
 
 --
 
@@ -558,29 +573,7 @@ And because $ATE = \mathop{\mathbb{E}}(\delta_i) = \mathop{\mathbb{E}}(\delta) =
   SDO = ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias}
 \end{equation}
 
----
-
-# Problems with Naive Comparisons
-
-Let's now relax the assumption that the treatment effect is constant among all individuals.
-
-After [some tedious calculations](https://mixtape.scunning.com/potential-outcomes.html#simple-difference-in-means-decomposition) that we skip, the SDO can now be decomposed as: 
-
-\begin{align}
-  SDO &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
-  & \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
-\end{align}
-
-where $1 - \pi$ denotes the share of people in the control group.
-
---
-
-So there is a novel source of bias that comes from the potential ***heterogeneity in the individual treatment effect*** $\delta_i$.
-
---
-
-* ***Selection bias***: those who attend university are likely to have higher baseline cognitive skills (regardless of whether they actually attend college).
-* ***Heterogeneous treatment effect bias***: those who attend university may improve their cognitive skills more at university because they are more motivated.
+([*Appendix*](#naive_comp_extended): when constant treatment assumption is relaxed another bias term appears.)
 
 ---
 
@@ -590,7 +583,7 @@ class:inverse
 
 `r countdown(minutes = 10, top = 0)`
 
-Let's compute these various quantities and biases with some toy data (i.e. data we generated ourselves).
+Let's compute these various quantities and biases with data we generated ourselves.
 
 ```{r, echo = FALSE, eval = FALSE}
 set.seed(1)
@@ -619,13 +612,13 @@ toy_data_random <- toy_data_random %>%
 # fwrite(toy_data_random, here::here("../ScPoEconometrics/introduction/pierre_gustave/toy_data_random.csv"))
 ```
 
-1. Load the data [here](https://www.dropbox.com/s/oqc3vq1m9eyp1d6/toy_data_2.csv?dl=1). The `group` variable corresponds to whether the individual has been treated or not, the `Y0` variable corresponds to the potential outcome if the individual does not receive the treatment $(Y_i^0)$ while `Y1` corresponds to the potential outcome if the individual receives the treatment $(Y_i^1)$. Create a new variable containing the observed outcome $(Y_i)$ and the individual treatment effect $(\delta_i)$. (Recall that $Y_i = D_i * Y_i^1 + (1 - D_i) Y_i^0$ and $\delta_i = Y_i^1 - Y_i^0$.)
+1. Load the data [here](https://www.dropbox.com/s/oqc3vq1m9eyp1d6/toy_data_2.csv?dl=1) using `read.csv`. The `group` variable corresponds to whether the individual has been treated or not, `Y0` to the potential outcome if the individual does not receive the treatment $(Y_i^0)$ while `Y1` to the potential outcome if the individual receives the treatment $(Y_i^1)$. Create a new variable containing the observed outcome $(Y_i)$ and the individual treatment effect $(\delta_i)$. Recall $Y_i = D_i \times Y_i^1 + (1 - D_i) \times Y_i^0$, $\delta_i = Y_i^1 - Y_i^0$.
 
 1. Compute the ***ATE*** and the ***SDO***. Is there is any *bias*? Is it large in magnitude?
 
 1. In this new [dataset](https://www.dropbox.com/s/0qfsonzz1t9gkxi/toy_data_random.csv?dl=1) we've randomly assigned the same individuals to the treatment and control groups. Compute the ***SDO under randomization***. Remember that you need to recompute $Y_i$ because the assignment is not the same anymore. If you got it right, the bias should be very close to 0. Why is it not exactly 0? 
 
-1. *To do at home*:  Compute the value of the ***selection bias*** and the ***heterogenous treatment effect bias*** and check that we have $$SDO = ATE + \textrm{selection bias} + \textrm{heterogenous treatment effect bias}$$
+1. *Optional*:  Compute the ***selection bias*** and the ***heterogeneous treatment effect bias*** and check that $SDO = ATE + \text{selection bias} + \text{heterogenous treatment effect bias}$
 
 
 ---
@@ -634,25 +627,17 @@ toy_data_random <- toy_data_random %>%
 
 * ***Randomized experiments***: you ***randomly*** assign people to a treatment and a control group.
 
-* In this case, the treatment assignement is **independent** of the potential outcomes.
+* In this case, the treatment assignment is **independent** of the potential outcomes.
 
 --
 
 * In particular, there is no reason for $\mathop{\mathbb{E}}(Y_i^0 | D_i = 1)$ to be different from $\mathop{\mathbb{E}}(Y_i^0 | D_i = 0)$
 
   * Therefore the ***selection bias is equal to 0***.
-  
+
 --
-  
-* In the same way, there is no reason for $\mathop{\mathbb{E}}[\delta_i]$ to be different in the treatment and control group. 
 
-  * There $ATT = ATU$, implying the ***heterogenous treatment effect bias will also be 0***.
-
----
-
-# Randomization solves the problem of causal inference!
-
-With random assignment we have: 
+* With random assignment we have: 
 
 $$ SDO = \mathop{\mathbb{E}}(Y_i^1|D_i=1) - \mathop{\mathbb{E}}(Y_i^0|D_i=0) = ATE$$ 
 
@@ -747,15 +732,11 @@ class:inverse
 
 `r countdown(minutes = 10, top = 0)`
 
-1. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1) and assign it to an object called `star_df`.
-
-1. Read the help for `AER::STAR` to understand what the variables correspond to. (Note: the data has been *reshaped* so don't mind the "k", "1", etc. in the variable names in the help.)
+1. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1) and assign it to an object called `star_df`. Read the help for the data [here](https://rdrr.io/cran/AER/man/STAR.html) to understand what the variables correspond to. (Note: the data has been *reshaped* so don't mind the "k", "1", etc. in the variable names in the help.)
 
 1. What's the unit of observation? Which variable contains: (i) the (random) class assignment, (ii) the student's class grade, (iii) the outcomes of interest?
 
-1. How many observations are there? Why so many?
-
-1. Why are there so many `NA`s? What do they correspond to?
+1. How many observations are there? Why so many if 11,598 students participated? Why are there so many `NA`s? What do they correspond to?
 
 1. Keep only cases with no `NA`s with the following code:  
 `star_df <- star_df[complete.cases(star_df),]`
@@ -881,9 +862,8 @@ $$
 .pull-left[
 ```{r, echo = TRUE}
 star_df_k_small <- star_df %>%
-  filter(
-    star %in% c("regular", "small") &
-      grade == "k") %>% 
+    filter(star %in% c("regular", "small") &
+           grade == "k") %>% 
   mutate(small = (star == "small"))
 ```
 
@@ -1048,11 +1028,16 @@ class:inverse
 
 `r countdown(minutes = 10, top = 0)`
 
-1. Filter the dataset to only keep first graders and the small class and regular class groups.
+Run the following code to filter the dataset to only keep first graders and the small class and regular class groups:
+
+```{r, eval = FALSE}
+star_df_clean <- star_df %>%
+    filter(grade == "1" & star %in% c("small", "regular"))
+```
 
 1. Compute the average math score for both groups, and the difference between the two. (Use base `R`.)
 
-1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). See slide 33 for how to create a dummy variable.
+1. Create a dummy variable `treatment` equal to `TRUE` if student is in treatment group (i.e. small class size) and `FALSE` if in control group (i.e. regular class size). *Hint:* you can create the dummy variable with `treatment = (star == "small")`.
 
 1. Regress math score on the treatment dummy variable. Are the results in line with question 2?
 
@@ -1091,14 +1076,6 @@ However, they have some shortcomings:
 
 --
 
-* It brings us back to models 
-
-  - In causal inference, the *model* is our idea of what the process that *generated the data* is.
-
-  - We have to make some assumptions about what this is!
-
---
-
 2 broad cases:
 
 * ***selection occurs on observable characteristics***: *multiple regression* (next week!)
@@ -1130,9 +1107,81 @@ background-position: 9% 19%
 
 |                                                                                                            |                                   |
 | :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
-| <a href="mailto:florian.oswald@sciencespo.fr">.ScPored[<i class="fa fa-paper-plane fa-fw"></i>]               | florian.oswald@sciencespo.fr       |
 | <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
 | <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
 
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Appendix
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+name: attandatu
+
+# Average Treatment on the Treated and on the Untreated
+
+Other ***conditional*** average treatment effects may be of interest:
+
+.pull-left[
+**A**verage **T**reatment on the **T**reated (***ATT***)
+
+\begin{align}
+ ATT &= \mathop{\mathbb{E}}(\delta_i | D_i = 1) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 1) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 1)
+\end{align}
+
+The ATT measures the ***average treatment effect conditional on being in the treatment group***.
+
+*Example:* the effect of participating in a training program (*treatment*) for those who participated (*treatment group*).
+]
+
+.pull-right[
+**A**verage **T**reatment on the **U**ntreated (***ATU***)
+
+\begin{align}
+ ATU &= \mathop{\mathbb{E}}(\delta_i | D_i = 0) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 - Y_i^0 | D_i = 0) \\
+     &= \mathop{\mathbb{E}}(Y_i^1 | D_i = 0) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)
+\end{align}
+
+The ATU measures the ***average treatment effect conditional on being in the control group***.
+
+*Example:* the effect of attending a private school (*treatment*) for students from a public school (*control group*).
+]
+
+*Note:* In the majority of cases, ATE $\neq$ ATT $\neq$ ATU! <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> [*back*](#ate)
+
+---
+
+name: naive_comp_extended
+
+# Problems with Naive Comparisons
+
+Let's now relax the assumption that the treatment effect is constant among all individuals.
+
+After [some tedious calculations](https://mixtape.scunning.com/potential-outcomes.html#simple-difference-in-means-decomposition) that we skip, the SDO can now be decomposed as: 
+
+\begin{align}
+  SDO &= ATE + \underbrace{\mathop{\mathbb{E}}(Y_i^0 | D_i = 1) - \mathop{\mathbb{E}}(Y_i^0 | D_i = 0)}_\text{Selection bias} \\
+  & \quad \quad  \quad \quad + \underbrace{(1-\pi)(ATT - ATU)}_\text{Heterogenous treatment effect bias}
+\end{align}
+
+where $1 - \pi$ denotes the share of people in the control group.
+
+So there is a novel source of bias that comes from the potential ***heterogeneity in the individual treatment effect*** $\delta_i$.
+
+* ***Selection bias***: those who attend university are likely to have higher baseline cognitive skills (regardless of whether they actually attend college).
+* ***Heterogeneous treatment effect bias***: those who attend university may improve their cognitive skills more at university because they are more motivated. <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> [back](#naive_comp)
