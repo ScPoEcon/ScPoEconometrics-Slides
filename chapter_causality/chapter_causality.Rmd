@@ -1082,6 +1082,24 @@ However, they have some shortcomings:
 
 * ***selection occurs on unobservable characteristics***: *regression discontinuity design* (lecture 10) or  *difference-in-differences* (not covered but set of slides online!)
 
+
+---
+
+# On the way to causality
+
+`r emo::ji("white heavy check mark")` How to manage data? Read it, tidy it, visualise it...
+
+`r emo::ji("construction")`  How to summarise relationships between variables? Simple linear regression... to be continued
+
+`r emo::ji("white heavy check mark")` **What is causality?**
+
+`r emo::ji("cross mark")` What if we don't observe an entire population?
+
+`r emo::ji("cross mark")`  Are our findings just due to randomness?
+
+`r emo::ji("cross mark")` How to find exogeneity in practice?
+
+
 ---
 
 <br>
