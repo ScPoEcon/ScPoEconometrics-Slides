@@ -3,7 +3,8 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi, Mylène Feuillade and Pierre Villedieu" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
@@ -17,8 +18,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Multiple Regression Model
-### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-03-22
+### Florian Oswald, Gustave Kenedi, Mylène Feuillade and Pierre Villedieu
+### SciencesPo Paris </br> 2022-03-08
 
 ---
 
@@ -189,6 +190,10 @@ where `\(y_i\)` is the ***dependent variable*** and `\(x_i\)` is the ***independ
 
 --
 
+* Remember: We say that `X` *causes* `Y` when if we were to intervene and change the value of `X` ***without changing anything else*** then `Y` would also change as a result.
+
+--
+
 ⚠️ Unless all other factors affecting `\(y_i\)` are uncorrelated with `\(x_i\)`, `\(b_1\)` **cannot be interpreted as a causal effect**.
 
 --
@@ -343,6 +348,8 @@ lm(avgmath ~ classize + disadvantaged, grades)
 
 2\. How do you explain the change in the `classize` coefficient compared to the SLM case?
 
+--
+
 * `\(b_1\)` decreases when the `disadvantaged` variable is taken into account. This was expected since part of the positive effect of class size was partly due to the smaller share of disadvantaged students in bigger classes.
 
 ---
@@ -383,7 +390,7 @@ class:inverse
 
 # Task 1
 
-<div class="countdown" id="timer_6058d8cb" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_622737e0" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -393,7 +400,7 @@ Let's analyse the regression results using **reading** score as the dependent va
 
 1. Regress `avgverb` on `classize` and `disadvantaged` and assign the output to a new object `reg`. Interpret the coefficients. How do they compare to the simple linear regression? How do they compare with the math score regression coefficients?
 
-1. What are the other available variables that we may add in the regression? 
+1. (Optional) What are the other available variables that we may add in the regression? 
   * Run the regression with all these variables and assign it to `reg_full`.
   * Look at the coefficients.
   * Discuss all coefficients: sign and magnitude.
@@ -406,7 +413,7 @@ You know how to interpret coefficients when the variable is numeric (i.e. contin
 
 --
 
-What if the regressor is a ***dummy variable***, that is it takes a value 1 if some condition is `TRUE` and 0 otherwise?
+What if one of the regressor is a ***dummy variable***, that is it takes a value 1 if some condition is `TRUE` and 0 otherwise?
 
 --
 
@@ -468,25 +475,25 @@ $$
 We have the following equalities:
 
 `\begin{equation}
-\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \text{class size} = n_1) = \color{#d96502}{b_0} + \color{#d90502}{b_1} \times n_1 + \color{#027D83}{b_2} \times \text{religious}
+\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \color{#d90502}{\text{class size} = n_1}) = \color{#d96502}{b_0} + \color{#d90502}{b_1} \times n_1 + \color{#027D83}{b_2} \times \text{religious}
 \end{equation}`
 
 --
 
 `\begin{multline}
-\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \text{class size} = n_1+1) = \\ \color{#d96502}{b_0} + \color{#d90502}{b_1} \times (n_1+1) + \color{#027D83}{b_2} \times \text{religious}
+\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \color{#d90502}{\text{class size} = n_1+1}) = \\ \color{#d96502}{b_0} + \color{#d90502}{b_1} \times (n_1+1) + \color{#027D83}{b_2} \times \text{religious}
 \end{multline}`
 
 --
 
 `\begin{multline}
-\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \text{class size} = n_1+1) - \\ \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \text{class size} = n_1) \\
+\mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \color{#d90502}{\text{class size} = n_1+1}) - \\ \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \color{#d90502}{\text{class size} = n_1}) \\
 = \color{#d96502}{b_0} + \color{#d90502}{b_1} \times (n_1+1) + \color{#027D83}{b_2} \times \text{religious} - (\color{#d96502}{b_0} + \color{#d90502}{b_1} \times n_1 + \color{#027D83}{b_2} \times \text{religious}) = \color{#d90502}{b_1}
 \end{multline}`
 
 --
 
-`\(\rightarrow\)` `\(\color{#d90502}{b_1}\)` corresponds to the expected change in average math score associated, on average, with a 1 student increase in class size, controlling for the religious status of the school
+`\(\rightarrow\)` `\(\color{#d90502}{b_1}\)` corresponds to the expected change in average math score associated, on average, with a 1 student increase in class size, controlling for the religious status of the school (= keeping the religious status constant)
 
 ---
 
@@ -501,21 +508,21 @@ $$
 We have the following equalities:
 
 `\begin{align}
-\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ &amp; } \text{class size} \in \mathbb{N}) &amp;= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 1 \\
+\mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} = 1} \text{ &amp; } \text{class size} \in \mathbb{N}) &amp;= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 1 \\
 &amp;= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2}
 \end{align}`
 
 --
 
 `\begin{align}
-\mathbb{E}(\text{average math score} | \text{religious} = 0 \text{ &amp; } \text{class size} \in \mathbb{N}) &amp;= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 0 \\
+\mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} = 0} \text{ &amp; } \text{class size} \in \mathbb{N}) &amp;= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2} \times 0 \\
 &amp;= \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size}
 \end{align}`
 
 --
 
 `\begin{multline}
-\mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ &amp; } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ &amp; } \text{class size} \in \mathbb{N}) \\
+\mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} = 1} \text{ &amp; } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} =0} \text{ &amp; } \text{class size} \in \mathbb{N}) \\
 = \color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size} + \color{#027D83}{b_2}- (\color{#d96502}{b_0} + \color{#d90502}{b_1} \times \text{class size}) = \color{#027D83}{b_2}
 \end{multline}`
 
@@ -540,11 +547,11 @@ We have the following equalities:
 \end{equation}`
 
 `\begin{multline}
-\color{#d90502}{b_1} = \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \text{class size} = n_1+1) - \\ \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \text{class size} = n_1)
+\color{#d90502}{b_1} = \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \color{#d90502}{\text{class size} = n_1+1}) - \\ \mathbb{E}(\text{average math score} | \text{religious} \in \{0,1\} \text{ &amp; } \color{#d90502}{\text{class size} = n_1})
 \end{multline}`
 
 `\begin{multline}
-\color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \text{religious} = 1 \text{ &amp; } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \text{religious} =0 \text{ &amp; } \text{class size} \in \mathbb{N})
+\color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} = 1} \text{ &amp; } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} =0} \text{ &amp; } \text{class size} \in \mathbb{N})
 \end{multline}`
 
 `\begin{equation}
@@ -704,7 +711,11 @@ grades %&gt;% count(is_religious == 1 - is_notreligious)
 
 --
 
-⚠️ you have to pay attention to the ***omitted/reference category***: the "baseline" category from which the coefficients are interpreted
+⚠️ you have to pay attention to the ***omitted/reference category***: the "baseline" category from which the coefficients are interpreted. Remember:
+
+`\begin{multline}
+\color{#027D83}{b_2} = \mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} = 1} \text{ &amp; } \text{class size} \in \mathbb{N}) - \\ \mathbb{E}(\text{average math score} | \color{#027D83}{\text{religious} =0} \text{ &amp; } \text{class size} \in \mathbb{N})
+\end{multline}`
 
 --
 
@@ -720,7 +731,7 @@ class: inverse
 
 # Task 2: Dummy Variable Trap
 
-<div class="countdown" id="timer_6058da34" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_62273680" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -729,11 +740,11 @@ Let's run a regression where there is perfect linear dependence between regresso
 1. Load the *STAR* data from [here](https://www.dropbox.com/s/bf1fog8yasw3wjj/star_data.csv?dl=1), using `read.csv`, and assign it to an object called `star_df`. Keep only cases with no `NA`s with the following code:  
 `star_df &lt;- star_df[complete.cases(star_df),]` 
 
-1. Create three dummy variables: (i) `small` equal to `TRUE` if students are in a small class and `FALSE` otherwise; (ii) `regular` equal to `TRUE` if students are in a regular class and `FALSE` otherwise; (iii) `regular_plus` equal to `TRUE` if students are in a regular+aide class and `FALSE` otherwise. Create a last variable, `sum`, equal to the sum of `small`, `regular` and `regular_plus`. What is `sum` equal to? What does this mean?
+1. Create three dummy variables: (i) `small` equal to `TRUE` if students are in a small class and `FALSE` otherwise; (ii) `regular` equal to `TRUE` if students are in a regular class and `FALSE` otherwise; (iii) `regular_plus` equal to `TRUE` if students are in a regular+aide class and `FALSE` otherwise. (*Hint: To create a dummy, write* `dummy = (variable=="value")`, *inside the appropriate dplyr verb*) Create a last variable, `sum`, equal to the sum of `small`, `regular` and `regular_plus`. What is `sum` equal to? What does this mean?
 
-1. Regress `math` on `small`. What is the average predicted `math` score of students in a small class? Do the same for `regular` and `regular_plus`.
+1. Regress `math` on `regular_plus`. What is the average predicted `math` score of students in a regular+aide class?
 
-1. Regress `math` on `small`, `regular` and `regular_plus`. What do you notice? What's the omitted (reference) category? Does this match the previous questions?
+1. Regress `math` on `small`, `regular` and `regular_plus`. What do you notice? What's the omitted (reference) category? Does this match the previous question?
 
 1. Regress `math` on `star`. What do you notice? What's the omitted category? Interpret the coefficient.
 
@@ -751,7 +762,7 @@ Let's note `\(y\)` our outcome variable, `\(x\)` our regressor and `\(z\)` our o
 
 --
 
-We have the following regression models:
+We could run regressions for the following models:
 
 --
 
@@ -850,7 +861,7 @@ class: inverse
 
 # Task 3: Recap
 
-<div class="countdown" id="timer_6058d9c4" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_622736e5" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -860,11 +871,35 @@ Let's use the *STAR* data (used in the previous task) to review the main concept
 
 1. Compute the share of students qualifying for free lunch (i.e. `lunch` equals "free") by school location category. What do you observe? Add `free` to the previous question's regression. How do the coefficients change?
 
-1. Regress `math` on `gender` and `experience` (the teacher's experience). Interpret the coefficients. How would these regression results look like visually?
-
 1. Regress `math` on `star`. After interpreting the coefficients, regress `math` on `star`, `gender`, `ethnicity`, `lunch`, `degree`, `experience` and `school`. Recalling that this is a randomized experiment, does it look like the randomization was well done?
 
 1. What's the adjusted `\(R^2\)` from the previous multiple regression. How do you interpret it? What might you deduce about the importance of observable individual, teacher and school characteristics in explaining educational outcomes?
+
+1. (Optional) Regress `math` on `gender` and `experience` (the teacher's experience). Interpret the coefficients. How would these regression results look like visually?
+
+---
+
+# On the way to causality
+
+✅ How to manage data? Read it, tidy it, visualise it...
+
+🚧  **How to summarise relationships between variables?** Simple and multiple linear regression... to be continued
+
+✅ What is causality?
+
+❌ What if we don't observe an entire population?
+
+❌  Are our findings just due to randomness?
+
+❌ How to find exogeneity in practice?
+---
+
+&lt;br&gt;
+&lt;br&gt;
+
+.center[
+&lt;img src="../img/photos/confounding_variables_funny.png" width="1000px" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
@@ -883,6 +918,7 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
