@@ -3,7 +3,8 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <meta name="author" content="Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
@@ -17,8 +18,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Linear Regression Extensions
-### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-03-22
+### Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu
+### SciencesPo Paris </br> 2022-03-15
 
 ---
 
@@ -52,12 +53,12 @@ Depending on the data and the relationships between the variables of interest, y
 --
 
 We will focus on 3 important variations:
-
-  1. ***Standardized*** regression
   
   1. ***Non-linear relationships***: log and polynomial models
   
   1. ***Interactions*** between variables
+
+  1. ***Standardized*** regression
 
 --
 
@@ -67,111 +68,9 @@ In each case, the way we estimate these coefficients does not change (i.e OLS).
 
 Empirical applications:
 
-  (i) *class size* and *student performance*,
-  (ii) *college tuition* and *earnings potential*,
-  (iii) *wage*, *education* and *gender* 
-
----
-
-layout: false
-class: title-slide-section-red, middle
-
-# Standardized Regression
-
----
-
-layout: true
-
-&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
-
----
-
-# Standardized Regression
-
-Let's define what *standardizing* a variable means.
-
-&gt; ***Standardizing*** a variable `\(z\)`  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
-
-$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
-where `\(\bar z\)` is the mean of `\(z\)` and `\(\sigma(z)\)` is the standard deviation of `\(z\)`, i.e. `\(\sigma(z) = \sqrt{\textrm{Var}(z)}\)`.
-
---
-
-`\(z^{stand}\)` now has mean 0 and standard deviation 1, i.e. `\(\overline{z^{stand}} = 0\)` and `\(\sigma(z^{stand}) = 1\)`
-
---
-
-Intuitively, standardizing ***puts variables on the same scale*** so we can compare them.
-  
-In our class size and student performance example, it will help to interpret: 
-
-  * The **magnitude** of the effects,
-  * The **relative importance of each variable**.
-
----
-
-# Standardized Regression: Graphically
-
-
-
-.pull-left[
-&lt;img src="chapter_regext_files/figure-html/graph_before.png" width="3200" style="display: block; margin: auto;" /&gt;
-]
-
---
-
-.pull-right[
-&lt;img src="chapter_regext_files/figure-html/graph_after.png" width="3200" style="display: block; margin: auto;" /&gt;
-]
-
----
-
-# Standardized Regression: Interpretation
-
-If the ***dependent*** variable `\(y\)` is standardized, i.e. the model is `\(\color{#d90502}{y^{stand}} = b_0 + \sum_{k=1}^Kb_kx_k +e\)`:
-
---
-
-* By definition, `\(b_k\)` measures the predicted change in ** `\(y^{stand}\)` **  associated with a one unit increase in `\(x_k\)`.
-  
-* If `\(y^{stand}\)` increases by one, it means that `\(y\)` increases by one standard deviation. So `\(b_k\)` measures the change in `\(y\)` **as a share of `\(y\)`'s standard deviation**.
-  
---
-
-If the ***regressor*** `\(x_k\)` is standardized, i.e. the model is `\(y = b_0 + \sum_{k=1}^Kb_k\color{#d90502}{x_k^{stand}} +e\)`:
-
---
-
-* By definition, `\(b_k\)` measures the predicted change in `\(y\)` associated with a one unit increase in ** `\(x_k^{stand}\)` **. 
-  
-* If `\(x_k^{stand}\)` increases by one unit, it means that `\(x_k\)` increases by one standard deviation. So `\(b_k\)` measures the predicted change in `\(y\)` **associated with an increase in `\(x_k\)` by one standard deviation**. 
-  
----
-
-class:inverse
-
-# Task 1: Standardized regression
-
-<div class="countdown" id="timer_60590cb5" style="top:0;right:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
-Let's go back our [grades](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) dataset. Remember that to load the data you need to use the `read_dta()` function from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
-
-
-```
-##       (Intercept)          classize     disadvantaged school_enrollment            female         religious 
-##      78.560725298       0.003320773      -0.389333008       0.000758258       0.923710499       2.876146701
-```
-
-1. Create a new variable `avgmath_stand` equal to the standardized math score. You can use the `scale()` function (combined with `mutate`) or do it by hand with base `R`.
-
-1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
-
-1. Create the standardized variables for each *continuous* regressor as `&lt;regressor&gt;_stand`.
-  * Would it make sense to standardize the `religious` variable?
-
-1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
+  (i) *college tuition* and *earnings potential*,
+  (ii) *wage*, *education* and *gender* ,
+  (iii) *class size* and *student performance*
 
 ---
 
@@ -225,7 +124,7 @@ There are two main "methods":
 
 # The (natural) log Function: A Primer 😉
 
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -250,13 +149,13 @@ If you have very ***skewed distributions*** taking the log will render it more *
 --
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -279,6 +178,7 @@ If you have very ***skewed distributions*** taking the log will render it more *
 * ⚠️ these interpretations are only true for ***small*** changes in `\(x\)` and small/or `\(b_1\)`. What happens if we want to know the change in `\(y\)` for big changes in `\(x\)` or when `\(b_1\)` is large?
 
 ---
+name: gen_log
 
 # Log Models: General Interpretations
 
@@ -291,79 +191,9 @@ For ***any increase in `\(x\)`, `\(\Delta x,\)` and any `\(b_1\)`*** `\((\Delta 
 | Level - Log | `\(y = b_0 + b_1 log(x)  + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 \times log(1 + \Delta x)\)`  .small[**unit change** in y] |
 | Log - Log  |  `\(log(y) = b_0 + b_1 log(x) + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(((1 + \Delta x)^{b_1} - 1) \times 100\)` .small[**percent change** in y]  |
 
----
 
-# Log Models: Approximations
+([*Appendix:*](#log_approx) Why are the previously shown approximations true?)
 
-Why are the approximations shown previously true?
-
---
-
-***Log-Level***
-
-*General interpretation:* A **one unit** increase in `\(x\)` is associated, on average, with a `\((e^{b_1} - 1) \times 100\)` **percent change** in y.
-
-*Simplified interpretation:* A **one unit** increase in `\(x\)` is associated, on average, with a `\(b_1 \times 100\)` **percent change** in y.
-
---
-
-This is because, for small `\(b_1\)`, `\(e^{b_1} \approx 1+ b_1 \iff b_1 \approx e^{b_1} - 1\)`
-
---
-
-`\(\rightarrow\)` for `\(b_1 = \color{#d90502}{0.04}\)`, `\(e^{b_1} - 1 = e^{0.04} - 1 = 0.0408\)` 
-
---
-
-`\(\rightarrow\)` for `\(b_1 = \color{#d90502}{0.5}\)`, `\(e^{b_1} - 1 = e^{0.5} - 1 = 0.6487\)`
-
----
-
-# Log Models: Approximations
-
-Why are the approximations shown previously true?
-
-***Level-Log***
-
-*General interpretation:* A ** `\(\Delta x\)`** **percent** increase in `\(x\)` is associated, on average, with a `\(b_1 \times log(1 + \Delta x)\)` **unit change** in y.
-
-*Simplified interpretation:* A **one percent** increase in `\(x\)` is associated, on average, with a `\(b_1 / 100\)` **unit change** in y.
-
---
-
-This is because for small `\(\Delta x\)`, `\(log(1 + \Delta x) \approx \Delta x\)`
-
---
-
-`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{1\%}=0.01\)`, `\(log(1+\Delta x) = log(1.01) = 0.01\)` (hence the `\(/100\)` in the simplified interpretation)
-
---
-
-`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{20\%}=0.20\)`, `\(log(1+\Delta x) = log(1.20) = 0.18\)`
-
----
-
-# Log Models: Approximations
-
-Why are the approximations shown previously true?
-
-***Log-Log***
-
-*General interpretation:* A ** `\(\Delta x\)`** **percent** increase in `\(x\)` is associated, on average, with a `\(((1 + \Delta x)^{b_1} - 1) \times 100\)` **percent change** in y.
-
-*Simplified interpretation:* A **one percent** increase in `\(x\)` is associated, on average, with a `\(b_1\)` **percent change** in y.
-
---
-
-This is because for small `\(|b_1|\times \Delta x\)`, `\((1 + \Delta x)^{b_1} \approx 1 + b_1 \times \Delta x \iff b_1 \times \Delta x \times 100 \approx ((1 + \Delta x)^{b_1} - 1) \times 100\)`
-
---
-
-`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{1\%}=0.01\)` and `\(b_1 = \color{#d90502}{0.5}\)`, `\(((1+\Delta x)^{b_1} - 1) \times 100 = (1.01^{0.5} - 1) \times 100 = 0.5\)`
-
---
-
-`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{10\%}=0.10\)` and `\(b_1 = \color{#d90502}{10}\)`, `\(((1+\Delta x)^{b_1} - 1) \times 100= (1.1^{10} - 1) \times 100 = 159.37\)`
 
 ---
 
@@ -374,13 +204,13 @@ This is because for small `\(|b_1|\times \Delta x\)`, `\((1 + \Delta x)^{b_1} \a
 --
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -390,13 +220,13 @@ This is because for small `\(|b_1|\times \Delta x\)`, `\((1 + \Delta x)^{b_1} \a
 1. If the relationship betwen `\(x\)` and `\(y\)` looks like a log or exponential function. 
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -424,13 +254,13 @@ What if the relationship between `\(x\)` and `\(y\)` is not exponential/log?
 # Polynomial Wut? 😟
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -473,7 +303,7 @@ lm(y ~ poly(x, 3, raw = TRUE), data)
 
 ***2nd order:***
 
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
@@ -482,7 +312,7 @@ lm(y ~ poly(x, 3, raw = TRUE), data)
 
 ***3rd order:***
 
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -493,9 +323,9 @@ lm(y ~ poly(x, 3, raw = TRUE), data)
 
 class:inverse
 
-# Task 2: Non-linear relationships
+# Task 1: Non-linear relationships
 
-<div class="countdown" id="timer_60590d4b" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6230ed16" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -601,8 +431,10 @@ lm(math ~ small+ experience + small*experience, star_df)
 ##     data = star_df)
 ## 
 ## Coefficients:
-##          (Intercept)             smallTRUE            experience  smallTRUE:experience  
-##             534.1919               15.8906                1.3305               -0.3034
+##          (Intercept)             smallTRUE            experience  
+##             534.1919               15.8906                1.3305  
+## smallTRUE:experience  
+##              -0.3034
 ```
 
 ***Interpretation:***
@@ -681,9 +513,9 @@ $$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}
 
 class:inverse
 
-# Task 3: Wages, education and gender in 1985
+# Task 2: Wages, education and gender in 1985
 
-<div class="countdown" id="timer_60590efe" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6230ed89" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -701,6 +533,109 @@ class:inverse
 
 1. Create a plot showing this interaction. (*Hint:* use the `color = gender` argument in `aes` and `geom_smooth(method = "lm", se = F)` to obtain a regression line per gender.)
 
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Standardized Regression
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Standardized Regression
+
+Let's define what *standardizing* a variable means.
+
+&gt; ***Standardizing*** a variable `\(z\)`  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
+
+$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
+where `\(\bar z\)` is the mean of `\(z\)` and `\(\sigma(z)\)` is the standard deviation of `\(z\)`, i.e. `\(\sigma(z) = \sqrt{\textrm{Var}(z)}\)`.
+
+--
+
+`\(z^{stand}\)` now has mean 0 and standard deviation 1, i.e. `\(\overline{z^{stand}} = 0\)` and `\(\sigma(z^{stand}) = 1\)`
+
+--
+
+Intuitively, standardizing ***puts variables on the same scale*** so we can compare them.
+  
+In our class size and student performance example, it will help to interpret: 
+
+  * The **magnitude** of the effects,
+  * The **relative importance of each variable**.
+
+---
+
+# Standardized Regression: Graphically
+
+
+
+.pull-left[
+&lt;img src="chapter_regext_files/figure-html/graph_before.png" width="3200" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_regext_files/figure-html/graph_after.png" width="3200" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Standardized Regression: Interpretation
+
+If the ***dependent*** variable `\(y\)` is standardized, i.e. the model is `\(\color{#d90502}{y^{stand}} = b_0 + \sum_{k=1}^Kb_kx_k +e\)`:
+
+--
+
+* By definition, `\(b_k\)` measures the predicted change in ** `\(y^{stand}\)` **  associated with a one unit increase in `\(x_k\)`.
+  
+* If `\(y^{stand}\)` increases by one, it means that `\(y\)` increases by one standard deviation. So `\(b_k\)` measures the change in `\(y\)` **as a share of `\(y\)`'s standard deviation**.
+  
+--
+
+If the ***regressor*** `\(x_k\)` is standardized, i.e. the model is `\(y = b_0 + \sum_{k=1}^Kb_k\color{#d90502}{x_k^{stand}} +e\)`:
+
+--
+
+* By definition, `\(b_k\)` measures the predicted change in `\(y\)` associated with a one unit increase in ** `\(x_k^{stand}\)` **. 
+  
+* If `\(x_k^{stand}\)` increases by one unit, it means that `\(x_k\)` increases by one standard deviation. So `\(b_k\)` measures the predicted change in `\(y\)` **associated with an increase in `\(x_k\)` by one standard deviation**. 
+  
+---
+
+class:inverse
+
+# Task 3: Standardized regression
+
+<div class="countdown" id="timer_6230eed1" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Let's go back our [grades](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) dataset. Remember that to load the data you need to use the `read_dta()` function from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
+
+
+```
+##       (Intercept)          classize     disadvantaged school_enrollment 
+##      78.560725298       0.003320773      -0.389333008       0.000758258 
+##            female         religious 
+##       0.923710499       2.876146701
+```
+
+1. Create a new variable `avgmath_stand` equal to the standardized math score. You can use the `scale()` function (combined with `mutate`) or do it by hand with base `R`.
+
+1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
+
+1. Create the standardized variables for each *continuous* regressor as `&lt;regressor&gt;_stand`.
+  * Would it make sense to standardize the `religious` variable?
+
+1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
 
 ---
 
@@ -723,6 +658,22 @@ class:inverse
   * We'll present the notion of **sampling**, and
   
   * Understand what **statistical inference** is and how to do it. 
+---
+
+# On the way to causality
+
+✅ How to manage data? Read it, tidy it, visualise it!
+
+✅  **How to summarise relationships between variables?** Simple and multiple linear regression, non-linear regressions, interactions...
+
+✅ What is causality?
+
+❌ What if we don't observe an entire population?
+
+❌  Are our findings just due to randomness?
+
+❌ How to find exogeneity in practice?
+
 
 ---
 
@@ -742,6 +693,83 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
+---
+name: log_approx
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
+
+--
+
+***Log-Level***
+
+*General interpretation:* A **one unit** increase in `\(x\)` is associated, on average, with a `\((e^{b_1} - 1) \times 100\)` **percent change** in y.
+
+*Simplified interpretation:* A **one unit** increase in `\(x\)` is associated, on average, with a `\(b_1 \times 100\)` **percent change** in y.
+
+--
+
+This is because, for small `\(b_1\)`, `\(e^{b_1} \approx 1+ b_1 \iff b_1 \approx e^{b_1} - 1\)`
+
+--
+
+`\(\rightarrow\)` for `\(b_1 = \color{#d90502}{0.04}\)`, `\(e^{b_1} - 1 = e^{0.04} - 1 = 0.0408\)` 
+
+--
+
+`\(\rightarrow\)` for `\(b_1 = \color{#d90502}{0.5}\)`, `\(e^{b_1} - 1 = e^{0.5} - 1 = 0.6487\)`
+
+---
+
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
+
+***Level-Log***
+
+*General interpretation:* A ** `\(\Delta x\)`** **percent** increase in `\(x\)` is associated, on average, with a `\(b_1 \times log(1 + \Delta x)\)` **unit change** in y.
+
+*Simplified interpretation:* A **one percent** increase in `\(x\)` is associated, on average, with a `\(b_1 / 100\)` **unit change** in y.
+
+--
+
+This is because for small `\(\Delta x\)`, `\(log(1 + \Delta x) \approx \Delta x\)`
+
+--
+
+`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{1\%}=0.01\)`, `\(log(1+\Delta x) = log(1.01) = 0.01\)` (hence the `\(/100\)` in the simplified interpretation)
+
+--
+
+`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{20\%}=0.20\)`, `\(log(1+\Delta x) = log(1.20) = 0.18\)`
+
+---
+
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
+
+***Log-Log***
+
+*General interpretation:* A ** `\(\Delta x\)`** **percent** increase in `\(x\)` is associated, on average, with a `\(((1 + \Delta x)^{b_1} - 1) \times 100\)` **percent change** in y.
+
+*Simplified interpretation:* A **one percent** increase in `\(x\)` is associated, on average, with a `\(b_1\)` **percent change** in y.
+
+--
+
+This is because for small `\(|b_1|\times \Delta x\)`, `\((1 + \Delta x)^{b_1} \approx 1 + b_1 \times \Delta x \iff b_1 \times \Delta x \times 100 \approx ((1 + \Delta x)^{b_1} - 1) \times 100\)`
+
+--
+
+`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{1\%}=0.01\)` and `\(b_1 = \color{#d90502}{0.5}\)`, `\(((1+\Delta x)^{b_1} - 1) \times 100 = (1.01^{0.5} - 1) \times 100 = 0.5\)`
+
+--
+
+`\(\rightarrow\)` for `\(\Delta x = \color{#d90502}{10\%}=0.10\)` and `\(b_1 = \color{#d90502}{10}\)`, `\(((1+\Delta x)^{b_1} - 1) \times 100= (1.1^{10} - 1) \times 100 = 159.37\)`
+
+
+[back](#gen_log)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
