@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Linear Regression Extensions"
-author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+author: "Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -83,12 +83,12 @@ Depending on the data and the relationships between the variables of interest, y
 --
 
 We will focus on 3 important variations:
-
-  1. ***Standardized*** regression
   
   1. ***Non-linear relationships***: log and polynomial models
   
   1. ***Interactions*** between variables
+
+  1. ***Standardized*** regression
 
 --
 
@@ -98,151 +98,9 @@ In each case, the way we estimate these coefficients does not change (i.e OLS).
 
 Empirical applications:
 
-  (i) *class size* and *student performance*,
-  (ii) *college tuition* and *earnings potential*,
-  (iii) *wage*, *education* and *gender* 
-
----
-
-layout: false
-class: title-slide-section-red, middle
-
-# Standardized Regression
-
----
-
-layout: true
-
-<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
-
----
-
-# Standardized Regression
-
-Let's define what *standardizing* a variable means.
-
-> ***Standardizing*** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
-
-$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
-where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{Var}(z)}$.
-
---
-
-$z^{stand}$ now has mean 0 and standard deviation 1, i.e. $\overline{z^{stand}} = 0$ and $\sigma(z^{stand}) = 1$
-
---
-
-Intuitively, standardizing ***puts variables on the same scale*** so we can compare them.
-  
-In our class size and student performance example, it will help to interpret: 
-
-  * The **magnitude** of the effects,
-  * The **relative importance of each variable**.
-
----
-
-# Standardized Regression: Graphically
-
-```{r, echo = FALSE}
-# nrom = data.frame(x = rnorm(100000, mean = 20, sd = 6))
-# nrom <- nrom %>%
-#     mutate(x_stand = scale(x))
-# 
-# mean = mean(nrom$x)
-# sd = sd(nrom$x)
-# mean_stand = mean(nrom$x_stand)
-# sd_stand = sd(nrom$x_stand)
-# 
-# nrom %>%
-#     ggplot(aes(x = x)) +
-#     geom_density() +
-#     geom_vline(xintercept = mean, color = "#d90502") +
-#     geom_vline(xintercept = mean + sd, linetype = 2, color = "#d96502") +
-#     scale_x_continuous(breaks = c(0,10,20, round(mean+sd,0), 30, 40)) +
-#     geom_segment(aes(x = 14, xend = 19, y = 0.005, yend = 0.005), size = .5, linetype = 1, colour = "#d90502", arrow = arrow(length = unit(0.2, "cm"))) +
-#     annotate("text", x = 8.5, y = 0.005, hjust = 0, label = "mean", color = "#d90502", size = 6) +
-#     geom_segment(aes(x = mean + 1, xend = mean + sd - 1, y = 0.005, yend = 0.005), size = .5, linetype = 1, colour = "#d96502", arrow = arrow(length = unit(0.2, "cm"), ends = "both")) +
-#     annotate("text", x = mean + sd/2, y = 0.008, label = "1 SD", color = "#d96502", size = 6) +
-#     labs(title = " Before standardizing") +
-#     theme_bw(base_size = 20)
-# ggsave("chapter_regext/chapter_regext_files/figure-html/graph_before.png", height = 7, width = 8)
-# 
-# nrom %>%
-#     ggplot(aes(x = x_stand)) +
-#     geom_density() +
-#     geom_vline(xintercept = mean_stand, color = "#d90502") +
-#     geom_vline(xintercept = mean_stand + sd_stand, linetype = 2, color = "#d96502") +
-#     scale_x_continuous(breaks = c(-2.5,0, round(mean_stand+sd_stand,0), 2.5)) +
-#     geom_segment(aes(x = -1, xend = -.15, y = 0.04, yend = 0.04), size = .5, linetype = 1, colour = "#d90502", arrow = arrow(length = unit(0.2, "cm"))) +
-#     annotate("text", x = -1.8, y = 0.04, hjust = 0, label = "mean", color = "#d90502", size = 5) +
-#     geom_segment(aes(x = mean_stand + .1, xend = mean_stand + sd_stand - .1, y = 0.04, yend = 0.04), size = .5, linetype = 1, colour = "#d96502", arrow = arrow(length = unit(0.2, "cm"), ends = "both")) +
-#     annotate("text", x = mean_stand + sd_stand/2, y = 0.06, label = "1 SD", color = "#d96502", size = 6) +
-#     labs(x = "standardized x", title = "After standardizing") +
-#     theme_bw(base_size = 20)
-# ggsave("chapter_regext/chapter_regext_files/figure-html/graph_after.png", height = 7, width = 8)
-```
-
-.pull-left[
-```{r, echo = F}
-knitr::include_graphics("chapter_regext_files/figure-html/graph_before.png")
-```
-]
-
---
-
-.pull-right[
-```{r, echo = F}
-knitr::include_graphics("chapter_regext_files/figure-html/graph_after.png")
-```
-]
-
----
-
-# Standardized Regression: Interpretation
-
-If the ***dependent*** variable $y$ is standardized, i.e. the model is $\color{#d90502}{y^{stand}} = b_0 + \sum_{k=1}^Kb_kx_k +e$:
-
---
-
-* By definition, $b_k$ measures the predicted change in ** $y^{stand}$ **  associated with a one unit increase in $x_k$.
-  
-* If $y^{stand}$ increases by one, it means that $y$ increases by one standard deviation. So $b_k$ measures the change in $y$ **as a share of $y$'s standard deviation**.
-  
---
-
-If the ***regressor*** $x_k$ is standardized, i.e. the model is $y = b_0 + \sum_{k=1}^Kb_k\color{#d90502}{x_k^{stand}} +e$:
-
---
-
-* By definition, $b_k$ measures the predicted change in $y$ associated with a one unit increase in ** $x_k^{stand}$ **. 
-  
-* If $x_k^{stand}$ increases by one unit, it means that $x_k$ increases by one standard deviation. So $b_k$ measures the predicted change in $y$ **associated with an increase in $x_k$ by one standard deviation**. 
-  
----
-
-class:inverse
-
-# Task 1: Standardized regression
-
-`r countdown(minutes = 7, top = 0)`
-
-Let's go back our [grades](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) dataset. Remember that to load the data you need to use the `read_dta()` function from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
-
-```{r echo = FALSE}
-grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
-
-reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
-reg_full$coefficients
-```
-
-1. Create a new variable `avgmath_stand` equal to the standardized math score. You can use the `scale()` function (combined with `mutate`) or do it by hand with base `R`.
-
-1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
-
-1. Create the standardized variables for each *continuous* regressor as `<regressor>_stand`.
-  * Would it make sense to standardize the `religious` variable?
-
-1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
+  (i) *college tuition* and *earnings potential*,
+  (ii) *wage*, *education* and *gender* ,
+  (iii) *class size* and *student performance*
 
 ---
 
@@ -371,6 +229,7 @@ data %>%
 * `r emo::ji("warning")` these interpretations are only true for ***small*** changes in $x$ and small/or $b_1$. What happens if we want to know the change in $y$ for big changes in $x$ or when $b_1$ is large?
 
 ---
+name: gen_log
 
 # Log Models: General Interpretations
 
@@ -383,79 +242,9 @@ For ***any increase in $x$, $\Delta x,$ and any $b_1$*** $(\Delta x = 5\% = 0.05
 | Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 \times log(1 + \Delta x)$  .small[**unit change** in y] |
 | Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a] $((1 + \Delta x)^{b_1} - 1) \times 100$ .small[**percent change** in y]  |
 
----
 
-# Log Models: Approximations
+([*Appendix:*](#log_approx) Why are the previously shown approximations true?)
 
-Why are the approximations shown previously true?
-
---
-
-***Log-Level***
-
-*General interpretation:* A **one unit** increase in $x$ is associated, on average, with a $(e^{b_1} - 1) \times 100$ **percent change** in y.
-
-*Simplified interpretation:* A **one unit** increase in $x$ is associated, on average, with a $b_1 \times 100$ **percent change** in y.
-
---
-
-This is because, for small $b_1$, $e^{b_1} \approx 1+ b_1 \iff b_1 \approx e^{b_1} - 1$
-
---
-
-$\rightarrow$ for $b_1 = \color{#d90502}{0.04}$, $e^{b_1} - 1 = e^{0.04} - 1 = `r round(exp(0.04) - 1,4)`$ 
-
---
-
-$\rightarrow$ for $b_1 = \color{#d90502}{0.5}$, $e^{b_1} - 1 = e^{0.5} - 1 = `r round(exp(0.5) - 1,4)`$
-
----
-
-# Log Models: Approximations
-
-Why are the approximations shown previously true?
-
-***Level-Log***
-
-*General interpretation:* A ** $\Delta x$** **percent** increase in $x$ is associated, on average, with a $b_1 \times log(1 + \Delta x)$ **unit change** in y.
-
-*Simplified interpretation:* A **one percent** increase in $x$ is associated, on average, with a $b_1 / 100$ **unit change** in y.
-
---
-
-This is because for small $\Delta x$, $log(1 + \Delta x) \approx \Delta x$
-
---
-
-$\rightarrow$ for $\Delta x = \color{#d90502}{1\%}=0.01$, $log(1+\Delta x) = log(1.01) = `r round(log(1.01),2)`$ (hence the $/100$ in the simplified interpretation)
-
---
-
-$\rightarrow$ for $\Delta x = \color{#d90502}{20\%}=0.20$, $log(1+\Delta x) = log(1.20) = `r round(log(1.20),2)`$
-
----
-
-# Log Models: Approximations
-
-Why are the approximations shown previously true?
-
-***Log-Log***
-
-*General interpretation:* A ** $\Delta x$** **percent** increase in $x$ is associated, on average, with a $((1 + \Delta x)^{b_1} - 1) \times 100$ **percent change** in y.
-
-*Simplified interpretation:* A **one percent** increase in $x$ is associated, on average, with a $b_1$ **percent change** in y.
-
---
-
-This is because for small $|b_1|\times \Delta x$, $(1 + \Delta x)^{b_1} \approx 1 + b_1 \times \Delta x \iff b_1 \times \Delta x \times 100 \approx ((1 + \Delta x)^{b_1} - 1) \times 100$
-
---
-
-$\rightarrow$ for $\Delta x = \color{#d90502}{1\%}=0.01$ and $b_1 = \color{#d90502}{0.5}$, $((1+\Delta x)^{b_1} - 1) \times 100 = (1.01^{0.5} - 1) \times 100 = `r round(((1.01)^0.5 - 1) * 100,2)`$
-
---
-
-$\rightarrow$ for $\Delta x = \color{#d90502}{10\%}=0.10$ and $b_1 = \color{#d90502}{10}$, $((1+\Delta x)^{b_1} - 1) \times 100= (1.1^{10} - 1) \times 100 = `r round(((1.10)^10 -1) * 100,2)`$
 
 ---
 
@@ -695,7 +484,7 @@ knitr::include_graphics("chapter_regext_files/figure-html/curve_fitting.png")
 
 class:inverse
 
-# Task 2: Non-linear relationships
+# Task 1: Non-linear relationships
 
 `r countdown(minutes = 10, top = 0)`
 
@@ -965,7 +754,7 @@ knitr::include_graphics("chapter_regext_files/figure-html/graph_reg_b0_b1_b2_b3.
 
 class:inverse
 
-# Task 3: Wages, education and gender in 1985
+# Task 2: Wages, education and gender in 1985
 
 `r countdown(minutes = 10, top = 0)`
 
@@ -983,6 +772,147 @@ class:inverse
 
 1. Create a plot showing this interaction. (*Hint:* use the `color = gender` argument in `aes` and `geom_smooth(method = "lm", se = F)` to obtain a regression line per gender.)
 
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Standardized Regression
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Standardized Regression
+
+Let's define what *standardizing* a variable means.
+
+> ***Standardizing*** a variable $z$  means to *demean* the variable and to divide the demeaned value by its own standard deviation:
+
+$$ z_i^{stand} = \frac{z_i - \bar z}{\sigma(z)}$$ 
+where $\bar z$ is the mean of $z$ and $\sigma(z)$ is the standard deviation of $z$, i.e. $\sigma(z) = \sqrt{\textrm{Var}(z)}$.
+
+--
+
+$z^{stand}$ now has mean 0 and standard deviation 1, i.e. $\overline{z^{stand}} = 0$ and $\sigma(z^{stand}) = 1$
+
+--
+
+Intuitively, standardizing ***puts variables on the same scale*** so we can compare them.
+  
+In our class size and student performance example, it will help to interpret: 
+
+  * The **magnitude** of the effects,
+  * The **relative importance of each variable**.
+
+---
+
+# Standardized Regression: Graphically
+
+```{r, echo = FALSE}
+# nrom = data.frame(x = rnorm(100000, mean = 20, sd = 6))
+# nrom <- nrom %>%
+#     mutate(x_stand = scale(x))
+# 
+# mean = mean(nrom$x)
+# sd = sd(nrom$x)
+# mean_stand = mean(nrom$x_stand)
+# sd_stand = sd(nrom$x_stand)
+# 
+# nrom %>%
+#     ggplot(aes(x = x)) +
+#     geom_density() +
+#     geom_vline(xintercept = mean, color = "#d90502") +
+#     geom_vline(xintercept = mean + sd, linetype = 2, color = "#d96502") +
+#     scale_x_continuous(breaks = c(0,10,20, round(mean+sd,0), 30, 40)) +
+#     geom_segment(aes(x = 14, xend = 19, y = 0.005, yend = 0.005), size = .5, linetype = 1, colour = "#d90502", arrow = arrow(length = unit(0.2, "cm"))) +
+#     annotate("text", x = 8.5, y = 0.005, hjust = 0, label = "mean", color = "#d90502", size = 6) +
+#     geom_segment(aes(x = mean + 1, xend = mean + sd - 1, y = 0.005, yend = 0.005), size = .5, linetype = 1, colour = "#d96502", arrow = arrow(length = unit(0.2, "cm"), ends = "both")) +
+#     annotate("text", x = mean + sd/2, y = 0.008, label = "1 SD", color = "#d96502", size = 6) +
+#     labs(title = " Before standardizing") +
+#     theme_bw(base_size = 20)
+# ggsave("chapter_regext/chapter_regext_files/figure-html/graph_before.png", height = 7, width = 8)
+# 
+# nrom %>%
+#     ggplot(aes(x = x_stand)) +
+#     geom_density() +
+#     geom_vline(xintercept = mean_stand, color = "#d90502") +
+#     geom_vline(xintercept = mean_stand + sd_stand, linetype = 2, color = "#d96502") +
+#     scale_x_continuous(breaks = c(-2.5,0, round(mean_stand+sd_stand,0), 2.5)) +
+#     geom_segment(aes(x = -1, xend = -.15, y = 0.04, yend = 0.04), size = .5, linetype = 1, colour = "#d90502", arrow = arrow(length = unit(0.2, "cm"))) +
+#     annotate("text", x = -1.8, y = 0.04, hjust = 0, label = "mean", color = "#d90502", size = 5) +
+#     geom_segment(aes(x = mean_stand + .1, xend = mean_stand + sd_stand - .1, y = 0.04, yend = 0.04), size = .5, linetype = 1, colour = "#d96502", arrow = arrow(length = unit(0.2, "cm"), ends = "both")) +
+#     annotate("text", x = mean_stand + sd_stand/2, y = 0.06, label = "1 SD", color = "#d96502", size = 6) +
+#     labs(x = "standardized x", title = "After standardizing") +
+#     theme_bw(base_size = 20)
+# ggsave("chapter_regext/chapter_regext_files/figure-html/graph_after.png", height = 7, width = 8)
+```
+
+.pull-left[
+```{r, echo = F}
+knitr::include_graphics("chapter_regext_files/figure-html/graph_before.png")
+```
+]
+
+--
+
+.pull-right[
+```{r, echo = F}
+knitr::include_graphics("chapter_regext_files/figure-html/graph_after.png")
+```
+]
+
+---
+
+# Standardized Regression: Interpretation
+
+If the ***dependent*** variable $y$ is standardized, i.e. the model is $\color{#d90502}{y^{stand}} = b_0 + \sum_{k=1}^Kb_kx_k +e$:
+
+--
+
+* By definition, $b_k$ measures the predicted change in ** $y^{stand}$ **  associated with a one unit increase in $x_k$.
+  
+* If $y^{stand}$ increases by one, it means that $y$ increases by one standard deviation. So $b_k$ measures the change in $y$ **as a share of $y$'s standard deviation**.
+  
+--
+
+If the ***regressor*** $x_k$ is standardized, i.e. the model is $y = b_0 + \sum_{k=1}^Kb_k\color{#d90502}{x_k^{stand}} +e$:
+
+--
+
+* By definition, $b_k$ measures the predicted change in $y$ associated with a one unit increase in ** $x_k^{stand}$ **. 
+  
+* If $x_k^{stand}$ increases by one unit, it means that $x_k$ increases by one standard deviation. So $b_k$ measures the predicted change in $y$ **associated with an increase in $x_k$ by one standard deviation**. 
+  
+---
+
+class:inverse
+
+# Task 3: Standardized regression
+
+`r countdown(minutes = 7, top = 0)`
+
+Let's go back our [grades](https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1) dataset. Remember that to load the data you need to use the `read_dta()` function from the `haven` package. These are the estimates we got from regressing average math test scores on the full set of regressors.
+
+```{r echo = FALSE}
+grades = read_dta(file = "https://www.dropbox.com/s/wwp2cs9f0dubmhr/grade5.dta?dl=1")
+
+reg_full <- lm(avgverb ~ classize + disadvantaged + school_enrollment + female + religious, grades)
+reg_full$coefficients
+```
+
+1. Create a new variable `avgmath_stand` equal to the standardized math score. You can use the `scale()` function (combined with `mutate`) or do it by hand with base `R`.
+
+1. Run the full regression using the standardized math test score as the dependent variable. Interpret the coefficients and their magnitude.
+
+1. Create the standardized variables for each *continuous* regressor as `<regressor>_stand`.
+  * Would it make sense to standardize the `religious` variable?
+
+1. Regress `avgmath_stand` on the full set of standardized regressors and `religious`. Discuss the relative influence of the regressors.
 
 ---
 
@@ -1005,6 +935,22 @@ class:inverse
   * We'll present the notion of **sampling**, and
   
   * Understand what **statistical inference** is and how to do it. 
+---
+
+# On the way to causality
+
+`r emo::ji("white heavy check mark")` How to manage data? Read it, tidy it, visualise it!
+
+`r emo::ji("white heavy check mark")`  **How to summarise relationships between variables?** Simple and multiple linear regression, non-linear regressions, interactions...
+
+`r emo::ji("white heavy check mark")` What is causality?
+
+`r emo::ji("cross mark")` What if we don't observe an entire population?
+
+`r emo::ji("cross mark")`  Are our findings just due to randomness?
+
+`r emo::ji("cross mark")` How to find exogeneity in practice?
+
 
 ---
 
@@ -1025,3 +971,79 @@ background-position: 9% 19%
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
 
+---
+name: log_approx
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
+
+--
+
+***Log-Level***
+
+*General interpretation:* A **one unit** increase in $x$ is associated, on average, with a $(e^{b_1} - 1) \times 100$ **percent change** in y.
+
+*Simplified interpretation:* A **one unit** increase in $x$ is associated, on average, with a $b_1 \times 100$ **percent change** in y.
+
+--
+
+This is because, for small $b_1$, $e^{b_1} \approx 1+ b_1 \iff b_1 \approx e^{b_1} - 1$
+
+--
+
+$\rightarrow$ for $b_1 = \color{#d90502}{0.04}$, $e^{b_1} - 1 = e^{0.04} - 1 = `r round(exp(0.04) - 1,4)`$ 
+
+--
+
+$\rightarrow$ for $b_1 = \color{#d90502}{0.5}$, $e^{b_1} - 1 = e^{0.5} - 1 = `r round(exp(0.5) - 1,4)`$
+
+---
+
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
+
+***Level-Log***
+
+*General interpretation:* A ** $\Delta x$** **percent** increase in $x$ is associated, on average, with a $b_1 \times log(1 + \Delta x)$ **unit change** in y.
+
+*Simplified interpretation:* A **one percent** increase in $x$ is associated, on average, with a $b_1 / 100$ **unit change** in y.
+
+--
+
+This is because for small $\Delta x$, $log(1 + \Delta x) \approx \Delta x$
+
+--
+
+$\rightarrow$ for $\Delta x = \color{#d90502}{1\%}=0.01$, $log(1+\Delta x) = log(1.01) = `r round(log(1.01),2)`$ (hence the $/100$ in the simplified interpretation)
+
+--
+
+$\rightarrow$ for $\Delta x = \color{#d90502}{20\%}=0.20$, $log(1+\Delta x) = log(1.20) = `r round(log(1.20),2)`$
+
+---
+
+# Log Models: Approximations
+
+Why are the approximations shown previously true?
+
+***Log-Log***
+
+*General interpretation:* A ** $\Delta x$** **percent** increase in $x$ is associated, on average, with a $((1 + \Delta x)^{b_1} - 1) \times 100$ **percent change** in y.
+
+*Simplified interpretation:* A **one percent** increase in $x$ is associated, on average, with a $b_1$ **percent change** in y.
+
+--
+
+This is because for small $|b_1|\times \Delta x$, $(1 + \Delta x)^{b_1} \approx 1 + b_1 \times \Delta x \iff b_1 \times \Delta x \times 100 \approx ((1 + \Delta x)^{b_1} - 1) \times 100$
+
+--
+
+$\rightarrow$ for $\Delta x = \color{#d90502}{1\%}=0.01$ and $b_1 = \color{#d90502}{0.5}$, $((1+\Delta x)^{b_1} - 1) \times 100 = (1.01^{0.5} - 1) \times 100 = `r round(((1.01)^0.5 - 1) * 100,2)`$
+
+--
+
+$\rightarrow$ for $\Delta x = \color{#d90502}{10\%}=0.10$ and $b_1 = \color{#d90502}{10}$, $((1+\Delta x)^{b_1} - 1) \times 100= (1.1^{10} - 1) \times 100 = `r round(((1.10)^10 -1) * 100,2)`$
+
+
+[back](#gen_log)
