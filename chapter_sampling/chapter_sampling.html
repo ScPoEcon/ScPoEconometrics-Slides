@@ -3,7 +3,8 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <meta name="author" content="Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
@@ -17,8 +18,8 @@ class: center, middle, inverse, title-slide
 
 # ScPoEconometrics
 ## Sampling
-### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-03-31
+### Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu
+### SciencesPo Paris </br> 2022-03-21
 
 ---
 
@@ -115,7 +116,7 @@ Yellow   |  1    |     0.05
 
 # Taking 18 Samples (One per Student)
 
-* Because we can't do this activity in class, we drew 18 samples of 20 pasta (with replacement).
+* Because we don't have pasta with us in class, we drew 18 samples of 20 pasta (with replacement) at home.
 
 --
 
@@ -130,7 +131,7 @@ Yellow   |  1    |     0.05
 
 # Taking 18 Samples (One per Student)
 
-* Because we can't do this activity in class, we drew 18 samples of 20 pasta (with replacement) at home.
+* Because we don't have pasta with us in class, we drew 18 samples of 20 pasta (with replacement) at home.
 
 * For each sample, we computed the share of green pasta.
 
@@ -168,11 +169,12 @@ class: inverse
 
 # Task 1
 
-<div class="countdown" id="timer_606435ca" style="top:0;right:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+<div class="countdown" id="timer_6238bef1" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
 1. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
+The proportions are as follows: `(0.7,0.7,0.5,0.5,0.3,0.5,0.4,0.45,0.55,0.4,0.35,0.45,0.45,0.7,0.55,0.5,0.35,0.65)`
 
 1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`.
 
@@ -249,9 +251,9 @@ head(bowl)
 --
 
 .pull-right[
-* `pasta_ID`: ball identifier
+* `pasta_ID`: pasta identifier
 
-* `color`: ball color
+* `color`: pasta color
 
 
 ```r
@@ -296,12 +298,12 @@ head(virtual_shovel)
 ## # Groups:   replicate [1]
 ##   replicate pasta_ID color 
 ##       &lt;int&gt;    &lt;int&gt; &lt;chr&gt; 
-## 1         1      327 green 
-## 2         1      158 yellow
-## 3         1       72 green 
-## 4         1      569 red   
-## 5         1      427 yellow
-## 6         1      242 green
+## 1         1      270 green 
+## 2         1      382 green 
+## 3         1      184 green 
+## 4         1      574 red   
+## 5         1        4 yellow
+## 6         1      661 yellow
 ```
 
 * Column `replicate` tells us the ID of the sample. Here: `1`.
@@ -344,7 +346,7 @@ sample_1
 ## # A tibble: 1 x 4
 ##   replicate num_green sample_n prop_green
 ##       &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-## 1         1        22       50       0.44
+## 1         1        20       50        0.4
 ```
 ]
 
@@ -355,7 +357,7 @@ sample_1
 
 1. Compute proportion of green pasta
 
-👉 0.44 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
+👉 0.4 are green! This is an ***estimate*** of the proportion of green pasta in the bowl. What if we try again?
 
 What if we try many times, like, 33 times?
 ]
@@ -381,17 +383,17 @@ virtual_samples
 ## # Groups:   replicate [33]
 ##    replicate pasta_ID color 
 ##        &lt;int&gt;    &lt;int&gt; &lt;chr&gt; 
-##  1         1      304 green 
-##  2         1      624 red   
-##  3         1       69 yellow
-##  4         1      526 red   
-##  5         1      690 green 
-##  6         1      538 red   
-##  7         1      594 yellow
-##  8         1      664 yellow
-##  9         1      682 green 
-## 10         1       44 red   
-## # … with 1,640 more rows
+##  1         1      595 red   
+##  2         1      434 red   
+##  3         1      218 red   
+##  4         1      508 green 
+##  5         1      276 yellow
+##  6         1      169 green 
+##  7         1       71 green 
+##  8         1      573 red   
+##  9         1      326 green 
+## 10         1      485 yellow
+## # ... with 1,640 more rows
 ```
 ]
 
@@ -416,17 +418,17 @@ virtual_prop_green
 ## # A tibble: 33 x 4
 ##    replicate num_green sample_n prop_green
 ##        &lt;int&gt;     &lt;int&gt;    &lt;int&gt;      &lt;dbl&gt;
-##  1         1        22       50      0.44 
-##  2         2        21       50      0.42 
-##  3         3        25       50      0.5  
-##  4         4        24       50      0.48 
-##  5         5        29       50      0.580
-##  6         6        20       50      0.4  
-##  7         7        15       50      0.3  
-##  8         8        29       50      0.580
-##  9         9        20       50      0.4  
-## 10        10        15       50      0.3  
-## # … with 23 more rows
+##  1         1        25       50       0.5 
+##  2         2        26       50       0.52
+##  3         3        23       50       0.46
+##  4         4        24       50       0.48
+##  5         5        24       50       0.48
+##  6         6        18       50       0.36
+##  7         7        25       50       0.5 
+##  8         8        32       50       0.64
+##  9         9        27       50       0.54
+## 10        10        24       50       0.48
+## # ... with 23 more rows
 ```
 ]
 
@@ -469,7 +471,7 @@ class: inverse
 
 # Task 2
 
-<div class="countdown" id="timer_6064360c" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6238be98" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -755,6 +757,22 @@ Scenario | Population parameter | Notation | Point estimate | Symbol(s)
 
 ---
 
+# On the way to causality [chapter sampling]
+
+✅ How to manage data? Read it, tidy it, visualise it!
+
+✅  How to summarise relationships between variables? Simple and multiple linear regression, non-linear regressions, interactions...
+
+✅ What is causality?
+
+✅ **What if we don't observe an entire population?** Sampling!
+
+❌  Are our findings just due to randomness?
+
+❌ How to find exogeneity in practice?
+
+
+---
 class: title-slide-final, middle
 
 # THANKS
@@ -780,6 +798,7 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
