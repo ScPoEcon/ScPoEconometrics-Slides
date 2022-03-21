@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Sampling"
-author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+author: "Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -143,7 +143,7 @@ Yellow   |  1    |     `r format(round(1/20,2), nsmall = 2)`
 
 # Taking 18 Samples (One per Student)
 
-* Because we can't do this activity in class, we drew 18 samples of 20 pasta (with replacement).
+* Because we don't have pasta with us in class, we drew 18 samples of 20 pasta (with replacement) at home.
 
 --
 
@@ -158,7 +158,7 @@ Yellow   |  1    |     `r format(round(1/20,2), nsmall = 2)`
 
 # Taking 18 Samples (One per Student)
 
-* Because we can't do this activity in class, we drew 18 samples of 20 pasta (with replacement) at home.
+* Because we don't have pasta with us in class, we drew 18 samples of 20 pasta (with replacement) at home.
 
 * For each sample, we computed the share of green pasta.
 
@@ -196,9 +196,10 @@ class: inverse
 
 # Task 1
 
-`r countdown(minutes = 10, top = 0)`
+`r countdown(minutes = 5, top = 0)`
 
 1. Create a data.frame containing the proportions of green pasta from the previous slide. Name it `pasta` and name the variable containing the proportions `prop_green`. (Hint: to create a data.frame you need to use the `data.frame()` function.)
+The proportions are as follows: `(0.7,0.7,0.5,0.5,0.3,0.5,0.4,0.45,0.55,0.4,0.35,0.45,0.45,0.7,0.55,0.5,0.35,0.65)`
 
 1. Create a histogram of these proportions using `ggplot2`. Use these parameters in `geom_histogram()`: `boundary = 0.325, binwidth = 0.05`.
 
@@ -307,9 +308,9 @@ head(bowl)
 --
 
 .pull-right[
-* `pasta_ID`: ball identifier
+* `pasta_ID`: pasta identifier
 
-* `color`: ball color
+* `color`: pasta color
 
 ```{r, echo = TRUE}
 nrow(bowl)
@@ -844,6 +845,22 @@ Scenario | Population parameter | Notation | Point estimate | Symbol(s)
 
 ---
 
+# On the way to causality [chapter sampling]
+
+`r emo::ji("white heavy check mark")` How to manage data? Read it, tidy it, visualise it!
+
+`r emo::ji("white heavy check mark")`  How to summarise relationships between variables? Simple and multiple linear regression, non-linear regressions, interactions...
+
+`r emo::ji("white heavy check mark")` What is causality?
+
+`r emo::ji("white heavy check mark")` **What if we don't observe an entire population?** Sampling!
+
+`r emo::ji("cross mark")`  Are our findings just due to randomness?
+
+`r emo::ji("cross mark")` How to find exogeneity in practice?
+
+
+---
 class: title-slide-final, middle
 
 # THANKS
