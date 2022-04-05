@@ -4,6 +4,7 @@
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Florian Oswald, Gustave Kenedi and Pierre Villedieu" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
@@ -18,7 +19,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Regression Inference
 ### Florian Oswald, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2021-11-09
+### SciencesPo Paris </br> 2022-04-05
 
 ---
 
@@ -213,6 +214,7 @@ Let's imagine we could redo the experiment 1,000 times on 1,000 different sample
   
   * Notice that we write `\(\hat{\textrm{SE}}\)` and not `\({\textrm{SE}}\)` because 1.68 is an estimate of the real standard error of `\(b_\textrm{small}\)` we get from our sample.
 
+  * We would love to know the real standard error `\({\textrm{SE}}\)`, but we have only one sample!
 --
 
 * Let's simulate the sampling distribution of `\(b_\textrm{small}\)` to see where it comes from.
@@ -223,29 +225,64 @@ class:inverse
 
 # Task 1
 
-<div class="countdown" id="timer_618ab18c" style="top:0;right:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+<div class="countdown" id="timer_624c65f7" style="top:0;right:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
 As we did for the sampling distribution of the proportion of *green pasta*, we want to generate the bootstrap distribution of `\(b_\textrm{small}\)`. 
 
 1. Copy the loading and cleaning code from slide 3 and run it.
 
-1. Generate the bootstrap distribution of `\(b_\textrm{small}\)` based on 1,000 samples drawn from `star_df`.  
-*Hint 1*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
-*Hint 2*: in `calculate` set `stat` to `slope` and `order` to `c("TRUE","FALSE")`.
+1. Generate the bootstrap distribution of `\(b_\textrm{small}\)` based on 1,000 samples drawn from `star_df`.  You can do so through the following code
 
-1. Plot this simulated sampling distribution and compute the mean and standard error of `\(b_\textrm{small}\)`.
+```r
+bootstrap_distrib &lt;- star_df %&gt;% 
+    mutate(small=as.numeric(small)) %&gt;% 
+    specify(response = math, explanatory = small) %&gt;%
+    generate(reps = 1000, type = "bootstrap") %&gt;%
+    calculate(stat = "slope")
+```
+
+
+3. Plot this simulated sampling distribution and compute the mean and standard error of `\(b_\textrm{small}\)`.
 
 ---
 
 # Bootstrap Distribution
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
 ***standard error:*** 1.66 `\(\rightarrow\)` very close to the one in the table (1.68)!
+
+Not exactly equal, because we used bootstrapping instead of the theory approach used by `R`.
+
+---
+
+# Back to our regression results
+
+
+```r
+library(broom)
+tidy(lm(math ~ small, star_df))
+```
+
+```
+## # A tibble: 2 x 5
+##   term        estimate std.error statistic     p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+## 1 (Intercept)   484.        1.15    421.   0          
+## 2 smallTRUE       8.90      1.68      5.30 0.000000123
+```
+
+  * We have made sense of the `std.error` column.
+
+  * The next two columns in our regression are `statistic` and `p.value`
+
+  * We know those terms from our previous class on hypothesis testing
+  
+  * But which hypothesis test do they correspond to?
 
 ---
 
@@ -329,7 +366,7 @@ round(observed_stat,2)
 
 --
 
-* If there is no relationship between math score and class size, i.e. `\(H_0\)` is true, then *reshuffling* / *permuting* the values of `small` across students should play no role.
+* If there is no relationship between math score and class size, i.e. `\(H_0\)` is true and `\(\beta_\textrm{small} = 0\)`, then *reshuffling* / *permuting* the values of `small` across students should play no role.
 
 --
 
@@ -370,14 +407,14 @@ null_distribution &lt;- null_distribution %&gt;%
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -394,7 +431,7 @@ Very unlikely to obtain `\(b_\textrm{small}\)` = 8.8951932 when `\(H_0\)` is tru
 # Testing `\(\beta_\textrm{small} = 0\)` vs `\(\beta_\textrm{small} \neq 0\)`
 
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -579,7 +616,7 @@ class:inverse
 
 # Task 2
 
-<div class="countdown" id="timer_618aafed" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624c6650" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -591,22 +628,25 @@ class:inverse
 
 # Confidence Intervals: Visually
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Theory-Based Inference: Hypothesis Testing
+
+* Theory tells us that `\(\frac{b - \beta_k}{\hat{\textrm{SE}(b)}}\)` converges to a standard normal distribution
 
 * As we already mentioned, the default test that is conducted by any statistical software is:
 
 `$$\begin{align}H_0:&amp; \beta_k = 0\\H_A:&amp; \beta_k \neq 0\end{align}$$`
 --
 
-* So, **under the null hypothesis** we get from theory that the sampling distribution of `\(\frac{b}{\hat{\textrm{SE}(b)}}\)` will be a standard normal distribution.
+* So, **under the null hypothesis**, `\(\beta_k=0\)`, and we get from theory that the sampling distribution of `\(\frac{b}{\hat{\textrm{SE}(b)}}\)` will be a standard normal distribution.
+
 
 --
 
-* As such we can directly compare the observed test statistic `\(\frac{b}{\hat{\textrm{SE}(b)}}\)` to the *standard normal distribution* which is the **null distribution** of our test statistic. 
+* So the *standard normal distribution* is the **null distribution** of our test statistic. 
 
 --
 
@@ -615,6 +655,68 @@ class:inverse
 --
 
 * Common rule of thumb: if the *estimate* is ***twice the size of the standard error***, then it is significant at the 5% level. Why?
+
+---
+
+# Formatting a regression table
+
+* Now that we have learned about all components of a regression table, let's finally learn how to create and read one!
+
+
+```r
+reg_simple_math &lt;- lm(math ~ small, data=star_df)
+reg_gender_math &lt;- lm(math ~ small + gender , data=star_df)
+reg_simple_read &lt;- lm(read ~ small, data=star_df)
+reg_gender_read &lt;- lm(read ~ small + gender , data=star_df)
+
+export_summs(reg_simple_math, reg_gender_math,
+             reg_simple_read, reg_gender_read,
+             model.names = c("Math score", "Math Score",
+                             "Reading score", "Reading score"),
+             coefs=c("Small class" = "smallTRUE",
+                     "Male gender" = "gendermale"))
+```
+
+---
+
+# Formatting a regression table
+
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-22">
+<col><col><col><col><col><tr>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Math score</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Math Score</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Reading score</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Reading score</th></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Small class</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8.90 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8.94 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.37 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.41 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.68)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.67)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.09)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.09)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Male gender</th><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-8.56 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-7.49 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.67)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.09)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">N</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3359&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3359&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3359&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3359&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">R2</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.02&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.02&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th colspan="5" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
+</table>
+
+
+---
+
+# Reading a regression table
+
+.center[
+&lt;img src="reg_inference_files/figure-html/reg_table.png" width="600px" style="display: block; margin: auto;" /&gt;
+]
+
+* Each column corresponds to a regression. For the first regression we have: 
+    * the **name of the outcome variable** in blue
+    * the **coefficient associated to being in a small class** `\(\beta_\textrm{small}\)` in green
+    * its **estimated standard error** in yellow
+    * the **number of observations** in purple
+    * the **R-squared** in red
+    * interpretation of the stars at the bottom
+
 
 ---
 
@@ -665,14 +767,14 @@ class: title-slide-section-red, middle
 
 # Mean Independence of Error: E[u | small] = ?
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 # Mean Independence of Error: E[u | small] = ?
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -771,7 +873,7 @@ class:inverse
 
 # Task 3.1
 
-<div class="countdown" id="timer_618aaf44" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624c66cc" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -799,7 +901,7 @@ class:inverse
 
 # Task 3.2
 
-<div class="countdown" id="timer_618ab089" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624c6496" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -816,7 +918,7 @@ class:inverse
   1. From `reg_bootstrap` extract and save the value of the intercept for men as `intercept_men_bootstrap` and the value of the slope for men as `slope_men_bootstrap`. Do the same for women.
 
   1. Add both predicted lines from this bootstrap sample to the previous plot (*Hint*: use `geom_abline` (x2))
-  
+
 ---
 
 # Illustrating Uncertainty
@@ -854,7 +956,7 @@ ggplot(data=cps,aes(y = log_wage, x = education, colour = gender)) +
 
 .pull-right[
 
-&lt;img src="reg_inference_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -883,6 +985,23 @@ Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` b
 * You should remember those moving lines when looking at the shaded area!
 
 ]
+
+---
+
+# On the way to causality
+
+✅ How to manage data? Read it, tidy it, visualise it!
+
+✅  How to summarise relationships between variables? Simple and multiple linear regression, non-linear regressions, interactions...
+
+✅ What is causality?
+
+✅ What if we don't observe an entire population? Sampling!
+
+✅  **Are our findings just due to randomness?** Confidence intervals and hypothesis testing, regression inference.
+
+❌ How to find exogeneity in practice?
+
 
 ---
 
@@ -915,6 +1034,7 @@ background-position: 9% 19%
 | &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
 | &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
 | &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
