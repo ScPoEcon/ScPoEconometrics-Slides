@@ -62,6 +62,8 @@ countdown(
   color_finished_text       = "#d90502",
   color_finished_border     = "#d90502"
 )
+
+library(jtools)
 ```
 
 layout: true
@@ -230,6 +232,7 @@ Let's imagine we could redo the experiment 1,000 times on 1,000 different sample
   
   * Notice that we write $\hat{\textrm{SE}}$ and not ${\textrm{SE}}$ because `r reg_summary_star_df[2,2]` is an estimate of the real standard error of $b_\textrm{small}$ we get from our sample.
 
+  * We would love to know the real standard error ${\textrm{SE}}$, but we have only one sample!
 --
 
 * Let's simulate the sampling distribution of $b_\textrm{small}$ to see where it comes from.
@@ -240,23 +243,29 @@ class:inverse
 
 # Task 1
 
-`r countdown(minutes = 10, top = 0)`
+`r countdown(minutes = 7, top = 0)`
 
 As we did for the sampling distribution of the proportion of *green pasta*, we want to generate the bootstrap distribution of $b_\textrm{small}$. 
 
 1. Copy the loading and cleaning code from slide 3 and run it.
 
-1. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1,000 samples drawn from `star_df`.  
-*Hint 1*: use the appropriate functions and arguments from the `infer` package so use the help pages.  
-*Hint 2*: in `calculate` set `stat` to `slope` and `order` to `c("TRUE","FALSE")`.
+1. Generate the bootstrap distribution of $b_\textrm{small}$ based on 1,000 samples drawn from `star_df`.  You can do so through the following code
+```{r, eval=FALSE}
+bootstrap_distrib <- star_df %>% 
+    mutate(small=as.numeric(small)) %>% 
+    specify(response = math, explanatory = small) %>%
+    generate(reps = 1000, type = "bootstrap") %>%
+    calculate(stat = "slope")
+```
 
-1. Plot this simulated sampling distribution and compute the mean and standard error of $b_\textrm{small}$.
+
+3. Plot this simulated sampling distribution and compute the mean and standard error of $b_\textrm{small}$.
 
 ---
 
 # Bootstrap Distribution
 
-```{r, echo=FALSE, fig.height = 4.75, fig.width = 8}
+```{r, echo=FALSE, fig.height = 4.25, fig.width = 8}
 library(infer)
 bootstrap_distrib = star_df %>% 
     mutate(small=as.numeric(small)) %>% 
@@ -278,6 +287,25 @@ bootstrap_distrib %>%
 --
 
 ***standard error:*** `r round(se_simul,2)` $\rightarrow$ very close to the one in the table (`r reg_summary_star_df[2,2]`)!
+
+Not exactly equal, because we used bootstrapping instead of the theory approach used by `R`.
+
+---
+
+# Back to our regression results
+
+```{r}
+library(broom)
+tidy(lm(math ~ small, star_df))
+```
+
+  * We have made sense of the `std.error` column.
+
+  * The next two columns in our regression are `statistic` and `p.value`
+
+  * We know those terms from our previous class on hypothesis testing
+  
+  * But which hypothesis test do they correspond to?
 
 ---
 
@@ -355,7 +383,7 @@ round(observed_stat,2)
 
 --
 
-* If there is no relationship between math score and class size, i.e. $H_0$ is true, then *reshuffling* / *permuting* the values of `small` across students should play no role.
+* If there is no relationship between math score and class size, i.e. $H_0$ is true and $\beta_\textrm{small} = 0$, then *reshuffling* / *permuting* the values of `small` across students should play no role.
 
 --
 
@@ -644,16 +672,19 @@ bootstrap_distrib %>%
 
 # Theory-Based Inference: Hypothesis Testing
 
+* Theory tells us that $\frac{b - \beta_k}{\hat{\textrm{SE}(b)}}$ converges to a standard normal distribution
+
 * As we already mentioned, the default test that is conducted by any statistical software is:
 
 $$\begin{align}H_0:& \beta_k = 0\\H_A:& \beta_k \neq 0\end{align}$$
 --
 
-* So, **under the null hypothesis** we get from theory that the sampling distribution of $\frac{b}{\hat{\textrm{SE}(b)}}$ will be a standard normal distribution.
+* So, **under the null hypothesis**, $\beta_k=0$, and we get from theory that the sampling distribution of $\frac{b}{\hat{\textrm{SE}(b)}}$ will be a standard normal distribution.
+
 
 --
 
-* As such we can directly compare the observed test statistic $\frac{b}{\hat{\textrm{SE}(b)}}$ to the *standard normal distribution* which is the **null distribution** of our test statistic. 
+* So the *standard normal distribution* is the **null distribution** of our test statistic. 
 
 --
 
@@ -662,6 +693,61 @@ $$\begin{align}H_0:& \beta_k = 0\\H_A:& \beta_k \neq 0\end{align}$$
 --
 
 * Common rule of thumb: if the *estimate* is ***twice the size of the standard error***, then it is significant at the 5% level. Why?
+
+---
+
+# Formatting a regression table
+
+* Now that we have learned about all components of a regression table, let's finally learn how to create and read one!
+
+```{r, eval=F}
+reg_simple_math <- lm(math ~ small, data=star_df)
+reg_gender_math <- lm(math ~ small + gender , data=star_df)
+reg_simple_read <- lm(read ~ small, data=star_df)
+reg_gender_read <- lm(read ~ small + gender , data=star_df)
+
+export_summs(reg_simple_math, reg_gender_math,
+             reg_simple_read, reg_gender_read,
+             model.names = c("Math score", "Math Score",
+                             "Reading score", "Reading score"),
+             coefs=c("Small class" = "smallTRUE",
+                     "Male gender" = "gendermale"))
+```
+
+---
+
+# Formatting a regression table
+
+```{r, eval=T, echo=F, results='asis'}
+reg_simple_math <- lm(math ~ small, data=star_df)
+reg_gender_math <- lm(math ~ small + gender , data=star_df)
+reg_simple_read <- lm(read ~ small, data=star_df)
+reg_gender_read <- lm(read ~ small + gender , data=star_df)
+
+export_summs(reg_simple_math, reg_gender_math, reg_simple_read, reg_gender_read,
+             model.names = c("Math score", "Math Score", "Reading score", "Reading score"),
+             coefs=c("Small class" = "smallTRUE",
+                     "Male gender" = "gendermale"))
+```
+
+---
+
+# Reading a regression table
+
+.center[
+```{r, echo = FALSE, out.width = "600px"}
+knitr::include_graphics("reg_inference_files/figure-html/reg_table.png")
+```
+]
+
+* Each column corresponds to a regression. For the first regression we have: 
+    * the **name of the outcome variable** in blue
+    * the **coefficient associated to being in a small class** $\beta_\textrm{small}$ in green
+    * its **estimated standard error** in yellow
+    * the **number of observations** in purple
+    * the **R-squared** in red
+    * interpretation of the stars at the bottom
+
 
 ---
 
@@ -929,7 +1015,7 @@ class:inverse
   1. From `reg_bootstrap` extract and save the value of the intercept for men as `intercept_men_bootstrap` and the value of the slope for men as `slope_men_bootstrap`. Do the same for women.
 
   1. Add both predicted lines from this bootstrap sample to the previous plot (*Hint*: use `geom_abline` (x2))
-  
+
 ---
 
 # Illustrating Uncertainty
@@ -1016,6 +1102,23 @@ Even better : [`ungeviz`](https://github.com/wilkelab/ungeviz) and `gganimate` b
 * You should remember those moving lines when looking at the shaded area!
 
 ]
+
+---
+
+# On the way to causality
+
+`r emo::ji("white heavy check mark")` How to manage data? Read it, tidy it, visualise it!
+
+`r emo::ji("white heavy check mark")`  How to summarise relationships between variables? Simple and multiple linear regression, non-linear regressions, interactions...
+
+`r emo::ji("white heavy check mark")` What is causality?
+
+`r emo::ji("white heavy check mark")` What if we don't observe an entire population? Sampling!
+
+`r emo::ji("white heavy check mark")`  **Are our findings just due to randomness?** Confidence intervals and hypothesis testing, regression inference.
+
+`r emo::ji("cross mark")` How to find exogeneity in practice?
+
 
 ---
 
