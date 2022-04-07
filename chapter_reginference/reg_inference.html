@@ -19,7 +19,7 @@ class: center, middle, inverse, title-slide
 # ScPoEconometrics
 ## Regression Inference
 ### Florian Oswald, Mylene Feuillade, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2022-04-05
+### SciencesPo Paris </br> 2022-04-07
 
 ---
 
@@ -225,7 +225,7 @@ class:inverse
 
 # Task 1
 
-<div class="countdown" id="timer_624c6b0f" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624f1535" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -616,7 +616,7 @@ class:inverse
 
 # Task 2
 
-<div class="countdown" id="timer_624c6916" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624f163f" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -669,11 +669,11 @@ reg_gender_math &lt;- lm(math ~ small + gender , data=star_df)
 reg_simple_read &lt;- lm(read ~ small, data=star_df)
 reg_gender_read &lt;- lm(read ~ small + gender , data=star_df)
 
-export_summs(reg_simple_math, reg_gender_math,
-             reg_simple_read, reg_gender_read,
+export_summs(reg_simple_math, reg_gender_math, reg_simple_read, reg_gender_read,
              model.names = c("Math score", "Math Score",
                              "Reading score", "Reading score"),
-             coefs=c("Small class" = "smallTRUE",
+             coefs=c("Intercept" = "(Intercept)",
+                     "Small class" = "smallTRUE",
                      "Male gender" = "gendermale"))
 ```
 
@@ -685,7 +685,11 @@ export_summs(reg_simple_math, reg_gender_math,
 <col><col><col><col><col><tr>
 <th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Math score</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Math Score</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Reading score</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Reading score</th></tr>
 <tr>
-<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Small class</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8.90 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8.94 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.37 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.41 ***</td></tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Intercept</th><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">484.45 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">488.85 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">435.76 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">439.62 ***</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.15)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.43)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.75)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.93)&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Small class</th><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8.90 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8.94 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.37 ***</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5.41 ***</td></tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.68)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.67)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.09)&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(1.09)&nbsp;&nbsp;&nbsp;</td></tr>
 <tr>
@@ -706,15 +710,15 @@ export_summs(reg_simple_math, reg_gender_math,
 # Reading a regression table
 
 .center[
-&lt;img src="reg_inference_files/figure-html/reg_table.png" width="600px" style="display: block; margin: auto;" /&gt;
+&lt;img src="reg_inference_files/figure-html/reg_table.png" width="500px" style="display: block; margin: auto;" /&gt;
 ]
 
 * Each column corresponds to a regression. For the first regression we have: 
-    * the **name of the outcome variable** in blue
-    * the **coefficient associated to being in a small class** `\(\beta_\textrm{small}\)` in green
-    * its **estimated standard error** in yellow
-    * the **number of observations** in purple
-    * the **R-squared** in red
+    * the **name of the outcome variable** in &lt;span style="color: #2F528F;"&gt;blue&lt;/span&gt;
+    * the **estimated coefficient associated to being in a small class** `\(\hat{\beta_\textrm{small}}\)` in &lt;span style="color: #70AD47;"&gt;green&lt;/span&gt;
+    * its **estimated standard error** in &lt;span style="color: #FFC000;"&gt;yellow&lt;/span&gt;
+    * the **number of observations** in &lt;span style="color: #7030A0;"&gt;purple&lt;/span&gt;
+    * the **R-squared** in &lt;span style="color: #C00000;"&gt;red&lt;/span&gt;
     * interpretation of the stars at the bottom
 
 
@@ -873,7 +877,7 @@ class:inverse
 
 # Task 3.1
 
-<div class="countdown" id="timer_624c68aa" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624f1319" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -901,7 +905,7 @@ class:inverse
 
 # Task 3.2
 
-<div class="countdown" id="timer_624c67d5" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_624f1349" style="top:0;right:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
