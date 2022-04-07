@@ -706,11 +706,11 @@ reg_gender_math <- lm(math ~ small + gender , data=star_df)
 reg_simple_read <- lm(read ~ small, data=star_df)
 reg_gender_read <- lm(read ~ small + gender , data=star_df)
 
-export_summs(reg_simple_math, reg_gender_math,
-             reg_simple_read, reg_gender_read,
+export_summs(reg_simple_math, reg_gender_math, reg_simple_read, reg_gender_read,
              model.names = c("Math score", "Math Score",
                              "Reading score", "Reading score"),
-             coefs=c("Small class" = "smallTRUE",
+             coefs=c("Intercept" = "(Intercept)",
+                     "Small class" = "smallTRUE",
                      "Male gender" = "gendermale"))
 ```
 
@@ -725,8 +725,10 @@ reg_simple_read <- lm(read ~ small, data=star_df)
 reg_gender_read <- lm(read ~ small + gender , data=star_df)
 
 export_summs(reg_simple_math, reg_gender_math, reg_simple_read, reg_gender_read,
-             model.names = c("Math score", "Math Score", "Reading score", "Reading score"),
-             coefs=c("Small class" = "smallTRUE",
+             model.names = c("Math score", "Math Score",
+                             "Reading score", "Reading score"),
+             coefs=c("Intercept" = "(Intercept)",
+                     "Small class" = "smallTRUE",
                      "Male gender" = "gendermale"))
 ```
 
@@ -735,17 +737,17 @@ export_summs(reg_simple_math, reg_gender_math, reg_simple_read, reg_gender_read,
 # Reading a regression table
 
 .center[
-```{r, echo = FALSE, out.width = "600px"}
+```{r, echo = FALSE, out.width = "500px"}
 knitr::include_graphics("reg_inference_files/figure-html/reg_table.png")
 ```
 ]
 
 * Each column corresponds to a regression. For the first regression we have: 
-    * the **name of the outcome variable** in blue
-    * the **coefficient associated to being in a small class** $\beta_\textrm{small}$ in green
-    * its **estimated standard error** in yellow
-    * the **number of observations** in purple
-    * the **R-squared** in red
+    * the **name of the outcome variable** in <span style="color: #2F528F;">blue</span>
+    * the **estimated coefficient associated to being in a small class** $\hat{\beta_\textrm{small}}$ in <span style="color: #70AD47;">green</span>
+    * its **estimated standard error** in <span style="color: #FFC000;">yellow</span>
+    * the **number of observations** in <span style="color: #7030A0;">purple</span>
+    * the **R-squared** in <span style="color: #C00000;">red</span>
     * interpretation of the stars at the bottom
 
 
