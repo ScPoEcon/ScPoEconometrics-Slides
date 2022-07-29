@@ -62,7 +62,7 @@ countdown(
 
 
 
-# Welcome to ScPoEconometrics!
+# Welcome to SciencesPo Econometrics!
 
 --
 
