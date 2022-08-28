@@ -100,6 +100,16 @@ a, a > code {
   float: left;
 }
 
+.right-60 {
+  width: 58%;
+  float: right;
+}
+
+.left-40 {
+  width: 40%;
+  float: left;
+}
+
 .pull-left {
   float: left;
   width: 48%;

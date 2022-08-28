@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Introduction"
-author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He"
 date: "Sciences Po Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -100,7 +100,7 @@ Does getting a college degree *afford* higher wages?
 --
 
 [<ru-blockquote>
-Does higher public debt levels *lead to* lower economic growth?
+Do higher public debt levels *lead to* lower economic growth?
 </ru-blockquote>](https://www.imf.org/external/pubs/ft/wp/2014/wp1434.pdf)
 
 --
@@ -117,11 +117,11 @@ Does the neighborhood you grew up in have an *impact* on your life outcomes?
 
 --
 
-* Want to focus on ***causal impact*** of just one of these factors (immigration, minimum wage, education ,etc.)
+* Often, we'll want to focus on the ***causal impact*** of just one of these factors (immigration, minimum wage, education ,etc.)
 
 --
 
-* Econometrics is often about spelling out ***conditions*** under which we can ***claim to measure causal relationships***.
+* Econometrics is about spelling out ***conditions*** under which we can ***claim to measure causal relationships***.
 
 * We will encounter the most basic of those conditions, and talk about some potential pitfalls.
 
@@ -235,20 +235,18 @@ layout: true
 
 --
 
-.left-column[
+.pull-left[
 ```{r, gapminder, echo = T, eval = F}
 # load gapminder package
 library(gapminder)
 # load the dataset from the gapminder package
 data(gapminder, package = "gapminder") 
-# display variables in the dataset
-names(gapminder)
 # show first 4 lines of this dataframe
 head(gapminder,n = 4)
 ```
 ]
 
-.right-column[
+.pull-right[
 ```{r, gapminder, echo = F, eval = T}
 ```
 ]
@@ -290,11 +288,12 @@ ggplot(data = gapminder_dplyr,
                      y = mean_gdppercap,
                      color = continent,
                      size = count)) +
-  geom_point(alpha = 1/3) +
+  geom_point(alpha = 1/2) +
   labs(x = "Average life expectancy",
        y = "Average GDP per capita",
        color = "Continent",
-       size = "Nb of countries")
+       size = "Nb of countries") +
+  theme_bw()
 ```
 ]
 
@@ -468,7 +467,7 @@ In practice:
 
 * Installing packages is easy! Just use the `install.packages` function:
     ```{r, eval = FALSE}
-    install.packages("ggplot2") # do NOT run this code on your end
+    install.packages("ggplot2")
     ```
 
 * To *use* the contents of a packge, we must load it from our library using `library`:
@@ -480,30 +479,40 @@ In practice:
 
 # Vectors
 
-* The `c` function creates vectors, i.e. an array of elements.
+
+
+.pull-left[
+* The `c` function creates vectors, i.e. *one-dimensional arrays*.
     ```{r}
     c(1, 3, 5, 7, 8, 9)
     ```
     
---
-
 * Coercion to unique types:
     ```{r}
-    c(42, "Statistics", TRUE)
+    (v <- c(42, "Statistics", TRUE))
     ```
+]
 
 --
+
+.pull-right[
 
 * Creating a *range*
     ```{r}
     1:10
     ```
 
+* get vector elements with square bracket operator `[index]`:
+    ```{r}
+    v[c(1,3)]
+    ```
+]
+
 ---
 
 # `data.frame`'s
 
-`data.frame`s are like spreadsheets.
+`data.frame`s represent **tabular data**. Like spreadsheets.
 
 ```{r}
 example_data = data.frame(x = c(1, 3, 5, 7),
@@ -512,7 +521,9 @@ example_data = data.frame(x = c(1, 3, 5, 7),
 example_data
 ```
 
-In practice, you will be importing files that contain the data into `R` rather than creating `data.frame`s by hand.
+* A `data.frame` has 2 dimensions: *rows* and *columns*. Like a *matrix*. Can get elements with `[row_index,col_index]`.
+
+* In practice, you will be importing files that contain the data into `R` rather than creating `data.frame`s by hand.
 
 ---
 
@@ -552,7 +563,7 @@ murders <- read.csv("https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?d
 
 Useful functions to describe a dataframe:
 ```{r}
-str(murders) # describes the data.frame
+str(murders) # `str` describes structure of any R object
 ```
 
 --
@@ -575,33 +586,6 @@ ncol(murders) # number of columns
 
 ---
 
-# Data on Gun Murders in the US
-    
-* To access one of the variables **as a vector** we use the `$` operator as in `murders$state`.
-    ```{r}
-    murders$state
-    ```
-
---
-
-.pull-left[
-* We can check the type of `murders$state` with
-    ```{r}
-    class(murders$state)
-    ```
-]
-
---
-
-.pull-right[
-* Or we use the column name or index: `murders[,"state"]` or `murders[,1]`
-    ```{r}
-    class(murders[,"state"])
-    ```
-]
-
----
-
 # Subsetting `data.frames`
 
 * Subsetting a data.frame: `murders[row condition, column number]` or `murders[row condition, "column name"]`
@@ -612,6 +596,37 @@ ncol(murders) # number of columns
     # Only keep California and Texas and keep only the "state" and "total" variables
     murders[murders$state %in% c("California", "Texas"), c("state", "total")]
     ```
+
+---
+
+# Accessing `data.frame` Columns
+    
+* To extract one column **as a vector** we can use the `$` operator (as in `murders$state`), or the square bracket operator `[which_index]` with name or position index:
+    ```{r}
+    first5 <- murders[1:5, ]  # take first 5 states only
+    first5$state  # extract with $ operator
+    first5[ ,"state"]  # extract with column name
+    first5[ ,1] # get first column
+    ```
+
+--
+
+.pull-left[
+* Check `class` of an object:
+    ```{r}
+    class(murders)
+    ```
+]
+
+--
+
+.pull-right[
+* `typeof` gives the R-internal data type:
+    ```{r}
+    typeof(murders)
+    ```
+]
+
 
 ---
 
@@ -641,7 +656,7 @@ Congratulations, you've created your first variable! Click on the `murders` obje
 layout: false
 class: title-slide-section-red, middle
 
-# Class Details
+# Course Details
 
 ---
 
@@ -756,11 +771,7 @@ Lecture 12: ***Recap***
 
 # Course Policies
 
-*Be nice. Be honest. Don't cheat.*<sup>1</sup>
-
-.footnote[
-[1] [Andrew Heiss](https://evalsp20.classes.andrewheiss.com/syllabus/)' put it more concisely than I could!
-]
+*Be nice. Be honest. Don't cheat.*
 
 --
 
@@ -787,7 +798,7 @@ I will be checking Slack sparingly so please help one another!
 
 *Cheating:* You will get 0. Just don't cheat, it's honestly not worth it.
 
-*Work in groups:* You can/should work in groups of 2 (3 max) on the quizzes.
+*Work in groups:* You can/should work in groups of 2-3 on the quizzes.
 ]
 
 ---
@@ -798,13 +809,11 @@ I will be checking Slack sparingly so please help one another!
 
 --
 
-Seeking help is a sign perceptive self-awareness, [not weakness](https://www.nytimes.com/2020/09/24/well/mind/cord-jefferson-emmy-black-mental-health.html).
-
-Especially important during this difficult period.
+Seeking help is a sign of perceptive self-awareness, [not weakness](https://www.nytimes.com/2020/09/24/well/mind/cord-jefferson-emmy-black-mental-health.html).
 
 --
 
-Don't hesitate to ***reach out*** to your friends, family, a professor or me if you feel the need.
+Don't hesitate to ***reach out*** to your friends, family, any professor (including myself!) if you feel the need.
 
 ***Sciences Po*** offers free and confidential [psychological support services](https://www.sciencespo.fr/students/en/living/health/health-centre) with professionals.
 

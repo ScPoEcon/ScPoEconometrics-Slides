@@ -1,0 +1,1416 @@
+
+---
+layout: true
+
+# Population *vs.* sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+---
+
+--
+
+```{R, gen dataset, include = F, cache = T}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30
+# Set the seed
+set.seed(12468)
+# Generate data
+pop_df <- tibble(
+  i = 3,
+  x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = i + 0.5 * x + e,
+  row = rep(1:sqrt(n_p), times = sqrt(n_p)),
+  col = rep(1:sqrt(n_p), each = sqrt(n_p)),
+  s1 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s))),
+  s2 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s))),
+  s3 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s)))
+)
+# Regressions
+lm0 <- lm(y ~ x, data = pop_df)
+lm1 <- lm(y ~ x, data = filter(pop_df, s1 == T))
+lm2 <- lm(y ~ x, data = filter(pop_df, s2 == T))
+lm3 <- lm(y ~ x, data = filter(pop_df, s3 == T))
+# Simulation
+set.seed(12468)
+sim_df <- mclapply(mc.cores = 10, X = 1:1e4, FUN = function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% tidy()
+}) %>% do.call(rbind, .) %>% as_tibble()
+```
+
+.pull-left[
+
+```{R, pop1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col)) +
+geom_point(color = "darkslategray", size = 10) +
+theme_empty
+```
+
+.center[**Population**]
+
+]
+
+--
+
+.pull-right[
+
+```{R, scatter1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3
+) +
+geom_point(color = "darkslategray", size = 6) +
+theme_empty
+```
+
+.center[**Population relationship**]
+
+$$ y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` x_i + u_i $$
+
+$$ y_i = \beta_0 + \beta_1 x_i + u_i $$
+
+
+]
+
+---
+
+.pull-left[
+
+```{R, sample1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s1)) +
+geom_point(color = "darkslategray", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 1:** 30 random individuals]
+
+]
+
+--
+
+.pull-right[
+
+```{R, sample1 scatter, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3, alpha = 0.3
+) +
+geom_point(aes(shape = s1), color = "darkslategray", size = 6) +
+geom_abline(
+  intercept = lm1$coefficients[1], slope = lm1$coefficients[2],
+  size = 2, linetype = 2, color = "black"
+) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` x_i + u_i$
+
+**Sample relationship**
+<br>
+$\hat{y}_i = `r round(lm1$coefficients[1], 2)` + `r round(lm1$coefficients[2], 2)` x_i$
+
+]
+
+]
+
+---
+count: false
+
+.pull-left[
+
+```{R, sample2, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s2)) +
+geom_point(color = "darkslategray", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 2:** 30 random individuals]
+
+]
+
+.pull-right[
+
+```{R, sample2 scatter, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3, alpha = 0.3
+) +
+geom_point(aes(shape = s2), color = "darkslategray", size = 6) +
+geom_abline(
+  intercept = lm1$coefficients[1], slope = lm1$coefficients[2],
+  size = 2, linetype = 2, color = "black", alpha = 0.3
+) +
+geom_abline(
+  intercept = lm2$coefficients[1], slope = lm2$coefficients[2],
+  size = 2, linetype = 2, color = "black"
+) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` x_i + u_i$
+
+**Sample relationship**
+<br>
+$\hat{y}_i = `r round(lm2$coefficients[1], 2)` + `r round(lm2$coefficients[2], 2)` x_i$
+
+]
+
+]
+---
+count: false
+
+.pull-left[
+
+```{R, sample3, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s3)) +
+geom_point(color = "darkslategray", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 3:** 30 random individuals]
+
+]
+
+.pull-right[
+
+```{R, sample3 scatter, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3, alpha = 0.3
+) +
+geom_point(aes(shape = s3), color = "darkslategray", size = 6) +
+geom_abline(
+  intercept = lm1$coefficients[1], slope = lm1$coefficients[2],
+  size = 2, linetype = 2, color = "black", alpha = 0.3
+) +
+geom_abline(
+  intercept = lm2$coefficients[1], slope = lm2$coefficients[2],
+  size = 2, linetype = 2, color = "black", alpha = 0.3
+) +
+geom_abline(
+  intercept = lm3$coefficients[1], slope = lm3$coefficients[2],
+  size = 2, linetype = 2, color = "black"
+) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` x_i + u_i$
+
+**Sample relationship**
+<br>
+$\hat{y}_i = `r round(lm3$coefficients[1], 2)` + `r round(lm3$coefficients[2], 2)` x_i$
+
+]
+
+]
+
+---
+layout: false
+class: clear, middle
+
+Let's repeat this **10,000 times**.
+
+(This exercise is called a (Monte Carlo) simulation.)
+
+---
+layout: true
+# Population *vs.* sample
+
+---
+
+```{R, simulation scatter, echo = F, dev = "png", dpi = 300, cache = T,eval = longeval}
+# Reshape sim_df
+line_df <- tibble(
+  intercept = sim_df %>% filter(term != "x") %>% select(estimate) %>% unlist(),
+  slope = sim_df %>% filter(term == "x") %>% select(estimate) %>% unlist()
+)
+ggplot() +
+geom_abline(data = line_df, aes(intercept = intercept, slope = slope), alpha = 0.01) +
+geom_point(data = pop_df, aes(x = x, y = y), size = 3, color = "darkslategray") +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 1.5
+) +
+theme_empty
+```
+
+---
+layout: true
+# Population *vs.* sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+---
+
+.pull-left[
+```{R, simulation scatter2, echo = F, dev = "png", dpi = 300, cache = T}
+# Reshape sim_df
+line_df <- tibble(
+  intercept = sim_df %>% filter(term != "x") %>% select(estimate) %>% unlist(),
+  slope = sim_df %>% filter(term == "x") %>% select(estimate) %>% unlist()
+)
+ggplot() +
+geom_abline(data = line_df, aes(intercept = intercept, slope = slope), alpha = 0.01, size = 1) +
+geom_point(data = pop_df, aes(x = x, y = y), size = 6, color = "darkslategray") +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3
+) +
+theme_empty
+```
+]
+
+.pull-right[
+
+- On **average**, our regression lines match the population line very nicely.
+
+- However, **individual lines** (samples) can really miss the mark.
+
+- Differences between individual samples and the population lead to **uncertainty** for the econometrician.
+
+]
+
+---
+
+# Population *vs.* sample
+
+
+**Question:** Why do we care about *population vs. sample*?
+
+--
+
+**Answer:** Uncertainty matters.
+
+$\hat{\beta}$ itself is a random variable—dependent upon the random sample. When we take a sample and run a regression, we don't know if it's a 'good' sample ( $\hat{\beta}$ is close to $\beta$) or a 'bad sample' (our sample differs greatly from the population).
+
+---
+layout: false
+# Population *vs.* sample
+
+## Uncertainty
+
+Keeping track of this uncertainty will be a key concept throughout our class.
+
+- Estimating standard errors for our estimates.
+
+- Testing hypotheses.
+
+- Correcting for heteroskedasticity and autocorrelation.
+
+--
+
+First, let's refresh on how we get these (uncertain) regression estimates.
+
+---
+# Linear regression
+
+## The estimator
+
+We can estimate a regression line in .mono[R] (`lm(y ~ x, my_data)`) and .mono[Stata] (`reg y x`). But where do these estimates come from?
+
+A few slides back:
+
+> $$ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i $$
+> which gives us the *best-fit* line through our dataset.
+
+But what do we mean by "best-fit line"?
+
+---
+layout: false
+
+# Being the "best"
+
+**Question:** What do we mean by *best-fit line*?
+
+**Answers:**
+
+- In general (econometrics), *best-fit line* means the line that minimizes the sum of squared errors (SSE):
+
+.center[
+
+$\text{SSE} = \sum_{i = 1}^{n} e_i^2\quad$ where $\quad e_i = y_i - \hat{y}_i$
+
+]
+
+- Ordinary **least squares** (**OLS**) minimizes the sum of the squared errors.
+- Based upon a set of (mostly palatable) assumptions, OLS
+  - Is unbiased (and consistent)
+  - Is the *best* (minimum variance) linear unbiased estimator (BLUE)
+
+---
+layout: true
+# OLS *vs.* other lines/estimators
+
+---
+
+Let's consider the dataset we previously generated.
+
+```{R, ols vs lines 1, echo = F, dev = "svg", fig.height = 6}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+theme_empty
+```
+
+---
+count: false
+
+For any line $\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)$
+
+```{R, vs lines 2, echo = F, dev = "svg", fig.height = 6}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 6
+b1 <- 0.2
+# The plot
+ggplot(data = pop_df, aes(x = x, y = y)) +
+# geom_segment(aes(x = x, xend = x, y = y, yend = y_hat(x, b0, b1)), size = 0.5, alpha = 0.2) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+geom_abline(intercept = b0, slope = b1, color = "orange", size = 2, alpha = 0.9) +
+theme_empty
+```
+
+---
+count: false
+
+For any line $\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)$, we can calculate errors: $e_i = y_i - \hat{y}_i$
+
+```{R, ols vs lines 3, echo = F, dev = "svg", fig.height = 6}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 6
+b1 <- 0.2
+# The plot
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_segment(aes(x = x, xend = x, y = y, yend = y_hat(x, b0, b1)), size = 0.5, alpha = 0.2) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+geom_abline(intercept = b0, slope = b1, color = "orange", size = 2, alpha = 0.9) +
+theme_empty
+```
+
+---
+count: false
+
+For any line $\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)$, we can calculate errors: $e_i = y_i - \hat{y}_i$
+
+```{R, ols vs lines 4, echo = F, dev = "svg", fig.height = 6}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 3
+b1 <- 0.2
+# The plot
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_segment(aes(x = x, xend = x, y = y, yend = y_hat(x, b0, b1)), size = 0.5, alpha = 0.2) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+geom_abline(intercept = b0, slope = b1, color = "orange", size = 2, alpha = 0.9) +
+theme_empty
+```
+
+---
+count: false
+
+For any line $\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)$, we can calculate errors: $e_i = y_i - \hat{y}_i$
+
+```{R, ols vs lines 5, echo = F, dev = "svg", fig.height = 6}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 10
+b1 <- -0.8
+# The plot
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_segment(aes(x = x, xend = x, y = y, yend = y_hat(x, b0, b1)), size = 0.5, alpha = 0.2) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+geom_abline(intercept = b0, slope = b1, color = "orange", size = 2, alpha = 0.9) +
+theme_empty
+```
+
+---
+count: false
+
+SSE squares the errors $\left(\sum e_i^2\right)$: bigger errors get bigger penalties.
+
+```{R, ols vs lines 6, echo = F, dev = "svg", fig.height = 6}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 10
+b1 <- -0.8
+# The plot
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_segment(aes(x = x, xend = x, y = y, yend = y_hat(x, b0, b1), color = (y - y_hat(x, b0, b1))^2), size = 0.5, alpha = 0.8) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+geom_abline(intercept = b0, slope = b1, color = "orange", size = 2, alpha = 0.9) +
+scale_color_viridis(option = "cividis", direction = -1) +
+theme_empty
+```
+
+---
+count: false
+
+The OLS estimate is the combination of $\hat{\beta}_0$ and $\hat{\beta}_1$ that minimize SSE.
+
+```{R, ols vs lines 7, echo = F, dev = "svg", fig.height = 6}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+# The plot
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_segment(aes(x = x, xend = x, y = y, yend = y_hat(x, b0, b1), color = (y - y_hat(x, b0, b1))^2), size = 0.5, alpha = 0.8) +
+geom_point(size = 5, color = "darkslategray", alpha = 0.9) +
+geom_abline(intercept = b0, slope = b1, color = red_pink, size = 2, alpha = 0.9) +
+scale_color_viridis(option = "cividis", direction = -1) +
+theme_empty
+```
+
+---
+layout: true
+# OLS
+
+## Formally
+
+---
+
+In simple linear regression, the OLS estimator comes from choosing the $\hat{\beta}_0$ and $\hat{\beta}_1$ that minimize the sum of squared errors (SSE), _i.e._,
+
+$$ \min_{\hat{\beta}_0,\, \hat{\beta}_1} \text{SSE} $$
+
+--
+
+but we already know $\text{SSE} = \sum_i e_i^2$. Now use the definitions of $e_i$ and $\hat{y}$.
+
+$$
+\begin{aligned}
+  e_i^2 &= \left( y_i - \hat{y}_i \right)^2 = \left( y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i \right)^2 \\
+  &= y_i^2 - 2 y_i \hat{\beta}_0 - 2 y_i \hat{\beta}_1 x_i + \hat{\beta}_0^2 + 2 \hat{\beta}_0 \hat{\beta}_1 x_i + \hat{\beta}_1^2 x_i^2
+\end{aligned}
+$$
+
+--
+
+**Recall:** Minimizing a multivariate function requires (**1**) first derivatives equal zero (the *1.super[st]-order conditions*) and (**2**) second-order conditions (concavity).
+
+---
+
+We're getting close. We need to **minimize SSE**. We've showed how SSE relates to our sample (our data: $x$ and $y$) and our estimates (_i.e._, $\hat{\beta}_0$ and $\hat{\beta}_1$).
+
+$$ \text{SSE} = \sum_i e_i^2 = \sum_i \left( y_i^2 - 2 y_i \hat{\beta}_0 - 2 y_i \hat{\beta}_1 x_i + \hat{\beta}_0^2 + 2 \hat{\beta}_0 \hat{\beta}_1 x_i + \hat{\beta}_1^2 x_i^2 \right) $$
+
+For the first-order conditions of minimization, we now take the first derivates of SSE with respect to $\hat{\beta}_0$ and $\hat{\beta}_1$.
+
+$$
+\begin{aligned}
+  \dfrac{\partial \text{SSE}}{\partial \hat{\beta}_0} &= \sum_i \left( 2 \hat{\beta}_0 + 2 \hat{\beta}_1 x_i - 2 y_i \right) = 2n \hat{\beta}_0 + 2 \hat{\beta}_1 \sum_i x_i - 2 \sum_i y_i \\
+  &= 2n \hat{\beta}_0 + 2n \hat{\beta}_1 \overline{x} - 2n \overline{y}
+\end{aligned}
+$$
+
+where $\overline{x} = \frac{\sum x_i}{n}$ and $\overline{y} = \frac{\sum y_i}{n}$ are sample means of $x$ and $y$ (size $n$).
+
+---
+
+The first-order conditions state that the derivatives are equal to zero, so:
+
+$$ \dfrac{\partial \text{SSE}}{\partial \hat{\beta}_0} = 2n \hat{\beta}_0 + 2n \hat{\beta}_1 \overline{x} - 2n \overline{y} = 0 $$
+
+which implies
+
+$$ \hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x} $$
+
+Now for $\hat{\beta}_1$.
+
+---
+
+Take the derivative of SSE with respect to $\hat{\beta}_1$
+
+$$
+\begin{aligned}
+  \dfrac{\partial \text{SSE}}{\partial \hat{\beta}_1} &= \sum_i \left( 2 \hat{\beta}_0 x_i + 2 \hat{\beta}_1 x_i^2 - 2 y_i x_i \right) = 2 \hat{\beta}_0 \sum_i x_i + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i \\
+  &= 2n \hat{\beta}_0 \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i
+\end{aligned}
+$$
+
+set it equal to zero (first-order conditions, again)
+
+$$ \dfrac{\partial \text{SSE}}{\partial \hat{\beta}_1} = 2n \hat{\beta}_0 \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0 $$
+
+and substitute in our relationship for $\hat{\beta}_0$, _i.e._, $\hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x}$. Thus,
+
+$$
+ 2n \left(\overline{y} - \hat{\beta}_1 \overline{x}\right) \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0
+$$
+
+---
+
+Continuing from the last slide
+
+$$ 2n \left(\overline{y} - \hat{\beta}_1 \overline{x}\right) \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0 $$
+
+we multiply out
+
+$$ 2n \overline{y}\,\overline{x} - 2n \hat{\beta}_1 \overline{x}^2 + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0 $$
+
+$$ \implies 2 \hat{\beta}_1 \left( \sum_i x_i^2 - n \overline{x}^2 \right) = 2 \sum_i y_i x_i - 2n \overline{y}\,\overline{x} $$
+
+$$ \implies \hat{\beta}_1 = \dfrac{\sum_i y_i x_i - 2n \overline{y}\,\overline{x}}{\sum_i x_i^2 - n \overline{x}^2} = \dfrac{\sum_i (x_i - \overline{x})(y_i - \overline{y})}{\sum_i (x_i - \overline{x})^2} $$
+
+---
+
+Done!
+
+We now have (lovely) OLS estimators for the slope
+
+$$ \hat{\beta}_1 = \dfrac{\sum_i (x_i - \overline{x})(y_i - \overline{y})}{\sum_i (x_i - \overline{x})^2} $$
+
+and the intercept
+
+$$ \hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x} $$
+
+And now you know where the *least squares* part of ordinary least squares comes from. 🎊
+
+--
+
+We now turn to the assumptions and (implied) properties of OLS.
+
+---
+layout: false
+class: inverse, middle
+
+# OLS: Assumptions and properties
+
+---
+layout: true
+# OLS: Assumptions and properties
+
+## Properties
+---
+
+**Question:** What properties might we care about for an estimator?
+
+--
+
+**Tangent:** Let's review statistical properies first.
+
+---
+
+**Refresher:** Density functions
+
+Recall that we use **probability density functions** (PDFs) to describe the probability a **continuous random variable** takes on a range of values. (The total area = 1.)
+
+These PDFs characterize probability distributions, and the most common/famous/popular distributions get names (_e.g._, normal, *t*, Gamma).
+
+---
+
+**Refresher:** Density functions
+
+The probability a standard normal random variable takes on a value between -2 and 0: $\mathop{\text{P}}\left(-2 \leq X \leq 0\right) = 0.48$
+
+```{R, example: pdf, echo = F, dev = "svg", fig.height = 3.5}
+# Generate data for density's polygon
+tmp <- tibble(x = seq(-4, 4, 0.01), y = dnorm(x))
+tmp <- rbind(tmp, tibble(x = seq(4, -4, -0.01), y = 0))
+# Plot it
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(fill = "grey85") +
+geom_polygon(data = tmp %>% filter(between(x, -2, 0)), fill = red_pink) +
+geom_hline(yintercept = 0, color = "black") +
+theme_simple
+```
+
+---
+
+**Refresher:** Density functions
+
+The probability a standard normal random variable takes on a value between -1.96 and 1.96: $\mathop{\text{P}}\left(-1.96 \leq X \leq 1.96\right) = 0.95$
+
+```{R, example: pdf 2, echo = F, dev = "svg", fig.height = 3.5}
+# Generate data for density's polygon
+tmp <- tibble(x = seq(-4, 4, 0.01), y = dnorm(x))
+tmp <- rbind(tmp, tibble(x = seq(4, -4, -0.01), y = 0))
+# Plot it
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(fill = "grey85") +
+geom_polygon(data = tmp %>% filter(between(x, -1.96, 1.96)), fill = red_pink) +
+geom_hline(yintercept = 0, color = "black") +
+theme_simple
+```
+
+---
+
+**Refresher:** Density functions
+
+The probability a standard normal random variable takes on a value beyond 2: $\mathop{\text{P}}\left(X > 2\right) = 0.023$
+
+```{R, example: pdf 3, echo = F, dev = "svg", fig.height = 3.5}
+# Generate data for density's polygon
+tmp <- tibble(x = seq(-4, 4, 0.01), y = dnorm(x))
+tmp <- rbind(tmp, tibble(x = seq(4, -4, -0.01), y = 0))
+# Plot it
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(fill = "grey85") +
+geom_polygon(data = tmp %>% filter(between(x, 2, Inf)), fill = red_pink) +
+geom_hline(yintercept = 0, color = "black") +
+theme_simple
+```
+
+---
+
+Imagine we are trying to estimate an unknown parameter $\beta$, and we know the distributions of three competing estimators. Which one would we want? How would we decide?
+
+```{R, competing pdfs, echo = F, dev = "svg", fig.height = 4.5}
+# Generate data for densities' polygons
+d1 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 1, sd = 1)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d2 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dunif(x, min = -2.5, max = 1.5)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d3 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 2.5)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+# Plot them
+ggplot() +
+geom_polygon(data = d1, aes(x, y), alpha = 0.8, fill = "orange") +
+geom_polygon(data = d2, aes(x, y), alpha = 0.65, fill = red_pink) +
+geom_polygon(data = d3, aes(x, y), alpha = 0.6, fill = "darkslategray") +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\beta$")) +
+theme_simple +
+theme(axis.text.x = element_text(size = 20))
+```
+
+---
+
+**Question:** What properties might we care about for an estimator?
+
+--
+
+**Answer one: Bias.**
+
+On average (after *many* samples), does the estimator tend toward the correct value?
+
+**More formally:** Does the mean of estimator's distribution equal the parameter it estimates?
+
+$$ \mathop{\text{Bias}}_\beta \left( \hat{\beta} \right) = \mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] - \beta $$
+
+---
+
+**Answer one: Bias.**
+
+.pull-left[
+
+**Unbiased estimator:** $\mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] = \beta$
+
+```{R, unbiased pdf, echo = F, dev = "svg"}
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(fill = red_pink, alpha = 0.9) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\beta$")) +
+theme_simple +
+theme(axis.text.x = element_text(size = 40))
+```
+
+]
+
+--
+
+.pull-right[
+
+**Biased estimator:** $\mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] \neq \beta$
+
+```{R, biased pdf, echo = F, dev = "svg"}
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(aes(x = x + 2), fill = "darkslategray", alpha = 0.9) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\beta$")) +
+theme_simple +
+theme(axis.text.x = element_text(size = 40))
+```
+
+]
+
+---
+
+**Answer two: Variance.**
+
+The central tendencies (means) of competing distributions are not the only things that matter. We also care about the **variance** of an estimator.
+
+$$ \mathop{\text{Var}} \left( \hat{\beta} \right) = \mathop{\boldsymbol{E}}\left[ \left( \hat{\beta} - \mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] \right)^2 \right] $$
+
+Lower variance estimators mean we get estimates closer to the mean in each sample.
+
+---
+count: false
+
+**Answer two: Variance.**
+
+```{R, variance pdf, echo = F, dev = "svg", fig.height = 5}
+d4 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 1)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d5 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 2)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+ggplot() +
+geom_polygon(data = d4, aes(x, y), fill = red_pink, alpha = 0.9) +
+geom_polygon(data = d5, aes(x, y), fill = "darkslategray", alpha = 0.8) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\beta$")) +
+theme_simple +
+theme(axis.text.x = element_text(size = 20))
+```
+
+---
+
+**Answer one: Bias.**
+
+**Answer two: Variance.**
+
+**Subtlety:** The bias-variance tradeoff.
+
+Should we be willing to take a bit of bias to reduce the variance?
+
+In econometrics, we generally stick with unbiased (or consistent) estimators. But other disciplines (especially computer science) think a bit more about this tradeoff.
+
+---
+layout: false
+
+# The bias-variance tradeoff.
+
+```{R, variance bias, echo = F, dev = "svg"}
+d4 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0.3, sd = 1)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d5 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 2)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+ggplot() +
+geom_polygon(data = d4, aes(x, y), fill = red_pink, alpha = 0.9) +
+geom_polygon(data = d5, aes(x, y), fill = "darkslategray", alpha = 0.8) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\beta$")) +
+theme_simple +
+theme(axis.text.x = element_text(size = 20))
+```
+
+---
+# OLS: Assumptions and properties
+
+## Properties
+
+As you might have guessed by now,
+
+- OLS is **unbiased**.
+- OLS has the **minimum variance** of all unbiased linear estimators.
+
+---
+# OLS: Assumptions and properties
+
+## Properties
+
+But... these (very nice) properties depend upon a set of assumptions:
+
+1. The population relationship is linear in parameters with an additive disturbance.
+
+2. Our $X$ variable is **exogenous**, _i.e._, $\mathop{\boldsymbol{E}}\left[ u \mid X \right] = 0$.
+
+3. The $X$ variable has variation. And if there are multiple explanatory variables, they are not perfectly collinear.
+
+4. The population disturbances $u_i$ are independently and identically distributed as normal random variables with mean zero $\left( \mathop{\boldsymbol{E}}\left[ u \right] = 0 \right)$ and variance $\sigma^2$ (_i.e._,  $\mathop{\boldsymbol{E}}\left[ u^2 \right] = \sigma^2$). Independently distributed and mean zero jointly imply $\mathop{\boldsymbol{E}}\left[ u_i u_j \right] = 0$ for any $i\neq j$.
+
+---
+# OLS: Assumptions and properties
+
+## Assumptions
+
+Different assumptions guarantee different properties:
+
+- Assumptions (1), (2), and (3) make OLS unbiased.
+- Assumption (4) gives us an unbiased estimator for the variance of our OLS estimator.
+
+During our course, we will discuss the many ways real life may **violate these assumptions**. For instance:
+
+- Non-linear relationships in our parameters/disturbances (or misspecification).
+- Disturbances that are not identically distributed and/or not independent.
+- Violations of exogeneity (especially omitted-variable bias).
+
+---
+# OLS: Assumptions and properties
+
+## Conditional expectation
+
+For many applications, our most important assumption is **exogeneity**, _i.e._,
+$$
+\begin{align}
+  \mathop{E}\left[ u \mid X \right] = 0
+\end{align}
+$$
+but what does it actually mean?
+
+--
+
+One way to think about this definition:
+
+> For *any* value of $X$, the mean of the residuals must be zero.
+
+- _E.g._, $\mathop{E}\left[ u \mid X=1 \right]=0$ *and* $\mathop{E}\left[ u \mid X=100 \right]=0$
+
+- _E.g._, $\mathop{E}\left[ u \mid X_2=\text{Female} \right]=0$ *and* $\mathop{E}\left[ u \mid X_2=\text{Male} \right]=0$
+
+- Notice: $\mathop{E}\left[ u \mid X \right]=0$ is more restrictive than $\mathop{E}\left[ u \right]=0$
+---
+layout: false
+class: clear, middle
+
+Graphically...
+---
+exclude: true
+
+```{R, conditional_expectation_setup, include = F, cache = T}
+
+# Setup ----------------------------------------------------------------------------------
+  # Options
+  options(stringsAsFactors = F)
+  # Packages
+  library(pacman)
+  p_load(ggridges)
+
+# Data work ------------------------------------------------------------------------------
+  # Set seed
+  set.seed(12345)
+  # Sample size
+  n <- 1e5
+  # Exogenous
+  e_good <- tibble(
+    x = runif(n = n, min = -4, max = 4),
+    e = rnorm(n)
+  ) %>% mutate(x = round(x))
+  # Endogenous
+  e_bad <- tibble(
+    x = runif(n = n, min = -4, max = 4),
+    e = rnorm(n) + 0.5 * x
+  ) %>% mutate(x = round(x))
+
+# Figures: Joint densities ---------------------------------------------------------------
+  # The joint plot: good
+  joint_good <- ggplot(data = e_good, aes(x = e)) +
+    geom_density() +
+    theme_pander()
+  # The joint plot: bad
+  joint_bad <- ggplot(data = e_bad, aes(x = e)) +
+    geom_density() +
+    theme_pander()
+
+# Figures: Conditional densities ---------------------------------------------------------
+  cond_good <- ggplot(data = e_good, aes(x = e, y = as.factor(x))) +
+    geom_density_ridges_gradient(
+      aes(fill = ..x..),
+      color = "white",
+      scale = 2.5,
+      size = 0.2
+    ) +
+    # geom_vline(xintercept = 0, alpha = 0.3) +
+    scale_fill_viridis(option = "magma") +
+    xlab("u") +
+    ylab("X") +
+    theme_pander(base_family = "Fira Sans Book", base_size = 18) +
+    theme(
+      legend.position = "none",
+      axis.title.y = element_text(angle = 0, vjust = 0.5, family = "MathJax_Math", size = 22),
+      axis.title.x = element_text(family = "MathJax_Math", size = 22)
+    )
+  cond_bad <- ggplot(data = e_bad, aes(x = e, y = as.factor(x))) +
+    geom_density_ridges_gradient(
+      aes(fill = ..x..),
+      color = "white",
+      scale = 2.5,
+      size = 0.2
+    ) +
+    # geom_vline(xintercept = 0, alpha = 0.3) +
+    scale_fill_viridis(option = "magma") +
+    xlab("u") +
+    ylab("X") +
+    theme_pander(base_family = "Fira Sans Book", base_size = 18) +
+    theme(
+      legend.position = "none",
+      axis.title.y = element_text(angle = 0, vjust = 0.5, family = "MathJax_Math", size = 22),
+      axis.title.x = element_text(family = "MathJax_Math", size = 22)
+    )
+```
+---
+class: clear
+
+Valid exogeneity, _i.e._, $\mathop{E}\left[ u \mid X \right] = 0$
+
+```{R, ex_good_exog, echo = F, dev = "svg"}
+cond_good
+```
+---
+class: clear
+
+Invalid exogeneity, _i.e._, $\mathop{E}\left[ u \mid X \right] \neq 0$
+
+```{R, ex_bad_exog, echo = F, dev = "svg"}
+cond_bad
+```
+
+
+---
+layout: false
+class: inverse, middle
+# Uncertainty and inference
+
+---
+layout: true
+# Uncertainty and inference
+
+---
+
+## Is there more?
+
+Up to this point, we know OLS has some nice properties, and we know how to estimate an intercept and slope coefficient via OLS.
+
+Our current workflow:
+- Get data (points with $x$ and $y$ values)
+- Regress $y$ on $x$
+- Plot the OLS line (_i.e._, $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1$)
+- Done?
+
+But how do we actually **learn** something from this exercise?
+---
+
+## There is more
+
+But how do we actually **learn** something from this exercise?
+
+- Based upon our value of $\hat{\beta}_1$, can we rule out previously hypothesized values?
+- How confident should we be in the precision of our estimates?
+- How well does our model explain the variation we observe in $y$?
+
+We need to be able to deal with uncertainty. Enter: **Inference.**
+
+---
+layout: true
+# Uncertainty and inference
+## Learning from our errors
+
+---
+
+As our previous simulation pointed out, our problem with **uncertainty** is that we don't know whether our sample estimate is *close* or *far* from the unknown population parameter.<sup>.pink[†]</sup>
+
+However, all is not lost. We can use the errors $\left(e_i = y_i - \hat{y}_i\right)$ to get a sense of how well our model explains the observed variation in $y$.
+
+When our model appears to be doing a "nice" job, we might be a little more confident in using it to learn about the relationship between $y$ and $x$.
+
+Now we just need to formalize what a "nice job" actually means.
+
+.footnote[
+.pink[†]: Except when we run the simulation ourselves—which is why we like simulations.
+]
+
+---
+
+First off, we will estimate the variance of $u_i$ (recall: $\mathop{\text{Var}} \left( u_i \right) = \sigma^2$) using our squared errors, _i.e._,
+
+$$ s^2 = \dfrac{\sum_i e_i^2}{n - k} $$
+
+where $k$ gives the number of slope terms and intercepts that we estimate (_e.g._, $\beta_0$ and $\beta_1$ would give $k=2$).
+
+$s^2$ is an unbiased estimator of $\sigma^2$.
+
+---
+
+You then showed that the variance of $\hat{\beta}_1$ (for simple linear regression) is
+
+$$ \mathop{\text{Var}} \left( \hat{\beta}_1 \right) = \dfrac{s^2}{\sum_i \left( x_i - \overline{x} \right)^2} $$
+
+which shows that the variance of our slope estimator
+
+1. increases as our disturbances become noisier
+2. decreases as the variance of $x$ increases
+
+---
+
+*More common:* The **standard error** of $\hat{\beta}_1$
+
+$$ \mathop{\hat{\text{SE}}} \left( \hat{\beta}_1 \right) = \sqrt{\dfrac{s^2}{\sum_i \left( x_i - \overline{x} \right)^2}} $$
+
+*Recall:* The standard error of an estimator is the standard deviation of the estimator's distribution.
+
+---
+
+Standard error output is standard in .mono[R]'s `lm`:
+
+```{R, se}
+tidy(lm(y ~ x, pop_df))
+```
+---
+
+We use the standard error of $\hat{\beta}_1$, along with $\hat{\beta}_1$ itself, to learn about the parameter $\beta_1$.
+
+After deriving the distribution of $\hat{\beta}_1$,<sup>.pink[†]</sup> we have two (related) options for formal statistical inference (learning) about our unknown parameter $\beta_1$:
+
+- **Confidence intervals:** Use the estimate and its standard error to create an interval that, when repeated, will generally<sup>.pink[††]</sup> contain the true parameter.
+
+- **Hypothesis tests:** Determine whether there is statistically significant evidence to reject a hypothesized value or range of values.
+
+.footnote[
+.pink[†]: *Hint:* it's normal with the mean and variance we've derived/discussed above)
+<br>
+.pink[††]: _E.g._, Similarly constructed 95% confidence intervals will contain the true parameter 95% of the time.
+]
+
+---
+layout: true
+# Uncertainty and inference
+## Confidence intervals
+
+We construct $(1-\alpha)$-level confidence intervals for $\beta_1$
+$$ \hat{\beta}\_1 \pm t\_{\alpha/2,\text{df}} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta}\_1 \right) $$
+
+---
+
+$t_{\alpha/2,\text{df}}$ denotes the $\alpha/2$ quantile of a $t$ dist. with $n-k$ degrees of freedom.
+
+---
+
+For example, 100 obs., two coefficients (_i.e._, $\hat{\beta}_0$ and $\hat{\beta}_1 \implies k = 2$), and $\alpha = 0.05$ (for a 95% confidence interval) gives us $t_{0.025,\,98} = `r qt(0.025, 98) %>% round(2)`$
+
+```{R, t dist, echo = F, dev = "svg", fig.height = 3}
+d6 <- tibble(x = seq(-4, 4, 0.01), y = dt(x, df = 98)) %>%
+  rbind(., tibble(x = seq(4, -4, -0.01), y = 0))
+ggplot() +
+geom_polygon(data = d6, aes(x, y), fill = "grey85") +
+geom_polygon(data = d6 %>% filter(x <= qt(0.025, 98)), aes(x, y), fill = red_pink) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = qt(0.025, 98), size = 0.35, linetype = "solid") +
+theme_simple +
+theme(axis.text.x = element_text(size = 12))
+```
+
+---
+
+**Example:**
+```{R ci r output, echo = T, highlight.output = 5}
+lm(y ~ x, data = pop_df) %>% tidy()
+```
+
+--
+
+Our 95% confidence interval is thus $0.567 \pm 1.98 \times 0.0793 = \left[ 0.410,\, 0.724 \right]$
+
+---
+layout: true
+# Uncertainty and inference
+## Confidence intervals
+
+---
+
+So we have a confidence interval for $\beta_1$, _i.e._, $\left[ 0.410,\, 0.724 \right]$.
+
+What does it mean?
+
+--
+
+**Informally:** The confidence interval gives us a region (interval) in which we can place some trust (confidence) for containing the parameter.
+
+--
+
+**More formally:** If repeatedly sample from our population and construct confidence intervals for each of these samples, $(1-\alpha)$ percent of our intervals (_e.g._, 95%) will contain the population parameter *somewhere in the interval*.
+
+--
+
+Now back to our simulation...
+
+---
+
+We drew 10,000 samples (each of size $n = 30$) from our population and estimated our regression model for each of these simulations:
+
+$$ y_i = \hat{\beta}_0 + \hat{\beta}_1 x_i + e_i $$
+<center>(repeated 10,000 times)</center>
+
+Now, let's estimate 95% confidence intervals for each of these intervals...
+
+---
+
+```{R, simulation ci data, include = F}
+# Create confidence intervals for b1
+ci_df <- sim_df %>% filter(term == "x") %>%
+  mutate(
+    lb = estimate - std.error * qt(.975, 28),
+    ub = estimate + std.error * qt(.975, 28),
+    ci_contains = (lm0$coefficients[2] >= lb) & (lm0$coefficients[2] <= ub),
+    ci_above = lm0$coefficients[2] < lb,
+    ci_below = lm0$coefficients[2] > ub,
+    ci_group = 2 * ci_above + (!ci_below)
+  ) %>%
+  arrange(ci_group, estimate) %>%
+  mutate(x = 1:1e4)
+```
+
+**From our previous simulation:** `r ci_df$ci_contains %>% multiply_by(100) %>% mean() %>% round(1)`% of 95% confidences intervals contain the true parameter value of $\beta_1$.
+
+```{R, simulation ci, echo = F, dev = "svg", fig.height = 5.5}
+# Plot
+ggplot(data = ci_df) +
+geom_segment(aes(y = lb, yend = ub, x = x, xend = x, color = ci_contains)) +
+geom_hline(yintercept = lm0$coefficients[2]) +
+scale_y_continuous(breaks = lm0$coefficients[2], labels = TeX("$\\beta_1$")) +
+scale_color_manual(values = c(red_pink, "grey85")) +
+theme_simple +
+theme(
+  axis.text.x = element_blank(),
+  axis.text.y = element_text(size = 18)
+)
+```
+
+---
+layout: true
+# Uncertainty and inference
+## Hypothesis testing
+
+---
+
+In many applications, we want to know more than a point estimate or a range of values. We want to know what our statistical evidence says about existing theories.
+
+We want to test hypotheses posed by officials, politicians, economists, scientists, friends, weird neighbors, *etc.*
+
+.hi-slate[Examples]
+
+- Does increasing police presence **reduce crime**?
+- Does building a giant wall **reduce crime**?
+- Does shutting down a government **adversely affect the economy**?
+- Does legal cannabis **reduce drunk driving** or **reduce opiod use**?
+- Do air quality standards **increase health** and/or **reduce jobs**?
+
+---
+
+Hypothesis testing relies upon very similar results and intuition.
+
+While uncertainty certainly exists, we can still build *reliable* statistical tests (rejecting or failing to reject a posited hypothesis).
+
+--
+
+.hi-slate[OLS *t* test] Our (null) hypothesis states that $\beta_1$ equals a value $c$, _i.e._, $H_o:\: \beta_1 = c$
+
+From OLS's properties, we can show that the test statistic
+
+$$ t_\text{stat} = \dfrac{\hat{\beta}_1 - c}{\mathop{\hat{\text{SE}}} \left( \hat{\beta}_1 \right)} $$
+
+follows the $t$ distribution with $n-k$ degrees of freedom.
+
+---
+
+For an $\alpha$-level, **two-sided** test, we reject the null hypothesis (and conclude with the alternative hypothesis) when
+
+$$ \left|t\_\text{stat}\right| > \left|t\_{1-\alpha/2,\,df}\right| $$
+
+meaning that our **test statistic is more extreme than the critical value**.
+
+Alternatively, we can calculate the **p-value** that accompanies our test statistic, which effectively gives us the probability of seeing our test statistic *or a more extreme test statistic* if the null hypothesis were true.
+
+Very small p-values (generally < 0.05) mean that it would be unlikely to see our results if the null hyopthesis were really true—we tend to reject the null for p-values below 0.05.
+
+---
+
+.mono[R] and .mono[Stata] default to testing hypotheses against the value zero.
+
+```{R hypothesis test, echo = T, highlight.output = 5}
+lm(y ~ x, data = pop_df) %>% tidy()
+```
+--
+
+H.sub[o]: $\beta_1 = 0$ *vs.* H.sub[a]: $\beta_1 \neq 0$
+
+--
+
+ $t_\text{stat} = 7.15$ and $t_\text{0.975, 28} = `r qt(0.975, 28) %>% round(2)`$
+--
+ which implies *p*-value $< 0.05$
+
+--
+
+Therefore, we .hi[reject H.sub[o]].
+
+---
+
+Back to our simulation! Let's see what our $t$ statistic is actually doing.
+
+In this situation, we can actually know (and enforce) the null hypothesis, since we generated the data.
+
+For each of the 10,000 samples, we will calculate the $t$ statistic, and then we can see how many $t$ statistics exceed our critical value (`r qt(0.975, 28) %>% round(2)`, as above).
+
+The answer should be approximately 5 percent—our $\alpha$ level.
+
+---
+layout: true
+# Uncertainty and inference
+
+---
+
+```{R, simulation t data, include = F}
+# Calculate test statistics
+t_df <- sim_df %>%
+  filter(term == "x") %>%
+  mutate(
+    t_stat = (estimate - lm0$coefficients[2]) / std.error,
+    reject = abs(t_stat) > abs(qt(0.975, 28))
+  )
+t_density <- density(t_df$t_stat, from = -5, to = 4) %$%
+  data.frame(x = x, y = y) %>%
+  mutate(area = abs(x) > abs(qt(0.975, 28)))
+```
+
+In our simulation, `r t_df$reject %>% mean() %>% multiply_by(100) %>% round(1)` percent of our $t$ statistics reject the null hypothesis.
+
+The distribution of our $t$ statistics (shading the rejection regions).
+```{R, simulation t plot, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = t_density, aes(x = x, ymin = 0, ymax = y)) +
+geom_vline(xintercept = 0) +
+geom_ribbon(fill = "grey85", alpha = 0.8) +
+geom_ribbon(
+  data = t_density %>% filter(x < qt(0.025, 28)),
+  fill = red_pink
+) +
+geom_ribbon(
+  data = t_density %>% filter(x > qt(0.975, 28)),
+  fill = red_pink
+) +
+geom_hline(yintercept = 0) +
+# geom_vline(xintercept = qt(c(0.025, 0.975), df = 28), color = red_pink) +
+theme_simple
+```
+
+---
+
+```{R, simulation p data, include = F}
+# Calculate test statistics
+p_df <- sim_df %>%
+  filter(term == "x") %>%
+  mutate(
+    p_value = 2 * pt(
+      q = abs((estimate - lm0$coefficients[2]) / std.error),
+      df = 28,
+      lower.tail = F
+    ),
+    reject = p_value < 0.05
+  )
+p_density <- density(p_df$p_value, from = 0, to = 1) %$%
+  data.frame(x = x, y = y) %>%
+  mutate(area = x < 0.05)
+```
+
+Correspondingly, `r p_df$reject %>% mean() %>% multiply_by(100) %>% round(1)` percent of our p-values reject the null hypothesis.
+
+The distribution of our p-values (shading the p-values below 0.05).
+```{R, simulation p plot, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = p_density, aes(x = x, ymin = 0, ymax = y)) +
+geom_vline(xintercept = 0) +
+geom_ribbon(fill = "grey85", alpha = 0.8) +
+geom_ribbon(
+  data = p_density %>% filter(x < 0.05),
+  fill = red_pink
+) +
+geom_hline(yintercept = 0) +
+theme_simple
+```
+
+---
+layout: true
+# Uncertainty and inference
+## *F* tests
+
+---
+You will sometimes see $F$ tests in econometrics.
+
+We use $F$ tests to test hypotheses that involve multiple parameters
+<br> (_e.g._, $\beta_1 = \beta_2$ or $\beta_3 + \beta_4 = 1$),
+
+rather than a single simple hypothesis
+<br> (_e.g._, $\beta_1 = 0$, for which we would just use a $t$ test).
+
+---
+**Example**
+
+Economists love to say "Money is fungible."
+
+Imagine that we might want to test whether money received as income actually has the same effect on consumption as money received from tax rebates/returns.
+
+$$ \text{Consumption}\_i = \beta\_0 + \beta\_1 \text{Income}\_{i} + \beta\_2 \text{Rebate}\_i + u\_i $$
+
+---
+
+**Example, continued**
+
+
+We can write our null hypothesis as
+
+$$ H_o:\: \beta_1 = \beta_2 \iff H_o :\: \beta_1 - \beta_2 = 0 $$
+
+Imposing this null hypothesis gives us the **restricted model**
+
+$$ \text{Consumption}\_i = \beta\_0 + \beta\_1 \text{Income}\_{i} + \beta\_1 \text{Rebate}\_i + u\_i $$
+$$ \text{Consumption}\_i = \beta\_0 + \beta\_1 \left( \text{Income}\_{i} + \text{Rebate}\_i \right) + u\_i $$
+
+---
+
+**Example, continued**
+
+To this the null hypothesis $H_o :\: \beta_1 = \beta_2$ against $H_a :\: \beta_1 \neq \beta_2$,
+<br>we use the $F$ statistic
+$$
+\begin{align}
+  F_{q,\,n-k-1} = \dfrac{\left(\text{SSE}_r - \text{SSE}_u\right)/q}{\text{SSE}_u/(n-k-1)}
+\end{align}
+$$
+which (as its name suggests) follows the $F$ distribution with $q$ numerator degrees of freedom and $n-k-1$ denominator degrees of freedom.
+
+Here, $q$ is the number of restrictions we impose via $H_o$.
+
+---
+
+**Example, continued**
+
+The term $\text{SSE}_r$ is the sum of squared errors (SSE) from our **restricted model**
+$$ \text{Consumption}\_i = \beta\_0 + \beta\_1 \left( \text{Income}\_{i} + \text{Rebate}\_i \right) + u\_i $$
+
+and $\text{SSE}_u$ is the sum of squared errors (SSE) from our **unrestricted model**
+$$ \text{Consumption}\_i = \beta\_0 + \beta\_1 \text{Income}\_{i} + \beta\_2 \text{Rebate}\_i + u\_i $$
+
+---
+
+
+
+---
+exclude: true
+
+```{R, generate pdfs, include = F, eval = F}
+source("../../ScriptsR/unpause.R")
+unpause("02_review.Rmd", ".", T, T)
+```
