@@ -584,18 +584,6 @@ nrow(murders) # number of rows
 ncol(murders) # number of columns
 ```
 
----
-
-# Subsetting `data.frames`
-
-* Subsetting a data.frame: `murders[row condition, column number]` or `murders[row condition, "column name"]`
-    ```{r}
-    # Only keep states with over 500 gun murders and keep only the "state" and "total" variables
-    murders[murders$total > 500, c("state", "total")]
-    
-    # Only keep California and Texas and keep only the "state" and "total" variables
-    murders[murders$state %in% c("California", "Texas"), c("state", "total")]
-    ```
 
 ---
 
@@ -626,6 +614,19 @@ ncol(murders) # number of columns
     typeof(murders)
     ```
 ]
+
+---
+
+# Subsetting `data.frames`
+
+* Subsetting a data.frame: `murders[row condition, column number]` or `murders[row condition, "column name"]`
+    ```{r}
+    # Only keep states with over 500 gun murders and keep only the "state" and "total" variables
+    murders[murders$total > 500, c("state", "total")]
+    
+    # Only keep California and Texas and keep only the "state" and "total" variables
+    murders[murders$state %in% c("California", "Texas"), c("state", "total")]
+    ```
 
 
 ---
