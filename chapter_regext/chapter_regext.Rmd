@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Linear Regression Extensions"
-author: "Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu"
+author: "Florian Oswald, Mylène Feuillade, Gustave Kenedi and Junnan He"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -62,19 +62,6 @@ countdown(
 ```
 
 
-# Quick "Quiz" on Last Week's Material
-
-1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOMLR***](https://app.wooclap.com/SCPOMLR)
-
-&nbsp; &nbsp; &nbsp; ***OR***
-
-2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
-
-```{r, echo = F, out.width = "300px"}
-knitr::include_graphics("chapter_regext_files/figure-html/qr_code_quiz.png")
-```
-
----
 
 # Today - Linear Regression Extensions
 
@@ -142,13 +129,13 @@ There are two main "methods":
   
 --
 
-* Taking the *natural* log of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions:
+* Taking the *natural* logarithm of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions (abuse of notation: $\ln(x) = \log_{e}(x)=\log(x)$):
 
-  * ***Log - level***: $\quad log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i$
+  * ***Log - level***: $\quad \log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i$
 
-  * ***Level - log***: $\quad \textrm{y}_i = b_0 + b_1 log(x_{1,i}) + ... + e_i$
+  * ***Level - log***: $\quad \textrm{y}_i = b_0 + b_1 \log(x_{1,i}) + ... + e_i$
 
-  * ***Log - log***: $\quad log(y_i) = b_0 + b_1 log(x_{1,i}) + ... + e_i$
+  * ***Log - log***: $\quad \log(y_i) = b_0 + b_1 \log(x_{1,i}) + ... + e_i$
   
 ---
 
@@ -167,11 +154,11 @@ data %>%
 
 # The (natural) log Function: A Primer `r emo::ji("winking_face")`
 
-The [natural log function](https://en.wikipedia.org/wiki/Natural_logarithm) is the inverse function of the exponential function. , i.e. $log(e^x)=x$
+The [natural log function](https://en.wikipedia.org/wiki/Natural_logarithm) is the inverse function of the exponential function. , i.e. $\log(\exp(x))=x$
 
 --
 
-$\rightarrow$ since for all $x$, $e^x>0 \implies$ natural log function is only defined for ***strictly positive values***! (It is not defined in 0!)
+$\rightarrow$ since for all $x$, $\exp(x)>0 \implies$ natural log function is only defined for ***strictly positive values***! (It is not defined in 0!)
 
 --
 
@@ -217,9 +204,9 @@ data %>%
 |    Specification           | Model  |  Interpretation of $b_1$            |
 |--------------------|:---------:|:-----------------------------------:|
 | Level - Level | $y = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a ] $b_1$ .small[**unit change** in y]  |
-| Log - Level | $log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $b_1 \times 100$ .small[ **percent change** in y]  |
-| Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A **one percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 / 100$  .small[**unit change** in y] |
-| Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A **one percent** increase in ] $x$ .small[ is associated, on average, with a] $b_1$ .small[**percent change** in y]  |
+| Log - Level | $\log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $b_1 \times 100$ .small[ **percent change** in y]  |
+| Level - Log | $y = b_0 + b_1 \log(x)  + e$ | .small[A **one percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 / 100$  .small[**unit change** in y] |
+| Log - Log  |  $\log(y) = b_0 + b_1 \log(x) + e$ | .small[A **one percent** increase in ] $x$ .small[ is associated, on average, with a] $b_1$ .small[**percent change** in y]  |
 
 --
 
@@ -239,9 +226,9 @@ For ***any increase in $x$, $\Delta x,$ and any $b_1$*** $(\Delta x = 5\% = 0.05
 |    Specification           | Model  |  Interpretation of $b_1$            |
 |--------------------|:---------:|:-----------------------------------:|
 | Level - Level | $y = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a ] $b_1$ .small[**unit change** in y]  |
-| Log - Level | $log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $(e^{b_1} - 1) \times 100$ .small[ **percent change** in y]  |
-| Level - Log | $y = b_0 + b_1 log(x)  + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 \times log(1 + \Delta x)$  .small[**unit change** in y] |
-| Log - Log  |  $log(y) = b_0 + b_1 log(x) + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a] $((1 + \Delta x)^{b_1} - 1) \times 100$ .small[**percent change** in y]  |
+| Log - Level | $\log(y) = b_0 + b_1 x + e$ | .small[A **one unit** increase in ] $x$ .small[ is associated, on average, with a] $(e^{b_1} - 1) \times 100$ .small[ **percent change** in y]  |
+| Level - Log | $y = b_0 + b_1 \log(x)  + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a ] $b_1 \times \log(1 + \Delta x)$  .small[**unit change** in y] |
+| Log - Log  |  $\log(y) = b_0 + b_1 \log(x) + e$ | .small[A  ] ** $\Delta x$** .small[**percent** increase in ] $x$ .small[ is associated, on average, with a] $((1 + \Delta x)^{b_1} - 1) \times 100$ .small[**percent change** in y]  |
 
 
 ([*Appendix:*](#log_approx) Why are the previously shown approximations true?)
@@ -522,7 +509,7 @@ layout: true
   
 * In practice, if we interact $x_1$ and $x_2$, we would write our model like this : 
 
-$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i}*x_{2,i} + ... + e_i$$
+$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i} \times x_{2,i} + ... + e_i$$
 
 --
 
@@ -552,7 +539,7 @@ How does the effect of being in a small vs regular class vary with the experienc
 
 Our regression model becomes:
 
-$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i \times \textrm{experience}_i + e_i$$ 
 
 --
 
