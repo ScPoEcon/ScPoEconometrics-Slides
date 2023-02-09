@@ -1,0 +1,608 @@
+---
+title: "ScPoProgramming"
+subtitle: "Introduction to R"
+author: "Florian Oswald"
+date: "Sciences Po Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    # chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include = FALSE, warning = FALSE, message = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+# Load packages
+library(tidyverse)
+library(pander)
+library(ggthemes)
+library(gapminder)
+library(countdown)
+library(xaringanExtra)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+```
+
+
+
+
+layout: false
+class: title-slide-section-red, middle
+
+# R
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+## What is `R`?
+
+`R` is a __programming language__ with powerful statistical and graphic capabilities.
+
+--
+
+## Why are we using `R`?<sup>1</sup>
+
+.footnote[
+[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
+<span style="visibility:hidden">[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! .</span>
+]
+
+--
+
+1. `R` is __free__ and __open source__—saving both you and the university 💰💵💰.
+
+--
+
+1. `R` is very __flexible and powerful__—adaptable to nearly any task, (data cleaning, data visualization, econometrics, spatial data analysis, machine learning, web scraping, etc.)
+
+--
+
+1. `R` has a vibrant, [thriving online community](https://stackoverflow.com/questions/tagged/r) that will (almost) always have a solution to your problem.
+
+--
+
+1. If you put in the work<sup>2</sup>, you will come away with a __very valuable and useful__ tool.
+
+.footnote[
+<span style="visibility:hidden">[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).</span>  
+[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! 
+]
+
+<!-- --- -->
+
+<!-- # Why can't we just use Excel? -->
+
+<!-- Many reasons but here are just a few: -->
+
+<!-- -- -->
+
+<!-- - Not ***reproducible***. -->
+
+<!-- -- -->
+
+<!-- - Not straightforward to ***merge*** datasets together. -->
+
+<!-- -- -->
+
+<!-- - Very fastidious to ***clean*** data. -->
+
+<!-- -- -->
+
+<!-- - Limited to ***small datasets***. -->
+
+<!-- -- -->
+
+<!-- - Not designed for proper ***econometric analyses***, maps, complex visualisations, etc. -->
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# First Taste of R 
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div>
+
+---
+
+# In Practice: Data Wrangling
+
+--
+
+* You will spend a lot of time preparing data for further analysis.
+
+--
+
+* The `gapminder` dataset contains data on life expectancy, GDP per capita and population by country between 1952 and 2007.
+
+* Suppose we want to know the average life expectancy and average GDP per capita for each continent in each year.
+
+--
+
+* We need to group the data by continent *and* year, then compute the average life expectancy and average GDP per capita
+
+--
+
+.pull-left[
+```{r, gapminder, echo = T, eval = F}
+# load gapminder package
+library(gapminder)
+# load the dataset from the gapminder package
+data(gapminder, package = "gapminder") 
+# show first 4 lines of this dataframe
+head(gapminder,n = 4)
+```
+]
+
+.pull-right[
+```{r, gapminder, echo = F, eval = T}
+```
+]
+
+---
+
+# In Practice: Data Wrangling
+
+* There are always several ways to achieve a goal. (As in life 😁)
+
+* Here we will only focus on the `dplyr` way:
+
+```{r}
+# compute the required statistics
+gapminder_dplyr <- gapminder %>% 
+  group_by(continent, year) %>% 
+  summarise(count = n(),
+            mean_lifeexp = mean(lifeExp),
+            mean_gdppercap = mean(gdpPercap))
+```
+
+```{r}
+# show first 5 lines of the new data
+head(gapminder_dplyr, n = 5)
+```
+
+---
+
+# Visualisation
+
+.pull-left[
+* Now we could *look* at the result in `gapminder_dplyr`, or compute some statistics from it. 
+
+* Nothing beats a picture, though:
+
+```{r gampminder_plot, eval = FALSE}
+ggplot(data = gapminder_dplyr, 
+       mapping = aes(x = mean_lifeexp,
+                     y = mean_gdppercap,
+                     color = continent,
+                     size = count)) +
+  geom_point(alpha = 1/2) +
+  labs(x = "Average life expectancy",
+       y = "Average GDP per capita",
+       color = "Continent",
+       size = "Nb of countries") +
+  theme_bw()
+```
+]
+
+.pull-right[
+```{r gampminder_plot, echo = FALSE}
+```
+]
+
+---
+
+# Animated Plotting 👌 <sup>1</sup>
+
+```{r, example: gganimate, include = F, cache = T}
+# The package for animating ggplot2
+library(gganimate)
+# As before
+# gg <- ggplot(
+#   data = gapminder %>% filter(continent != "Oceania"),
+#   aes(gdpPercap, lifeExp, size = pop, color = country)
+# ) +
+# geom_point(alpha = 0.7, show.legend = FALSE) +
+# scale_colour_manual(values = country_colors) +
+# scale_size(range = c(2, 12)) +
+# scale_x_log10("GDP per capita", label = scales::comma) +
+# facet_wrap(~continent) +
+# theme_pander(base_size = 16) +
+# theme(panel.border = element_rect(color = "grey90", fill = NA)) +
+# # Here comes the gganimate-specific bits
+# labs(title = "Year: {frame_time}") +
+# ylab("Life Expectancy") +
+# transition_time(year) +
+# ease_aes("linear")
+# # Save the animation
+# anim_save(
+#   animation = gg,
+#   filename = "ex_gganimate.gif",
+#   path = "chapter_in1les/figure-html",
+#   width = 9,
+#   height = 4,
+#   units = "in",
+#   res = 150,
+#   nframes = 56
+# )
+```
+
+.center[![Gapminder](chapter_intro_files/figure-html/ex_gganimate.gif)]
+
+.footnote[
+[1]: This animation is taken from [Ed Rubin](https://raw.githack.com/edrubin/EC421S19/master/LectureNotes/01Intro/01_intro.html#40).
+]
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# R 101: Here Is Where You Start
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Start your `RStudio`!
+
+## First Glossary of Terms
+
+* `R`: a programming language.
+
+* `RStudio`: an integrated development environment (IDE) to work with `R`.
+
+--
+
+* *command*: user input (text or numbers) that `R` *understands*.
+
+* *script*: a list of commands collected in a text file, each separated by a new line, to be run one after the other.
+
+--
+
+* To run a script, you need to highlight the relevant code lines and hit `Ctrl`+`Enter` (Windows) or `Cmd`+`Enter` (Mac).
+
+---
+
+# `RStudio` Layout
+
+```{r, echo = F, out.width = "600px"}
+knitr::include_graphics("chapter_intro_files/figure-html/rstudio.png")
+```
+
+---
+
+# R as a Calculator
+
+* You can use the `R` console like a calculator
+
+* Just type an arithmetic operation after `>` and hit `Enter`!
+
+--
+
+* Some basic arithmetic first:
+```{r}
+4 + 1
+8 / 2
+```
+
+
+* Great! What about this?
+```{r}
+2^3
+# by the way: this is a comment! R therefore disregards it
+```
+
+---
+
+class: inverse
+
+# Task 1
+
+```{r, echo = FALSE}
+countdown(minutes = 3, top = 0)
+```
+
+1. Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
+
+1. Type the following code in your script and run it. To run the code press `Ctrl` or `Cmd` + `Enter` (you can either highlight the code or just put your cursor at the end of the line)
+    ```{r, eval = F}
+    4 * 8
+    ```
+
+1. Type the following code in your script and run it. What happens if you only run the first line of the code?
+    ```{r, eval = F}
+    x = 5 # equivalently x <- 5
+    x
+    ```
+Congratulations, you have created your first `R` "object"! Everything is an object in R! Objects are assigned using `=` or `<-`.
+
+1. Create a new object named `x_3` to which you assign the cube of `x`. Note that to assign you need to use `=` or `<-`. Use code to compute the cube, not a calculator.
+
+---
+
+# Where to get Help?
+
+.pull-left[
+`R` built-in `help`:
+```{r, eval = FALSE}
+?log #? in front of function
+help(lm)   # help() is equivalent
+??plot  # get all help on keyword "plot"
+```
+]
+
+--
+
+.pull-right[
+In practice:
+![Learning R](chapter_intro_files/figure-html/learning_path.png)
+]
+
+---
+
+# Collaborate!
+
+<img src="chapter_intro_files/figure-html/gator_error.jpg" alt="Gator collaboration" width="900" style="display: block; margin-left: auto; margin-right: auto"/>
+
+---
+
+# R Packages
+
+* `R` users contribute add-on data and functions as *packages*
+
+* Installing packages is easy! Just use the `install.packages` function:
+    ```{r, eval = FALSE}
+    install.packages("ggplot2")
+    ```
+
+* To *use* the contents of a packge, we must load it from our library using `library`:
+    ```{r, message = FALSE, warning = FALSE,eval=FALSE}
+    library(ggplot2)
+    ```
+
+---
+
+# Vectors
+
+
+
+.pull-left[
+* The `c` function creates vectors, i.e. *one-dimensional arrays*.
+    ```{r}
+    c(1, 3, 5, 7, 8, 9)
+    ```
+    
+* Coercion to unique types:
+    ```{r}
+    (v <- c(42, "Statistics", TRUE))
+    ```
+]
+
+--
+
+.pull-right[
+
+* Creating a *range*
+    ```{r}
+    1:10
+    ```
+
+* get vector elements with square bracket operator `[index]`:
+    ```{r}
+    v[c(1,3)]
+    ```
+]
+
+---
+
+# `data.frame`'s
+
+`data.frame`s represent **tabular data**. Like spreadsheets.
+
+```{r}
+example_data = data.frame(x = c(1, 3, 5, 7),
+                          y = c(rep("Hello", 3), "Goodbye"),
+                          z = c("one", 2, "three", 4))
+example_data
+```
+
+* A `data.frame` has 2 dimensions: *rows* and *columns*. Like a *matrix*. Can get elements with `[row_index,col_index]`.
+
+* In practice, you will be importing files that contain the data into `R` rather than creating `data.frame`s by hand.
+
+---
+
+class: inverse
+# Task 2
+
+`r countdown(minutes = 7, top = 0)`
+
+```{r, echo=F}
+brexit <- read.csv("https://vincentarelbundock.github.io/Rdatasets/csv/dslabs/brexit_polls.csv")
+```
+
+1. Find out (using `help()` or google) how to import a .csv file. Do NOT use the "Import Dataset" button, nor install a package.
+
+1. Download the csv file [brexit.csv](https://vincentarelbundock.github.io/Rdatasets/csv/dslabs/brexit_polls.csv) and create a new object called `brexit` (Hint: objects are created using `=` or `<-`).
+
+1. Ensure that `brexit` is a data.frame by running:
+    ```{r,eval=F}
+    class(brexit) # check class
+    ```
+
+1. Find out what variables are contained in `brexit` by running:
+    ```{r, eval = F}
+    names(brexit) # obtain variable names
+    ```
+
+1. View the contents of `brexit` by clicking on `brexit` in your workspace. What does the `remain` variable correspond to?
+
+.footnote[
+[1]: This dataset is taken from the `dslabs` package.
+]
+
+---
+
+# `data.frame`s
+
+Useful functions to describe a dataframe:
+```{r}
+str(brexit) # `str` describes structure of any R object
+```
+
+--
+
+```{r}
+names(brexit) # column names
+```
+
+--
+
+```{r}
+nrow(brexit) # number of rows
+```
+
+--
+
+```{r}
+ncol(brexit) # number of columns
+```
+
+
+---
+
+# Accessing `data.frame` Columns
+    
+* To extract one column **as a vector** we can use the `$` operator (as in `brexit$state`), or the square bracket operator `[which_index]` with name or position index:
+    ```{r}
+    first5 <- brexit[1:5, ]  # take first 5 states only
+    first5$pollster  # extract with $ operator
+    first5[ ,"pollster"]  # extract with column name
+    first5[ ,2] # get second column
+    ```
+
+--
+
+.pull-left[
+* Check `class` of an object:
+    ```{r}
+    class(brexit)
+    ```
+]
+
+--
+
+.pull-right[
+* `typeof` gives the R-internal data type:
+    ```{r}
+    typeof(brexit)
+    ```
+]
+
+---
+
+# Subsetting `data.frames`
+
+* Subsetting a data.frame: `brexit[row condition, column number]` or `brexit[row condition, "column name"]`
+    ```{r}
+    # Only keep polls with more than 1000 observations and keep 2 columns
+    brexit[brexit$samplesize > 3900, c("remain", "leave")]
+    
+    # Only keep polls from YouGov and Opinium
+    brexit[brexit$pollster %in% c("YouGov", "Opinium") & brexit$samplesize > 3000, c("remain", "leave", "pollster")]
+    ```
+
+
+---
+
+class: inverse
+
+# Task 3
+
+```{r, echo = FALSE}
+countdown(minutes = 5, top = 0)
+```
+1. How many observations are there in `brexit`?
+
+1. How many variables? What are the data types of each variable?
+
+1. Remember that the colon operator `1:10` is just short for *construct a sequence from `1` to `10`* (i.e. 1, 2, 3, etc). Create a new object `brexit_2` containing the rows 10 to 25 of `brexit`.
+
+1. Create a new object `brexit_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
+
+1. Create a `total_percap` variable equal to the number of brexit per 10,000 inhabitants by running the following code.
+    ```{r}
+    brexit$remainers = brexit$remain * brexit$samplesize
+    ```
+
+Congratulations, you've created your first variable! Click on the `brexit` object to see the new variable.
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# The END!
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides">.ScPored[<i class="fa fa-link fa-fw"></i>] | Slides |
+| <a href="https://scpoecon.github.io/ScPoEconometrics">.ScPored[<i class="fa fa-link fa-fw"></i>] | Book |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/ScPoEcon">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @ScPoEcon                       |
+
+```{r makepdf, echo=FALSE,eval=FALSE}
+system("decktape chapter1.html chapter1.pdf --chrome-arg=--disable-web-security")
+```

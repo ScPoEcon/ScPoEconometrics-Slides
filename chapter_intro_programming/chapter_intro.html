@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ScPoProgramming</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Florian Oswald" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# ScPoProgramming
+]
+.subtitle[
+## Introduction to R
+]
+.author[
+### Florian Oswald
+]
+.date[
+### Sciences Po Paris </br> 2023-02-09
+]
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+
+
+
+layout: false
+class: title-slide-section-red, middle
+
+# R
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+## What is `R`?
+
+`R` is a __programming language__ with powerful statistical and graphic capabilities.
+
+--
+
+## Why are we using `R`?&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
+&lt;span style="visibility:hidden"&gt;[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! .&lt;/span&gt;
+]
+
+--
+
+1. `R` is __free__ and __open source__—saving both you and the university 💰💵💰.
+
+--
+
+1. `R` is very __flexible and powerful__—adaptable to nearly any task, (data cleaning, data visualization, econometrics, spatial data analysis, machine learning, web scraping, etc.)
+
+--
+
+1. `R` has a vibrant, [thriving online community](https://stackoverflow.com/questions/tagged/r) that will (almost) always have a solution to your problem.
+
+--
+
+1. If you put in the work&lt;sup&gt;2&lt;/sup&gt;, you will come away with a __very valuable and useful__ tool.
+
+.footnote[
+&lt;span style="visibility:hidden"&gt;[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).&lt;/span&gt;  
+[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! 
+]
+
+&lt;!-- --- --&gt;
+
+&lt;!-- # Why can't we just use Excel? --&gt;
+
+&lt;!-- Many reasons but here are just a few: --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- - Not ***reproducible***. --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- - Not straightforward to ***merge*** datasets together. --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- - Very fastidious to ***clean*** data. --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- - Limited to ***small datasets***. --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- - Not designed for proper ***econometric analyses***, maps, complex visualisations, etc. --&gt;
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# First Taste of R 
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt;
+
+---
+
+# In Practice: Data Wrangling
+
+--
+
+* You will spend a lot of time preparing data for further analysis.
+
+--
+
+* The `gapminder` dataset contains data on life expectancy, GDP per capita and population by country between 1952 and 2007.
+
+* Suppose we want to know the average life expectancy and average GDP per capita for each continent in each year.
+
+--
+
+* We need to group the data by continent *and* year, then compute the average life expectancy and average GDP per capita
+
+--
+
+.pull-left[
+
+```r
+# load gapminder package
+library(gapminder)
+# load the dataset from the gapminder package
+data(gapminder, package = "gapminder") 
+# show first 4 lines of this dataframe
+head(gapminder,n = 4)
+```
+]
+
+.pull-right[
+
+```
+## # A tibble: 4 × 6
+##   country     continent  year lifeExp      pop gdpPercap
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Afghanistan Asia       1952    28.8  8425333      779.
+## 2 Afghanistan Asia       1957    30.3  9240934      821.
+## 3 Afghanistan Asia       1962    32.0 10267083      853.
+## 4 Afghanistan Asia       1967    34.0 11537966      836.
+```
+]
+
+---
+
+# In Practice: Data Wrangling
+
+* There are always several ways to achieve a goal. (As in life 😁)
+
+* Here we will only focus on the `dplyr` way:
+
+
+```r
+# compute the required statistics
+gapminder_dplyr &lt;- gapminder %&gt;% 
+  group_by(continent, year) %&gt;% 
+  summarise(count = n(),
+            mean_lifeexp = mean(lifeExp),
+            mean_gdppercap = mean(gdpPercap))
+```
+
+
+```r
+# show first 5 lines of the new data
+head(gapminder_dplyr, n = 5)
+```
+
+```
+## # A tibble: 5 × 5
+## # Groups:   continent [1]
+##   continent  year count mean_lifeexp mean_gdppercap
+##   &lt;fct&gt;     &lt;int&gt; &lt;int&gt;        &lt;dbl&gt;          &lt;dbl&gt;
+## 1 Africa     1952    52         39.1          1253.
+## 2 Africa     1957    52         41.3          1385.
+## 3 Africa     1962    52         43.3          1598.
+## 4 Africa     1967    52         45.3          2050.
+## 5 Africa     1972    52         47.5          2340.
+```
+
+---
+
+# Visualisation
+
+.pull-left[
+* Now we could *look* at the result in `gapminder_dplyr`, or compute some statistics from it. 
+
+* Nothing beats a picture, though:
+
+
+```r
+ggplot(data = gapminder_dplyr, 
+       mapping = aes(x = mean_lifeexp,
+                     y = mean_gdppercap,
+                     color = continent,
+                     size = count)) +
+  geom_point(alpha = 1/2) +
+  labs(x = "Average life expectancy",
+       y = "Average GDP per capita",
+       color = "Continent",
+       size = "Nb of countries") +
+  theme_bw()
+```
+]
+
+.pull-right[
+&lt;img src="chapter_intro_files/figure-html/gampminder_plot-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Animated Plotting 👌 &lt;sup&gt;1&lt;/sup&gt;
+
+
+
+.center[![Gapminder](chapter_intro_files/figure-html/ex_gganimate.gif)]
+
+.footnote[
+[1]: This animation is taken from [Ed Rubin](https://raw.githack.com/edrubin/EC421S19/master/LectureNotes/01Intro/01_intro.html#40).
+]
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# R 101: Here Is Where You Start
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Start your `RStudio`!
+
+## First Glossary of Terms
+
+* `R`: a programming language.
+
+* `RStudio`: an integrated development environment (IDE) to work with `R`.
+
+--
+
+* *command*: user input (text or numbers) that `R` *understands*.
+
+* *script*: a list of commands collected in a text file, each separated by a new line, to be run one after the other.
+
+--
+
+* To run a script, you need to highlight the relevant code lines and hit `Ctrl`+`Enter` (Windows) or `Cmd`+`Enter` (Mac).
+
+---
+
+# `RStudio` Layout
+
+&lt;img src="chapter_intro_files/figure-html/rstudio.png" width="600px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# R as a Calculator
+
+* You can use the `R` console like a calculator
+
+* Just type an arithmetic operation after `&gt;` and hit `Enter`!
+
+--
+
+* Some basic arithmetic first:
+
+```r
+4 + 1
+```
+
+```
+## [1] 5
+```
+
+```r
+8 / 2
+```
+
+```
+## [1] 4
+```
+
+
+* Great! What about this?
+
+```r
+2^3
+```
+
+```
+## [1] 8
+```
+
+```r
+# by the way: this is a comment! R therefore disregards it
+```
+
+---
+
+class: inverse
+
+# Task 1
+
+<div class="countdown" id="timer_c5d47d13" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Create a new R script (File `\(\rightarrow\)` New File `\(\rightarrow\)` R Script). Save it somewhere as `lecture_intro.R`.
+
+1. Type the following code in your script and run it. To run the code press `Ctrl` or `Cmd` + `Enter` (you can either highlight the code or just put your cursor at the end of the line)
+    
+    ```r
+    4 * 8
+    ```
+
+1. Type the following code in your script and run it. What happens if you only run the first line of the code?
+    
+    ```r
+    x = 5 # equivalently x &lt;- 5
+    x
+    ```
+Congratulations, you have created your first `R` "object"! Everything is an object in R! Objects are assigned using `=` or `&lt;-`.
+
+1. Create a new object named `x_3` to which you assign the cube of `x`. Note that to assign you need to use `=` or `&lt;-`. Use code to compute the cube, not a calculator.
+
+---
+
+# Where to get Help?
+
+.pull-left[
+`R` built-in `help`:
+
+```r
+?log #? in front of function
+help(lm)   # help() is equivalent
+??plot  # get all help on keyword "plot"
+```
+]
+
+--
+
+.pull-right[
+In practice:
+![Learning R](chapter_intro_files/figure-html/learning_path.png)
+]
+
+---
+
+# Collaborate!
+
+&lt;img src="chapter_intro_files/figure-html/gator_error.jpg" alt="Gator collaboration" width="900" style="display: block; margin-left: auto; margin-right: auto"/&gt;
+
+---
+
+# R Packages
+
+* `R` users contribute add-on data and functions as *packages*
+
+* Installing packages is easy! Just use the `install.packages` function:
+    
+    ```r
+    install.packages("ggplot2")
+    ```
+
+* To *use* the contents of a packge, we must load it from our library using `library`:
+    
+    ```r
+    library(ggplot2)
+    ```
+
+---
+
+# Vectors
+
+
+
+.pull-left[
+* The `c` function creates vectors, i.e. *one-dimensional arrays*.
+    
+    ```r
+    c(1, 3, 5, 7, 8, 9)
+    ```
+    
+    ```
+    ## [1] 1 3 5 7 8 9
+    ```
+    
+* Coercion to unique types:
+    
+    ```r
+    (v &lt;- c(42, "Statistics", TRUE))
+    ```
+    
+    ```
+    ## [1] "42"         "Statistics" "TRUE"
+    ```
+]
+
+--
+
+.pull-right[
+
+* Creating a *range*
+    
+    ```r
+    1:10
+    ```
+    
+    ```
+    ##  [1]  1  2  3  4  5  6  7  8  9 10
+    ```
+
+* get vector elements with square bracket operator `[index]`:
+    
+    ```r
+    v[c(1,3)]
+    ```
+    
+    ```
+    ## [1] "42"   "TRUE"
+    ```
+]
+
+---
+
+# `data.frame`'s
+
+`data.frame`s represent **tabular data**. Like spreadsheets.
+
+
+```r
+example_data = data.frame(x = c(1, 3, 5, 7),
+                          y = c(rep("Hello", 3), "Goodbye"),
+                          z = c("one", 2, "three", 4))
+example_data
+```
+
+```
+##   x       y     z
+## 1 1   Hello   one
+## 2 3   Hello     2
+## 3 5   Hello three
+## 4 7 Goodbye     4
+```
+
+* A `data.frame` has 2 dimensions: *rows* and *columns*. Like a *matrix*. Can get elements with `[row_index,col_index]`.
+
+* In practice, you will be importing files that contain the data into `R` rather than creating `data.frame`s by hand.
+
+---
+
+class: inverse
+# Task 2
+
+<div class="countdown" id="timer_a0bd4014" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+
+1. Find out (using `help()` or google) how to import a .csv file. Do NOT use the "Import Dataset" button, nor install a package.
+
+1. Download the csv file [brexit.csv](https://vincentarelbundock.github.io/Rdatasets/csv/dslabs/brexit_polls.csv) and create a new object called `brexit` (Hint: objects are created using `=` or `&lt;-`).
+
+1. Ensure that `brexit` is a data.frame by running:
+    
+    ```r
+    class(brexit) # check class
+    ```
+
+1. Find out what variables are contained in `brexit` by running:
+    
+    ```r
+    names(brexit) # obtain variable names
+    ```
+
+1. View the contents of `brexit` by clicking on `brexit` in your workspace. What does the `remain` variable correspond to?
+
+.footnote[
+[1]: This dataset is taken from the `dslabs` package.
+]
+
+---
+
+# `data.frame`s
+
+Useful functions to describe a dataframe:
+
+```r
+str(brexit) # `str` describes structure of any R object
+```
+
+```
+## 'data.frame':	127 obs. of  10 variables:
+##  $ X         : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ startdate : chr  "2016-06-23" "2016-06-22" "2016-06-20" "2016-06-20" ...
+##  $ enddate   : chr  "2016-06-23" "2016-06-22" "2016-06-22" "2016-06-22" ...
+##  $ pollster  : chr  "YouGov" "Populus" "YouGov" "Ipsos MORI" ...
+##  $ poll_type : chr  "Online" "Online" "Online" "Telephone" ...
+##  $ samplesize: int  4772 4700 3766 1592 3011 1032 1032 2320 1003 1652 ...
+##  $ remain    : num  0.52 0.55 0.51 0.49 0.44 0.54 0.48 0.41 0.45 0.42 ...
+##  $ leave     : num  0.48 0.45 0.49 0.46 0.45 0.46 0.42 0.43 0.44 0.44 ...
+##  $ undecided : num  0 0 0 0.01 0.09 0 0.11 0.16 0.11 0.13 ...
+##  $ spread    : num  0.04 0.1 0.02 0.03 -0.01 0.08 0.06 -0.02 0.01 -0.02 ...
+```
+
+--
+
+
+```r
+names(brexit) # column names
+```
+
+```
+##  [1] "X"          "startdate"  "enddate"    "pollster"   "poll_type" 
+##  [6] "samplesize" "remain"     "leave"      "undecided"  "spread"
+```
+
+--
+
+
+```r
+nrow(brexit) # number of rows
+```
+
+```
+## [1] 127
+```
+
+--
+
+
+```r
+ncol(brexit) # number of columns
+```
+
+```
+## [1] 10
+```
+
+
+---
+
+# Accessing `data.frame` Columns
+    
+* To extract one column **as a vector** we can use the `$` operator (as in `brexit$state`), or the square bracket operator `[which_index]` with name or position index:
+    
+    ```r
+    first5 &lt;- brexit[1:5, ]  # take first 5 states only
+    first5$pollster  # extract with $ operator
+    ```
+    
+    ```
+    ## [1] "YouGov"     "Populus"    "YouGov"     "Ipsos MORI" "Opinium"
+    ```
+    
+    ```r
+    first5[ ,"pollster"]  # extract with column name
+    ```
+    
+    ```
+    ## [1] "YouGov"     "Populus"    "YouGov"     "Ipsos MORI" "Opinium"
+    ```
+    
+    ```r
+    first5[ ,2] # get second column
+    ```
+    
+    ```
+    ## [1] "2016-06-23" "2016-06-22" "2016-06-20" "2016-06-20" "2016-06-20"
+    ```
+
+--
+
+.pull-left[
+* Check `class` of an object:
+    
+    ```r
+    class(brexit)
+    ```
+    
+    ```
+    ## [1] "data.frame"
+    ```
+]
+
+--
+
+.pull-right[
+* `typeof` gives the R-internal data type:
+    
+    ```r
+    typeof(brexit)
+    ```
+    
+    ```
+    ## [1] "list"
+    ```
+]
+
+---
+
+# Subsetting `data.frames`
+
+* Subsetting a data.frame: `brexit[row condition, column number]` or `brexit[row condition, "column name"]`
+    
+    ```r
+    # Only keep polls with more than 1000 observations and keep 2 columns
+    brexit[brexit$samplesize &gt; 3900, c("remain", "leave")]
+    ```
+    
+    ```
+    ##    remain leave
+    ## 1    0.52  0.48
+    ## 2    0.55  0.45
+    ## 95   0.48  0.45
+    ```
+    
+    ```r
+    # Only keep polls from YouGov and Opinium
+    brexit[brexit$pollster %in% c("YouGov", "Opinium") &amp; brexit$samplesize &gt; 3000, c("remain", "leave", "pollster")]
+    ```
+    
+    ```
+    ##     remain leave pollster
+    ## 1     0.52  0.48   YouGov
+    ## 3     0.51  0.49   YouGov
+    ## 5     0.44  0.45  Opinium
+    ## 32    0.41  0.45   YouGov
+    ## 56    0.42  0.40   YouGov
+    ## 73    0.40  0.39   YouGov
+    ## 79    0.39  0.38   YouGov
+    ## 105   0.37  0.38   YouGov
+    ```
+
+
+---
+
+class: inverse
+
+# Task 3
+
+<div class="countdown" id="timer_de389522" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+1. How many observations are there in `brexit`?
+
+1. How many variables? What are the data types of each variable?
+
+1. Remember that the colon operator `1:10` is just short for *construct a sequence from `1` to `10`* (i.e. 1, 2, 3, etc). Create a new object `brexit_2` containing the rows 10 to 25 of `brexit`.
+
+1. Create a new object `brexit_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
+
+1. Create a `total_percap` variable equal to the number of brexit per 10,000 inhabitants by running the following code.
+    
+    ```r
+    brexit$remainers = brexit$remain * brexit$samplesize
+    ```
+
+Congratulations, you've created your first variable! Click on the `brexit` object to see the new variable.
+
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# SEE YOU NEXT WEEK!
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="https://github.com/ScPoEcon/ScPoEconometrics-Slides"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Slides |
+| &lt;a href="https://scpoecon.github.io/ScPoEconometrics"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Book |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                       |
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,119 @@
+---
+title: "Introduction - Tasks"
+author: "Florian Oswald, Gustave Kenedi and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1
+
+1\. Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
+
+2\. Type the following code in your script and run it. To run the code press `Ctrl` or `Cmd` + `Enter` (you can either highlight the code or just put your cursor at the end of the line)
+```{r}
+4 * 8
+```
+
+3\. Type the following code in your script and run it. What happens if you only run the first line of the code?
+```{r}
+x = 5 # equivalently x <- 5
+x
+```
+
+```{r}
+x = 5
+```
+
+**If I only run the first line of code, the object `x` is created in my environment but no output appears in the console. This is because I am not asking `R` to output anything; the only thing I am asking it is to create an object `x` equal to $5$.**
+
+Congratulations, you have created your first `R` "object"! Everything is an object in R! Objects are assigned using `=` or `<-`.
+
+4\. Create a new object named `x_3` to which you assign the cube of `x`. Note that to assign you need to use `=` or `<-`. Use code to compute the cube, not a calculator.
+
+```{r}
+x_3 = x^3
+x_3
+```
+
+
+## Task 2
+
+1\. Find out (using `help()` or google) how to import a .csv file. Do NOT use the "Import Dataset" button, nor install a package.
+
+**There are many ways to import a .csv file. The simplest way is to use the `read.csv()` function.**
+
+2\. Import [gun_murders.csv](https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1)<sup>1</sup> in a new object `murders`. This file contains data on gun murders by US state in 2010. (Hint: objects are created using `=` or `<-`).
+
+```{r}
+link <- "https://www.dropbox.com/s/zuk0qcfm3kyzs4e/gun_murders.csv?dl=1"
+
+murders <- read.csv(link)
+```
+
+3\. Ensure that `murders` is a data.frame by running:
+
+```{r, error = TRUE}
+class(murder)
+```
+
+**Hmm I get an error: "object 'murder' not found." Why is that? It's simple, there's a typo: it should be `murders` not `murder`. Everytime you see an error that says objet `x` not found it simply means that there is no object named `x` in your environment. So either you haven't created it yet or there's a small typo in your code. Always read what the error message says!**
+
+```{r}
+class(murders)
+```
+
+4\. Find out what variables are contained in `murders` by running
+
+```{r}
+names(murders)
+```
+
+5\. View the contents of `murders` by clicking on `murders` in your workspace. What does the `total` variable correspond to?
+
+```{r}
+View(murders)
+```
+
+**The `total` variable corresponds to the total number of gun murders by state (in 2010).**
+
+
+## Task 3
+
+1\. How many observations are there in `murders`?
+
+```{r}
+nrow(murders)
+```
+
+2\. How many variables? What are the data types of each variable?
+
+```{r}
+str(murders)
+```
+
+3\. Remember that the colon operator `1:10` is just short for *construct a sequence from `1` to `10`* (i.e. 1, 2, 3, etc). Create a new object `murders_2` containing the rows 10 to 25 of `murders`.
+
+```{r}
+murders_2 <- murders[10:25,]
+nrow(murders_2)
+```
+
+4\. Create a new object `murders_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
+
+```{r}
+murders_3 <- murders[, c("state", "total")]
+```
+
+5\. Create a `total_percap` variable equal to the number of murders per 10,000 inhabitants by running the following code.
+```{r}
+murders$total_percap = (murders$total / murders$population) * 10000
+names(murders)
+```
+
+Congratulations, you've created your first variable! Click on the `murders` object to see the new variable.
+ 
+
