@@ -3,7 +3,7 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald, Gustave Kenedi, Pierre Villedieu and Mylène Feuillade" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi, Pierre Villedieu and Mylène Feuillade, Junnan He" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/5235085b15.js"></script>
@@ -14,10 +14,18 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # ScPoEconometrics
+]
+.subtitle[
 ## Confidence Intervals and Hypothesis Testing
-### Florian Oswald, Gustave Kenedi, Pierre Villedieu and Mylène Feuillade
-### SciencesPo Paris </br> 2022-03-29
+]
+.author[
+### Florian Oswald, Gustave Kenedi, Pierre Villedieu and Mylène Feuillade, Junnan He
+]
+.date[
+### SciencesPo Paris </br> 2022-11-22
+]
 
 ---
 
@@ -30,17 +38,6 @@ layout: true
 
 
 
-# Quick "Quiz" on Last Week's Material
-
-1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOSAMP***](https://app.wooclap.com/SCPOSAMP)
-
-&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
-
-2\. From your ***phone*** 👉 flash QR code below
-
-&lt;img src="chapter_ci_hyptest_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
-
----
 
 # Today - Deeper dive into ***statistical inference*** &lt;sup&gt;1&lt;/sup&gt;
 
@@ -133,7 +130,7 @@ In practice, you ***don't*** need to compute your confidence intervals using *bo
 
 # Back to Pasta
 
-* As in real life, imagine we had access to *only one random sample* from our bowl of past.
+* As in real life, imagine we had access to *only one random sample* from our bowl of pasta.
 
 --
 
@@ -164,7 +161,7 @@ head(my_sample,3)
 ```
 
 ```
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   pasta_ID color    
 ##      &lt;int&gt; &lt;fct&gt;    
 ## 1        4 non-green
@@ -236,7 +233,7 @@ head(one_bootstrap, 8)
 ```
 
 ```
-## # A tibble: 8 x 3
+## # A tibble: 8 × 3
 ## # Groups:   replicate [1]
 ##   replicate pasta_ID color    
 ##       &lt;int&gt;    &lt;int&gt; &lt;fct&gt;    
@@ -322,7 +319,7 @@ head(bootstrap_distrib)
 
 ```
 ## Response: color (factor)
-## # A tibble: 6 x 2
+## # A tibble: 6 × 2
 ##   replicate  stat
 ##       &lt;int&gt; &lt;dbl&gt;
 ## 1         1  0.44
@@ -349,7 +346,7 @@ Let's visualize this sampling variation!
 
 # Bootstrap Distribution
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -359,7 +356,7 @@ The ***bootstrap distribution*** is an approximation of the ***sampling distribu
 
 # Bootstrap Distribution with Mean
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -369,7 +366,7 @@ The ***bootstrap distribution*** mean is very close to the original sample propo
 
 # Bootstrap Distribution with Mean
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 Let's use this ***bootstrap distribution*** to construct confidence intervals!
 
@@ -450,7 +447,7 @@ quantile(bootstrap_distrib$stat,0.975)
 
 # Percentile Method: 95% Confidence Interval Visually
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -460,7 +457,7 @@ Does the interval contain the true population proportion?
 
 # Percentile Method: 95% Confidence Interval Visually
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -474,7 +471,7 @@ Let's repeatedly draw 100 different samples from our `bowl` and for each sample 
 
 --
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
 
 How many confidence intervals contain the true parameter? Why?
 
@@ -582,7 +579,7 @@ head(promotions)
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 6 × 3
 ##      id decision gender
 ##   &lt;int&gt; &lt;fct&gt;    &lt;fct&gt; 
 ## 1     1 promoted male  
@@ -610,7 +607,7 @@ promotions %&gt;%
 ```
 
 ```
-## # A tibble: 4 x 4
+## # A tibble: 4 × 4
 ## # Groups:   gender [2]
 ##   gender decision     n percentage
 ##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
@@ -626,7 +623,7 @@ There is a ***29.2 percentage points difference*** in promotions between men and
 --
 
 .pull-right[
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
@@ -654,7 +651,7 @@ promotions %&gt;%
 ```
 
 ```
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ##      id decision gender shuffled_gender
 ##   &lt;int&gt; &lt;fct&gt;    &lt;fct&gt;  &lt;fct&gt;          
 ## 1     1 promoted male   female         
@@ -681,7 +678,7 @@ promotions_shuffled %&gt;%
 ```
 
 ```
-## # A tibble: 4 x 4
+## # A tibble: 4 × 4
 ## # Groups:   gender [2]
 ##   gender decision     n percentage
 ##   &lt;fct&gt;  &lt;fct&gt;    &lt;int&gt;      &lt;dbl&gt;
@@ -713,7 +710,7 @@ promotions %&gt;%
 ```
 
 ```
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ##      id decision gender shuffled_gender
 ##   &lt;int&gt; &lt;fct&gt;    &lt;fct&gt;  &lt;fct&gt;          
 ## 1     1 promoted male   female         
@@ -729,7 +726,7 @@ How do the promotion rates look like in our reshuffled sample?
 
 .pull-right[
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -767,13 +764,13 @@ How do the promotion rates look like in our reshuffled sample?
 
 # Sampling Distribution with 1000 Reshufflings
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Sampling Distribution with 1000 Reshufflings
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
 
 How ***likely*** is it to observe a 0.292 difference in a world with no discrimination?
 
@@ -849,7 +846,7 @@ where `\(p_m =\)` promotion rate of men, and `\(p_f =\)` promotion rate of women
 
 # Null Distribution
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -908,7 +905,7 @@ where `\(p_m =\)` promotion rate of men, and `\(p_f =\)` promotion rate of women
 
 # Visualizing the P-value
 
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -1060,7 +1057,7 @@ visualize(null_distribution,
 ]
 
 .pull-right[
-&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_ci_hyptest_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 
@@ -1133,6 +1130,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

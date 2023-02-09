@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Simple Linear Regression"
-author: "Gustave Kenedi, Mylène Feuillade, Florian Oswald and Pierre Villedieu"
+author: "Gustave Kenedi, Mylène Feuillade, Florian Oswald and Junnan He"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -56,19 +56,6 @@ countdown(
 )
 ```
 
-# Quick "Quiz" on Last Week's Material
-
-1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOTIDY2***](https://app.wooclap.com/SCPOTIDY2)
-
-&nbsp; &nbsp; &nbsp; ***OR***
-
-2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
-
-```{r, echo = F, out.width = "300px"}
-knitr::include_graphics("chapter_slr_files/figure-html/qr_code_quiz.png")
-```
-
----
 
 # Today - Real 'metrics finally `r emo::ji("v")`
 

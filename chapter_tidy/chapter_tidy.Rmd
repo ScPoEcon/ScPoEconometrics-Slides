@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Tidying, Visualising and Summarising Data"
-author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -57,19 +57,6 @@ countdown(
 #   error: The shiny_prerendered_chunk function can only be called from within runtime: shiny_prerendered
 ```
 
-# Quick "Quiz" on Last Week's Material
-
-1\. From your ***computer*** `r emo::ji("backhand_index_pointing_right")` connect to [***www.wooclap.com/SCPOINTRO***](https://app.wooclap.com/SCPOINTRO)
-
-&nbsp; &nbsp; &nbsp; ***OR***
-
-2\. From your ***phone*** `r emo::ji("backhand_index_pointing_right")` flash QR code below
-
-```{r, echo = F, out.width = "300px"}
-knitr::include_graphics("chapter_tidy_files/figure-html/qr_code_quiz.png")
-```
-
----
   
 # Working With Data
 
@@ -103,7 +90,7 @@ layout: true
 
 * [`dplyr`](https://dplyr.tidyverse.org) is part of the [`tidyverse`](https://www.tidyverse.org) package family.
 
-* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast but a bit more difficult.
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast and highly recommended for **big** data. Look [here](https://raw.githack.com/ScPoEcon/Advanced-Metrics-slides/master/lectures/03-datatable/03-datatable.html#1) for an intro!
 
 * Both have pros and cons. We'll start you off with `dplyr`.
 
@@ -132,7 +119,7 @@ $$\text{verb}(\underbrace{\text{data.frame}}_{\text{1st argument}}, \underbrace{
 
 --
 
-* Alternatively you can (should) use the `pipe` operator `%>%`:
+* Alternatively you can (should) use the `pipe` operator `%>%` (part of `magrittr` package):
 
 $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}_{\text{"pipe" operator}} \text{verb}(\underbrace{\text{what to do}}_\text{2nd argument})$$
 
@@ -160,7 +147,7 @@ $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}
 
 --
 
-1. `group_by()`: All the above can be used in conjunction with `group_by()` to use function on groups rather than entire data
+1. `group_by()`: All the above can be used in conjunction with `group_by()` to use functions on groups rather than entire data
 
 ---
 
@@ -268,7 +255,7 @@ Logical operators:
 ---
 
 .right-wide[
-`R` has the convenient `x %in% y` operator (conversely `!x %in% y`), `TRUE` if `x` is *a member of* `y`.
+`R` has the convenient `x %in% y` operator (conversely `!(x %in% y)`), `TRUE` if `x` is *a member of* `y`.
 ```{r, echo = TRUE}
 3 %in% 1:3
 c(2,5) %in% 2:10  # also vectorized
@@ -689,30 +676,33 @@ layout: true
 
 Works for all `dplyr` verbs:
 
-.pull-left[
+.left-40[
 ```{r, eval = FALSE}
 polls_us_election_2016
 ```
 ]
 
-.pull-right[
+.rigiht-60[
 ```{r, echo = FALSE}
 polls_us_election_2016
 ```
 ]
 
+
 ---
 
 Works for all `dplyr` verbs:
 
-.pull-left[
+.left-40[
 ```{r, eval = FALSE}
 polls_us_election_2016 %>%
-    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) #<<
+    mutate(trump_clinton_diff = #<<
+             rawpoll_trump - #<<
+             rawpoll_clinton) #<<
 ```
 ]
 
-.pull-right[
+.right-60[
 ```{r, echo = FALSE}
 polls_us_election_2016 %>%
     mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)
@@ -723,20 +713,24 @@ polls_us_election_2016 %>%
 
 Works for all `dplyr` verbs:
 
-.pull-left[
+.left-40[
 ```{r, eval = FALSE}
 polls_us_election_2016 %>%
-    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
     filter(trump_clinton_diff>5 & #<<
            state == "Iowa" & #<<
            is.na(rawpoll_johnson)) #<<
 ```
 ]
 
-.pull-right[
+.right-60[
 ```{r, echo = FALSE}
 polls_us_election_2016 %>%
-    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
     filter(trump_clinton_diff>5 &
            state == "Iowa" &
            is.na(rawpoll_johnson))
@@ -747,10 +741,12 @@ polls_us_election_2016 %>%
 
 Works for all `dplyr` verbs:
 
-.pull-left[
+.left-40[
 ```{r, eval = FALSE}
 polls_us_election_2016 %>%
-    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
     filter(trump_clinton_diff>5 &
            state == "Iowa" &
            is.na(rawpoll_johnson)) %>%
@@ -758,14 +754,46 @@ polls_us_election_2016 %>%
 ```
 ]
 
-.pull-right[
+.right-60[
 ```{r, echo = FALSE}
 polls_us_election_2016 %>%
-    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton) %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
     filter(trump_clinton_diff>5 &
            state == "Iowa" &
            is.na(rawpoll_johnson)) %>%
     select(pollster) #<<
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    pull(pollster) #<<
+```
+]
+
+.right-60[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    pull(pollster) #<<
 ```
 ]
 
@@ -788,6 +816,16 @@ polls_us_election_2016$samplesize %>% mean(na.rm = T)
 polls_us_election_2016 %>% count()
 ```
 ]
+
+#### (only for `r emo::ji("nerd")`  nerds:)
+
+* The `%>%` pipe is part of the `magrittr` package. `R v4.1.0` adds a *native pipe* via `|>`. you could use it like
+
+```{r}
+polls_us_election_2016$samplesize |> mean(na.rm = T)
+```
+
+
 
 ---
 
@@ -1670,7 +1708,7 @@ cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs"
 # Correlation
 
 * The correlation is a measure of the strength of the __linear association__ between two variables.
-    $$Cor(x,y) = \frac{Cov(x,y)}{\sqrt(Var(x))\sqrt(Var(y))}$$
+    $$Cor(x,y) = \frac{Cov(x,y)}{\sqrt{Var(x)}\sqrt{Var(y)}}$$
 
 --
 
@@ -1700,7 +1738,9 @@ knitr::include_graphics("chapter_tidy_files/figure-html/correlation.svg")
 
 # Correlation
 
-```{r, echo = F, out.extra = 'style="border: none;"'}
+* [App](https://gustavek.shinyapps.io/corr_continuous/)
+
+```{r, echo = F}
 knitr::include_url("https://gustavek.shinyapps.io/corr_continuous/")
 ```
 

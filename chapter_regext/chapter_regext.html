@@ -3,7 +3,7 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu" />
+    <meta name="author" content="Florian Oswald, Mylène Feuillade, Gustave Kenedi and Junnan He" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
@@ -16,10 +16,18 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # ScPoEconometrics
+]
+.subtitle[
 ## Linear Regression Extensions
-### Florian Oswald, Mylène Feuillade, Gustave Kenedi and Pierre Villedieu
-### SciencesPo Paris </br> 2022-03-16
+]
+.author[
+### Florian Oswald, Mylène Feuillade, Gustave Kenedi and Junnan He
+]
+.date[
+### SciencesPo Paris </br> 2022-10-24
+]
 
 ---
 
@@ -34,17 +42,6 @@ layout: true
 
 
 
-# Quick "Quiz" on Last Week's Material
-
-1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOMLR***](https://app.wooclap.com/SCPOMLR)
-
-&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
-
-2\. From your ***phone*** 👉 flash QR code below
-
-&lt;img src="chapter_regext_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
-
----
 
 # Today - Linear Regression Extensions
 
@@ -112,29 +109,29 @@ There are two main "methods":
   
 --
 
-* Taking the *natural* log of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions:
+* Taking the *natural* logarithm of the dependent and/or the independent variable(s) leads us to define 3 other types of regressions (abuse of notation: `\(\ln(x) = \log_{e}(x)=\log(x)\)`):
 
-  * ***Log - level***: `\(\quad log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i\)`
+  * ***Log - level***: `\(\quad \log(y_i) = b_0 + b_1 x_{1,i} + ... + e_i\)`
 
-  * ***Level - log***: `\(\quad \textrm{y}_i = b_0 + b_1 log(x_{1,i}) + ... + e_i\)`
+  * ***Level - log***: `\(\quad \textrm{y}_i = b_0 + b_1 \log(x_{1,i}) + ... + e_i\)`
 
-  * ***Log - log***: `\(\quad log(y_i) = b_0 + b_1 log(x_{1,i}) + ... + e_i\)`
+  * ***Log - log***: `\(\quad \log(y_i) = b_0 + b_1 \log(x_{1,i}) + ... + e_i\)`
   
 ---
 
 # The (natural) log Function: A Primer 😉
 
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # The (natural) log Function: A Primer 😉
 
-The [natural log function](https://en.wikipedia.org/wiki/Natural_logarithm) is the inverse function of the exponential function. , i.e. `\(log(e^x)=x\)`
+The [natural log function](https://en.wikipedia.org/wiki/Natural_logarithm) is the inverse function of the exponential function. , i.e. `\(\log(\exp(x))=x\)`
 
 --
 
-`\(\rightarrow\)` since for all `\(x\)`, `\(e^x&gt;0 \implies\)` natural log function is only defined for ***strictly positive values***! (It is not defined in 0!)
+`\(\rightarrow\)` since for all `\(x\)`, `\(\exp(x)&gt;0 \implies\)` natural log function is only defined for ***strictly positive values***! (It is not defined in 0!)
 
 --
 
@@ -149,13 +146,13 @@ If you have very ***skewed distributions*** taking the log will render it more *
 --
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 
@@ -166,9 +163,9 @@ If you have very ***skewed distributions*** taking the log will render it more *
 |    Specification           | Model  |  Interpretation of `\(b_1\)`            |
 |--------------------|:---------:|:-----------------------------------:|
 | Level - Level | `\(y = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1\)` .small[**unit change** in y]  |
-| Log - Level | `\(log(y) = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(b_1 \times 100\)` .small[ **percent change** in y]  |
-| Level - Log | `\(y = b_0 + b_1 log(x)  + e\)` | .small[A **one percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 / 100\)`  .small[**unit change** in y] |
-| Log - Log  |  `\(log(y) = b_0 + b_1 log(x) + e\)` | .small[A **one percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(b_1\)` .small[**percent change** in y]  |
+| Log - Level | `\(\log(y) = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(b_1 \times 100\)` .small[ **percent change** in y]  |
+| Level - Log | `\(y = b_0 + b_1 \log(x)  + e\)` | .small[A **one percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 / 100\)`  .small[**unit change** in y] |
+| Log - Log  |  `\(\log(y) = b_0 + b_1 \log(x) + e\)` | .small[A **one percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(b_1\)` .small[**percent change** in y]  |
 
 --
 
@@ -188,9 +185,9 @@ For ***any increase in `\(x\)`, `\(\Delta x,\)` and any `\(b_1\)`*** `\((\Delta 
 |    Specification           | Model  |  Interpretation of `\(b_1\)`            |
 |--------------------|:---------:|:-----------------------------------:|
 | Level - Level | `\(y = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1\)` .small[**unit change** in y]  |
-| Log - Level | `\(log(y) = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a] `\((e^{b_1} - 1) \times 100\)` .small[ **percent change** in y]  |
-| Level - Log | `\(y = b_0 + b_1 log(x)  + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 \times log(1 + \Delta x)\)`  .small[**unit change** in y] |
-| Log - Log  |  `\(log(y) = b_0 + b_1 log(x) + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(((1 + \Delta x)^{b_1} - 1) \times 100\)` .small[**percent change** in y]  |
+| Log - Level | `\(\log(y) = b_0 + b_1 x + e\)` | .small[A **one unit** increase in ] `\(x\)` .small[ is associated, on average, with a] `\((e^{b_1} - 1) \times 100\)` .small[ **percent change** in y]  |
+| Level - Log | `\(y = b_0 + b_1 \log(x)  + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a ] `\(b_1 \times \log(1 + \Delta x)\)`  .small[**unit change** in y] |
+| Log - Log  |  `\(\log(y) = b_0 + b_1 \log(x) + e\)` | .small[A  ] ** `\(\Delta x\)`** .small[**percent** increase in ] `\(x\)` .small[ is associated, on average, with a] `\(((1 + \Delta x)^{b_1} - 1) \times 100\)` .small[**percent change** in y]  |
 
 
 ([*Appendix:*](#log_approx) Why are the previously shown approximations true?)
@@ -205,13 +202,13 @@ For ***any increase in `\(x\)`, `\(\Delta x,\)` and any `\(b_1\)`*** `\((\Delta 
 --
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -221,13 +218,13 @@ For ***any increase in `\(x\)`, `\(\Delta x,\)` and any `\(b_1\)`*** `\((\Delta 
 1. If the relationship betwen `\(x\)` and `\(y\)` looks like a log or exponential function. 
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -255,13 +252,13 @@ What if the relationship between `\(x\)` and `\(y\)` is not exponential/log?
 # Polynomial Wut? 😟
 
 .pull-left[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
 
 .pull-right[
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -304,7 +301,7 @@ lm(y ~ poly(x, 3, raw = TRUE), data)
 
 ***2nd order:***
 
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 --
@@ -313,7 +310,7 @@ lm(y ~ poly(x, 3, raw = TRUE), data)
 
 ***3rd order:***
 
-&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_regext_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -326,7 +323,8 @@ class:inverse
 
 # Task 1: Non-linear relationships
 
-<div class="countdown" id="timer_6231b286" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_d4025d22" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -363,7 +361,7 @@ layout: true
   
 * In practice, if we interact `\(x_1\)` and `\(x_2\)`, we would write our model like this : 
 
-`$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i}*x_{2,i} + ... + e_i$$`
+`$$y_i =  b_0 + b_1 x_{1,i} + b_2 x_{2,i} + b_3x_{1,i} \times x_{2,i} + ... + e_i$$`
 
 --
 
@@ -393,7 +391,7 @@ How does the effect of being in a small vs regular class vary with the experienc
 
 Our regression model becomes:
 
-$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i * \textrm{experience}_i + e_i$$ 
+$$ \textrm{score}_i = \color{#d96502}{b_0} + \color{#027D83}{b_1} \textrm{small}_i + \color{#02AB0D}{b_2} \textrm{experience}_i + \color{#d90502}{b_3} \textrm{small}_i \times \textrm{experience}_i + e_i$$ 
 
 --
 
@@ -516,7 +514,8 @@ class:inverse
 
 # Task 2: Wages, education and gender in 1985
 
-<div class="countdown" id="timer_6231b5aa" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_2251400e" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -615,7 +614,8 @@ class:inverse
 
 # Task 3: Standardized regression
 
-<div class="countdown" id="timer_6231b350" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_aa93d53e" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -820,6 +820,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

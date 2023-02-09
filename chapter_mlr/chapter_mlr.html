@@ -3,7 +3,7 @@
   <head>
     <title>ScPoEconometrics</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Florian Oswald, Gustave Kenedi, Mylène Feuillade and Pierre Villedieu" />
+    <meta name="author" content="Florian Oswald, Gustave Kenedi, Mylène Feuillade and Junnan He" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
@@ -16,10 +16,18 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # ScPoEconometrics
+]
+.subtitle[
 ## Multiple Regression Model
-### Florian Oswald, Gustave Kenedi, Mylène Feuillade and Pierre Villedieu
-### SciencesPo Paris </br> 2022-03-08
+]
+.author[
+### Florian Oswald, Gustave Kenedi, Mylène Feuillade and Junnan He
+]
+.date[
+### SciencesPo Paris </br> 2022-10-02
+]
 
 ---
 
@@ -33,18 +41,6 @@ layout: true
 
 
 
-
-# Quick "Quiz" on Last Week's Material
-
-1\. From your ***computer*** 👉 connect to [***www.wooclap.com/SCPOCAUSALITY***](https://app.wooclap.com/SCPOCAUSALITY)
-
-&amp;nbsp; &amp;nbsp; &amp;nbsp; ***OR***
-
-2\. From your ***phone*** 👉 flash QR code below
-
-&lt;img src="chapter_mlr_files/figure-html/qr_code_quiz.png" width="300px" style="display: block; margin: auto;" /&gt;
-
----
 
 # Today - Multiple Regression Model
 
@@ -76,20 +72,20 @@ layout: true
 
 # Class size and student performance: Raw relationship
 
+&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Class size and student performance: Raw relationship
+
 &lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Class size and student performance: Raw relationship
 
-&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-
-# Class size and student performance: Raw relationship
-
 .pull-left[
-&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 .pull-right[
@@ -137,7 +133,7 @@ lm(avgmath ~ classize, grades)
 .pull-left[
 Link between **class size** and **the share of students who come from `disadvantaged` backgrounds** in the class.
 
-&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
 
 👉 On average, there is a greater % of disadvantaged students in smaller classes.
 ]
@@ -147,7 +143,7 @@ Link between **class size** and **the share of students who come from `disadvant
 .pull-right[
 Link between **average math score** and **the share of students who come from `disadvantaged` backgrounds** in the class.
 
-&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 
 👉 On average, the greater the % of students coming from a disadvantaged background, the lower the average math score.
 
@@ -390,7 +386,8 @@ class:inverse
 
 # Task 1
 
-<div class="countdown" id="timer_622737e0" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_09ab9df8" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -566,6 +563,16 @@ $$
 \text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
 $$
 
+&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# A Numeric and a Dummy Regressor: Visually
+
+$$
+\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
+$$
+
 &lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -597,16 +604,6 @@ $$
 $$
 
 &lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-
-# A Numeric and a Dummy Regressor: Visually
-
-$$
-\text{average math score}_i = \color{#d96502}{b_0} + \color{#d90502}{b_1}\text{class size}_i + \color{#027D83}{b_2}\text{religious}_i +e_i
-$$
-
-&lt;img src="chapter_mlr_files/figure-html/unnamed-chunk-18-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -677,8 +674,10 @@ lm(avgmath ~ classize + is_religious +
 ##     data = grades)
 ## 
 ## Coefficients:
-##         (Intercept)             classize     is_religiousTRUE  is_notreligiousTRUE  
-##             61.3092               0.2311              -3.7800                   NA
+##         (Intercept)             classize     is_religiousTRUE  
+##             61.3092               0.2311              -3.7800  
+## is_notreligiousTRUE  
+##                  NA
 ```
 
 Only one of two has a coefficient! Why?
@@ -695,7 +694,7 @@ grades %&gt;% count(is_religious == 1 - is_notreligious)
 .pull-right[
 
 ```
-## # A tibble: 1 x 2
+## # A tibble: 1 × 2
 ##   `is_religious == 1 - is_notreligious`     n
 ##   &lt;lgl&gt;                                 &lt;int&gt;
 ## 1 TRUE                                   2019
@@ -731,7 +730,8 @@ class: inverse
 
 # Task 2: Dummy Variable Trap
 
-<div class="countdown" id="timer_62273680" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_88268092" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -861,7 +861,8 @@ class: inverse
 
 # Task 3: Recap
 
-<div class="countdown" id="timer_622736e5" style="top:0;right:0;" data-warnwhen="0">
+<div class="countdown" id="timer_ad43683a" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -968,6 +969,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
