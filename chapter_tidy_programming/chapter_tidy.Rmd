@@ -1,7 +1,7 @@
 ---
-title: "ScPoEconometrics"
-subtitle: "Tidying, Visualising and Summarising Data"
-author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He"
+title: "ScPoProgramming"
+subtitle: "`R` Tidyverse"
+author: "Florian Oswald"
 date: "SciencesPo Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -57,6 +57,17 @@ countdown(
 #   error: The shiny_prerendered_chunk function can only be called from within runtime: shiny_prerendered
 ```
 
+
+# Due Credit
+
+1. The first part of those slides were developed jointly with 
+    - [Gustave Kenedi](https://gustavekenedi.github.io/)
+    - [Mylène Feuillade](https://github.com/mylenefeuillade)
+    - [Pierre Vielledieu](https://github.com/pvielledieu)
+    
+2. The second part is copied from [Grant McDermott's](https://grantmcdermott.com/) amazing data science lectures.
+
+---
   
 # Working With Data
 
