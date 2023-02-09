@@ -1,7 +1,7 @@
 ---
 title: "ScPoEconometrics"
 subtitle: "Introduction"
-author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He"
 date: "Sciences Po Paris </br> `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -416,7 +416,9 @@ class: inverse
 
 # Task 1
 
-`r countdown(minutes = 5, top = 0)`
+```{r}
+countdown(minutes = 5, top = 0)
+```
 
 1. Create a new R script (File $\rightarrow$ New File $\rightarrow$ R Script). Save it somewhere as `lecture_intro.R`.
 
