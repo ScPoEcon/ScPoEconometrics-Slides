@@ -1,0 +1,2869 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ScPoEconometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="../css/scpo.css" type="text/css" />
+    <link rel="stylesheet" href="../css/scpo-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# ScPoEconometrics
+]
+.subtitle[
+## Tidying, Visualising and Summarising Data
+]
+.author[
+### Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He
+]
+.date[
+### SciencesPo Paris </br> 2023-02-09
+]
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+
+
+  
+# Working With Data
+
+* Econometrics is about `data`.
+
+&lt;img src="chapter_tidy_files/figure-html/data_science_pipeline.png" width="400px" style="display: block; margin: auto;" /&gt;
+
+--
+
+* According a to [2014 NYTimes article](https://www.nytimes.com/2014/08/18/technology/for-big-data-scientists-hurdle-to-insights-is-janitor-work.html), "data scientists [...] spend from ***50 percent to 80 percent of their time*** mired in this more mundane labor of collecting and preparing unruly digital data, before it can be explored for useful nuggets."
+
+* In the next two lectures you will learn the basics of ***tidying***, ***visualising*** and ***summarising*** data
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Tidying Data
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Intro to `dplyr`
+
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [`tidyverse`](https://www.tidyverse.org) package family.
+
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast and highly recommended for **big** data. Look [here](https://raw.githack.com/ScPoEcon/Advanced-Metrics-slides/master/lectures/03-datatable/03-datatable.html#1) for an intro!
+
+* Both have pros and cons. We'll start you off with `dplyr`.
+
+---
+
+# `dplyr` Overview
+
+* You are ***highly encouraged*** to read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's clear and concise.
+
+--
+
+* Also check out this great "cheatsheet" [here](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf).
+
+--
+
+
+* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
+
+* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
+
+--
+
+* All *verbs* work as follows:
+
+`$$\text{verb}(\underbrace{\text{data.frame}}_{\text{1st argument}}, \underbrace{\text{what to do}}_\text{2nd argument})$$`
+
+--
+
+* Alternatively you can (should) use the `pipe` operator `%&gt;%` (part of `magrittr` package):
+
+`$$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %&gt;% }}_{\text{"pipe" operator}} \text{verb}(\underbrace{\text{what to do}}_\text{2nd argument})$$`
+
+---
+
+# Main `dplyr` Verbs
+
+1. `filter()`: Choose observations based on a certain condition (i.e. subset)
+
+--
+
+1. `arrange()`: Reorder rows 
+
+--
+
+1. `select()`: Select variables by name
+
+--
+
+1. `mutate()`: Create new variables out of existing ones
+
+--
+
+1. `summarise()`: Collapse data to a single summary
+
+--
+
+1. `group_by()`: All the above can be used in conjunction with `group_by()` to use functions on groups rather than entire data
+
+---
+
+# Data: 2016 US election polls from the `dslabs` package
+
+* This dataset contains __real__ data on polls made during the 2016 US Presidential elections and compiled by [fivethirtyeight](fivethirtyeight.com)
+
+
+```r
+library(dslabs)
+library(tidyverse)
+data(polls_us_election_2016, package = "dslabs") # load data from package
+polls_us_election_2016 &lt;- as_tibble(polls_us_election_2016) # convert to a tibble
+head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
+```
+
+```
+## # A tibble: 6 × 6
+##   state startdate  enddate    pollster                             grade sampl…¹
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                                &lt;fct&gt;   &lt;int&gt;
+## 1 U.S.  2016-11-03 2016-11-06 ABC News/Washington Post             A+       2220
+## 2 U.S.  2016-11-01 2016-11-07 Google Consumer Surveys              B       26574
+## 3 U.S.  2016-11-02 2016-11-06 Ipsos                                A-       2195
+## 4 U.S.  2016-11-04 2016-11-07 YouGov                               B        3677
+## 5 U.S.  2016-11-03 2016-11-06 Gravis Marketing                     B-      16639
+## 6 U.S.  2016-11-03 2016-11-06 Fox News/Anderson Robbins Research/… A        1295
+## # … with abbreviated variable name ¹​samplesize
+```
+
+🚨 This is a `tibble` (more informative than `data.frame`)
+
+---
+
+# Data: 2016 US election polls from the `dslabs` package
+
+What variables does this dataset contain?
+
+
+```r
+str(polls_us_election_2016)
+```
+
+```
+## tibble [4,208 × 15] (S3: tbl_df/tbl/data.frame)
+##  $ state           : Factor w/ 57 levels "Alabama","Alaska",..: 50 50 50 50 50 50 50 50 37 50 ...
+##  $ startdate       : Date[1:4208], format: "2016-11-03" "2016-11-01" ...
+##  $ enddate         : Date[1:4208], format: "2016-11-06" "2016-11-07" ...
+##  $ pollster        : Factor w/ 196 levels "ABC News/Washington Post",..: 1 63 81 194 65 55 18 113 195 76 ...
+##  $ grade           : Factor w/ 10 levels "D","C-","C","C+",..: 10 6 8 6 5 9 8 8 NA 8 ...
+##  $ samplesize      : int [1:4208] 2220 26574 2195 3677 16639 1295 1426 1282 8439 1107 ...
+##  $ population      : chr [1:4208] "lv" "lv" "lv" "lv" ...
+##  $ rawpoll_clinton : num [1:4208] 47 38 42 45 47 ...
+##  $ rawpoll_trump   : num [1:4208] 43 35.7 39 41 43 ...
+##  $ rawpoll_johnson : num [1:4208] 4 5.46 6 5 3 3 5 6 6 7.1 ...
+##  $ rawpoll_mcmullin: num [1:4208] NA NA NA NA NA NA NA NA NA NA ...
+##  $ adjpoll_clinton : num [1:4208] 45.2 43.3 42 45.7 46.8 ...
+##  $ adjpoll_trump   : num [1:4208] 41.7 41.2 38.8 40.9 42.3 ...
+##  $ adjpoll_johnson : num [1:4208] 4.63 5.18 6.84 6.07 3.73 ...
+##  $ adjpoll_mcmullin: num [1:4208] NA NA NA NA NA NA NA NA NA NA ...
+```
+
+
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter observations
+
+```r
+filter()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* Which polls had a sample size of at least 2,000 people?
+]
+
+---
+
+.right-wide[
+*Example:* Which polls had a sample size of at least 2,000 people?
+]
+
+.right-wide[
+
+```r
+*polls_us_election_2016
+```
+
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which polls had a sample size of at least 2,000 people?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* filter(samplesize &gt; 2000)
+```
+
+
+```
+## # A tibble: 403 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+##  7 U.S.      2016-11-05 2016-11-07 The Ti… &lt;NA&gt;     2521 lv         45      40  
+##  8 U.S.      2016-11-01 2016-11-07 USC Do… &lt;NA&gt;     2972 lv         43.6    46.8
+##  9 Georgia   2016-11-03 2016-11-06 Gravis… B-       2002 rv         44      48  
+## 10 Virginia  2016-11-01 2016-11-02 Reming… &lt;NA&gt;     3076 lv         46      44  
+## # … with 393 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+Standard suite of comparison operators:
+- `&gt;`: greater than,
+- `&lt;`: smaller than,
+- `&gt;=`: greater than or equal to,
+- `&lt;=`: smaller than or equal to,
+- `!=`: not equal to,
+- `==`: equal to.
+
+Logical operators:
+1. `x &amp; y`: `x` **and** `y`
+1. `x | y`: `x` **or** `y`
+1. `!y`: **not** `y`
+]
+
+---
+
+.right-wide[
+`R` has the convenient `x %in% y` operator (conversely `!(x %in% y)`), `TRUE` if `x` is *a member of* `y`.
+
+```r
+3 %in% 1:3
+```
+
+```
+## [1] TRUE
+```
+
+```r
+c(2,5) %in% 2:10  # also vectorized
+```
+
+```
+## [1] TRUE TRUE
+```
+
+```r
+c("S","Po") %in% c("Sciences","Po")  # also strings
+```
+
+```
+## [1] FALSE  TRUE
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+
+```r
+*polls_us_election_2016
+```
+
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* filter(grade == "A" &amp; samplesize &gt; 2000 &amp; rawpoll_trump &gt; 45)
+```
+
+
+```
+## # A tibble: 1 × 15
+##   state   startdate  enddate    pollster   grade sampl…¹ popul…² rawpo…³ rawpo…⁴
+##   &lt;fct&gt;   &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;      &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Indiana 2016-04-26 2016-04-28 Marist Co… A        2149 rv           41      48
+## # … with 6 more variables: rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable names ¹​samplesize,
+## #   ²​population, ³​rawpoll_clinton, ⁴​rawpoll_trump
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Create new variable(s)
+
+```r
+mutate()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016
+```
+
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+*        trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
+```
+
+
+```
+## # A tibble: 4,208 × 17
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 8 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, trump_clinton_tot &lt;dbl&gt;,
+## #   trump_raw_adj_diff &lt;dbl&gt;, and abbreviated variable names ¹​pollster,
+## #   ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %&gt;%
+* names()
+```
+
+
+```
+##  [1] "state"              "startdate"          "enddate"           
+##  [4] "pollster"           "grade"              "samplesize"        
+##  [7] "population"         "rawpoll_clinton"    "rawpoll_trump"     
+## [10] "rawpoll_johnson"    "rawpoll_mcmullin"   "adjpoll_clinton"   
+## [13] "adjpoll_trump"      "adjpoll_johnson"    "adjpoll_mcmullin"  
+## [16] "trump_clinton_tot"  "trump_raw_adj_diff"
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Keep some variable(s)
+
+```r
+select()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016
+```
+
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump)
+```
+
+
+```
+## # A tibble: 4,208 × 6
+##    state      startdate  enddate    pollster                     rawpo…¹ rawpo…²
+##    &lt;fct&gt;      &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;                          &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.       2016-11-03 2016-11-06 ABC News/Washington Post        47      43  
+##  2 U.S.       2016-11-01 2016-11-07 Google Consumer Surveys         38.0    35.7
+##  3 U.S.       2016-11-02 2016-11-06 Ipsos                           42      39  
+##  4 U.S.       2016-11-04 2016-11-07 YouGov                          45      41  
+##  5 U.S.       2016-11-03 2016-11-06 Gravis Marketing                47      43  
+##  6 U.S.       2016-11-03 2016-11-06 Fox News/Anderson Robbins R…    48      44  
+##  7 U.S.       2016-11-02 2016-11-06 CBS News/New York Times         45      41  
+##  8 U.S.       2016-11-03 2016-11-05 NBC News/Wall Street Journal    44      40  
+##  9 New Mexico 2016-11-06 2016-11-06 Zia Poll                        46      44  
+## 10 U.S.       2016-11-04 2016-11-07 IBD/TIPP                        41.2    42.7
+## # … with 4,198 more rows, and abbreviated variable names ¹​rawpoll_clinton,
+## #   ²​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %&gt;%
+* names()
+```
+
+
+```
+## [1] "state"           "startdate"       "enddate"         "pollster"       
+## [5] "rawpoll_clinton" "rawpoll_trump"
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Compute statistic
+
+```r
+summarise()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016
+```
+
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* summarise(max_trump = max(rawpoll_trump))
+```
+
+
+```
+## # A tibble: 1 × 1
+##   max_trump
+##       &lt;dbl&gt;
+## 1        68
+```
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Summarise
+
+### Apply function by group
+
+```r
+group_by()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016
+```
+
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* group_by(grade)
+```
+
+
+```
+## # A tibble: 4,208 × 15
+## # Groups:   grade [11]
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+  group_by(grade) %&gt;%
+* class()
+```
+
+
+```
+## [1] "grouped_df" "tbl_df"     "tbl"        "data.frame"
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+* group_by(grade)
+```
+
+
+```
+## # A tibble: 4,208 × 15
+## # Groups:   grade [11]
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+
+```r
+polls_us_election_2016 %&gt;%
+  group_by(grade) %&gt;%
+* summarise(mean_vote_clinton = mean(rawpoll_clinton))
+```
+
+
+```
+## # A tibble: 11 × 2
+##    grade mean_vote_clinton
+##    &lt;fct&gt;             &lt;dbl&gt;
+##  1 D                  46.7
+##  2 C-                 43.2
+##  3 C                  41.8
+##  4 C+                 44.2
+##  5 B-                 43.9
+##  6 B                  37.3
+##  7 B+                 44.1
+##  8 A-                 43.0
+##  9 A                  45.3
+## 10 A+                 45.8
+## 11 &lt;NA&gt;               43.2
+```
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# Chaining ⛓ Commands Together
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+
+```r
+polls_us_election_2016
+```
+]
+
+.rigiht-60[
+
+```
+## # A tibble: 4,208 × 15
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 6 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​pollster, ²​samplesize, ³​population, ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+
+```r
+polls_us_election_2016 %&gt;%
+*   mutate(trump_clinton_diff =
+*            rawpoll_trump -
+*            rawpoll_clinton)
+```
+]
+
+.right-60[
+
+```
+## # A tibble: 4,208 × 16
+##    state     startdate  enddate    polls…¹ grade sampl…² popul…³ rawpo…⁴ rawpo…⁵
+##    &lt;fct&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt;   &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##  1 U.S.      2016-11-03 2016-11-06 ABC Ne… A+       2220 lv         47      43  
+##  2 U.S.      2016-11-01 2016-11-07 Google… B       26574 lv         38.0    35.7
+##  3 U.S.      2016-11-02 2016-11-06 Ipsos   A-       2195 lv         42      39  
+##  4 U.S.      2016-11-04 2016-11-07 YouGov  B        3677 lv         45      41  
+##  5 U.S.      2016-11-03 2016-11-06 Gravis… B-      16639 rv         47      43  
+##  6 U.S.      2016-11-03 2016-11-06 Fox Ne… A        1295 lv         48      44  
+##  7 U.S.      2016-11-02 2016-11-06 CBS Ne… A-       1426 lv         45      41  
+##  8 U.S.      2016-11-03 2016-11-05 NBC Ne… A-       1282 lv         44      40  
+##  9 New Mexi… 2016-11-06 2016-11-06 Zia Po… &lt;NA&gt;     8439 lv         46      44  
+## 10 U.S.      2016-11-04 2016-11-07 IBD/TI… A-       1107 lv         41.2    42.7
+## # … with 4,198 more rows, 7 more variables: rawpoll_johnson &lt;dbl&gt;,
+## #   rawpoll_mcmullin &lt;dbl&gt;, adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;,
+## #   adjpoll_johnson &lt;dbl&gt;, adjpoll_mcmullin &lt;dbl&gt;, trump_clinton_diff &lt;dbl&gt;,
+## #   and abbreviated variable names ¹​pollster, ²​samplesize, ³​population,
+## #   ⁴​rawpoll_clinton, ⁵​rawpoll_trump
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+
+```r
+polls_us_election_2016 %&gt;%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %&gt;%
+*   filter(trump_clinton_diff&gt;5 &amp;
+*          state == "Iowa" &amp;
+*          is.na(rawpoll_johnson))
+```
+]
+
+.right-60[
+
+```
+## # A tibble: 3 × 16
+##   state startdate  enddate    pollster grade samplesize popula…¹ rawpo…² rawpo…³
+##   &lt;fct&gt; &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;    &lt;fct&gt;      &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Iowa  2016-09-09 2016-09-29 Ipsos    A-           343 lv          42.2    48.8
+## 2 Iowa  2016-09-02 2016-09-22 Ipsos    A-           344 lv          40.5    50.7
+## 3 Iowa  2016-08-26 2016-09-15 Ipsos    A-           347 lv          40.6    49.5
+## # … with 7 more variables: rawpoll_johnson &lt;dbl&gt;, rawpoll_mcmullin &lt;dbl&gt;,
+## #   adjpoll_clinton &lt;dbl&gt;, adjpoll_trump &lt;dbl&gt;, adjpoll_johnson &lt;dbl&gt;,
+## #   adjpoll_mcmullin &lt;dbl&gt;, trump_clinton_diff &lt;dbl&gt;, and abbreviated variable
+## #   names ¹​population, ²​rawpoll_clinton, ³​rawpoll_trump
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+
+```r
+polls_us_election_2016 %&gt;%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %&gt;%
+    filter(trump_clinton_diff&gt;5 &amp;
+           state == "Iowa" &amp;
+           is.na(rawpoll_johnson)) %&gt;%
+*   select(pollster)
+```
+]
+
+.right-60[
+
+```
+## # A tibble: 3 × 1
+##   pollster
+##   &lt;fct&gt;   
+## 1 Ipsos   
+## 2 Ipsos   
+## 3 Ipsos
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+
+```r
+polls_us_election_2016 %&gt;%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %&gt;%
+    filter(trump_clinton_diff&gt;5 &amp;
+           state == "Iowa" &amp;
+           is.na(rawpoll_johnson)) %&gt;%
+*   pull(pollster)
+```
+]
+
+.right-60[
+
+```
+## [1] Ipsos Ipsos Ipsos
+## 196 Levels: ABC News/Washington Post ... Zogby Interactive/JZ Analytics
+```
+]
+
+---
+
+But also with other `R` commands:
+
+.pull-left[
+
+
+```r
+polls_us_election_2016$samplesize %&gt;% mean(na.rm = T)
+```
+
+```
+## [1] 1148.216
+```
+]
+
+--
+
+.pull-right[
+
+
+```r
+polls_us_election_2016 %&gt;% count()
+```
+
+```
+## # A tibble: 1 × 1
+##       n
+##   &lt;int&gt;
+## 1  4208
+```
+]
+
+#### (only for 🤓  nerds:)
+
+* The `%&gt;%` pipe is part of the `magrittr` package. `R v4.1.0` adds a *native pipe* via `|&gt;`. you could use it like
+
+
+```r
+polls_us_election_2016$samplesize |&gt; mean(na.rm = T)
+```
+
+```
+## [1] 1148.216
+```
+
+
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Missing Values: `NA`
+
+.pull-left[
+* Whenever a value is *missing*, we code it as `NA`.
+    
+    ```r
+    x &lt;- NA
+    ```
+* `R` propagates `NA` through operations:
+    
+    ```r
+    NA &gt; 5
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+    
+    ```r
+    NA + 10
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+* `is.na(x)` function returns `TRUE` if `x` is an `NA`.
+    
+    ```r
+    is.na(x)
+    ```
+    
+    ```
+    ## [1] TRUE
+    ```
+]
+
+--
+
+.pull-right[
+* What is confusing is that 
+    
+    ```r
+    NA == NA
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+
+* It's easy to illustrate like that:
+    
+    ```r
+    # Let x be Mary's age. We don't know how old she is.
+    x &lt;- NA
+    
+    # Let y be John's age. We don't know how old he is.
+    y &lt;- NA
+    
+    # Are John and Mary the same age?
+    x == y
+    ```
+    
+    ```
+    ## [1] NA
+    ```
+    
+    ```r
+    #&gt; [1] NA
+    # We don't know!
+    ```
+]
+
+---
+
+class: inverse
+
+# Task 1: Data wrangling
+
+<div class="countdown" id="timer_5e28d0c1" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Load the data by running the following code:
+
+
+```r
+library(dslabs)
+data(polls_us_election_2016)
+```
+
+1. Which polls had a missing `grade`?
+
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016? (*Hint: for (i) `%in%` might come in handy. Recall that vectors are created using the `c()` function. For (iii) make sure to check the format of the variable containing the poll's start date.*)
+
+1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) were done in the state of Ohio?  (*Hint: it might be practical to first create a variable containing the combined raw poll vote share for Trump and Clinton and then filter.*)
+
+1. Which state had the highest average Trump vote share for polls which had at least a sample size of 2,000? (*Hint: you'll have to use `filter`, `group_by`, `summarise` and `arrange`. To obtain ranking in descending order check `arrange`'s help page.*)
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Visualising Data
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+background-image: url("../img/logo/ggplot2.svg")
+background-position: 90% 5%
+background-size: 150px
+
+# Base `R` and `ggplot2`
+
+* Base `R` plotting is fairly good.
+
+* There is an extremely powerful alternative: `ggplot2` (part of the `tidyverse` suite) `\(\rightarrow\)` what we'll be using
+
+* Let's go back to the `gapminder` dataset to run the examples.
+
+---
+
+# The `gapminder` dataset: Overview
+
+* Let's first load the `gapminder` dataset with these commands:
+    
+    ```r
+    library(dslabs)
+    data(gapminder, package = "dslabs")
+    ```
+    
+    
+
+--
+
+* Here are the first 3 rows and last 2 rows.
+    
+    ```r
+    head(gapminder, n = 3)
+    ```
+    
+    ```
+    ##   country year infant_mortality life_expectancy fertility population
+    ## 1 Albania 1960            115.4           62.87      6.19    1636054
+    ## 2 Algeria 1960            148.2           47.50      7.65   11124892
+    ## 3  Angola 1960            208.0           35.98      7.32    5270844
+    ##           gdp continent          region
+    ## 1          NA    Europe Southern Europe
+    ## 2 13828152297    Africa Northern Africa
+    ## 3          NA    Africa   Middle Africa
+    ```
+    
+    ```r
+    tail(gapminder, n = 2)
+    ```
+    
+    ```
+    ##        country year infant_mortality life_expectancy fertility population gdp
+    ## 10544   Zambia 2016               NA           57.10        NA         NA  NA
+    ## 10545 Zimbabwe 2016               NA           61.69        NA         NA  NA
+    ##       continent         region
+    ## 10544    Africa Eastern Africa
+    ## 10545    Africa Eastern Africa
+    ```
+
+---
+
+class: inverse
+
+# Task 2: Understanding the data
+
+<div class="countdown" id="timer_0df70192" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Load the data by running the following code:
+
+
+```r
+library(dslabs)
+data(gapminder, package = "dslabs")
+```
+
+1. Compute the average population per continent per year, `mean_pop`, and assign the output to a new object `gapminder_mean`. (*Hint: you should have one observation (row) per continent for each year. You'll have to use `group_by` and `summarise`.*)
+
+
+
+---
+
+# gg is for Grammar of Graphics&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[1]: The following slides are taken from [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1)
+]
+
+---
+
+# gg is for Grammar of Graphics
+
+
+.left-thin[
+### Data
+
+```r
+data %&gt;%
+  ggplot()
+```
+
+or 
+
+```r
+ggplot(data)
+```
+]
+
+--
+
+.right-wide[
+
+#### Tidy Data
+
+1. Each variable forms a ***column***
+
+2. Each observation forms a ***row***
+
+3. Each observational unit forms a table
+]
+
+--
+
+.right-wide[
+#### Start by asking
+
+1. What information do I want to use in my visualization?
+
+1. Is that data contained in ***one column/row*** for a given data point?
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+
+```r
++ aes()
+```
+
+]
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+- year
+
+- population
+
+- country
+]
+
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+- year → **x**
+
+- population → **y**
+
+- country → *shape*, *color*, etc.
+]
+
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+```r
+aes(
+  x = year,
+  y = population,
+  color = country
+)
+```
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+
+---
+
+.right-wide[
+Geometric objects displayed on the plot
+
+&lt;img src="chapter_tidy_files/figure-html/geom_demo-1.svg" width="650px" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+Here are the [some of the most widely used geoms](https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/)
+
+.small[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+&lt;https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/&gt;
+]
+]
+
+
+---
+
+.right-wide[
+Just start typing `geom_` in `RStudio` to see all the options
+
+&lt;img src="chapter_tidy_files/figure-html/geom.gif" width="300px" style="float: center;"&gt;
+
+]
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# (Y)Our first plot!
+---
+
+.left-thin[
+
+```r
+gapminder_mean
+```
+]
+
+.right-wide[
+
+```
+## # A tibble: 285 × 3
+## # Groups:   continent [5]
+##    continent  year mean_pop
+##    &lt;fct&gt;     &lt;int&gt;    &lt;dbl&gt;
+##  1 Africa     1960 5464985.
+##  2 Africa     1961 5598112.
+##  3 Africa     1962 5736073.
+##  4 Africa     1963 5878867.
+##  5 Africa     1964 6026474.
+##  6 Africa     1965 6178906.
+##  7 Africa     1966 6336258.
+##  8 Africa     1967 6498656.
+##  9 Africa     1968 6666202.
+## 10 Africa     1969 6839011.
+## # … with 275 more rows
+```
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+* ggplot()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1a-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+* aes(x = year,
+*     y = mean_pop)
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1b-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop) +
+* geom_point()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1c-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+*     color = continent) +
+  geom_point()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot1-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  geom_point() +
+* geom_line()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot2-fake-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+* # geom_point() +
+  geom_line()
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/first-plot2-line-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.left-thin[
+
+```r
+g = gapminder_mean %&gt;%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+* # geom_point() +
+  geom_line()
+g
+# graphs can be saved as
+# objects!
+```
+]
+
+.right-wide[
+&lt;img src="chapter_tidy_files/figure-html/save-plot-out-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+
+```r
++ facet_wrap() 
++ facet_grid()
+```
+]
+---
+
+
+
+.right-wide[
+
+```r
+g + facet_wrap(~ continent)
+```
+
+&lt;img src="chapter_tidy_files/figure-html/geom_facet-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+
+```r
+g + facet_grid(~ continent)
+```
+
+&lt;img src="chapter_tidy_files/figure-html/geom_grid-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+
+```r
++ labs()
+```
+]
+---
+
+.right-wide[
+
+```r
+g + labs(x = "Year", y = "Average Population", color = "Continent")
+```
+
+&lt;img src="chapter_tidy_files/figure-html/labs-ex-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Scales
+
+```r
++ scale_*_*()
+```
+]
+---
+
+.right-wide[ 
+`scale` + `_` + `&lt;aes&gt;` + `_` + `&lt;type&gt;` + `()`
+
+What parameter do you want to adjust? → `&lt;aes&gt;` &lt;br&gt;
+What type is the parameter? → `&lt;type&gt;`
+
+- I want to change my discrete x-axis&lt;br&gt;`scale_x_discrete()`
+- I want to change range of point sizes from continuous variable&lt;br&gt;`scale_size_continuous()`
+- I want to rescale y-axis as log10&lt;br&gt;`scale_y_log10()`
+- I want to use a different color palette&lt;br&gt;`scale_fill_discrete()`&lt;br&gt;`scale_color_manual()`
+]
+
+---
+
+.right-wide[
+
+```r
+g + scale_color_viridis_d()
+```
+
+&lt;img src="chapter_tidy_files/figure-html/scale_ex1-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+
+```r
+g + scale_y_log10()
+```
+
+&lt;img src="chapter_tidy_files/figure-html/scale_ex2-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+.right-wide[
+
+```r
+g + scale_x_continuous(breaks = seq(1950, 2020, 10))
+```
+
+&lt;img src="chapter_tidy_files/figure-html/scale_ex4-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Scales
+
+---
+
+layout:true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Delving Deeper into ggplot
+
+* Each graph is different and `ggplot2` provides a zillion options to customize your graph to perfection.
+
+--
+
+* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
+
+--
+
+* [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken from.
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+--
+
+***Boxplots:*** displays the distribution of a variable.
+
+--
+
+&lt;img src="chapter_tidy_files/figure-html/boxplot_explanation.png" width="850px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+***Boxplots:*** displays the distribution of a variable.
+
+***Scatter plots:*** shows the association between two variables.
+
+---
+
+class: inverse
+
+# Task 3: Visualising data
+
+<div class="countdown" id="timer_ebe0f7a0" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Using the `gapminder` data, create the following plots using `ggplot2`.
+
+1. A histogram of life expectancy in 2015. (*Hint: do you need to specify a `y` in `aes()` for a histogram?*) Once you've created the histogram, within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502". What does each of these options do? &lt;br&gt; *Optional:* Using the previous graph, facet it by continent such that each continent's plot is a new row. (*Hint: check the help for `facet_grid`.*)
+
+1. A boxplot of average life expectancy per year by continent. Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
+
+1. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis) in 2015. Once you've created the scatter plot, within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502". Add labels (`labs`) to the plot so that it is cleaner.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Summarising
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt; 
+
+---
+
+# Summarising Data
+
+
+* In general, we can learn from the data by visualising it and/or computing summary statistics
+
+--
+
+* Let's now turn to summary statistics!
+
+--
+
+* In particular, let's look at two features: *central tendency* and *spread*.
+
+---
+
+# Central Tendency
+
+
+.pull-left[
+`mean(x)`: the average of all values in `x`.
+`$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$`
+
+
+```r
+x &lt;- c(1,2,2,2,2,100)
+mean(x)
+```
+
+```
+## [1] 18.16667
+```
+
+```r
+mean(x) == sum(x) / length(x)
+```
+
+```
+## [1] TRUE
+```
+]
+
+--
+
+.pull-right[
+`median`: the value `\(x_j\)` below and above which 50% of the values in `x` lie. `\(m\)` is the median if
+    `$$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$`
+    
+The median is robust against *outliers*.
+
+
+```r
+median(x)
+```
+
+```
+## [1] 2
+```
+]
+
+---
+
+# Spread
+
+.pull-left[
+Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
+
+The *variance* is such a measure.
+    `$$Var(X) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})^2$$`
+    
+Consider two `normal distributions` with equal mean at `0`:
+]
+
+--
+
+.pull-right[
+&lt;img src="chapter_tidy_files/figure-html/unnamed-chunk-65-1.svg" style="display: block; margin: auto;" /&gt;
+
+Compute with:
+
+```r
+var(x)
+```
+]
+---
+
+# Tabulating Data
+
+`table(x)` is a useful function that counts the occurence of each unique value in `x`:
+
+```r
+table(gapminder$continent)
+```
+
+```
+## 
+##   Africa Americas     Asia   Europe  Oceania 
+##     2907     2052     2679     2223      684
+```
+
+--
+
+The same can be achieved using the `count` function (from `dplyr`)
+
+```r
+gapminder %&gt;% count(continent)
+```
+
+```
+##   continent    n
+## 1    Africa 2907
+## 2  Americas 2052
+## 3      Asia 2679
+## 4    Europe 2223
+## 5   Oceania  684
+```
+
+---
+
+# Tabulating Data
+
+
+Given two variables, `table` produces a contingency table:
+
+```r
+gapminder_new &lt;- gapminder %&gt;%
+  filter(year == 2015) %&gt;%
+  mutate(fertility_above_2 = (fertility &gt; 2.1)) # dummy variable for fertility rate above replacement rate
+```
+
+.pull-left[
+
+```r
+table(gapminder_new$fertility_above_2)
+```
+
+```
+## 
+## FALSE  TRUE 
+##    80   104
+```
+]
+
+--
+
+.pull-right[
+
+```r
+table(gapminder_new$fertility_above_2,gapminder_new$continent)
+```
+
+```
+##        
+##         Africa Americas Asia Europe Oceania
+##   FALSE      2       15   20     39       4
+##   TRUE      49       20   27      0       8
+```
+]
+
+--
+
+With `prop.table`, we can get proportions:
+
+```r
+# proportions by row
+prop.table(table(gapminder_new$fertility_above_2,gapminder_new$continent), margin = 1)
+# proportions by column
+prop.table(table(gapminder_new$fertility_above_2,gapminder_new$continent), margin = 2) 
+```
+
+* ⚠️ To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
+
+---
+
+# Tabulating Data
+
+Again the `count` function can get you there as well:
+
+
+```r
+gapminder_new %&gt;%
+  count(continent, fertility_above_2)
+```
+
+```
+##    continent fertility_above_2  n
+## 1     Africa             FALSE  2
+## 2     Africa              TRUE 49
+## 3   Americas             FALSE 15
+## 4   Americas              TRUE 20
+## 5   Americas                NA  1
+## 6       Asia             FALSE 20
+## 7       Asia              TRUE 27
+## 8     Europe             FALSE 39
+## 9    Oceania             FALSE  4
+## 10   Oceania              TRUE  8
+```
+
+Note that `count` will display `NA`s only if there are some.
+
+---
+
+# How are x and y related? Covariance and Correlation
+
+
+&lt;img src="chapter_tidy_files/figure-html/x-y-corr-1.svg" style="display: block; margin: auto;" /&gt;
+
+Two main statistics to characterise the relationship between `\(x\)` and `\(y\)`:
+1. Covariance
+2. Correlation
+
+---
+
+# Covariance
+
+* The covariance is a measure of __joint variability__ of two variables.
+    `$$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$`
+
+--
+
+* The `cov` function computes the covariance:
+
+
+```r
+cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+```
+## [1] 24.21146
+```
+
+--
+
+* Difficult to interpret because sensitive to the variables' dispersions from the mean
+
+---
+
+# Correlation
+
+* The correlation is a measure of the strength of the __linear association__ between two variables.
+    `$$Cor(x,y) = \frac{Cov(x,y)}{\sqrt{Var(x)}\sqrt{Var(y)}}$$`
+
+--
+
+* The `cor` function computes the correlation:
+
+
+```r
+cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+```
+## [1] 0.8286402
+```
+
+---
+
+# Correlation
+
+* **Correlation is always between -1 and 1!**
+
+--
+
+&lt;img src="chapter_tidy_files/figure-html/correlation.svg" width="100%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+*Source: [mathisfun](https://www.mathsisfun.com/data/correlation.html)*
+]
+
+---
+
+# Correlation
+
+* [App](https://gustavek.shinyapps.io/corr_continuous/)
+
+---
+
+class: inverse
+
+# Task 4: Summarising data
+
+<div class="countdown" id="timer_e89fa413" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+1. Compute the mean of GDP in 2011 and assign to object `mean`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
+
+1. Compute the median of GDP in 2011 and assign to object `median`. Again, you should exclude missing values. Is it greater or smaller than the average?
+
+1. Create a density plot of GDP in 2011 using `geom_density`. A density plot is a way of representing the distribution of a numeric variable. Add the following code to your plot to show the median and mean as vertical lines. What do you observe?
+`geom_vline(xintercept = as.numeric(mean), colour = "red") +` &lt;br&gt;
+    `geom_vline(xintercept = as.numeric(median), colour = "orange")`
+
+1. Compute the correlation between fertility and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
+
+In your free time, you can do this tutorial:
+
+```r
+library(ScPoApps) # this may take a while to install
+runTutorial('chapter2')
+```
+
+
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# `joins`: Merging Datasets
+
+### The remainder of those slides come from [Grant McDermott's](https://github.com/uo-ec607/lectures/) great course
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt;
+
+
+---
+name: joins
+
+# Joins
+
+One of the mainstays of the dplyr package is merging data with the family [join operations](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html).
+- `inner_join(df1, df2)`
+- `left_join(df1, df2)`
+- `right_join(df1, df2)`
+- `full_join(df1, df2)`
+- `semi_join(df1, df2)`
+- `anti_join(df1, df2)`
+
+(You find find it helpful to to see visual depictions of the different join operations [here](https://r4ds.had.co.nz/relational-data.html).)
+
+--
+
+For the simple examples that I'm going to show here, we'll need some data sets that come bundled with the [**nycflights13**](http://github.com/hadley/nycflights13) package. 
+- Load it now and then inspect these data frames in your own console.
+
+
+
+```r
+library(nycflights13)
+flights 
+planes
+```
+
+---
+
+# Joins (cont.)
+
+Let's perform a [left join](https://stat545.com/bit001_dplyr-cheatsheet.html#left_joinsuperheroes-publishers) on the flights and planes datasets. 
+- *Note*: I'm going subset columns after the join, but only to keep text on the slide.
+
+--
+
+
+```r
+left_join(flights, planes) %&gt;%
+  select(year, month, day, dep_time, arr_time, carrier, flight, tailnum, type, model)
+```
+
+```
+## # A tibble: 336,776 × 10
+##     year month   day dep_time arr_time carrier flight tailnum type  model
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;    &lt;int&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;
+##  1  2013     1     1      517      830 UA        1545 N14228  &lt;NA&gt;  &lt;NA&gt; 
+##  2  2013     1     1      533      850 UA        1714 N24211  &lt;NA&gt;  &lt;NA&gt; 
+##  3  2013     1     1      542      923 AA        1141 N619AA  &lt;NA&gt;  &lt;NA&gt; 
+##  4  2013     1     1      544     1004 B6         725 N804JB  &lt;NA&gt;  &lt;NA&gt; 
+##  5  2013     1     1      554      812 DL         461 N668DN  &lt;NA&gt;  &lt;NA&gt; 
+##  6  2013     1     1      554      740 UA        1696 N39463  &lt;NA&gt;  &lt;NA&gt; 
+##  7  2013     1     1      555      913 B6         507 N516JB  &lt;NA&gt;  &lt;NA&gt; 
+##  8  2013     1     1      557      709 EV        5708 N829AS  &lt;NA&gt;  &lt;NA&gt; 
+##  9  2013     1     1      557      838 B6          79 N593JB  &lt;NA&gt;  &lt;NA&gt; 
+## 10  2013     1     1      558      753 AA         301 N3ALAA  &lt;NA&gt;  &lt;NA&gt; 
+## # … with 336,766 more rows
+```
+
+---
+
+# Joins (cont.)
+
+(*continued from previous slide*)
+
+Note that dplyr made a reasonable guess about which columns to join on (i.e. columns that share the same name). It also told us its choices: 
+
+```
+*## Joining, by = c("year", "tailnum")
+```
+
+However, there's an obvious problem here: the variable "year" does not have a consistent meaning across our joining datasets!
+- In one it refers to the *year of flight*, in the other it refers to *year of construction*.
+
+--
+
+Luckily, there's an easy way to avoid this problem. 
+- See if you can figure it out before turning to the next slide.
+- Try `?dplyr::join`.
+
+---
+
+# Joins (cont.)
+
+(*continued from previous slide*)
+
+You just need to be more explicit in your join call by using the `by = ` argument.
+- You can also rename any ambiguous columns to avoid confusion. 
+
+```r
+left_join(
+  flights,
+  planes %&gt;% rename(year_built = year), ## Not necessary w/ below line, but helpful
+  by = "tailnum" ## Be specific about the joining column
+  ) %&gt;%
+  select(year, month, day, dep_time, arr_time, carrier, flight, tailnum, year_built, type, model) %&gt;%
+  head(3) ## Just to save vertical space on the slide
+```
+
+```
+## # A tibble: 3 × 11
+##    year month   day dep_time arr_time carrier flight tailnum year_…¹ type  model
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;    &lt;int&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;     &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+## 1  2013     1     1      517      830 UA        1545 N14228     1999 Fixe… 737-…
+## 2  2013     1     1      533      850 UA        1714 N24211     1998 Fixe… 737-…
+## 3  2013     1     1      542      923 AA        1141 N619AA     1990 Fixe… 757-…
+## # … with abbreviated variable name ¹​year_built
+```
+
+---
+
+
+# Joins (cont.)
+
+(*continued from previous slide*)
+
+Last thing I'll mention for now; note what happens if we again specify the join column... but don't rename the ambiguous "year" column in at least one of the given data frames.
+
+```r
+left_join(
+  flights,
+  planes, ## Not renaming "year" to "year_built" this time
+  by = "tailnum"
+  ) %&gt;%
+  select(contains("year"), month, day, dep_time, arr_time, carrier, flight, tailnum, type, model) %&gt;%
+  head(3)
+```
+
+```
+## # A tibble: 3 × 11
+##   year.x year.y month   day dep_time arr_time carrier flight tailnum type  model
+##    &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;    &lt;int&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;
+## 1   2013   1999     1     1      517      830 UA        1545 N14228  Fixe… 737-…
+## 2   2013   1998     1     1      533      850 UA        1714 N24211  Fixe… 737-…
+## 3   2013   1990     1     1      542      923 AA        1141 N619AA  Fixe… 757-…
+```
+
+--
+
+Make sure you know what "year.x" and "year.y" are. Again, it pays to be specific.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# `tidyr`: Reshaping Datasets
+
+### By [Grant McDermott](https://github.com/uo-ec607/lectures/).
+
+---
+
+layout: true
+
+&lt;div class="my-footer"&gt;&lt;img src="../img/logo/ScPo-shield.png" style="height: 60px;"/&gt;&lt;/div&gt;
+
+
+
+---
+# Key tidyr verbs
+
+1. `pivot_longer`: Pivot wide data into long format (i.e. "melt").&lt;sup&gt;1&lt;/sup&gt; 
+
+2. `pivot_wider`: Pivot long data into wide format (i.e. "cast").&lt;sup&gt;2&lt;/sup&gt; 
+
+3. `separate`: Separate (i.e. split) one column into multiple columns.
+
+4. `unite`: Unite (i.e. combine) multiple columns into one.
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt; Updated version of `tidyr::gather`.
+
+&lt;sup&gt;2&lt;/sup&gt; Updated version of `tidyr::spread`.
+]  
+
+--
+
+&lt;/br&gt;
+
+Let's practice these verbs together in class.
+- Side question: Which of `pivot_longer` vs `pivot_wider` produces "tidy" data?
+  
+---
+
+name: pivot_longer
+
+# 1) tidyr::pivot_longer
+
+
+```r
+stocks = data.frame( ## Could use "tibble" instead of "data.frame" if you prefer
+  time = as.Date('2009-01-01') + 0:1,
+  X = rnorm(2, 0, 1),
+  Y = rnorm(2, 0, 2),
+  Z = rnorm(2, 0, 4)
+  )
+stocks
+```
+
+```
+##         time         X         Y         Z
+## 1 2009-01-01 -1.366401 0.9747837  2.553785
+## 2 2009-01-02 -1.023099 2.4229061 -2.239642
+```
+
+```r
+stocks %&gt;% pivot_longer(-time, names_to="stock", values_to="price")
+```
+
+```
+## # A tibble: 6 × 3
+##   time       stock  price
+##   &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;
+## 1 2009-01-01 X     -1.37 
+## 2 2009-01-01 Y      0.975
+## 3 2009-01-01 Z      2.55 
+## 4 2009-01-02 X     -1.02 
+## 5 2009-01-02 Y      2.42 
+## 6 2009-01-02 Z     -2.24
+```
+
+---
+
+# 1) tidyr::pivot_longer *cont.*
+
+Let's quickly save the "tidy" (i.e. long) stocks data frame for use on the next slide. 
+
+
+```r
+## Write out the argument names this time: i.e. "names_to=" and "values_to="
+tidy_stocks = 
+  stocks %&gt;% 
+  pivot_longer(-time, names_to="stock", values_to="price")
+```
+
+
+---
+name: pivot_wider
+
+# 2) tidyr::pivot_wider
+
+
+
+```r
+tidy_stocks %&gt;% pivot_wider(names_from=stock, values_from=price)
+```
+
+```
+## # A tibble: 2 × 4
+##   time           X     Y     Z
+##   &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 2009-01-01 -1.37 0.975  2.55
+## 2 2009-01-02 -1.02 2.42  -2.24
+```
+
+```r
+tidy_stocks %&gt;% pivot_wider(names_from=time, values_from=price)
+```
+
+```
+## # A tibble: 3 × 3
+##   stock `2009-01-01` `2009-01-02`
+##   &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;
+## 1 X           -1.37         -1.02
+## 2 Y            0.975         2.42
+## 3 Z            2.55         -2.24
+```
+
+--
+
+&lt;/br&gt;
+Note that the second example, which has combined different pivoting arguments , has effectively transposed the data.
+
+
+
+---
+
+# Aside: Remembering the pivot_* syntax 
+
+There's a long-running joke about no-one being able to remember Stata's "reshape" command. ([Exhibit A](https://twitter.com/helleringer143/status/1117234887902285836).)
+
+It's easy to see this happening with the `pivot_*` functions too. However, I find that I never forget the commands as long as I remember the argument order is *"names"* then *"values"*.
+
+---
+name: separate
+
+# 3) tidyr::separate
+
+
+```r
+economists = data.frame(name = c("Adam.Smith", "Paul.Samuelson", "Milton.Friedman"))
+economists
+```
+
+```
+##              name
+## 1      Adam.Smith
+## 2  Paul.Samuelson
+## 3 Milton.Friedman
+```
+
+```r
+economists %&gt;% separate(name, c("first_name", "last_name")) 
+```
+
+```
+##   first_name last_name
+## 1       Adam     Smith
+## 2       Paul Samuelson
+## 3     Milton  Friedman
+```
+
+--
+
+&lt;/br&gt;
+
+This command is pretty smart. But to avoid ambiguity, you can also specify the separation character with `separate(..., sep=".")`.
+
+---
+
+# 3) tidyr::separate *cont.*
+
+A related function is `separate_rows`, for splitting up cells that contain multiple fields or observations (a frustratingly common occurence with survey data).
+
+
+```r
+jobs = data.frame(
+  name = c("Jack", "Jill"),
+  occupation = c("Homemaker", "Philosopher, Philanthropist, Troublemaker") 
+  ) 
+jobs
+```
+
+```
+##   name                                occupation
+## 1 Jack                                 Homemaker
+## 2 Jill Philosopher, Philanthropist, Troublemaker
+```
+
+```r
+## Now split out Jill's various occupations into different rows
+jobs %&gt;% separate_rows(occupation)
+```
+
+```
+## # A tibble: 4 × 2
+##   name  occupation    
+##   &lt;chr&gt; &lt;chr&gt;         
+## 1 Jack  Homemaker     
+## 2 Jill  Philosopher   
+## 3 Jill  Philanthropist
+## 4 Jill  Troublemaker
+```
+
+---
+name: unite
+
+# 4) tidyr::unite
+
+
+```r
+gdp = data.frame(
+  yr = rep(2016, times = 4),
+  mnth = rep(1, times = 4),
+  dy = 1:4,
+  gdp = rnorm(4, mean = 100, sd = 2)
+  )
+gdp 
+```
+
+```
+##     yr mnth dy      gdp
+## 1 2016    1  1  97.2672
+## 2 2016    1  2  97.9538
+## 3 2016    1  3 100.9748
+## 4 2016    1  4 102.4229
+```
+
+```r
+## Combine "yr", "mnth", and "dy" into one "date" column
+gdp %&gt;% unite(date, c("yr", "mnth", "dy"), sep = "-")
+```
+
+```
+##       date      gdp
+## 1 2016-1-1  97.2672
+## 2 2016-1-2  97.9538
+## 3 2016-1-3 100.9748
+## 4 2016-1-4 102.4229
+```
+
+---
+
+# 4) tidyr::unite *cont.*
+
+Note that `unite` will automatically create a character variable. You can see this better if we convert it to a tibble. 
+
+```r
+gdp_u = gdp %&gt;% unite(date, c("yr", "mnth", "dy"), sep = "-") %&gt;% as_tibble()
+gdp_u
+```
+
+```
+## # A tibble: 4 × 2
+##   date       gdp
+##   &lt;chr&gt;    &lt;dbl&gt;
+## 1 2016-1-1  97.3
+## 2 2016-1-2  98.0
+## 3 2016-1-3 101. 
+## 4 2016-1-4 102.
+```
+
+--
+
+If you want to convert it to something else (e.g. date or numeric) then you will need to modify it using `mutate`. See the next slide for an example, using the [lubridate](https://lubridate.tidyverse.org/) package's super helpful date conversion functions.
+
+---
+
+# 4) tidyr::unite *cont.*
+
+*(continued from previous slide)*
+
+
+```r
+library(lubridate)
+gdp_u %&gt;% mutate(date = ymd(date))
+```
+
+```
+## # A tibble: 4 × 2
+##   date         gdp
+##   &lt;date&gt;     &lt;dbl&gt;
+## 1 2016-01-01  97.3
+## 2 2016-01-02  98.0
+## 3 2016-01-03 101. 
+## 4 2016-01-04 102.
+```
+
+---
+
+# Other tidyr goodies
+
+Use `crossing` to get the full combination of a group of variables.&lt;sup&gt;1&lt;/sup&gt;
+
+
+```r
+crossing(side=c("left", "right"), height=c("top", "bottom"))
+```
+
+```
+## # A tibble: 4 × 2
+##   side  height
+##   &lt;chr&gt; &lt;chr&gt; 
+## 1 left  bottom
+## 2 left  top   
+## 3 right bottom
+## 4 right top
+```
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt; Base R alternative: `expand.grid`.
+]  
+
+--
+
+See `?expand` and `?complete` for more specialised functions that allow you to fill in (implicit) missing data or variable combinations in existing data frames.
+- You'll encounter this during your next assignment.
+
+---
+class: inverse, center, middle
+name: summary
+
+# Summary
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=796px&gt;&lt;/html&gt;
+
+---
+
+# Key verbs
+
+### dplyr
+1. `filter`
+2. `arrange`
+3. `select`
+4. `mutate`
+5. `summarise`
+
+### tidyr
+1. `pivot_longer`
+2. `pivot_wider`
+3. `separate`
+4. `unite`
+
+--
+
+Other useful items include: pipes (`%&gt;%`), grouping (`group_by`), joining functions (`left_join`, `inner_join`, etc.).
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# Next Week: `data.table`
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| &lt;a href="https://floswald.github.io/ScPoProgramming"&gt;.ScPored[&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;] | Course Website |
+| &lt;a href="http://twitter.com/ScPoEcon"&gt;.ScPored[&lt;i class="fa fa-twitter fa-fw"&gt;&lt;/i&gt;]                          | @ScPoEcon                         |
+| &lt;a href="http://github.com/floswald"&gt;.ScPored[&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;]                          | @floswald                       |
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"></script>
+<script src="../js/ru_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

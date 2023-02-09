@@ -1,0 +1,211 @@
+---
+title: "Tidying, Visualising and Summarising Data - Tasks"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Pierre Villedieu"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1: Data wrangling
+
+Load the data by running the following code:
+
+```{r}
+library(dslabs)
+data(polls_us_election_2016)
+
+library(tidyverse)
+```
+
+1\. Which polls had a missing `grade`?
+
+Only showing the first 6 rows using `head`, otherwise the document would be very long.
+
+```{r}
+polls_us_election_2016 %>%
+    filter(is.na(grade)) %>%
+    head
+```
+
+2\. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016? (*Hint: for (i) `%in%` might come in handy. Recall that vectors are created using the `c()` function. For (iii) make sure to check the format of the variable containing the poll's start date.*)
+
+```{r}
+polls_us_election_2016 %>%
+    filter(pollster %in% c("American Strategies","GfK Group","Merrill Poll") &
+               samplesize > 1000 &
+               startdate == "2016-10-20")
+```
+
+3\. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) were done in the state of Ohio?  (*Hint: it might be practical to first create a variable containing the combined raw poll vote share for Trump and Clinton and then filter.*)
+
+```{r}
+polls_us_election_2016 %>%
+    mutate(rawpoll_clintontrump = rawpoll_clinton + rawpoll_trump) %>%
+    filter(!is.na(rawpoll_johnson) & rawpoll_clintontrump > 95 & state == "Ohio")
+```
+
+
+4\. Which state had the highest average Trump vote share for polls which had at least a sample size of 2,000? (*Hint: you'll have to use `filter`, `group_by`, `summarise` and `arrange`. To obtain ranking in descending order check `arrange`'s help page.*)
+
+```{r}
+polls_us_election_2016 %>%
+    filter(samplesize >= 2000) %>%
+    group_by(state) %>%
+    summarise(mean_trump = mean(rawpoll_trump)) %>%
+    arrange(desc(mean_trump))
+```
+
+
+## Task 2: Understanding the data
+
+Load the data by running the following code:
+
+```{r, echo = T, eval = F}
+library(dslabs)
+data(gapminder, package = "dslabs")
+```
+
+1\. Compute the average population per continent per year, `mean_pop`, and assign the output to a new object `gapminder_mean`. (*Hint: you should have one observation (row) per continent for each year. You'll have to use `group_by` and `summarise`.*)
+
+```{r}
+gapminder_mean <- gapminder %>%
+  group_by(continent, year) %>%
+  summarise(mean_pop = mean(population))
+```
+
+
+## Task 3: Visualising data
+
+Using the `gapminder` data, create the following plots using `ggplot2`. Don't forget to label the axes.
+
+1\. A histogram of life expectancy in 2015. (*Hint: do you need to specify a `y` in `aes()` for a histogram?*) Once you've created the histogram, within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502". What does each of these options do? <br> *Optional:* Using the previous graph, facet it by continent such that each continent's plot is a new row. (*Hint: check the help for `facet_grid`.*)
+
+The basic histogram:
+
+```{r}
+gapminder %>%
+    filter(year == 2015) %>%
+    ggplot() +
+    aes(x = life_expectancy) +
+    geom_histogram()
+```
+
+The fancy histogram (with axis labels):
+
+```{r}
+life_exp_hist <- gapminder %>%
+    filter(year == 2015) %>%
+    ggplot() +
+    aes(x = life_expectancy) +
+    geom_histogram(binwidth = 5,
+                   boundary = 45,
+                   colour = "white",
+                   fill = "#d90502") +
+    labs(x = "Life expectancy",
+         y = "Frequency")
+life_exp_hist
+```
+
+The faceted fancy histogram:
+
+```{r}
+life_exp_hist +
+    facet_grid(rows = vars(continent))
+```
+
+2\. A boxplot of average life expectancy per year by continent. Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
+
+```{r}
+gapminder %>%
+    group_by(continent, year) %>%
+    summarise(mean_life_exp = mean(life_expectancy)) %>%
+    ggplot() +
+    aes(x = continent, y = mean_life_exp) +
+    geom_boxplot(colour = "black",
+                 fill = "#d90502") +
+    labs(x = "Continent",
+         y = "Life expectancy")
+```
+
+3\. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis) in 2015. Once you've created the scatter plot, within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502".
+
+The basic scatter plot:
+
+```{r}
+gapminder %>%
+    filter(year == 2015) %>%
+    ggplot() +
+    aes(x = infant_mortality, y = fertility) +
+    geom_point()
+```
+
+The fancy scatter plot with axis labels:
+
+```{r}
+gapminder %>%
+    filter(year == 2015) %>%
+    ggplot() +
+    aes(x = infant_mortality, y = fertility) +
+    geom_point(size = 3,
+               alpha = 0.5,
+               colour = "#d90502") +
+    labs(x = "Infant mortality", y = "Fertility")
+```
+
+
+## Task 4: Summarising data
+
+1\. Compute the mean of GDP in 2011 and assign to object `mean`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
+
+```{r}
+mean <- gapminder %>%
+    filter(year == 2011) %>%
+    summarise(mean(gdp, na.rm = T))
+mean
+```
+
+2\. Compute the median of GDP in 2011 and assign to object `median`. Again, you should exclude missing values. Is it greater or smaller than the average?
+
+```{r}
+median <- gapminder %>%
+    filter(year == 2011) %>%
+    summarise(median(gdp, na.rm = T))
+median
+```
+
+**The median is much smaller than the average.**
+
+3\. Create a density plot of GDP in 2011 using `geom_density`. A density plot is a way of representing the distribution of a numeric variable. Add the following code to your plot to show the median and mean as vertical lines. What do you observe?
+`geom_vline(xintercept = as.numeric(mean), colour = "red") + <br>
+    geom_vline(xintercept = as.numeric(median), colour = "orange")`
+    
+```{r}
+gdp_density <- gapminder %>%
+    filter(year == 2011) %>%
+    ggplot() +
+    aes(x = gdp) +
+    geom_density() +
+    geom_vline(xintercept = as.numeric(mean), colour = "red") +
+    geom_vline(xintercept = as.numeric(median), colour = "orange")
+gdp_density
+```
+
+**The distribution of GDP is highly ***skewed***: there are many countries with small GDPs and very few with huge GDPs (U.S., Japan, China). In such cases, the average will be (significantly) greater than the median. To see this more clearly, here's a graph where I've transformed the x-axis such that each tick is 10 times larger than the previous one (the scale is therefore not linear, i.e. the first tick is 100,000, the second is 1 million, the third is 10 million, etc.).**
+
+```{r}
+gdp_density +
+    scale_x_log10()
+```
+
+4\. Compute the correlation between fertility and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
+
+```{r}
+gapminder %>%
+    filter(year == 2015) %>%
+    summarise(cor(fertility, infant_mortality, use = "pairwise.complete.obs"))
+```
+
+**This correlation is positive and strong (relatively close to 1) which is consistent with the graph produced in Task 3. Indeed, that graph displayed a positive relationship between these two variables and the points were not that dispersed.**

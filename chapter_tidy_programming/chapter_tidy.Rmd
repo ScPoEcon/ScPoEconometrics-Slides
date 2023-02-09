@@ -1,0 +1,2125 @@
+---
+title: "ScPoEconometrics"
+subtitle: "Tidying, Visualising and Summarising Data"
+author: "Mylène Feuillade, Gustave Kenedi, Florian Oswald and Junnan He"
+date: "SciencesPo Paris </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    chakra: "https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js"
+    lib_dir: libs
+    css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
+    nature:
+      beforeInit: ["../js/ru_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "../libs/partials/header.html"
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+```{r setup, include=FALSE,warning=FALSE,message=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  dev = "svg",
+  cache = TRUE,
+  fig.align = "center"
+  #fig.width = 11,
+  #fig.height = 5
+)
+
+library(countdown)
+
+# countdown style
+countdown(
+  color_border              = "#d90502",
+  color_text                = "black",
+  color_running_background  = "#d90502",
+  color_running_text        = "white",
+  color_finished_background = "white",
+  color_finished_text       = "#d90502",
+  color_finished_border     = "#d90502"
+)
+
+#library(learnr) # this line needs to be run manually I have no idea why but otherwise I get this error message which I can't seem to solve...
+# Quitting from lines 27-40 (chapter2.Rmd) 
+# Error: package or namespace load failed for 'learnr':
+#  .onAttach failed in attachNamespace() for 'learnr', details:
+#   call: NULL
+#   error: The shiny_prerendered_chunk function can only be called from within runtime: shiny_prerendered
+```
+
+  
+# Working With Data
+
+* Econometrics is about `data`.
+
+```{r, echo = F, out.width = "400px"}
+knitr::include_graphics("chapter_tidy_files/figure-html/data_science_pipeline.png")
+```
+
+--
+
+* According a to [2014 NYTimes article](https://www.nytimes.com/2014/08/18/technology/for-big-data-scientists-hurdle-to-insights-is-janitor-work.html), "data scientists [...] spend from ***50 percent to 80 percent of their time*** mired in this more mundane labor of collecting and preparing unruly digital data, before it can be explored for useful nuggets."
+
+* In the next two lectures you will learn the basics of ***tidying***, ***visualising*** and ***summarising*** data
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Tidying Data
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Intro to `dplyr`
+
+* [`dplyr`](https://dplyr.tidyverse.org) is part of the [`tidyverse`](https://www.tidyverse.org) package family.
+
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast and highly recommended for **big** data. Look [here](https://raw.githack.com/ScPoEcon/Advanced-Metrics-slides/master/lectures/03-datatable/03-datatable.html#1) for an intro!
+
+* Both have pros and cons. We'll start you off with `dplyr`.
+
+---
+
+# `dplyr` Overview
+
+* You are ***highly encouraged*** to read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's clear and concise.
+
+--
+
+* Also check out this great "cheatsheet" [here](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf).
+
+--
+
+
+* The package is organized around a set of **verbs**, i.e. *actions* to be taken.
+
+* We operate on `data.frames` or `tibbles` (*nicer looking* data.frames.)
+
+--
+
+* All *verbs* work as follows:
+
+$$\text{verb}(\underbrace{\text{data.frame}}_{\text{1st argument}}, \underbrace{\text{what to do}}_\text{2nd argument})$$
+
+--
+
+* Alternatively you can (should) use the `pipe` operator `%>%` (part of `magrittr` package):
+
+$$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}_{\text{"pipe" operator}} \text{verb}(\underbrace{\text{what to do}}_\text{2nd argument})$$
+
+---
+
+# Main `dplyr` Verbs
+
+1. `filter()`: Choose observations based on a certain condition (i.e. subset)
+
+--
+
+1. `arrange()`: Reorder rows 
+
+--
+
+1. `select()`: Select variables by name
+
+--
+
+1. `mutate()`: Create new variables out of existing ones
+
+--
+
+1. `summarise()`: Collapse data to a single summary
+
+--
+
+1. `group_by()`: All the above can be used in conjunction with `group_by()` to use functions on groups rather than entire data
+
+---
+
+# Data: 2016 US election polls from the `dslabs` package
+
+* This dataset contains __real__ data on polls made during the 2016 US Presidential elections and compiled by [fivethirtyeight](fivethirtyeight.com)
+
+```{r dslabs, echo = TRUE}
+library(dslabs)
+library(tidyverse)
+data(polls_us_election_2016, package = "dslabs") # load data from package
+polls_us_election_2016 <- as_tibble(polls_us_election_2016) # convert to a tibble
+head(polls_us_election_2016[,1:6]) # show first 6 lines of first 6 variables
+```
+
+🚨 This is a `tibble` (more informative than `data.frame`)
+
+---
+
+# Data: 2016 US election polls from the `dslabs` package
+
+What variables does this dataset contain?
+
+```{r}
+str(polls_us_election_2016)
+```
+
+
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter observations
+
+```r
+filter()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* Which polls had a sample size of at least 2,000 people?
+]
+
+---
+
+.right-wide[
+*Example:* Which polls had a sample size of at least 2,000 people?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 #<<
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016 #<<
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which polls had a sample size of at least 2,000 people?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 %>%
+  filter(samplesize > 2000) #<<
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016 %>%
+  filter(samplesize > 2000)
+```
+]
+
+---
+
+.right-wide[
+Standard suite of comparison operators:
+- `>`: greater than,
+- `<`: smaller than,
+- `>=`: greater than or equal to,
+- `<=`: smaller than or equal to,
+- `!=`: not equal to,
+- `==`: equal to.
+
+Logical operators:
+1. `x & y`: `x` **and** `y`
+1. `x | y`: `x` **or** `y`
+1. `!y`: **not** `y`
+]
+
+---
+
+.right-wide[
+`R` has the convenient `x %in% y` operator (conversely `!(x %in% y)`), `TRUE` if `x` is *a member of* `y`.
+```{r, echo = TRUE}
+3 %in% 1:3
+c(2,5) %in% 2:10  # also vectorized
+c("S","Po") %in% c("Sciences","Po")  # also strings
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 #<<
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016 #<<
+```
+]
+
+---
+
+.right-wide[
+*Example:* Which A graded poll with at least 2,000 people had Trump win at least 45% of the vote?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016 %>%
+  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45) #<<
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016 %>%
+  filter(grade == "A" & samplesize > 2000 & rawpoll_trump > 45)
+```
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Create new variable(s)
+
+```r
+mutate()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+```{r, eval=FALSE}
+polls_us_election_2016
+```
+
+```{r, echo=FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton, #<<
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump)
+```
+]
+
+---
+
+.right-wide[
+*Example:* What was
+1. the combined vote share of Trump and Clinton for each poll?
+2. the difference between Trump's raw poll vote share and 538's adjusted vote share?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %>%
+  names() #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  mutate(trump_clinton_tot = rawpoll_trump + rawpoll_clinton,
+         trump_raw_adj_diff = rawpoll_trump - adjpoll_trump) %>%
+  names()
+```
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Keep some variable(s)
+
+```r
+select()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump)
+```
+]
+
+---
+
+.right-wide[
+*Example:* Only keep the variables `state, startdate, enddate, pollster, rawpoll_clinton, rawpoll_trump`
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %>%
+  names() #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  select(state,startdate,enddate,pollster,rawpoll_clinton,rawpoll_trump) %>%
+  names()
+```
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Compute statistic
+
+```r
+summarise()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the maximum vote share for Trump?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  summarise(max_trump = max(rawpoll_trump)) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  summarise(max_trump = max(rawpoll_trump))
+```
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# `dplyr` Verbs
+
+.left-thin[
+
+### Filter
+
+### Mutate
+
+### Select
+
+### Summarise
+
+### Apply function by group
+
+```r
+group_by()
+```
+
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade)
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  class() #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  class()
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade)
+```
+]
+
+---
+
+.right-wide[
+*Example:* What is the average vote share for Clinton by poll grade?
+]
+
+.right-wide[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  summarise(mean_vote_clinton = mean(rawpoll_clinton)) #<<
+```
+
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+  group_by(grade) %>%
+  summarise(mean_vote_clinton = mean(rawpoll_clinton))
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# Chaining ⛓ Commands Together
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+```{r, eval = FALSE}
+polls_us_election_2016
+```
+]
+
+.rigiht-60[
+```{r, echo = FALSE}
+polls_us_election_2016
+```
+]
+
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = #<<
+             rawpoll_trump - #<<
+             rawpoll_clinton) #<<
+```
+]
+
+.right-60[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = rawpoll_trump-rawpoll_clinton)
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 & #<<
+           state == "Iowa" & #<<
+           is.na(rawpoll_johnson)) #<<
+```
+]
+
+.right-60[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson))
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    select(pollster) #<<
+```
+]
+
+.right-60[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    select(pollster) #<<
+```
+]
+
+---
+
+Works for all `dplyr` verbs:
+
+.left-40[
+```{r, eval = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    pull(pollster) #<<
+```
+]
+
+.right-60[
+```{r, echo = FALSE}
+polls_us_election_2016 %>%
+    mutate(trump_clinton_diff = 
+             rawpoll_trump - 
+             rawpoll_clinton) %>%
+    filter(trump_clinton_diff>5 &
+           state == "Iowa" &
+           is.na(rawpoll_johnson)) %>%
+    pull(pollster) #<<
+```
+]
+
+---
+
+But also with other `R` commands:
+
+.pull-left[
+
+```{r, echo = TRUE}
+polls_us_election_2016$samplesize %>% mean(na.rm = T)
+```
+]
+
+--
+
+.pull-right[
+
+```{r,echo = TRUE}
+polls_us_election_2016 %>% count()
+```
+]
+
+#### (only for 🤓  nerds:)
+
+* The `%>%` pipe is part of the `magrittr` package. `R v4.1.0` adds a *native pipe* via `|>`. you could use it like
+
+```{r}
+polls_us_election_2016$samplesize |> mean(na.rm = T)
+```
+
+
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Missing Values: `NA`
+
+.pull-left[
+* Whenever a value is *missing*, we code it as `NA`.
+    ```{r, echo = TRUE}
+    x <- NA
+    ```
+* `R` propagates `NA` through operations:
+    ```{r, echo = TRUE}
+    NA > 5
+    NA + 10
+    ```
+* `is.na(x)` function returns `TRUE` if `x` is an `NA`.
+    ```{r, echo = TRUE}
+    is.na(x)
+    ```
+]
+
+--
+
+.pull-right[
+* What is confusing is that 
+    ```{r, echo = TRUE}
+    NA == NA
+    ```
+
+* It's easy to illustrate like that:
+    ```{r, echo = TRUE}
+    # Let x be Mary's age. We don't know how old she is.
+    x <- NA
+    
+    # Let y be John's age. We don't know how old he is.
+    y <- NA
+    
+    # Are John and Mary the same age?
+    x == y
+    #> [1] NA
+    # We don't know!
+    ```
+]
+
+---
+
+class: inverse
+
+# Task 1: Data wrangling
+
+`r countdown(minutes = 10, top = 0)`
+
+Load the data by running the following code:
+
+```{r, echo = T, eval = F}
+library(dslabs)
+data(polls_us_election_2016)
+```
+
+1. Which polls had a missing `grade`?
+
+1. Which polls were (i) polled by American Strategies, GfK Group or Merrill Poll, (ii) had a sample size greater than 1,000, _and_ (iii) started on October 20th, 2016? (*Hint: for (i) `%in%` might come in handy. Recall that vectors are created using the `c()` function. For (iii) make sure to check the format of the variable containing the poll's start date.*)
+
+1. Which polls (i) did not have missing poll data for Johnson, (ii) had a combined raw poll vote share for Trump and Clinton greater than 95% _and_ (iii) were done in the state of Ohio?  (*Hint: it might be practical to first create a variable containing the combined raw poll vote share for Trump and Clinton and then filter.*)
+
+1. Which state had the highest average Trump vote share for polls which had at least a sample size of 2,000? (*Hint: you'll have to use `filter`, `group_by`, `summarise` and `arrange`. To obtain ranking in descending order check `arrange`'s help page.*)
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Visualising Data
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+background-image: url("../img/logo/ggplot2.svg")
+background-position: 90% 5%
+background-size: 150px
+
+# Base `R` and `ggplot2`
+
+* Base `R` plotting is fairly good.
+
+* There is an extremely powerful alternative: `ggplot2` (part of the `tidyverse` suite) $\rightarrow$ what we'll be using
+
+* Let's go back to the `gapminder` dataset to run the examples.
+
+---
+
+# The `gapminder` dataset: Overview
+
+* Let's first load the `gapminder` dataset with these commands:
+    ```{r, echo = TRUE, eval = FALSE}
+    library(dslabs)
+    data(gapminder, package = "dslabs")
+    ```
+    
+    ```{r, echo = FALSE, eval = TRUE}
+    gapminder <- dslabs::gapminder
+    ```
+
+--
+
+* Here are the first 3 rows and last 2 rows.
+    ```{r}
+    head(gapminder, n = 3)
+    tail(gapminder, n = 2)
+    ```
+
+---
+
+class: inverse
+
+# Task 2: Understanding the data
+
+`r countdown(minutes = 5, top = 0)`
+
+Load the data by running the following code:
+
+```{r, echo = T, eval = F}
+library(dslabs)
+data(gapminder, package = "dslabs")
+```
+
+1. Compute the average population per continent per year, `mean_pop`, and assign the output to a new object `gapminder_mean`. (*Hint: you should have one observation (row) per continent for each year. You'll have to use `group_by` and `summarise`.*)
+
+```{r, echo = F}
+gapminder_mean <- gapminder %>%
+  group_by(continent, year) %>%
+  summarise(mean_pop = mean(population))
+
+gapminder_2015 <- gapminder %>%
+  filter(year == "2015")
+```
+
+---
+
+# gg is for Grammar of Graphics<sup>1</sup>
+
+.footnote[
+[1]: The following slides are taken from [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1)
+]
+
+---
+
+# gg is for Grammar of Graphics
+
+
+.left-thin[
+### Data
+
+```r
+data %>%
+  ggplot()
+```
+
+or 
+
+```r
+ggplot(data)
+```
+]
+
+--
+
+.right-wide[
+
+#### Tidy Data
+
+1. Each variable forms a ***column***
+
+2. Each observation forms a ***row***
+
+3. Each observational unit forms a table
+]
+
+--
+
+.right-wide[
+#### Start by asking
+
+1. What information do I want to use in my visualization?
+
+1. Is that data contained in ***one column/row*** for a given data point?
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+
+```r
++ aes()
+```
+
+]
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+- year
+
+- population
+
+- country
+]
+
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+- year → **x**
+
+- population → **y**
+
+- country → *shape*, *color*, etc.
+]
+
+---
+
+.right-wide[
+Map data to visual elements or parameters
+
+```r
+aes(
+  x = year,
+  y = population,
+  color = country
+)
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+
+---
+
+.right-wide[
+Geometric objects displayed on the plot
+
+```{r geom_demo, echo=FALSE, fig.width=6, fig.height=3.5,  out.width="650px"}
+minimal_theme <- theme_bw() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    panel.border = element_blank(),
+    axis.title = element_blank(),
+    plot.title = element_text(hjust = 0.5),
+    text = element_text(family = "Fira Mono"),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
+set.seed(4242)
+df_geom <- data_frame(y = rnorm(10), x = 1:10)
+g_geom <- list()
+g_geom$point <- ggplot(df_geom, aes(x, y)) + geom_point() + ggtitle("geom_point()")
+g_geom$line <- ggplot(df_geom, aes(x, y)) + geom_line() + ggtitle("geom_line()")
+g_geom$bar <- ggplot(df_geom, aes(x, y)) + geom_col() + ggtitle("geom_col()")
+g_geom$boxplot <- ggplot(df_geom, aes(y = y)) + geom_boxplot() + ggtitle("geom_boxplot()")
+g_geom$histogram <- ggplot(df_geom, aes(y)) + geom_histogram(binwidth = 1) + ggtitle("geom_histogram()")
+g_geom$density <- ggplot(df_geom, aes(y)) + geom_density(fill = "grey40", alpha = 0.25) + ggtitle("geom_density()") + xlim(-4, 4)
+g_geom <- map(g_geom, ~ . + minimal_theme)
+cowplot::plot_grid(plotlist = g_geom)
+```
+]
+
+---
+
+.right-wide[
+Here are the [some of the most widely used geoms](https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/)
+
+.small[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+<https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/>
+]
+]
+
+
+---
+
+.right-wide[
+Just start typing `geom_` in `RStudio` to see all the options
+
+<img src="chapter_tidy_files/figure-html/geom.gif" width="300px" style="float: center;">
+
+]
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# (Y)Our first plot!
+---
+
+.left-thin[
+```{r first-plot0a, eval=FALSE}
+gapminder_mean
+```
+]
+
+.right-wide[
+```{r first-plot0a-out, ref.label='first-plot0a', echo=FALSE}
+```
+]
+
+---
+
+.left-thin[
+```{r first-plot1a, eval=FALSE}
+gapminder_mean %>%
+  ggplot() #<<
+```
+]
+
+.right-wide[
+```{r first-plot1a-out, ref.label='first-plot1a', echo=FALSE, fig.height = 3.5, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r first-plot1b, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year, #<<
+      y = mean_pop) #<<
+```
+]
+
+.right-wide[
+```{r first-plot1b-out, ref.label='first-plot1b', echo=FALSE, fig.height = 3.5, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r first-plot1c, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop) +
+  geom_point() #<<
+```
+]
+
+.right-wide[
+```{r first-plot1c-out, ref.label='first-plot1c', echo=FALSE, fig.height = 3.5, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r first-plot1, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) + #<<
+  geom_point()
+```
+]
+
+.right-wide[
+```{r first-plot1-out, ref.label='first-plot1', echo=FALSE, fig.height = 3.5, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r first-plot2-fake, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  geom_point() +
+  geom_line() #<<
+```
+]
+
+.right-wide[
+```{r first-plot2-fake-out, ref.label='first-plot2-fake', fig.height = 3.5, echo=FALSE, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r first-plot2-line, eval=FALSE}
+gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  # geom_point() + #<<
+  geom_line()
+```
+]
+
+.right-wide[
+```{r first-plot2-line-out, ref.label='first-plot2-line', fig.height = 3.5, echo=FALSE, out.width="100%"}
+```
+]
+
+---
+
+.left-thin[
+```{r save-plot, eval=FALSE}
+g = gapminder_mean %>%
+  ggplot() +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  # geom_point() + #<<
+  geom_line()
+g
+# graphs can be saved as
+# objects!
+```
+]
+
+.right-wide[
+```{r save-plot-out, ref.label='save-plot', fig.height = 3.5, echo=FALSE, out.width="100%"}
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+
+```r
++ facet_wrap() 
++ facet_grid()
+```
+]
+---
+
+```{r geom_facet_setup, include=FALSE}
+g <- ggplot(gapminder_mean) +
+  aes(x = year,
+      y = mean_pop,
+      color = continent) +
+  geom_point() +
+  geom_line()
+```
+
+.right-wide[
+```{r geom_facet, echo=TRUE, out.width="90%", fig.height = 3.5, fig.width=6}
+g + facet_wrap(~ continent)
+```
+]
+
+---
+
+.right-wide[
+```{r geom_grid, echo=TRUE, out.width="90%", fig.height = 3.5, fig.width=6}
+g + facet_grid(~ continent)
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+
+```r
++ labs()
+```
+]
+---
+
+.right-wide[
+```{r labs-ex, echo=TRUE, out.width="90%", fig.height = 3.5, fig.width=6}
+g + labs(x = "Year", y = "Average Population", color = "Continent")
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Scales
+
+```r
++ scale_*_*()
+```
+]
+---
+
+.right-wide[ 
+`scale` + `_` + `<aes>` + `_` + `<type>` + `()`
+
+What parameter do you want to adjust? → `<aes>` <br>
+What type is the parameter? → `<type>`
+
+- I want to change my discrete x-axis<br>`scale_x_discrete()`
+- I want to change range of point sizes from continuous variable<br>`scale_size_continuous()`
+- I want to rescale y-axis as log10<br>`scale_y_log10()`
+- I want to use a different color palette<br>`scale_fill_discrete()`<br>`scale_color_manual()`
+]
+
+---
+
+.right-wide[
+```{r scale_ex1, out.width="90%", fig.height = 3.5, fig.width=6}
+g + scale_color_viridis_d()
+```
+]
+
+---
+
+.right-wide[
+```{r scale_ex2, out.width="90%", fig.height = 3.5, fig.width=6}
+g + scale_y_log10()
+```
+]
+
+---
+
+.right-wide[
+```{r scale_ex4, out.width="90%", fig.height = 3.5, fig.width=6}
+g + scale_x_continuous(breaks = seq(1950, 2020, 10))
+```
+]
+
+---
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+# gg is for Grammar of Graphics
+
+.left-thin[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Scales
+
+---
+
+layout:true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Delving Deeper into ggplot
+
+* Each graph is different and `ggplot2` provides a zillion options to customize your graph to perfection.
+
+--
+
+* Excellent cheatsheet on [project website](https://ggplot2.tidyverse.org).
+
+--
+
+* [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken from.
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+--
+
+***Boxplots:*** displays the distribution of a variable.
+
+--
+
+```{r, echo = F, out.width = "850px"}
+knitr::include_graphics("chapter_tidy_files/figure-html/boxplot_explanation.png")
+```
+
+---
+
+# Types of Plots
+
+***Histograms:*** counts how many obserations fall within a certain bin.
+
+***Boxplots:*** displays the distribution of a variable.
+
+***Scatter plots:*** shows the association between two variables.
+
+---
+
+class: inverse
+
+# Task 3: Visualising data
+
+`r countdown(minutes = 10, top = 0)`
+
+Using the `gapminder` data, create the following plots using `ggplot2`.
+
+1. A histogram of life expectancy in 2015. (*Hint: do you need to specify a `y` in `aes()` for a histogram?*) Once you've created the histogram, within the appropriate `geom_*` set: `binwidth` to 5, `boundary` to 45, `colour` to "white" and `fill` to "#d90502". What does each of these options do? <br> *Optional:* Using the previous graph, facet it by continent such that each continent's plot is a new row. (*Hint: check the help for `facet_grid`.*)
+
+1. A boxplot of average life expectancy per year by continent. Within the appropriate `geom_*` set: `colour` to "black" and `fill` to "#d90502". (*Hint: you need to group by both `continent` and `year`.*)
+
+1. A scatter plot of fertility rate (y-axis) with respect to infant mortality (x-axis) in 2015. Once you've created the scatter plot, within the appropriate `geom_*` set: `size` to 3, `alpha` to 0.5, `colour` to "#d90502". Add labels (`labs`) to the plot so that it is cleaner.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# Summarising
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div> 
+
+---
+
+# Summarising Data
+
+
+* In general, we can learn from the data by visualising it and/or computing summary statistics
+
+--
+
+* Let's now turn to summary statistics!
+
+--
+
+* In particular, let's look at two features: *central tendency* and *spread*.
+
+---
+
+# Central Tendency
+
+
+.pull-left[
+`mean(x)`: the average of all values in `x`.
+$$\bar{x} = \frac{1}{N}\sum_{i=1}^N x_i$$
+
+```{r}
+x <- c(1,2,2,2,2,100)
+mean(x)
+mean(x) == sum(x) / length(x)
+```
+]
+
+--
+
+.pull-right[
+`median`: the value $x_j$ below and above which 50% of the values in `x` lie. $m$ is the median if
+    $$\Pr(X \leq m) \geq 0.5 \text{ and } \Pr(X \geq m) \geq 0.5$$
+    
+The median is robust against *outliers*.
+
+```{r}
+median(x)
+```
+]
+
+---
+
+# Spread
+
+.pull-left[
+Another interesting feature is how much a variable is *spread out* about it's center (the mean in this case).
+
+The *variance* is such a measure.
+    $$Var(X) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})^2$$
+    
+Consider two `normal distributions` with equal mean at `0`:
+]
+
+--
+
+.pull-right[
+```{r,echo = FALSE,fig.height=4,message = FALSE,warning = FALSE}
+ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1), aes(color = "1"), size = 2) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), aes(color = "4"), size = 2) +
+  ylab(NULL) +
+  scale_y_continuous(breaks = NULL) +
+  scale_color_manual("Variance:", values = c("#d90502","#DE9854")) +
+  theme_bw() +
+  theme(legend.position = c(0.02,0.98),
+        legend.justification = c(0,1),
+        text = element_text(size=20))
+```
+
+Compute with:
+```{r,eval = FALSE}
+var(x)
+```
+]
+---
+
+# Tabulating Data
+
+`table(x)` is a useful function that counts the occurence of each unique value in `x`:
+```{r}
+table(gapminder$continent)
+```
+
+--
+
+The same can be achieved using the `count` function (from `dplyr`)
+```{r}
+gapminder %>% count(continent)
+```
+
+---
+
+# Tabulating Data
+
+
+Given two variables, `table` produces a contingency table:
+```{r}
+gapminder_new <- gapminder %>%
+  filter(year == 2015) %>%
+  mutate(fertility_above_2 = (fertility > 2.1)) # dummy variable for fertility rate above replacement rate
+```
+
+.pull-left[
+```{r}
+table(gapminder_new$fertility_above_2)
+```
+]
+
+--
+
+.pull-right[
+```{r}
+table(gapminder_new$fertility_above_2,gapminder_new$continent)
+```
+]
+
+--
+
+With `prop.table`, we can get proportions:
+```{r,eval=FALSE}
+# proportions by row
+prop.table(table(gapminder_new$fertility_above_2,gapminder_new$continent), margin = 1)
+# proportions by column
+prop.table(table(gapminder_new$fertility_above_2,gapminder_new$continent), margin = 2) 
+```
+
+* ⚠️ To obtain `table`s or `crosstable`s with `NA`s, use the `useNA = "always"` or `useNA = "ifany"`
+
+---
+
+# Tabulating Data
+
+Again the `count` function can get you there as well:
+
+```{r}
+gapminder_new %>%
+  count(continent, fertility_above_2)
+```
+
+Note that `count` will display `NA`s only if there are some.
+
+---
+
+# How are x and y related? Covariance and Correlation
+
+
+```{r x-y-corr,echo=FALSE,message=FALSE,warning=FALSE,fig.align='center',fig.height = 4,fig.width=8}
+plot(fertility ~ infant_mortality,
+    data = gapminder_new,
+    xlab   = "Infant mortality",
+    ylab   = "Fertility rate",
+    main   = "Relationship between fertility and infant mortality in 2015",
+    col = "#d90502")
+```
+
+Two main statistics to characterise the relationship between $x$ and $y$:
+1. Covariance
+2. Correlation
+
+---
+
+# Covariance
+
+* The covariance is a measure of __joint variability__ of two variables.
+    $$Cov(x,y) = \frac{1}{N} \sum_{i=1}^N(x_i-\bar{x})(y_i-\bar{y})$$
+
+--
+
+* The `cov` function computes the covariance:
+
+```{r}
+cov(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+--
+
+* Difficult to interpret because sensitive to the variables' dispersions from the mean
+
+---
+
+# Correlation
+
+* The correlation is a measure of the strength of the __linear association__ between two variables.
+    $$Cor(x,y) = \frac{Cov(x,y)}{\sqrt{Var(x)}\sqrt{Var(y)}}$$
+
+--
+
+* The `cor` function computes the correlation:
+
+```{r}
+cor(gapminder_new$fertility,gapminder_new$infant_mortality, use = "complete.obs")
+```
+
+---
+
+# Correlation
+
+* **Correlation is always between -1 and 1!**
+
+--
+
+```{r, echo = F, out.width = "100%"}
+knitr::include_graphics("chapter_tidy_files/figure-html/correlation.svg")
+```
+
+.footnote[
+*Source: [mathisfun](https://www.mathsisfun.com/data/correlation.html)*
+]
+
+---
+
+# Correlation
+
+* [App](https://gustavek.shinyapps.io/corr_continuous/)
+
+---
+
+class: inverse
+
+# Task 4: Summarising data
+
+`r countdown(minutes = 10, top = 0)`
+
+1. Compute the mean of GDP in 2011 and assign to object `mean`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
+
+1. Compute the median of GDP in 2011 and assign to object `median`. Again, you should exclude missing values. Is it greater or smaller than the average?
+
+1. Create a density plot of GDP in 2011 using `geom_density`. A density plot is a way of representing the distribution of a numeric variable. Add the following code to your plot to show the median and mean as vertical lines. What do you observe?
+`geom_vline(xintercept = as.numeric(mean), colour = "red") +` <br>
+    `geom_vline(xintercept = as.numeric(median), colour = "orange")`
+
+1. Compute the correlation between fertility and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
+
+In your free time, you can do this tutorial:
+```{r, echo = TRUE, eval=FALSE}
+library(ScPoApps) # this may take a while to install
+runTutorial('chapter2')
+```
+
+
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# `joins`: Merging Datasets
+
+### The remainder of those slides come from [Grant McDermott's](https://github.com/uo-ec607/lectures/) great course
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div>
+
+
+---
+name: joins
+
+# Joins
+
+One of the mainstays of the dplyr package is merging data with the family [join operations](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html).
+- `inner_join(df1, df2)`
+- `left_join(df1, df2)`
+- `right_join(df1, df2)`
+- `full_join(df1, df2)`
+- `semi_join(df1, df2)`
+- `anti_join(df1, df2)`
+
+(You find find it helpful to to see visual depictions of the different join operations [here](https://r4ds.had.co.nz/relational-data.html).)
+
+--
+
+For the simple examples that I'm going to show here, we'll need some data sets that come bundled with the [**nycflights13**](http://github.com/hadley/nycflights13) package. 
+- Load it now and then inspect these data frames in your own console.
+
+```{r flights, echo = F}
+library(nycflights13)
+```
+```{r, eval = F}
+library(nycflights13)
+flights 
+planes
+```
+
+---
+
+# Joins (cont.)
+
+Let's perform a [left join](https://stat545.com/bit001_dplyr-cheatsheet.html#left_joinsuperheroes-publishers) on the flights and planes datasets. 
+- *Note*: I'm going subset columns after the join, but only to keep text on the slide.
+
+--
+
+```{r join1}
+left_join(flights, planes) %>%
+  select(year, month, day, dep_time, arr_time, carrier, flight, tailnum, type, model)
+```
+
+---
+
+# Joins (cont.)
+
+(*continued from previous slide*)
+
+Note that dplyr made a reasonable guess about which columns to join on (i.e. columns that share the same name). It also told us its choices: 
+
+```
+*## Joining, by = c("year", "tailnum")
+```
+
+However, there's an obvious problem here: the variable "year" does not have a consistent meaning across our joining datasets!
+- In one it refers to the *year of flight*, in the other it refers to *year of construction*.
+
+--
+
+Luckily, there's an easy way to avoid this problem. 
+- See if you can figure it out before turning to the next slide.
+- Try `?dplyr::join`.
+
+---
+
+# Joins (cont.)
+
+(*continued from previous slide*)
+
+You just need to be more explicit in your join call by using the `by = ` argument.
+- You can also rename any ambiguous columns to avoid confusion. 
+```{r join2}
+left_join(
+  flights,
+  planes %>% rename(year_built = year), ## Not necessary w/ below line, but helpful
+  by = "tailnum" ## Be specific about the joining column
+  ) %>%
+  select(year, month, day, dep_time, arr_time, carrier, flight, tailnum, year_built, type, model) %>%
+  head(3) ## Just to save vertical space on the slide
+```
+
+---
+
+
+# Joins (cont.)
+
+(*continued from previous slide*)
+
+Last thing I'll mention for now; note what happens if we again specify the join column... but don't rename the ambiguous "year" column in at least one of the given data frames.
+```{r join3}
+left_join(
+  flights,
+  planes, ## Not renaming "year" to "year_built" this time
+  by = "tailnum"
+  ) %>%
+  select(contains("year"), month, day, dep_time, arr_time, carrier, flight, tailnum, type, model) %>%
+  head(3)
+```
+
+--
+
+Make sure you know what "year.x" and "year.y" are. Again, it pays to be specific.
+
+---
+
+layout: false
+class: title-slide-section-red, middle
+
+# `tidyr`: Reshaping Datasets
+
+### By [Grant McDermott](https://github.com/uo-ec607/lectures/).
+
+---
+
+layout: true
+
+<div class="my-footer"><img src="../img/logo/ScPo-shield.png" style="height: 60px;"/></div>
+
+
+
+---
+# Key tidyr verbs
+
+1. `pivot_longer`: Pivot wide data into long format (i.e. "melt").<sup>1</sup> 
+
+2. `pivot_wider`: Pivot long data into wide format (i.e. "cast").<sup>2</sup> 
+
+3. `separate`: Separate (i.e. split) one column into multiple columns.
+
+4. `unite`: Unite (i.e. combine) multiple columns into one.
+
+.footnote[
+<sup>1</sup> Updated version of `tidyr::gather`.
+
+<sup>2</sup> Updated version of `tidyr::spread`.
+]  
+
+--
+
+</br>
+
+Let's practice these verbs together in class.
+- Side question: Which of `pivot_longer` vs `pivot_wider` produces "tidy" data?
+  
+---
+
+name: pivot_longer
+
+# 1) tidyr::pivot_longer
+
+```{r pivot_longer1}
+stocks = data.frame( ## Could use "tibble" instead of "data.frame" if you prefer
+  time = as.Date('2009-01-01') + 0:1,
+  X = rnorm(2, 0, 1),
+  Y = rnorm(2, 0, 2),
+  Z = rnorm(2, 0, 4)
+  )
+stocks
+stocks %>% pivot_longer(-time, names_to="stock", values_to="price")
+```
+
+---
+
+# 1) tidyr::pivot_longer *cont.*
+
+Let's quickly save the "tidy" (i.e. long) stocks data frame for use on the next slide. 
+
+```{r pivot_longer2}
+## Write out the argument names this time: i.e. "names_to=" and "values_to="
+tidy_stocks = 
+  stocks %>% 
+  pivot_longer(-time, names_to="stock", values_to="price")
+```
+
+
+---
+name: pivot_wider
+
+# 2) tidyr::pivot_wider
+
+
+```{r pivot_wider1}
+tidy_stocks %>% pivot_wider(names_from=stock, values_from=price)
+tidy_stocks %>% pivot_wider(names_from=time, values_from=price)
+```
+
+--
+
+</br>
+Note that the second example, which has combined different pivoting arguments , has effectively transposed the data.
+
+
+
+---
+
+# Aside: Remembering the pivot_* syntax 
+
+There's a long-running joke about no-one being able to remember Stata's "reshape" command. ([Exhibit A](https://twitter.com/helleringer143/status/1117234887902285836).)
+
+It's easy to see this happening with the `pivot_*` functions too. However, I find that I never forget the commands as long as I remember the argument order is *"names"* then *"values"*.
+
+---
+name: separate
+
+# 3) tidyr::separate
+
+```{r sep1}
+economists = data.frame(name = c("Adam.Smith", "Paul.Samuelson", "Milton.Friedman"))
+economists
+economists %>% separate(name, c("first_name", "last_name")) 
+```
+
+--
+
+</br>
+
+This command is pretty smart. But to avoid ambiguity, you can also specify the separation character with `separate(..., sep=".")`.
+
+---
+
+# 3) tidyr::separate *cont.*
+
+A related function is `separate_rows`, for splitting up cells that contain multiple fields or observations (a frustratingly common occurence with survey data).
+
+```{r sep2}
+jobs = data.frame(
+  name = c("Jack", "Jill"),
+  occupation = c("Homemaker", "Philosopher, Philanthropist, Troublemaker") 
+  ) 
+jobs
+## Now split out Jill's various occupations into different rows
+jobs %>% separate_rows(occupation)
+```
+
+---
+name: unite
+
+# 4) tidyr::unite
+
+```{r unite1}
+gdp = data.frame(
+  yr = rep(2016, times = 4),
+  mnth = rep(1, times = 4),
+  dy = 1:4,
+  gdp = rnorm(4, mean = 100, sd = 2)
+  )
+gdp 
+## Combine "yr", "mnth", and "dy" into one "date" column
+gdp %>% unite(date, c("yr", "mnth", "dy"), sep = "-")
+```
+
+---
+
+# 4) tidyr::unite *cont.*
+
+Note that `unite` will automatically create a character variable. You can see this better if we convert it to a tibble. 
+```{r unite2}
+gdp_u = gdp %>% unite(date, c("yr", "mnth", "dy"), sep = "-") %>% as_tibble()
+gdp_u
+```
+
+--
+
+If you want to convert it to something else (e.g. date or numeric) then you will need to modify it using `mutate`. See the next slide for an example, using the [lubridate](https://lubridate.tidyverse.org/) package's super helpful date conversion functions.
+
+---
+
+# 4) tidyr::unite *cont.*
+
+*(continued from previous slide)*
+
+```{r unite3, message=F}
+library(lubridate)
+gdp_u %>% mutate(date = ymd(date))
+```
+
+---
+
+# Other tidyr goodies
+
+Use `crossing` to get the full combination of a group of variables.<sup>1</sup>
+
+```{r cross1}
+crossing(side=c("left", "right"), height=c("top", "bottom"))
+```
+
+.footnote[
+<sup>1</sup> Base R alternative: `expand.grid`.
+]  
+
+--
+
+See `?expand` and `?complete` for more specialised functions that allow you to fill in (implicit) missing data or variable combinations in existing data frames.
+- You'll encounter this during your next assignment.
+
+---
+class: inverse, center, middle
+name: summary
+
+# Summary
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>
+
+---
+
+# Key verbs
+
+### dplyr
+1. `filter`
+2. `arrange`
+3. `select`
+4. `mutate`
+5. `summarise`
+
+### tidyr
+1. `pivot_longer`
+2. `pivot_wider`
+3. `separate`
+4. `unite`
+
+--
+
+Other useful items include: pipes (`%>%`), grouping (`group_by`), joining functions (`left_join`, `inner_join`, etc.).
+---
+
+class: title-slide-final, middle
+background-image: url(../img/logo/ScPo-econ.png)
+background-size: 250px
+background-position: 9% 19%
+
+# Next Week: `data.table`
+
+
+
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="https://floswald.github.io/ScPoProgramming">.ScPored[<i class="fa fa-link fa-fw"></i>] | Course Website |
+| <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
+| <a href="http://github.com/floswald">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @floswald                       |
+
