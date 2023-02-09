@@ -223,11 +223,17 @@ blockquote {
 .title-slide-section-red {
   background-color: #d90502;
   padding-left: 100px;  /* delete this for 4:3 aspect ratio */
+  link-color
 }
 
 /* section divider red H1 fonts */
 .title-slide-section-red h1, .title-slide-section-red h2, .title-slide-section-red h3, .title-slide-section-red p {
   color: #fff;
+}
+
+/* section divider red H1 fonts */
+.title-slide-section-red a {
+  color: #515151;
 }
 
 /* section divider grey */
