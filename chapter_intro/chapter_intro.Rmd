@@ -41,7 +41,6 @@ library(tidyverse)
 library(pander)
 library(ggthemes)
 library(gapminder)
-library(emo)
 library(countdown)
 library(xaringanExtra)
 
@@ -152,7 +151,7 @@ layout: true
 
 .footnote[
 [1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).  
-<span style="visibility:hidden">[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`.</span>
+<span style="visibility:hidden">[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! .</span>
 ]
 
 --
@@ -173,7 +172,7 @@ layout: true
 
 .footnote[
 <span style="visibility:hidden">[1]: This list has been inspired by [Ed Rubin's](https://github.com/edrubin/EC421S19).</span>  
-[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! `r emo::ji("muscle")`
+[2]: Learning `R` definitely requires time and effort but it's worth it, trust me! 
 ]
 
 <!-- --- -->
@@ -255,7 +254,7 @@ head(gapminder,n = 4)
 
 # In Practice: Data Wrangling
 
-* There are always several ways to achieve a goal. (As in life `r emo::ji("smile")`)
+* There are always several ways to achieve a goal. (As in life 😁)
 
 * Here we will only focus on the `dplyr` way:
 
@@ -304,7 +303,7 @@ ggplot(data = gapminder_dplyr,
 
 ---
 
-# Animated Plotting `r emo::ji("ok_hand")` <sup>1</sup>
+# Animated Plotting 👌 <sup>1</sup>
 
 ```{r, example: gganimate, include = F, cache = T}
 # The package for animating ggplot2
@@ -683,7 +682,7 @@ layout: true
 
 --
 
-- `r emo::ji("warning")` This is *not* a course about `R`.
+- ⚠️ This is *not* a course about `R`.
 
 --
 
@@ -697,11 +696,11 @@ layout: true
 
 --
 
-1. There will be _no_ final exam `r emo::ji("sweat_smile")`
+1. There will be _no_ final exam 😅
 
 ---
 
-# Syllabus `r emo::ji("crossed_fingers")`
+# Syllabus 🤞
 
 .pull-left[
 Lecture 1 (today): ***Introduction***
@@ -778,7 +777,7 @@ Lecture 12: ***Recap***
 
 --
 
-(BTW you should apply these principles outside of the classroom as well ***#lifeadvice*** `r emo::ji("wink")`)
+(BTW you should apply these principles outside of the classroom as well ***#lifeadvice*** 😉)
 
 --
 
@@ -822,7 +821,7 @@ Don't hesitate to ***reach out*** to your friends, family, any professor (includ
 
 ---
 
-# Last But Not Least: Class Rep `r emo::ji("man_raising_hand")` `r emo::ji("woman_raising_hand")`
+# Last But Not Least: Class Rep 
 
 .center[![:scale 60%](chapter_intro_files/figure-html/notme.gif)]
 
