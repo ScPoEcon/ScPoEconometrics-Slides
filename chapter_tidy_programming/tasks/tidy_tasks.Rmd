@@ -161,26 +161,26 @@ gapminder %>%
 1\. Compute the mean of GDP in 2011 and assign to object `mean`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
 
 ```{r}
-mean <- gapminder %>%
+mean_GDP <- gapminder %>%
     filter(year == 2011) %>%
     summarise(mean(gdp, na.rm = T))
-mean
+mean_GDP
 ```
 
 2\. Compute the median of GDP in 2011 and assign to object `median`. Again, you should exclude missing values. Is it greater or smaller than the average?
 
 ```{r}
-median <- gapminder %>%
+median_GDP <- gapminder %>%
     filter(year == 2011) %>%
     summarise(median(gdp, na.rm = T))
-median
+median_GDP
 ```
 
 **The median is much smaller than the average.**
 
 3\. Create a density plot of GDP in 2011 using `geom_density`. A density plot is a way of representing the distribution of a numeric variable. Add the following code to your plot to show the median and mean as vertical lines. What do you observe?
-`geom_vline(xintercept = as.numeric(mean), colour = "red") + <br>
-    geom_vline(xintercept = as.numeric(median), colour = "orange")`
+`geom_vline(xintercept = as.numeric(mean_GDP), colour = "red") + <br>
+    geom_vline(xintercept = as.numeric(median_GDP), colour = "orange")`
     
 ```{r}
 gdp_density <- gapminder %>%
@@ -188,8 +188,8 @@ gdp_density <- gapminder %>%
     ggplot() +
     aes(x = gdp) +
     geom_density() +
-    geom_vline(xintercept = as.numeric(mean), colour = "red") +
-    geom_vline(xintercept = as.numeric(median), colour = "orange")
+    geom_vline(xintercept = as.numeric(mean_GDP), colour = "red") +
+    geom_vline(xintercept = as.numeric(median_GDP), colour = "orange")
 gdp_density
 ```
 

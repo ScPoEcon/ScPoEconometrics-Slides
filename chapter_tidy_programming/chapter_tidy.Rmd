@@ -912,7 +912,7 @@ class: inverse
 Load the data by running the following code:
 
 ```{r, echo = T, eval = F}
-library(dslabs)
+library(dslabs)  # need to install.packages("dslabs") first? 
 data(polls_us_election_2016)
 ```
 
@@ -1489,7 +1489,7 @@ layout:true
 
 --
 
-* [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken from.
+* [Garrick Aden-Buie](https://www.garrickadenbuie.com/)'s wonderful [Gentle Guide to the Grammar of Graphics with `ggplot2`](https://pkg.garrickadenbuie.com/gentle-ggplot2/#1) from which the previous slides were taken.
 
 ---
 
@@ -1773,13 +1773,13 @@ class: inverse
 
 `r countdown(minutes = 10, top = 0)`
 
-1. Compute the mean of GDP in 2011 and assign to object `mean`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
+1. Compute the mean of GDP in 2011 and assign to object `mean_GDP`. You should exclude missing values. (*Hint: read the help for `mean` to remove `NA`s*).
 
-1. Compute the median of GDP in 2011 and assign to object `median`. Again, you should exclude missing values. Is it greater or smaller than the average?
+1. Compute the median of GDP in 2011 and assign to object `median_GDP`. Again, you should exclude missing values. Is it greater or smaller than the average?
 
 1. Create a density plot of GDP in 2011 using `geom_density`. A density plot is a way of representing the distribution of a numeric variable. Add the following code to your plot to show the median and mean as vertical lines. What do you observe?
-`geom_vline(xintercept = as.numeric(mean), colour = "red") +` <br>
-    `geom_vline(xintercept = as.numeric(median), colour = "orange")`
+`geom_vline(xintercept = mean_GDP, colour = "red") +` <br>
+    `geom_vline(xintercept = median_GDP, colour = "orange")`
 
 1. Compute the correlation between fertility and infant mortality in 2015. To drop `NA`s in either variable set the argument `use` to "pairwise.complete.obs" in your `cor()` function. Is this correlation consistent with the graph you produced in Task 3?
 
