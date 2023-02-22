@@ -71,7 +71,7 @@ countdown(
   
 # Working With Data
 
-* Econometrics is about `data`.
+* Economists work with `data`.
 
 ```{r, echo = F, out.width = "400px"}
 knitr::include_graphics("chapter_tidy_files/figure-html/data_science_pipeline.png")
@@ -101,7 +101,7 @@ layout: true
 
 * [`dplyr`](https://dplyr.tidyverse.org) is part of the [`tidyverse`](https://www.tidyverse.org) package family.
 
-* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast and highly recommended for **big** data. Look [here](https://raw.githack.com/ScPoEcon/Advanced-Metrics-slides/master/lectures/03-datatable/03-datatable.html#1) for an intro!
+* [`data.table`](https://github.com/Rdatatable/data.table/wiki) is an alternative. Very fast and highly recommended for **big** data. We will dedicate an entire  [lecture](https://raw.githack.com/floswald/lectures/master/05-datatable/05-datatable.html#1)  to it! 💪
 
 * Both have pros and cons. We'll start you off with `dplyr`.
 
@@ -109,7 +109,7 @@ layout: true
 
 # `dplyr` Overview
 
-* You are ***highly encouraged*** to read through [Hadley Wickham's chapter](https://r4ds.had.co.nz/transform.html). It's clear and concise.
+* You are ***highly encouraged*** to read through [Hadley Wickham's chapter on data transforms](https://r4ds.had.co.nz/transform.html). It's clear and concise.
 
 --
 
@@ -133,6 +133,20 @@ $$\text{verb}(\underbrace{\text{data.frame}}_{\text{1st argument}}, \underbrace{
 * Alternatively you can (should) use the `pipe` operator `%>%` (part of `magrittr` package):
 
 $$\underbrace{\text{data.frame}}_{\text{1st argument}} \underbrace{\text{ %>% }}_{\text{"pipe" operator}} \text{verb}(\underbrace{\text{what to do}}_\text{2nd argument})$$
+
+---
+background-image: url("https://media.giphy.com/media/VzeoEQydDR2c93O0HG/giphy.gif")
+background-position: 60% 50%
+
+<br>
+<br>
+<br>
+## THE PIPE in `R`?! 
+## `%>%` or `|>`
+<br>
+<br>
+## YES!! THE PIPE!!! 
+## LIKE OUR UNIX PIPE!! `|`
 
 ---
 
