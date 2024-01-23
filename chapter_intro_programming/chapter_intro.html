@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 ### Florian Oswald
 ]
 .date[
-### Sciences Po Paris </br> 2023-02-09
+### Sciences Po Paris </br> 2024-01-23
 ]
 
 ---
@@ -339,7 +339,7 @@ class: inverse
 
 # Task 1
 
-<div class="countdown" id="timer_c5d47d13" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown" id="timer_f263776a" data-update-every="1" tabindex="0" style="top:0;right:0;">
 <div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
@@ -491,7 +491,7 @@ example_data
 class: inverse
 # Task 2
 
-<div class="countdown" id="timer_a0bd4014" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown" id="timer_75e71ef1" data-update-every="1" tabindex="0" style="top:0;right:0;">
 <div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
@@ -532,7 +532,7 @@ str(brexit) # `str` describes structure of any R object
 
 ```
 ## 'data.frame':	127 obs. of  10 variables:
-##  $ X         : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ rownames  : int  1 2 3 4 5 6 7 8 9 10 ...
 ##  $ startdate : chr  "2016-06-23" "2016-06-22" "2016-06-20" "2016-06-20" ...
 ##  $ enddate   : chr  "2016-06-23" "2016-06-22" "2016-06-22" "2016-06-22" ...
 ##  $ pollster  : chr  "YouGov" "Populus" "YouGov" "Ipsos MORI" ...
@@ -541,7 +541,7 @@ str(brexit) # `str` describes structure of any R object
 ##  $ remain    : num  0.52 0.55 0.51 0.49 0.44 0.54 0.48 0.41 0.45 0.42 ...
 ##  $ leave     : num  0.48 0.45 0.49 0.46 0.45 0.46 0.42 0.43 0.44 0.44 ...
 ##  $ undecided : num  0 0 0 0.01 0.09 0 0.11 0.16 0.11 0.13 ...
-##  $ spread    : num  0.04 0.1 0.02 0.03 -0.01 0.08 0.06 -0.02 0.01 -0.02 ...
+##  $ spread    : num  0.04 0.1 0.02 0.03 -0.01 ...
 ```
 
 --
@@ -552,7 +552,7 @@ names(brexit) # column names
 ```
 
 ```
-##  [1] "X"          "startdate"  "enddate"    "pollster"   "poll_type" 
+##  [1] "rownames"   "startdate"  "enddate"    "pollster"   "poll_type" 
 ##  [6] "samplesize" "remain"     "leave"      "undecided"  "spread"
 ```
 
@@ -680,7 +680,7 @@ class: inverse
 
 # Task 3
 
-<div class="countdown" id="timer_de389522" data-update-every="1" tabindex="0" style="top:0;right:0;">
+<div class="countdown" id="timer_d6eb272e" data-update-every="1" tabindex="0" style="top:0;right:0;">
 <div class="countdown-controls"><button class="countdown-bump-down">&minus;</button><button class="countdown-bump-up">&plus;</button></div>
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
@@ -690,9 +690,9 @@ class: inverse
 
 1. Remember that the colon operator `1:10` is just short for *construct a sequence from `1` to `10`* (i.e. 1, 2, 3, etc). Create a new object `brexit_2` containing the rows 10 to 25 of `brexit`.
 
-1. Create a new object `brexit_3` which only contains the columns `state` and `total`. (Recall that `c` creates vectors.)
+1. Create a new object `brexit_3` which only contains the columns `poll_type` and `spread`. (Recall that `c` creates vectors.)
 
-1. Create a `total_percap` variable equal to the number of brexit per 10,000 inhabitants by running the following code.
+1. Create a `remainers` variable equal to the number of total remain-voters in each poll by running the following code.
     
     ```r
     brexit$remainers = brexit$remain * brexit$samplesize
@@ -707,7 +707,7 @@ background-image: url(../img/logo/ScPo-econ.png)
 background-size: 250px
 background-position: 9% 19%
 
-# SEE YOU NEXT WEEK!
+# The END!
 
 
 

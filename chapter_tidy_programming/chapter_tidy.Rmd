@@ -9,7 +9,7 @@ output:
     lib_dir: libs
     css: [default, "../css/scpo.css", "../css/scpo-fonts.css"]
     nature:
-      beforeInit: ["../js/ru_xaringan.js"]
+      beforeInit: ["./ru_xaringan.js"]
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
@@ -2148,3 +2148,7 @@ background-position: 9% 19%
 | <a href="http://twitter.com/ScPoEcon">.ScPored[<i class="fa fa-twitter fa-fw"></i>]                          | @ScPoEcon                         |
 | <a href="http://github.com/floswald">.ScPored[<i class="fa fa-github fa-fw"></i>]                          | @floswald                       |
 
+```{r gen_pdf, include = FALSE, cache = FALSE, eval = FALSE}
+infile = list.files(pattern = '.html')
+pagedown::chrome_print(input = infile, timeout = 100)
+```
