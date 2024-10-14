@@ -1820,7 +1820,7 @@ One of the mainstays of the dplyr package is merging data with the family [join 
 - `semi_join(df1, df2)`
 - `anti_join(df1, df2)`
 
-(You find find it helpful to to see visual depictions of the different join operations [here](https://r4ds.had.co.nz/relational-data.html).)
+You will find it helpful to to see visual depictions of the different join operations [here](https://r4ds.hadley.nz/joins.html). You should read as much of that chapter as possible.
 
 --
 
